@@ -364,3 +364,12 @@ document.querySelectorAll('.main-nav a[href]').forEach(link => {
 // Footer year
 const currentYear = String(new Date().getFullYear());
 document.querySelectorAll('[data-current-year]').forEach(el => { el.textContent = currentYear; });
+
+// Clean legacy index.html URLs without reloading the page.
+(() => {
+  const { pathname, search, hash } = window.location;
+  if (/\/index\.html$/i.test(pathname)) {
+    const cleanPath = pathname.replace(/index\.html$/i, "");
+    window.history.replaceState(null, "", `${cleanPath}${search}${hash}`);
+  }
+})();

@@ -1,22 +1,11 @@
-# BG Studio 3D v1.0 — Yayın Adayı
+# BG Studio 3D v1.3 Clean URL Patch
 
-Bu paket, `3d.bgstudio.com.tr` için ilk tam sürüm adayıdır.
+Bu patch dahili bağlantılardaki `index.html` parçalarını temiz URL yapısına çevirir.
 
-## v1.0 ile eklenenler
-- Ayrı **Kişiye Özel Üretim** landing page (`/ozel-uretim/`).
-- Ayrı **Kuşadası 3D Baskı** yerel SEO landing page (`/kusadasi-3d-baski/`).
-- Ana menüde Özel Üretim artık doğrudan forma değil, açıklayıcı hizmet sayfasına gider.
-- Tüm footer'lara Özel Üretim ve Kuşadası 3D Baskı iç bağlantıları eklendi.
-- Ana sayfadaki yerel SEO bölümü yeni Kuşadası sayfasına bağlandı.
-- Ana sayfaya `WebSite + SearchAction` structured data eklendi.
-- Yeni hizmet sayfalarına `Service` ve `FAQPage` structured data eklendi.
-- Sitemap otomatik olarak yeniden oluşturuldu.
-- Sealight Resort NFC/QR referansı içermez; çikolata şelalesi spiral aksam işi yalnızca özel 3D üretim örneği olarak yer alır.
+Örnek:
+- `/urunler/index.html` → `/urunler/`
+- `/urunler/dekoratif-kus-obje/index.html` → `/urunler/dekoratif-kus-obje/`
 
-## Durum
-- Statik site, GitHub Pages uyumlu.
-- Custom domain dosyası hazır: `3d.bgstudio.com.tr`.
-- Veritabanı veya checkout yok; satış/teklif akışı WhatsApp üzerinden.
-- PC önizleme için `ONIZLE.bat` kullanılabilir.
+Ayrıca eski `index.html` adresiyle açılan sayfalarda tarayıcı adresini sayfa yenilemeden temizleyen küçük bir uyumluluk kodu eklenmiştir.
 
-Yayına geçmeden önce `YAYIN-KONTROL.md` ve `DEPLOY.md` dosyalarını kontrol et.
+CNAME dosyası bu patch içinde yoktur; mevcut repodaki CNAME korunmalıdır.
