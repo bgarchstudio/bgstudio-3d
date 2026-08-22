@@ -1,15 +1,17 @@
-# BG Studio 3D v2.1.1 — Panel Logo Patch
+# BG Studio 3D v2.2 PRO Patch
 
-Bu patch yalnızca yerel Ürün Yöneticisi arayüzünü günceller.
+Bu patch yalnızca yerel Ürün Yöneticisi altyapısını geliştirir.
 
-- Sol üstteki metin tabanlı `BG` rozeti kaldırıldı.
-- Yerine BG Studio 3D metalik monogram logosu eklendi.
-- Panel sekmesine BG Studio 3D favicon'u eklendi.
-- Panel işlevleri, ürün verileri, SEO, canlı site ve CNAME ayarları değişmez.
+- Ürün kopyalama
+- Arşiv / tekrar yayına alma
+- Güvenli kalıcı silme
+- Sürükle-bırak katalog sıralaması
+- Hızlı öne çıkan yıldızı
+- Liste filtreleri
+- Kaydetmeden ürün önizleme
+- Eksik alan kalite kontrolü
+- SEO sayaçları
+- Ana + afiş + çoklu galeri görselleri
+- Galeri görsellerini ürün detay sayfasına otomatik bağlama
 
-## Kurulum
-1. ZIP'i çıkarın.
-2. İçindeki dosya/klasörleri GitHub Desktop'taki `bgstudio-3d` repo klasörünün üzerine kopyalayın.
-3. GitHub Desktop: `Update product manager branding`
-4. Commit to main → Push origin.
-5. Panel açıksa kapatıp yeniden başlatın ve Ctrl+F5 yapın.
+CNAME, DNS, Analytics ve GitHub Pages ayarlarına dokunmaz.
