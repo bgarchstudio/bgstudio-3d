@@ -138,6 +138,7 @@ button{font-family:inherit}
 .has-brand-icon::before,.footer-social::before{content:"";display:inline-block;width:1.05em;height:1.05em;flex:0 0 auto;background:currentColor;mask-repeat:no-repeat;mask-position:center;mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:contain}
 .icon-whatsapp::before{mask-image:url("../icons/whatsapp.svg");-webkit-mask-image:url("../icons/whatsapp.svg")}
 .icon-instagram::before{mask-image:url("../icons/instagram.svg");-webkit-mask-image:url("../icons/instagram.svg")}
+.icon-facebook::before{mask-image:url("../icons/facebook.svg");-webkit-mask-image:url("../icons/facebook.svg")}
 .icon-architecture::before{mask-image:url("../icons/building.svg");-webkit-mask-image:url("../icons/building.svg")}
 
 .nav-cta.has-brand-icon{gap:8px;padding-inline:16px}.nav-cta.has-brand-icon::before{width:1.08em;height:1.08em}

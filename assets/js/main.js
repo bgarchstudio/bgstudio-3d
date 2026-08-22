@@ -29,6 +29,12 @@ document.addEventListener('click', (event) => {
       link_text: (link.textContent || '').trim().slice(0, 100),
       page_location: canonicalUrl
     });
+  } else if (href.includes('facebook.com/bgstudio.3dtr')) {
+    trackEvent('social_click', {
+      network: 'facebook',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    });
   }
 });
 
@@ -380,6 +386,7 @@ document.querySelectorAll('[data-current-year]').forEach(el => { el.textContent 
 // v1.4 — Brand-family icon treatment and Architecture-inspired WhatsApp quick panel.
 document.querySelectorAll('a[href*="wa.me/"]').forEach(link => link.classList.add('has-brand-icon', 'icon-whatsapp'));
 document.querySelectorAll('a[href*="instagram.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-instagram'));
+document.querySelectorAll('a[href*="facebook.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-facebook'));
 document.querySelectorAll('a[href^="https://bgstudio.com.tr"]').forEach(link => {
   if (!link.closest('.footer-socials')) link.classList.add('has-brand-icon', 'icon-architecture');
 });

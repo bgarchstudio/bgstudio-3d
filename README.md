@@ -36,7 +36,14 @@ Yayına geçmeden önce `YAYIN-KONTROL.md` ve `DEPLOY.md` dosyalarını kontrol 
 
 ## v1.4 Brand Family UI
 - Mimarlık sitesinden esinlenen koyu premium footer ve telif dili.
-- Instagram, WhatsApp ve Architecture bağlantılarında marka ikonları.
+- Instagram, Facebook, WhatsApp ve Architecture bağlantılarında marka ikonları.
 - WhatsApp CTA’larında ikon standardı.
 - Masaüstü hızlı WhatsApp seçenek paneli.
 - CNAME, GA4, clean URL ve SEO yapısı korunur.
+
+
+## v1.4.1
+- Footer Instagram görünen adındaki `@` kaldırıldı.
+- Facebook profili footer sosyal satırına eklendi.
+- Facebook tıklamaları GA4 `social_click` etkinliğiyle izlenir.
+- Ana sayfa LocalBusiness `sameAs` verisine Facebook eklendi.
