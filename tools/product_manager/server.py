@@ -26,6 +26,30 @@ def slugify(text):
     return s[:80]
 
 
+def clip_seo_text(text, max_len=160):
+    text = re.sub(r'\s+', ' ', str(text or '')).strip()
+    if len(text) <= max_len:
+        return text
+    clipped = text[:max_len + 1]
+    if ' ' in clipped:
+        clipped = clipped.rsplit(' ', 1)[0]
+    clipped = re.sub(r'[,:;.!?\-–—]+$', '', clipped).rstrip()
+    return clipped + '.'
+
+
+def make_seo(name, card_description='', description=''):
+    name = str(name or '').strip()
+    source = str(card_description or description or '').strip()
+    if source and name:
+        source = re.sub(r'^' + re.escape(name) + r'\s*[-—–:,.]*\s*', '', source, flags=re.I)
+        source = re.sub(r'\s+', ' ', source).strip()
+        source = re.sub(r'[.!?]+$', '', source).strip()
+    title = f"{name} | Kuşadası 3D Baskı | BG Studio 3D" if name else ''
+    suffix = '3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.'
+    seo_description = f"{name}, {source}. {suffix}" if source else f"{name}, {suffix}"
+    return title, clip_seo_text(seo_description, 160)
+
+
 def read_products():
     return json.loads(DATA.read_text(encoding='utf-8'))
 
@@ -81,8 +105,9 @@ def clean_product(p):
         out['sort_order'] = int(out.get('sort_order') or 999)
     except Exception:
         out['sort_order'] = 999
-    out['seo_title'] = str(out.get('seo_title') or f"{out['name']} | BG Studio 3D").strip()
-    out['seo_description'] = str(out.get('seo_description') or f"{out['name']} — {out['description']}").strip()[:170]
+    default_title, default_description = make_seo(out['name'], out['card_description'], out['description'])
+    out['seo_title'] = str(out.get('seo_title') or default_title).strip()
+    out['seo_description'] = clip_seo_text(out.get('seo_description') or default_description, 160)
     return out
 
 

@@ -1,9 +1,7 @@
-# BG Studio 3D v2.0 Ürün Yöneticisi Patch
+# v2.1 Final SEO Patch
 
-Bu klasörün **içindekileri** GitHub Desktop'taki `bgstudio-3d` repo klasörünün üzerine kopyalayın.
+Bu klasörün **içindekileri** GitHub Desktop ile klonladığın `bgstudio-3d` repo klasörünün üzerine kopyala.
 
-İlk kurulumdan sonra yeni ürün eklerken ZIP kullanmanız gerekmez. Repo kökündeki `URUN-YONETICI.bat` dosyasına çift tıklamanız yeterlidir.
+Commit mesajı önerisi: `Finalize product SEO automation`
 
-Panel ürün kaydettiğinde GitHub Desktop değişen dosyaları otomatik gösterecektir. Commit + Push sonrası GitHub Pages canlı siteyi günceller.
-
-CNAME bu patch'e dahil değildir; mevcut `3d.bgstudio.com.tr` bağlantınız korunur.
+Patch CNAME içermez. Mevcut custom domain ayarı korunur.

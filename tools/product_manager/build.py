@@ -22,6 +22,30 @@ def esc(v):
     return html.escape(str(v or ''), quote=True)
 
 
+def clip_seo_text(text, max_len=160):
+    text = re.sub(r'\s+', ' ', str(text or '')).strip()
+    if len(text) <= max_len:
+        return text
+    clipped = text[:max_len + 1]
+    if ' ' in clipped:
+        clipped = clipped.rsplit(' ', 1)[0]
+    clipped = re.sub(r'[,:;.!?\-–—]+$', '', clipped).rstrip()
+    return clipped + '.'
+
+
+def make_seo(p):
+    name = str(p.get('name') or '').strip()
+    source = str(p.get('card_description') or p.get('description') or '').strip()
+    if source and name:
+        source = re.sub(r'^' + re.escape(name) + r'\s*[-—–:,.]*\s*', '', source, flags=re.I)
+        source = re.sub(r'\s+', ' ', source).strip()
+        source = re.sub(r'[.!?]+$', '', source).strip()
+    title = f"{name} | Kuşadası 3D Baskı | BG Studio 3D" if name else ''
+    suffix = '3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.'
+    description = f"{name}, {source}. {suffix}" if source else f"{name}, {suffix}"
+    return title, clip_seo_text(description, 160)
+
+
 def load_products():
     data = json.loads(DATA.read_text(encoding='utf-8'))
     return sorted(data, key=lambda p: (int(p.get('sort_order') or 9999), p.get('name', '').casefold()))
@@ -93,8 +117,9 @@ def render_product_page(p, related):
     price = esc(p.get('price_text') or 'Fiyat için iletişim')
     desc = esc(p.get('description') or '')
     card_desc = esc(p.get('card_description') or p.get('description') or '')
-    title = esc(p.get('seo_title') or f"{p['name']} | BG Studio 3D")
-    seo_desc = esc((p.get('seo_description') or f"{p['name']} — {p.get('description', '')}")[:170])
+    default_title, default_description = make_seo(p)
+    title = esc(p.get('seo_title') or default_title)
+    seo_desc = esc(clip_seo_text(p.get('seo_description') or default_description, 160))
     canonical = f"{BASE_URL}/urunler/{esc(p['slug'])}/"
     main_rel = '../../' + p['main_image']
     main_abs = f"{BASE_URL}/{p['main_image']}"
