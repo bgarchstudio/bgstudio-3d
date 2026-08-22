@@ -2,8 +2,22 @@
   "name": "BG Studio 3D",
   "short_name": "BG Studio 3D",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f4ede3",
   "theme_color": "#f5ede2",
-  "icons": []
+  "icons": [
+    {
+      "src": "/assets/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
