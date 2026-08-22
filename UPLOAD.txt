@@ -1,0 +1,8 @@
+BG Studio 3D GA4 PATCH
+
+GitHub repo kökünde Add file > Upload files ekranına bu klasörün İÇİNDEKİ dosya ve klasörleri sürükleyin.
+Mevcut dosyalar güncellenecektir.
+CNAME, DNS ve GitHub Pages ayarlarına dokunmayın.
+Commit mesajı: Add GA4 analytics
+
+Measurement ID: G-WHJ7Y7KN3L

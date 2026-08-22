@@ -2,6 +2,34 @@ const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
+
+// Google Analytics helper. gtag is defined in every page head and queues events until GA4 loads.
+const trackEvent = (name, params = {}) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', name, params);
+  }
+};
+
+// Track high-intent outbound actions without changing navigation behavior.
+document.addEventListener('click', (event) => {
+  const link = event.target.closest?.('a[href]');
+  if (!link) return;
+  const href = link.getAttribute('href') || '';
+  if (href.includes('wa.me/')) {
+    trackEvent('generate_lead', {
+      method: 'whatsapp',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    });
+  } else if (href.includes('instagram.com/bgstudio.3dtr')) {
+    trackEvent('social_click', {
+      network: 'instagram',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    });
+  }
+});
+
 // Mobile navigation
 const setMenuState = (open) => {
   if (!nav || !menuButton) return;
@@ -189,6 +217,11 @@ if (quoteForm) {
       '',
       `Talep: ${data.get('detay') || '-'}`
     ];
+    trackEvent('generate_lead', {
+      method: 'quote_form_whatsapp',
+      lead_type: data.get('talep_turu') || 'unknown',
+      page_location: canonicalUrl
+    });
     window.open('https://wa.me/905302466903?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
   });
 }
@@ -219,9 +252,11 @@ if (shareProduct) {
     try {
       if (navigator.share && location.protocol.startsWith('http')) {
         await navigator.share({ title, url: canonicalUrl });
+        trackEvent('share', { method: 'native_share', content_type: 'product', item_id: canonicalUrl });
         return;
       }
       await navigator.clipboard.writeText(canonicalUrl);
+      trackEvent('share', { method: 'copy_link', content_type: 'product', item_id: canonicalUrl });
       shareProduct.textContent = 'Link kopyalandı ✓';
       shareProduct.classList.add('copied');
       setTimeout(() => {
