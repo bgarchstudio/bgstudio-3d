@@ -16,6 +16,8 @@ document.addEventListener('click', (event) => {
   if (!link) return;
   const href = link.getAttribute('href') || '';
   if (href.includes('wa.me/')) {
+    // The floating button opens the quick-choice panel; count the actual send link as the lead instead.
+    if (link.classList.contains('floating-whatsapp') && link.getAttribute('aria-haspopup') === 'dialog') return;
     trackEvent('generate_lead', {
       method: 'whatsapp',
       link_text: (link.textContent || '').trim().slice(0, 100),
@@ -373,3 +375,87 @@ document.querySelectorAll('[data-current-year]').forEach(el => { el.textContent 
     window.history.replaceState(null, "", `${cleanPath}${search}${hash}`);
   }
 })();
+
+
+// v1.4 — Brand-family icon treatment and Architecture-inspired WhatsApp quick panel.
+document.querySelectorAll('a[href*="wa.me/"]').forEach(link => link.classList.add('has-brand-icon', 'icon-whatsapp'));
+document.querySelectorAll('a[href*="instagram.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-instagram'));
+document.querySelectorAll('a[href^="https://bgstudio.com.tr"]').forEach(link => {
+  if (!link.closest('.footer-socials')) link.classList.add('has-brand-icon', 'icon-architecture');
+});
+
+const floatingWhatsApp = document.querySelector('.floating-whatsapp');
+if (floatingWhatsApp) {
+  const originalHref = floatingWhatsApp.href;
+  const productName = document.querySelector('.product-info h1')?.textContent?.trim();
+  const defaultMessage = productName
+    ? `Merhaba BG Studio 3D, ${productName} hakkında bilgi almak istiyorum.`
+    : 'Merhaba BG Studio 3D, web sitenizden yazıyorum. Ürün ve üretim seçenekleri hakkında bilgi almak istiyorum.';
+  const options = [
+    ['Ürün siparişi', productName ? `Merhaba BG Studio 3D, ${productName} hakkında bilgi almak istiyorum.` : 'Merhaba BG Studio 3D, bir ürün hakkında bilgi almak istiyorum.'],
+    ['Kişiye özel üretim', 'Merhaba BG Studio 3D, kişiye özel 3D baskı üretim için teklif almak istiyorum.'],
+    ['Toplu / kurumsal', 'Merhaba BG Studio 3D, işletmem için toplu veya kurumsal üretim hakkında görüşmek istiyorum.'],
+    ['NFC & QR', 'Merhaba BG Studio 3D, NFC & QR sistemleri hakkında bilgi almak istiyorum.']
+  ];
+
+  const panel = document.createElement('aside');
+  panel.className = 'wa-quick-panel';
+  panel.setAttribute('aria-label', 'WhatsApp hızlı iletişim');
+  panel.setAttribute('aria-hidden', 'true');
+  panel.innerHTML = `
+    <div class="wa-panel-head">
+      <div><h2>Merhaba 👋</h2><p>Ürün, özel üretim veya işletme çözümü için mesajını birkaç saniyede hazırla.</p></div>
+      <button class="wa-panel-close" type="button" aria-label="WhatsApp panelini kapat">×</button>
+    </div>
+    <span class="wa-panel-label">HIZLI SEÇENEKLER</span>
+    <div class="wa-panel-options"></div>
+    <div class="wa-panel-message" aria-live="polite"></div>
+    <a class="wa-panel-send has-brand-icon icon-whatsapp" target="_blank" rel="noopener">WhatsApp'ta Gönder</a>
+    <p class="wa-panel-meta">Ortalama yanıt süresi: aynı gün içinde</p>`;
+  document.body.append(panel);
+
+  const messageBox = panel.querySelector('.wa-panel-message');
+  const sendLink = panel.querySelector('.wa-panel-send');
+  const optionWrap = panel.querySelector('.wa-panel-options');
+  const closeButton = panel.querySelector('.wa-panel-close');
+  const setMessage = (message, activeButton = null) => {
+    messageBox.textContent = message;
+    sendLink.href = 'https://wa.me/905302466903?text=' + encodeURIComponent(message);
+    optionWrap.querySelectorAll('.wa-panel-option').forEach(btn => btn.classList.toggle('active', btn === activeButton));
+  };
+  setMessage(defaultMessage);
+  options.forEach(([label, message], index) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wa-panel-option';
+    btn.textContent = label;
+    btn.addEventListener('click', () => setMessage(message, btn));
+    optionWrap.append(btn);
+  });
+
+  const setPanel = (open) => {
+    panel.classList.toggle('open', open);
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    floatingWhatsApp.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
+  };
+  floatingWhatsApp.setAttribute('aria-haspopup', 'dialog');
+  floatingWhatsApp.setAttribute('aria-expanded', 'false');
+  floatingWhatsApp.addEventListener('click', event => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+    event.preventDefault();
+    setPanel(!panel.classList.contains('open'));
+  });
+  closeButton.addEventListener('click', () => { setPanel(false); floatingWhatsApp.focus(); });
+  document.addEventListener('click', event => {
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(event.target) || floatingWhatsApp.contains(event.target)) return;
+    setPanel(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && panel.classList.contains('open')) {
+      setPanel(false);
+      floatingWhatsApp.focus();
+    }
+  });
+}
