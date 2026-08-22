@@ -1,17 +1,13 @@
-# BG Studio 3D v2.2 PRO Patch
+# BG Studio 3D v2.2.1 — Ampersand Typography Fix
 
-Bu patch yalnızca yerel Ürün Yöneticisi altyapısını geliştirir.
+Bu patch, Playfair Display yazı tipinin dekoratif `&` karakterini başlıklarda temiz ve standart bir `&` görünümüne çevirir.
 
-- Ürün kopyalama
-- Arşiv / tekrar yayına alma
-- Güvenli kalıcı silme
-- Sürükle-bırak katalog sıralaması
-- Hızlı öne çıkan yıldızı
-- Liste filtreleri
-- Kaydetmeden ürün önizleme
-- Eksik alan kalite kontrolü
-- SEO sayaçları
-- Ana + afiş + çoklu galeri görselleri
-- Galeri görsellerini ürün detay sayfasına otomatik bağlama
+## Kapsam
+- Ana site: tüm `h1`, `h2`, `h3` başlıkları
+- Mevcut sayfalar ve gelecekte ürün yöneticisinin ürettiği ürün başlıkları
+- Ürün Yöneticisi panelindeki dinamik başlık / önizleme başlıkları
+- Menü, SEO metinleri, URL'ler, CNAME, GA4 ve ürün verileri değiştirilmez
 
-CNAME, DNS, Analytics ve GitHub Pages ayarlarına dokunmaz.
+## Kurulum
+Patch klasörünün içindekileri mevcut `bgstudio-3d` repo klasörünün üzerine kopyala.
+GitHub Desktop: `Fix ampersand typography site-wide` → Commit to main → Push origin.

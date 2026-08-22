@@ -170,3 +170,17 @@ button{font-family:inherit}
 
 /* v1.5 logo integration */
 @media(max-width:680px){.brand-monogram{width:34px;height:34px;flex-basis:34px}.brand{gap:9px}}
+
+/* v2.2.1 — Keep ampersands visually consistent in display headings.
+   Playfair Display has a decorative ampersand glyph; the brand UI uses a clean & instead. */
+.plain-amp{
+  font-family:"DM Sans",Arial,sans-serif!important;
+  font-style:normal!important;
+  font-weight:500!important;
+  font-size:.82em;
+  line-height:1;
+  letter-spacing:-.02em!important;
+  display:inline-block;
+  vertical-align:.06em;
+  margin:0 .035em;
+}

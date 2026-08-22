@@ -466,3 +466,34 @@ if (floatingWhatsApp) {
     }
   });
 }
+
+// v2.2.1 — Playfair Display renders a very decorative ampersand.
+// Replace only ampersands inside display headings with a clean brand-safe glyph.
+const normalizeHeadingAmpersands = (root = document) => {
+  const headings = root?.matches?.('h1,h2,h3') ? [root] : [...(root?.querySelectorAll?.('h1,h2,h3') || [])];
+  headings.forEach((heading) => {
+    if (!heading.textContent?.includes('&')) return;
+    const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node.parentElement?.classList.contains('plain-amp')) continue;
+      if (node.nodeValue?.includes('&')) nodes.push(node);
+    }
+    nodes.forEach((node) => {
+      const parts = node.nodeValue.split('&');
+      const fragment = document.createDocumentFragment();
+      parts.forEach((part, index) => {
+        if (part) fragment.append(document.createTextNode(part));
+        if (index < parts.length - 1) {
+          const amp = document.createElement('span');
+          amp.className = 'plain-amp';
+          amp.textContent = '&';
+          fragment.append(amp);
+        }
+      });
+      node.replaceWith(fragment);
+    });
+  });
+};
+normalizeHeadingAmpersands();

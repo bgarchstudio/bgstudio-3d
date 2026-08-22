@@ -43,3 +43,35 @@ $('form').addEventListener('submit',async e=>{e.preventDefault();try{$('saveStat
 async function refreshProducts(slug){const d=await api('/api/products');products=d.products;renderList();if(slug)editProduct(slug);else resetForm()}
 $('rebuild').onclick=async()=>{try{$('saveState').textContent='Site oluşturuluyor…';const d=await api('/api/rebuild',{method:'POST',body:'{}'});$('saveState').textContent='Hazır';toast(`✅ Site hazır: ${d.result.active} aktif ürün`)}catch(e){toast(e.message,true)}};$('openSite').onclick=()=>window.open('https://3d.bgstudio.com.tr','_blank');$('shutdown').onclick=async()=>{try{await api('/api/shutdown',{method:'POST',body:'{}'});document.body.innerHTML='<div style="font:20px system-ui;padding:60px">BG Studio 3D Ürün Yöneticisi kapatıldı. Bu sekmeyi kapatabilirsin. 👋</div>'}catch{window.close()}};
 load().catch(e=>toast(e.message,true));
+
+// v2.2.1 — normalize ampersands in product-manager display headings too.
+function normalizePanelAmpersands(root=document){
+  const headings=root?.matches?.('h1,h2,h3')?[root]:[...(root?.querySelectorAll?.('h1,h2,h3')||[])];
+  headings.forEach(heading=>{
+    if(!heading.textContent?.includes('&'))return;
+    const walker=document.createTreeWalker(heading,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()){
+      const node=walker.currentNode;
+      if(node.parentElement?.classList.contains('plain-amp'))continue;
+      if(node.nodeValue?.includes('&'))nodes.push(node);
+    }
+    nodes.forEach(node=>{
+      const parts=node.nodeValue.split('&');
+      const frag=document.createDocumentFragment();
+      parts.forEach((part,i)=>{
+        if(part)frag.append(document.createTextNode(part));
+        if(i<parts.length-1){const amp=document.createElement('span');amp.className='plain-amp';amp.textContent='&';frag.append(amp)}
+      });
+      node.replaceWith(frag);
+    });
+  });
+}
+normalizePanelAmpersands();
+const ampObserver=new MutationObserver(mutations=>{
+  mutations.forEach(m=>{
+    if(m.type==='characterData')normalizePanelAmpersands(m.target.parentElement);
+    m.addedNodes?.forEach(node=>{if(node.nodeType===1)normalizePanelAmpersands(node)});
+  });
+});
+ampObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
