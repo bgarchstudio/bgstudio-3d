@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /tools/
+Disallow: /data/
 Sitemap: https://3d.bgstudio.com.tr/sitemap.xml

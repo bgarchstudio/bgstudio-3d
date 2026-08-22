@@ -1,8 +1,9 @@
-# BG Studio 3D v1.4.1 Social Patch
+# BG Studio 3D v2.0 Ürün Yöneticisi Patch
 
-- Instagram footer adındaki @ kaldırıldı: `bgstudio.3dtr`.
-- Facebook eklendi: https://www.facebook.com/bgstudio.3dtr
-- Facebook ikonu mevcut marka ikon sistemiyle aynı temada eklendi.
-- Facebook çıkış tıklamaları GA4 `social_click` / `network=facebook` olarak ölçülür.
-- LocalBusiness schema `sameAs` alanına Facebook eklendi.
-- CNAME bu patch içinde yoktur; mevcut canlı domain dosyası korunur.
+Bu klasörün **içindekileri** GitHub Desktop'taki `bgstudio-3d` repo klasörünün üzerine kopyalayın.
+
+İlk kurulumdan sonra yeni ürün eklerken ZIP kullanmanız gerekmez. Repo kökündeki `URUN-YONETICI.bat` dosyasına çift tıklamanız yeterlidir.
+
+Panel ürün kaydettiğinde GitHub Desktop değişen dosyaları otomatik gösterecektir. Commit + Push sonrası GitHub Pages canlı siteyi günceller.
+
+CNAME bu patch'e dahil değildir; mevcut `3d.bgstudio.com.tr` bağlantınız korunur.

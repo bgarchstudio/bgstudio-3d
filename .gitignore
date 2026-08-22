@@ -1,0 +1,7 @@
+.DS_Store
+Thumbs.db
+*.log
+# BG Studio 3D local product manager
+data/backups/
+tools/product_manager/__pycache__/
+*.pyc
