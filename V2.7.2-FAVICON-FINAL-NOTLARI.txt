@@ -1,0 +1,12 @@
+BG Studio 3D v2.7.2 — Favicon Final
+
+- Favicon için kullanıcının sağladığı BG krom monogram görseli doğrudan baz alındı.
+- Tasarım değiştirilmedi; yalnızca favicon okunabilirliği için monogram çevresindeki gereksiz boşluk kırpılıp kare alana dengeli yerleştirildi.
+- favicon.ico: 16, 32, 48, 64, 128 ve 256 px katmanları içerir.
+- PNG faviconlar: 16x16, 32x32, 48x48.
+- Apple Touch Icon: 180x180.
+- PWA ikonları: 192x192 ve 512x512.
+- assets/favicon.svg aynı görselin gömülü raster sürümüne güncellendi.
+- Site ürünleri, panel verileri, CNAME, Analytics ve SEO metinleri değiştirilmedi.
+
+Not: Tarayıcı/favicon önbelleği ve Google arama sonuçları yeni simgeyi hemen göstermeyebilir. Dosya yayına girdikten sonra tarayıcıda hard refresh yapılabilir; Google kendi yeniden taramasında günceller.

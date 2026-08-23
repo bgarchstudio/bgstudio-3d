@@ -1,21 +1,24 @@
-BG STUDIO 3D v2.6.3 - TAM PAKET
-================================
+BG STUDIO 3D v2.7.1 - FINAL TAM PAKET
+Baz: 23.08.2026 kilit sürüm
 
-Bu ZIP sitenin ve yerel Urun Yoneticisinin tum dosyalarini icerir.
+KURULUM
+1) Açık BG Studio 3D ürün yöneticisi sekmesini kapat.
+2) Açık eski CMD / Python penceresini kapat.
+3) Bu paketin içindeki tüm dosyaları mevcut bgstudio-3d repo klasörüne kopyala ve dosyaları değiştir.
+4) URUN-YONETICI.cmd dosyasını çalıştır.
+5) Panelden Siteyi yeniden oluştur butonuna bir kez bas.
+6) Yayın kontrolünü çalıştır.
+7) GitHub Desktop üzerinden Commit + Push yap.
 
-ONEMLI:
-- Mevcut repo klasorundeki data/products.json, data/colors.json ve referans JSON'larinda sonradan yaptigin degisiklikler varsa once data klasorunun yedegini al.
-- Tam paketi mevcut repo klasorunun uzerine kopyalarsan ayni isimli dosyalar degisir.
-- CNAME bu tam pakette bulunur ve 3d.bgstudio.com.tr olarak ayarlidir.
+PAKET FİYATLANDIRMA v2.7.1
+- Paket adı hazır seçimli.
+- Ürün adedi girildiğinde Paket adı otomatik oluşur.
+- Tekli, 2’li alım, 3’lü alım ... 10’lu alım ve diğer adetler otomatik desteklenir.
+- Paket adı seçildiğinde ürün adedi otomatik eşleşir.
+- Kısa not: Tekli Fiyat / Avantajlı Fiyat / Set Fiyatı.
+- Sayısal olarak yalnızca ürün adedi ve fiyat girilir.
 
-URUN YONETICISI:
-1) Acik eski panel sekmelerini kapat.
-2) Acik eski CMD/Python pencerelerini kapat.
-3) URUN-YONETICI.cmd dosyasina cift tikla.
-4) Panel yeni bir 127.0.0.1 portunda otomatik acilir.
-
-Surum eslesmesi:
-- server.py: 2.6.3
-- manager.js: 2.6.3
-
-Sorun olursa URUN-YONETICI-KONTROL.cmd dosyasini calistir.
+SÜRÜM
+- server.py: 2.7.1
+- manager.js: 2.7.1
+- yönetici CMD: 2.7.1

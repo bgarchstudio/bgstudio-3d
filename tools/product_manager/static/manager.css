@@ -27,7 +27,7 @@
 /* v2.5 — flexible set / quantity pricing */
 .pricing-manager{margin:8px 0 16px;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.24)}
 .pricing-manager-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px}.pricing-manager-head>div{display:grid;gap:3px}.pricing-manager-head strong{font-size:12px}.pricing-manager-head small{font-size:10px;color:var(--muted)}
-.pricing-tier-list{display:grid;gap:8px}.pricing-tier-row{display:grid;grid-template-columns:minmax(130px,1.15fr) 92px 115px minmax(140px,1fr) 34px;gap:8px;align-items:end;padding:10px;border:1px solid rgba(71,47,29,.1);border-radius:14px;background:#fffaf6}.pricing-tier-row label{margin:0;gap:5px}.pricing-tier-row label>span{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}.pricing-tier-row input{padding:9px 10px;border-radius:10px}.tier-remove{width:34px;height:38px;border:1px solid rgba(167,74,67,.22);border-radius:10px;background:rgba(167,74,67,.06);color:#a74a43;font-size:18px}.pricing-empty{font-size:10px;color:var(--muted);padding:7px 2px}.pv-pricing{display:flex;gap:7px;flex-wrap:wrap;margin:-8px 0 16px}.pv-pricing>span{display:grid;gap:1px;border:1px solid var(--line);padding:8px 10px;border-radius:12px;background:#fff8f0;font-size:10px}.pv-pricing b{color:var(--brown)}.pv-pricing small{color:var(--muted);font-size:8px}
+.pricing-tier-list{display:grid;gap:8px}.pricing-tier-row{display:grid;grid-template-columns:minmax(130px,1.15fr) 92px 115px minmax(140px,1fr) 34px;gap:8px;align-items:end;padding:10px;border:1px solid rgba(71,47,29,.1);border-radius:14px;background:#fffaf6}.pricing-tier-row label{margin:0;gap:5px}.pricing-tier-row label>span{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}.pricing-tier-row input,.pricing-tier-row select{padding:9px 10px;border-radius:10px}.tier-remove{width:34px;height:38px;border:1px solid rgba(167,74,67,.22);border-radius:10px;background:rgba(167,74,67,.06);color:#a74a43;font-size:18px}.pricing-empty{font-size:10px;color:var(--muted);padding:7px 2px}.pv-pricing{display:flex;gap:7px;flex-wrap:wrap;margin:-8px 0 16px}.pv-pricing>span{display:grid;gap:1px;border:1px solid var(--line);padding:8px 10px;border-radius:12px;background:#fff8f0;font-size:10px}.pv-pricing b{color:var(--brown)}.pv-pricing small{color:var(--muted);font-size:8px}
 @media(max-width:1000px){.pricing-tier-row{grid-template-columns:1fr 90px 110px 34px}.pricing-tier-row label:nth-child(4){grid-column:1/4}.pricing-manager-head{align-items:flex-start;flex-direction:column}}
 @media(max-width:640px){.pricing-tier-row{grid-template-columns:1fr 1fr}.pricing-tier-row label:nth-child(4){grid-column:1/3}.tier-remove{grid-column:2;justify-self:end}.pricing-manager-head .tiny{width:100%}}
 
@@ -87,7 +87,8 @@
   gap:5px;
   align-content:start;
 }
-.pricing-tier-row input{
+.pricing-tier-row input,
+.pricing-tier-row select{
   height:42px;
   min-height:42px;
 }
@@ -337,3 +338,8 @@ textarea{line-height:1.55;resize:vertical}
   .product-color-choices{grid-template-columns:1fr}
   .form-footer{padding:21px;align-items:stretch}.form-footer .save{width:100%}
 }
+
+/* v2.7.1 — preset package names and price notes */
+.pricing-tier-row select{appearance:auto;background:#fffaf6;color:var(--ink);cursor:pointer}
+.pricing-tier-row .tier-label,.pricing-tier-row .tier-note{font-weight:600}
+.pricing-tier-row .tier-label:focus,.pricing-tier-row .tier-note:focus{border-color:#b88651;box-shadow:0 0 0 3px rgba(184,134,81,.1)}

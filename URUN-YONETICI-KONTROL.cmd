@@ -5,7 +5,7 @@ echo BG Studio 3D Urun Yoneticisi - Kontrol
 echo ======================================
 echo Repo: %CD%
 echo.
-echo Beklenen panel surumu: 2.6.3
+echo Beklenen panel surumu: 2.7.1
 echo.
 where py 2>nul
 where python 2>nul

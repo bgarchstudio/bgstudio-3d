@@ -1,0 +1,29 @@
+BG Studio 3D v2.7.1 FINAL
+Baz: 23.08.2026 kilit sürüm
+
+YENİ:
+- Paket adı hazır seçimli.
+- Ürün adedi girilince paket adı otomatik oluşur.
+  1 = Tekli
+  2 = 2’li alım
+  3 = 3’lü alım
+  4 = 4’lü alım
+  5 = 5’li alım
+  10 = 10’lu alım
+  Diğer sayılarda da otomatik devam eder.
+- Paket adı seçilirse ürün adedi otomatik eşleşir.
+- Kısa not hazır seçimli: Tekli Fiyat / Avantajlı Fiyat / Set Fiyatı.
+- Fiyat ve ürün adedi sayısal giriş olarak kalır.
+- Panel client/server sürümü 2.7.1 eşleşir.
+- Gelecek site rebuildlerinde Prototip & Parça menü adı korunur.
+
+KURULUM:
+1) Açık ürün yöneticisi ve CMD/Python pencerelerini kapat.
+2) Bu paketin içindekileri mevcut bgstudio-3d repo klasörüne kopyala ve dosyaları değiştir.
+3) URUN-YONETICI.cmd ile paneli yeniden aç.
+4) Siteyi yeniden oluştur butonuna bir kez bas.
+5) Yayın kontrolünü çalıştır.
+6) GitHub Desktop: Commit + Push.
+
+Önerilen commit:
+Improve pricing presets and auto package labels v2.7.1

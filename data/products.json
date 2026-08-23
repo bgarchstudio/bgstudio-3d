@@ -117,7 +117,7 @@
     "active": true,
     "pricing_tiers": [
       {
-        "label": "2'li Alım",
+        "label": "2’li alım",
         "quantity": 2,
         "price_value": "499",
         "note": "Avantajlı Fiyat"
@@ -171,7 +171,7 @@
         "note": "Avantajlı Fiyat"
       },
       {
-        "label": "4’lü set",
+        "label": "4’lü alım",
         "quantity": 4,
         "price_value": "899",
         "note": "Set Fiyatı"
@@ -215,7 +215,7 @@
     "seo_description": "Dekoratif Mirket Obje, Sevimli ve minimal mirket formunda 3D baskı dekor. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "pricing_tiers": [
       {
-        "label": "3'lü Set",
+        "label": "3’lü alım",
         "quantity": 3,
         "price_value": "549",
         "note": "Set Fiyatı"
@@ -294,7 +294,7 @@
     "seo_description": "Dekoratif Tavşan Obje, Kalp detaylı, zarif çizgili tavşan dekor objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "pricing_tiers": [
       {
-        "label": "2'li Alım",
+        "label": "2’li alım",
         "quantity": 2,
         "price_value": "379",
         "note": "Set Fiyatı"

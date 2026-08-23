@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='2.7.0';
+const PANEL_VERSION='2.7.1';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -58,19 +58,80 @@ function colorInventoryRow(item={}){
 function renderColorInventory(){const wrap=$('colorInventoryList');wrap.innerHTML='';colors.forEach(c=>wrap.append(colorInventoryRow(c)));if(!wrap.children.length)wrap.append(colorInventoryRow({in_stock:true}))}
 function collectColors(){return [...$('colorInventoryList').querySelectorAll('.color-inventory-row')].map((row,i)=>({id:slugify(row.querySelector('.color-name').value),name:row.querySelector('.color-name').value.trim(),hex:row.querySelector('.color-hex').value.trim(),in_stock:row.querySelector('.color-stock').checked,stock_qty:row.querySelector('.color-qty').value===''?null:Number(row.querySelector('.color-qty').value),sort_order:(i+1)*10})).filter(x=>x.name)}
 function openColorsModal(){renderColorInventory();$('colorsModal').hidden=false;document.body.classList.add('modal-open')}
+const PRICING_NOTE_PRESETS=['Tekli Fiyat','Avantajlı Fiyat','Set Fiyatı'];
+function packageSuffixForQuantity(qty){
+  const n=Math.abs(Number(qty)||0);
+  if(!Number.isInteger(n)||n<2)return 'li';
+  const last=n%10, lastTwo=n%100;
+  if(lastTwo===0)return 'lü';
+  if(last===0)return ({10:'lu',20:'li',30:'lu',40:'lı',50:'li',60:'lı',70:'li',80:'li',90:'lı'}[lastTwo]||'li');
+  return ({1:'li',2:'li',3:'lü',4:'lü',5:'li',6:'lı',7:'li',8:'li',9:'lu'}[last]||'li')
+}
+function packageLabelForQuantity(qty){
+  const n=Number(qty);
+  if(!Number.isInteger(n)||n<1)return '';
+  if(n===1)return 'Tekli';
+  return `${n}’${packageSuffixForQuantity(n)} alım`
+}
+function quantityFromPackageLabel(label){
+  if(String(label||'').trim().toLocaleLowerCase('tr-TR')==='tekli')return 1;
+  const m=String(label||'').match(/^(\d+)/);
+  return m?Number(m[1]):null
+}
+function defaultPricingNote(qty){
+  const n=Number(qty);
+  if(n===1)return 'Tekli Fiyat';
+  if(n>=4)return 'Set Fiyatı';
+  return 'Avantajlı Fiyat'
+}
+function pricingPackageOptions(current='',qty=''){
+  const values=[1,2,3,4,5,6,7,8,9,10].map(packageLabelForQuantity);
+  const automatic=packageLabelForQuantity(Number(qty));
+  if(automatic&&!values.includes(automatic))values.push(automatic);
+  if(current&&!values.includes(current))values.push(current);
+  return '<option value="">Paket seç</option>'+values.map(v=>`<option value="${esc(v)}" ${v===current?'selected':''}>${esc(v)}</option>`).join('')
+}
+function pricingNoteOptions(current=''){
+  const values=[...PRICING_NOTE_PRESETS];
+  if(current&&!values.includes(current))values.push(current);
+  return values.map(v=>`<option value="${esc(v)}" ${v===current?'selected':''}>${esc(v)}</option>`).join('')
+}
+function ensurePackageOption(select,value){
+  if(!value)return;
+  if(![...select.options].some(o=>o.value===value)){const option=document.createElement('option');option.value=value;option.textContent=value;select.append(option)}
+}
 function pricingTierRow(item={}){
   const row=document.createElement('div');row.className='pricing-tier-row';
-  row.innerHTML=`<label><span>Paket adı</span><input class="tier-label" maxlength="60" placeholder="Örn. 2’li alım" value="${esc(item.label||'')}"></label><label><span>Ürün adedi</span><input class="tier-qty" type="number" min="1" max="999" inputmode="numeric" placeholder="2" value="${esc(item.quantity||'')}"></label><label><span>Set fiyatı (TL)</span><input class="tier-price" inputmode="decimal" placeholder="499" value="${esc(item.price_value||'')}"></label><label><span>Kısa not</span><input class="tier-note" maxlength="80" placeholder="Örn. Avantajlı fiyat" value="${esc(item.note||'')}"></label><button class="tier-remove" type="button" title="Fiyat seçeneğini kaldır">×</button>`;
+  const initialQty=Number(item.quantity)||'';
+  const initialLabel=item.label||packageLabelForQuantity(initialQty);
+  const initialNote=item.note||defaultPricingNote(initialQty);
+  row.innerHTML=`<label><span>Paket adı</span><select class="tier-label" title="Hazır paket adları">${pricingPackageOptions(initialLabel,initialQty)}</select></label><label><span>Ürün adedi</span><input class="tier-qty" type="number" min="1" max="999" inputmode="numeric" placeholder="2" value="${esc(initialQty)}"></label><label><span>Set fiyatı (TL)</span><input class="tier-price" inputmode="decimal" placeholder="499" value="${esc(item.price_value||'')}"></label><label><span>Kısa not</span><select class="tier-note" title="Hazır fiyat açıklamaları">${pricingNoteOptions(initialNote)}</select></label><button class="tier-remove" type="button" title="Fiyat seçeneğini kaldır">×</button>`;
+  const label=row.querySelector('.tier-label'),qty=row.querySelector('.tier-qty'),note=row.querySelector('.tier-note');
+  const syncFromQty=()=>{
+    const n=Number(qty.value);
+    const autoLabel=packageLabelForQuantity(n);
+    if(autoLabel){ensurePackageOption(label,autoLabel);label.value=autoLabel}
+    if(Number.isInteger(n)&&n>0)note.value=defaultPricingNote(n);
+    updatePricingEmpty();updateQuality()
+  };
+  const syncFromLabel=()=>{
+    const n=quantityFromPackageLabel(label.value);
+    if(n){qty.value=String(n);note.value=defaultPricingNote(n)}
+    updatePricingEmpty();updateQuality()
+  };
+  qty.addEventListener('input',syncFromQty);
+  label.addEventListener('change',syncFromLabel);
+  note.addEventListener('change',()=>{updatePricingEmpty();updateQuality()});
+  row.querySelector('.tier-price').addEventListener('input',()=>{updatePricingEmpty();updateQuality()});
   row.querySelector('.tier-remove').onclick=()=>{row.remove();updatePricingEmpty();updateQuality()};
-  row.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>{updatePricingEmpty();updateQuality()}));
   return row
 }
 function updatePricingEmpty(){const wrap=$('pricingTiers');if(!wrap)return;const empty=wrap.querySelector('.pricing-empty');if(empty)empty.remove();if(!wrap.querySelector('.pricing-tier-row')){const note=document.createElement('div');note.className='pricing-empty';note.textContent='Set fiyatı yok. Normal ürünlerde bu alanı boş bırakabilirsin.';wrap.append(note)}}
 function renderPricingTiers(items=[]){const wrap=$('pricingTiers');if(!wrap)return;wrap.innerHTML='';(items||[]).forEach(item=>wrap.append(pricingTierRow(item)));updatePricingEmpty()}
 function effectivePreviewTiers(){let items=collectPricingTiers().filter(t=>+t.quantity>1);const base=Number(String($('price_value').value||'').replace(',','.'));if(Number.isFinite(base)&&base>0)items=[{label:'Tekli',quantity:1,price_value:String(base),note:'Tekli fiyat',_auto:true},...items];return items.sort((a,b)=>a.quantity-b.quantity)}
-function collectPricingTiers(){const rows=[...$('pricingTiers').querySelectorAll('.pricing-tier-row')];const items=[];const used=new Set();rows.forEach((row,i)=>{const qty=Number(row.querySelector('.tier-qty').value);const raw=row.querySelector('.tier-price').value.trim().replace(',','.');const price=Number(raw);let label=row.querySelector('.tier-label').value.trim();const note=row.querySelector('.tier-note').value.trim();if(!qty&&!raw&&!label&&!note)return;if(!Number.isInteger(qty)||qty<1)throw new Error(`${i+1}. set fiyatında ürün adedi geçersiz.`);if(!Number.isFinite(price)||price<=0)throw new Error(`${i+1}. set fiyatında fiyat geçersiz.`);if(used.has(qty))throw new Error(`${qty} adet için iki ayrı set fiyatı tanımlanamaz.`);used.add(qty);if(!label)label=qty===1?'Tekli':`${qty}’li set`;items.push({label,quantity:qty,price_value:String(price),note})});return items.sort((a,b)=>a.quantity-b.quantity)}
+function collectPricingTiers(){const rows=[...$('pricingTiers').querySelectorAll('.pricing-tier-row')];const items=[];const used=new Set();rows.forEach((row,i)=>{const qty=Number(row.querySelector('.tier-qty').value);const raw=row.querySelector('.tier-price').value.trim().replace(',','.');const price=Number(raw);let label=row.querySelector('.tier-label').value.trim();let note=row.querySelector('.tier-note').value.trim();if(!qty&&!raw&&!label&&!note)return;if(!Number.isInteger(qty)||qty<1)throw new Error(`${i+1}. set fiyatında ürün adedi geçersiz.`);if(!Number.isFinite(price)||price<=0)throw new Error(`${i+1}. set fiyatında fiyat geçersiz.`);if(used.has(qty))throw new Error(`${qty} adet için iki ayrı set fiyatı tanımlanamaz.`);used.add(qty);label=packageLabelForQuantity(qty);note=note||defaultPricingNote(qty);items.push({label,quantity:qty,price_value:String(price),note})});return items.sort((a,b)=>a.quantity-b.quantity)}
 function pricingIssues(){try{collectPricingTiers();return []}catch(e){return [e.message]}}
-$('addPricingTier').onclick=()=>{const wrap=$('pricingTiers');wrap.querySelector('.pricing-empty')?.remove();wrap.append(pricingTierRow({}));wrap.lastElementChild.querySelector('.tier-label')?.focus()};
+$('addPricingTier').onclick=()=>{const wrap=$('pricingTiers');wrap.querySelector('.pricing-empty')?.remove();wrap.append(pricingTierRow({}));wrap.lastElementChild.querySelector('.tier-qty')?.focus()};
 function sortedProducts(){return [...products].sort((a,b)=>(+a.sort_order||9999)-(+b.sort_order||9999)||a.name.localeCompare(b.name,'tr'))}
 function filteredProducts(){const q=$('search').value.trim().toLocaleLowerCase('tr-TR');return sortedProducts().filter(p=>{const text=(p.name+' '+p.slug+' '+(p.price_text||'')+' '+categoryLabel(p.category)).toLocaleLowerCase('tr-TR');const qok=!q||text.includes(q);const fok=listFilter==='all'||(listFilter==='live'&&p.active!==false)||(listFilter==='draft'&&p.active===false)||(listFilter==='featured'&&p.active!==false&&p.featured);return qok&&fok})}
 function renderList(){stats();const wrap=$('productList');wrap.innerHTML='';const canDrag=listFilter==='all'&&!$('search').value.trim();$('dragNote').textContent=canDrag?'Sıralamak için ürünleri sürükle.':'Sürükle-bırak için “Tümü” filtresinde aramayı temizle.';filteredProducts().forEach(p=>{const row=document.createElement('div');row.className='product-item'+(p.slug===currentSlug?' active':'');row.dataset.slug=p.slug;row.draggable=canDrag;row.innerHTML=`<span class="drag-handle" title="Sürükle">⋮⋮</span><button class="product-main" type="button"><img src="/${esc(p.main_image)}" onerror="this.style.visibility='hidden'"><span><strong>${esc(p.name)}</strong><small>${esc(p.price_text)} · ${esc(categoryLabel(p.category))}</small></span><i class="dot ${p.active!==false?'live':''}"></i></button><button class="feature-toggle ${p.featured?'on':''}" type="button" title="Öne çıkan">★</button>`;row.querySelector('.product-main').onclick=()=>editProduct(p.slug);row.querySelector('.feature-toggle').onclick=async e=>{e.stopPropagation();try{const d=await api('/api/feature',{method:'POST',body:JSON.stringify({slug:p.slug})});toast('✅ '+d.message);await refreshProducts(currentSlug||p.slug)}catch(err){toast(err.message,true)}};if(canDrag){row.addEventListener('dragstart',()=>{draggedSlug=p.slug;row.classList.add('dragging')});row.addEventListener('dragend',()=>{draggedSlug=null;row.classList.remove('dragging')});row.addEventListener('dragover',e=>{e.preventDefault();row.classList.add('drag-over')});row.addEventListener('dragleave',()=>row.classList.remove('drag-over'));row.addEventListener('drop',async e=>{e.preventDefault();row.classList.remove('drag-over');if(!draggedSlug||draggedSlug===p.slug)return;const order=sortedProducts().map(x=>x.slug);const from=order.indexOf(draggedSlug),to=order.indexOf(p.slug);order.splice(from,1);order.splice(to,0,draggedSlug);try{const d=await api('/api/reorder',{method:'POST',body:JSON.stringify({order})});products=d.products;toast('✅ '+d.message);renderList();if(currentSlug)editProduct(currentSlug)}catch(err){toast(err.message,true)}})}wrap.append(row)})}
