@@ -32,3 +32,11 @@ Mevcut ürün yayına girdikten sonra URL slug'ını değiştirmeyin. Panel mevc
 
 ## Güvenli alanlar
 Panel `CNAME`, DNS, GitHub Pages, Analytics ölçüm kimliği veya Cloudflare ayarlarını değiştirmez.
+
+## v2.3 — Yayın güvenliği ve yedek merkezi
+- Üst bardaki `Yayın kontrolü` düğmesi ürün verisi, slug, görsel/sayfa dosyaları, SEO, CNAME, sitemap ve öne çıkan sayısını kontrol eder.
+- `Şimdi tam yedek al` ürün verisini ve ürün/poster görsellerini `data/backups/` altında ZIP olarak saklar.
+- Ürün üzerinde yapılan değişikliklerde hafif JSON yedeği otomatik alınır.
+- Bir ürün kalıcı silinmeden önce otomatik tam site yedeği alınır.
+- Yedek geri yüklenmeden önce mevcut durum da otomatik tam yedeklenir.
+- `data/backups/` `.gitignore` içinde olduğu için bu yerel yedekler GitHub'a gönderilmez.

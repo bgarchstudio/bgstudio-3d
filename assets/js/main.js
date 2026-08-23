@@ -10,19 +10,48 @@ const trackEvent = (name, params = {}) => {
   }
 };
 
+const analyticsProductContext = () => {
+  const config = document.querySelector('[data-order-config]');
+  if (!config) return null;
+  const itemName = config.dataset.productName || document.querySelector('.product-info h1')?.textContent?.trim() || 'Ürün';
+  const itemId = canonicalUrl.match(/\/urunler\/([^/]+)\/?$/)?.[1] || itemName;
+  const priceText = config.dataset.productPrice || '';
+  const numeric = Number(String(priceText).replace(/[^0-9,]/g, '').replace(',', '.')) || undefined;
+  return { item_name: itemName, item_id: itemId, price: numeric };
+};
+
+let initialAnalyticsTracked = false;
+const trackInitialAnalyticsContext = () => {
+  if (initialAnalyticsTracked || typeof window.gtag !== 'function') return;
+  const product = analyticsProductContext();
+  if (product) {
+    const item = { item_id: product.item_id, item_name: product.item_name };
+    if (product.price) item.price = product.price;
+    const payload = { currency: 'TRY', items: [item] };
+    if (product.price) payload.value = product.price;
+    trackEvent('view_item', payload);
+  }
+  initialAnalyticsTracked = true;
+};
+trackInitialAnalyticsContext();
+window.addEventListener('bg-consent-granted', trackInitialAnalyticsContext);
+
 // Track high-intent outbound actions without changing navigation behavior.
 document.addEventListener('click', (event) => {
   const link = event.target.closest?.('a[href]');
   if (!link) return;
   const href = link.getAttribute('href') || '';
   if (href.includes('wa.me/')) {
-    // The floating button opens the quick-choice panel; count the actual send link as the lead instead.
+    // Dedicated order/quick-contact buttons have richer event payloads below; avoid double counting.
     if (link.classList.contains('floating-whatsapp') && link.getAttribute('aria-haspopup') === 'dialog') return;
-    trackEvent('generate_lead', {
-      method: 'whatsapp',
+    if (link.matches('[data-order-whatsapp],[data-mobile-order-whatsapp],.wa-panel-send')) return;
+    const payload = {
+      method: 'whatsapp_generic',
       link_text: (link.textContent || '').trim().slice(0, 100),
       page_location: canonicalUrl
-    });
+    };
+    trackEvent('whatsapp_click', payload);
+    trackEvent('generate_lead', payload);
   } else if (href.includes('instagram.com/bgstudio.3dtr')) {
     trackEvent('social_click', {
       network: 'instagram',
@@ -225,11 +254,13 @@ if (quoteForm) {
       '',
       `Talep: ${data.get('detay') || '-'}`
     ];
-    trackEvent('generate_lead', {
+    const leadPayload = {
       method: 'quote_form_whatsapp',
       lead_type: data.get('talep_turu') || 'unknown',
       page_location: canonicalUrl
-    });
+    };
+    trackEvent('quote_request', leadPayload);
+    trackEvent('generate_lead', leadPayload);
     window.open('https://wa.me/905302466903?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
   });
 }
@@ -317,6 +348,24 @@ if (orderConfig) {
     if (send) send.href = href;
     if (mobileSend) mobileSend.href = href;
   };
+  const trackProductOrder = () => {
+    const amount = clampQty();
+    const selected = option?.value || 'Standart';
+    const product = analyticsProductContext();
+    const payload = {
+      method: 'product_order_whatsapp',
+      item_id: product?.item_id || name,
+      item_name: product?.item_name || name,
+      option: selected,
+      quantity: amount,
+      page_location: canonicalUrl
+    };
+    if (product?.price) { payload.value = product.price * amount; payload.currency = 'TRY'; }
+    trackEvent('whatsapp_order', payload);
+    trackEvent('generate_lead', payload);
+  };
+  send?.addEventListener('click', trackProductOrder);
+  mobileSend?.addEventListener('click', trackProductOrder);
 
   orderConfig.querySelector('[data-qty-minus]')?.addEventListener('click', () => {
     if (qty) qty.value = clampQty() - 1;
@@ -425,19 +474,28 @@ if (floatingWhatsApp) {
   const sendLink = panel.querySelector('.wa-panel-send');
   const optionWrap = panel.querySelector('.wa-panel-options');
   const closeButton = panel.querySelector('.wa-panel-close');
-  const setMessage = (message, activeButton = null) => {
+  let selectedContactType = productName ? 'product' : 'general';
+  const setMessage = (message, activeButton = null, contactType = selectedContactType) => {
+    selectedContactType = contactType;
     messageBox.textContent = message;
     sendLink.href = 'https://wa.me/905302466903?text=' + encodeURIComponent(message);
     optionWrap.querySelectorAll('.wa-panel-option').forEach(btn => btn.classList.toggle('active', btn === activeButton));
   };
   setMessage(defaultMessage);
+  const contactTypeMap = ['product', 'custom_production', 'corporate', 'nfc_qr'];
   options.forEach(([label, message], index) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'wa-panel-option';
     btn.textContent = label;
-    btn.addEventListener('click', () => setMessage(message, btn));
+    btn.addEventListener('click', () => setMessage(message, btn, contactTypeMap[index] || 'general'));
     optionWrap.append(btn);
+  });
+  sendLink.addEventListener('click', () => {
+    const payload = { method: 'quick_whatsapp_panel', contact_type: selectedContactType, page_location: canonicalUrl };
+    if (productName) payload.item_name = productName;
+    trackEvent('whatsapp_quick_contact', payload);
+    trackEvent('generate_lead', payload);
   });
 
   const setPanel = (open) => {

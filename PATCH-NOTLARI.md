@@ -1,13 +1,26 @@
-# BG Studio 3D v2.2.1 — Ampersand Typography Fix
+# BG Studio 3D v2.3 — Safety + Analytics
 
-Bu patch, Playfair Display yazı tipinin dekoratif `&` karakterini başlıklarda temiz ve standart bir `&` görünümüne çevirir.
+Bu patch üç alanı güçlendirir:
 
-## Kapsam
-- Ana site: tüm `h1`, `h2`, `h3` başlıkları
-- Mevcut sayfalar ve gelecekte ürün yöneticisinin ürettiği ürün başlıkları
-- Ürün Yöneticisi panelindeki dinamik başlık / önizleme başlıkları
-- Menü, SEO metinleri, URL'ler, CNAME, GA4 ve ürün verileri değiştirilmez
+1. Gizlilik / Analytics
+- GA4 artık kullanıcı analitik izni vermeden yüklenmez.
+- `Sadece gerekli` ve `Analitiğe izin ver` seçenekleri eklenmiştir.
+- Footer'a `Çerez tercihleri` düğmesi otomatik eklenir.
+- Reklam kişiselleştirme sinyalleri kapalı tutulur.
+- Gizlilik sayfası yeni davranışı açıklar.
 
-## Kurulum
-Patch klasörünün içindekileri mevcut `bgstudio-3d` repo klasörünün üzerine kopyala.
-GitHub Desktop: `Fix ampersand typography site-wide` → Commit to main → Push origin.
+2. Dönüşüm ölçümü
+- Genel WhatsApp tıklaması: `whatsapp_click` + `generate_lead`
+- Ürün siparişi: `whatsapp_order` + `generate_lead`
+- Hızlı WhatsApp paneli: `whatsapp_quick_contact` + `generate_lead`
+- Teklif formu: `quote_request` + `generate_lead`
+- Ürün detay görüntüleme: `view_item`
+
+3. Ürün Yöneticisi güvenliği
+- `Yayın kontrolü` ekranı eklendi.
+- CNAME, sitemap, SEO, ürün dosyaları ve slug çakışmaları kontrol edilir.
+- Manuel tam yedek alınabilir.
+- Yedek listesi ve geri yükleme sistemi eklendi.
+- Kalıcı ürün silme öncesinde otomatik tam yedek alınır.
+
+Not: Patch CNAME içermez. `data/backups/` GitHub'a gönderilmez.

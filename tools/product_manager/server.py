@@ -2,7 +2,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 from datetime import datetime
-import json, base64, re, webbrowser, threading, sys, shutil, traceback
+import json, base64, re, webbrowser, threading, sys, shutil, traceback, zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / 'static'
@@ -61,7 +61,100 @@ def write_products(data):
 def backup():
     BACKUPS.mkdir(parents=True, exist_ok=True)
     if DATA.exists():
-        shutil.copy2(DATA, BACKUPS / f"products-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json")
+        stamp = datetime.now().strftime('%Y%m%d-%H%M%S-%f')
+        path = BACKUPS / f"products-{stamp}.json"
+        shutil.copy2(DATA, path)
+        # Keep lightweight automatic JSON backups bounded.
+        auto = sorted(BACKUPS.glob('products-*.json'), reverse=True)
+        for old in auto[60:]:
+            old.unlink(missing_ok=True)
+        return path
+    return None
+
+
+def full_backup(reason='manual'):
+    BACKUPS.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+    safe_reason = re.sub(r'[^a-z0-9-]+', '-', str(reason).lower()).strip('-') or 'manual'
+    path = BACKUPS / f"site-{stamp}-{safe_reason}.zip"
+    with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as z:
+        if DATA.exists(): z.write(DATA, DATA.relative_to(ROOT))
+        for folder in (ROOT / 'assets/images/products', ROOT / 'assets/images/posters'):
+            if folder.exists():
+                for file in folder.rglob('*'):
+                    if file.is_file(): z.write(file, file.relative_to(ROOT))
+    snaps = sorted(BACKUPS.glob('site-*.zip'), reverse=True)
+    for old in snaps[15:]: old.unlink(missing_ok=True)
+    return path
+
+
+def list_backups():
+    BACKUPS.mkdir(parents=True, exist_ok=True)
+    files = sorted([*BACKUPS.glob('site-*.zip'), *BACKUPS.glob('products-*.json')], key=lambda x: x.stat().st_mtime, reverse=True)
+    out = []
+    for file in files[:30]:
+        out.append({
+            'name': file.name,
+            'type': 'full' if file.suffix.lower() == '.zip' else 'products',
+            'size': file.stat().st_size,
+            'modified': datetime.fromtimestamp(file.stat().st_mtime).isoformat(timespec='seconds')
+        })
+    return out
+
+
+def restore_backup(name):
+    file = (BACKUPS / Path(str(name)).name).resolve()
+    if BACKUPS.resolve() not in file.parents or not file.exists():
+        raise ValueError('Yedek bulunamadı.')
+    full_backup('before-restore')
+    if file.suffix.lower() == '.json':
+        data = json.loads(file.read_text(encoding='utf-8'))
+        if not isinstance(data, list): raise ValueError('Yedek ürün verisi geçersiz.')
+        write_products(data)
+    elif file.suffix.lower() == '.zip':
+        with zipfile.ZipFile(file, 'r') as z:
+            for member in z.infolist():
+                target = (ROOT / member.filename).resolve()
+                if ROOT.resolve() not in target.parents and target != ROOT.resolve():
+                    raise ValueError('Yedek içeriği güvenli değil.')
+            z.extractall(ROOT)
+    else:
+        raise ValueError('Desteklenmeyen yedek türü.')
+    return build_site()
+
+
+def preflight():
+    checks = []
+    try:
+        products = read_products()
+        checks.append({'status':'pass','label':'Ürün verisi','detail':f'{len(products)} ürün JSON dosyasından okunuyor.'})
+    except Exception as e:
+        return {'ok':False,'checks':[{'status':'fail','label':'Ürün verisi','detail':str(e)}]}
+    active = [x for x in products if x.get('active', True)]
+    slugs = [x.get('slug') for x in products]
+    dupes = sorted({x for x in slugs if x and slugs.count(x) > 1})
+    checks.append({'status':'fail' if dupes else 'pass','label':'URL slug','detail':('Tekrarlanan: '+', '.join(dupes)) if dupes else 'Tüm ürün URL slug alanları benzersiz.'})
+    missing = []
+    for prod in products:
+        if prod.get('main_image') and not (ROOT / prod['main_image']).exists(): missing.append(f"{prod.get('name')}: ana görsel")
+        if not (ROOT / 'urunler' / str(prod.get('slug')) / 'index.html').exists(): missing.append(f"{prod.get('name')}: ürün sayfası")
+        for item in normalize_gallery(prod.get('gallery_images')):
+            if not (ROOT / item['path']).exists(): missing.append(f"{prod.get('name')}: galeri")
+    checks.append({'status':'fail' if missing else 'pass','label':'Ürün dosyaları','detail':('Eksik: '+', '.join(missing[:8])) if missing else 'Ürün sayfaları ve referans verilen görseller mevcut.'})
+    seo_missing = [p.get('name') for p in active if not p.get('seo_title') or not p.get('seo_description')]
+    checks.append({'status':'warn' if seo_missing else 'pass','label':'SEO alanları','detail':('Eksik: '+', '.join(seo_missing[:8])) if seo_missing else 'Yayındaki tüm ürünlerde SEO başlığı ve açıklaması var.'})
+    cname = ROOT / 'CNAME'
+    cname_ok = cname.exists() and cname.read_text(encoding='utf-8').strip() == '3d.bgstudio.com.tr'
+    checks.append({'status':'fail' if not cname_ok else 'pass','label':'Canlı domain','detail':'CNAME = 3d.bgstudio.com.tr' if cname_ok else 'CNAME eksik veya beklenen domain farklı.'})
+    sitemap = ROOT / 'sitemap.xml'
+    expected = len(active) + 11
+    locs = sitemap.read_text(encoding='utf-8').count('<loc>') if sitemap.exists() else 0
+    checks.append({'status':'pass' if locs == expected else 'warn','label':'Sitemap','detail':f'{locs} URL bulundu; beklenen {expected}.'})
+    featured = len([p for p in active if p.get('featured')])
+    checks.append({'status':'warn' if featured > 8 else 'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor.'})
+    failures = sum(c['status']=='fail' for c in checks)
+    warnings = sum(c['status']=='warn' for c in checks)
+    return {'ok': failures == 0, 'checks':checks, 'summary':{'products':len(products),'active':len(active),'failures':failures,'warnings':warnings}}
 
 
 def save_data_uri(uri, path):
@@ -202,6 +295,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'products': read_products(), 'root': str(ROOT)})
         if u.path == '/api/status':
             return self.send_json({'ok': True, 'root': str(ROOT)})
+        if u.path == '/api/backups':
+            return self.send_json({'ok': True, 'backups': list_backups()})
+        if u.path == '/api/preflight':
+            return self.send_json(preflight())
         if u.path.startswith('/assets/') or u.path in ('/favicon.ico', '/apple-touch-icon.png'):
             return self.send_file(ROOT / unquote(u.path.lstrip('/')), ROOT)
         path = 'index.html' if u.path in ('/', '') else unquote(u.path.lstrip('/'))
@@ -361,6 +458,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not p:
                     raise ValueError('Ürün bulunamadı.')
                 backup()
+                full_backup('before-delete')
                 products = [x for x in products if x.get('slug') != slug]
                 write_products(products)
                 remove_file(p.get('main_image'))
@@ -372,6 +470,15 @@ class Handler(BaseHTTPRequestHandler):
                     shutil.rmtree(folder)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Ürün kalıcı olarak silindi.'})
+
+            if self.path == '/api/backup':
+                path = full_backup('manual')
+                return self.send_json({'ok': True, 'message': 'Tam site yedeği oluşturuldu.', 'backup': path.name, 'backups': list_backups()})
+
+            if self.path == '/api/restore':
+                payload = self.read_json()
+                result = restore_backup(payload.get('name') or '')
+                return self.send_json({'ok': True, 'message': 'Yedek geri yüklendi ve site yeniden oluşturuldu.', 'result': result})
 
             if self.path == '/api/rebuild':
                 return self.send_json({'ok': True, 'result': build_site(), 'message': 'Site yeniden oluşturuldu.'})
