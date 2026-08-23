@@ -11,8 +11,8 @@
     ],
     "active": true,
     "sort_order": 10,
-    "image": null,
-    "category": "Restoran • QR Stand"
+    "category": "Restoran • QR Stand",
+    "profile_image": "assets/images/references/istavrit-restaurant-profile.webp"
   },
   {
     "slug": "koala-petshop",
