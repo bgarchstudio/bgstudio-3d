@@ -325,15 +325,25 @@ if (shareProduct) {
 const orderConfig = document.querySelector('[data-order-config]');
 if (orderConfig) {
   const name = orderConfig.dataset.productName || document.querySelector('.product-info h1')?.textContent?.trim() || 'Ürün';
-  const price = orderConfig.dataset.productPrice || '';
+  const fallbackPriceText = orderConfig.dataset.productPrice || '';
+  const basePriceValue = Number(String(orderConfig.dataset.productBasePriceValue || '').replace(',', '.')) || 0;
   const option = orderConfig.querySelector('[data-order-option]');
+  const tier = orderConfig.querySelector('[data-order-tier]');
   const qty = orderConfig.querySelector('[data-order-qty]');
   const note = orderConfig.querySelector('[data-order-note]');
   const summary = orderConfig.querySelector('[data-order-summary]');
   const send = orderConfig.querySelector('[data-order-whatsapp]');
   const mobileSend = document.querySelector('[data-mobile-order-whatsapp]');
+  const priceDisplay = document.querySelector('[data-product-price-display]');
+  const mobilePrice = document.querySelector('[data-mobile-price]');
   const choiceBtns = document.querySelectorAll('[data-order-choice]');
+  const tierBtns = document.querySelectorAll('[data-order-tier-choice]');
 
+  const formatTL = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '';
+    return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(n) + ' TL';
+  };
   const clampQty = () => {
     let value = parseInt(qty?.value || '1', 10);
     if (!Number.isFinite(value)) value = 1;
@@ -341,17 +351,49 @@ if (orderConfig) {
     if (qty) qty.value = value;
     return value;
   };
+  const selectedTier = () => {
+    const opt = tier?.selectedOptions?.[0];
+    if (!opt) return null;
+    const packQty = parseInt(opt.dataset.tierQty || '1', 10) || 1;
+    const packPrice = Number(String(opt.dataset.tierPrice || '').replace(',', '.'));
+    return {
+      index: opt.value,
+      label: opt.dataset.tierLabel || opt.textContent.trim(),
+      packQty,
+      packPrice: Number.isFinite(packPrice) ? packPrice : 0,
+      priceLabel: opt.dataset.tierPriceLabel || (Number.isFinite(packPrice) ? formatTL(packPrice) : '')
+    };
+  };
+  const syncTierUi = () => {
+    const t = selectedTier();
+    tierBtns.forEach(btn => btn.classList.toggle('selected', !!t && btn.dataset.orderTierChoice === t.index));
+    const label = t?.priceLabel || fallbackPriceText;
+    if (priceDisplay && label) priceDisplay.textContent = label;
+    if (mobilePrice && label) mobilePrice.textContent = label;
+  };
   const buildMessage = () => {
     const amount = clampQty();
     const selected = option?.value || 'Standart';
-    if (summary) summary.textContent = `${selected} • ${amount} adet`;
+    const t = selectedTier();
+    let totalItems = amount;
+    let totalValue = basePriceValue ? basePriceValue * amount : 0;
+    if (t) {
+      totalItems = t.packQty * amount;
+      totalValue = t.packPrice * amount;
+      if (summary) summary.textContent = `${selected} • ${t.label} • ${amount} set (${totalItems} adet)${totalValue ? ' • ' + formatTL(totalValue) : ''}`;
+    } else if (summary) {
+      summary.textContent = `${selected} • ${amount} adet${totalValue ? ' • ' + formatTL(totalValue) : ''}`;
+    }
     const lines = [
       'Merhaba BG Studio 3D, web sitesinden sipariş için yazıyorum.',
       '',
       `Ürün: ${name}`,
       `Seçenek: ${selected}`,
-      `Adet: ${amount}`,
-      price ? `Sayfadaki fiyat: ${price}` : '',
+      t ? `Paket: ${t.label}` : '',
+      t ? `Paket adedi: ${amount}` : `Adet: ${amount}`,
+      t ? `Toplam ürün: ${totalItems} adet` : '',
+      t && t.packPrice ? `Paket fiyatı: ${formatTL(t.packPrice)}` : '',
+      totalValue ? `Toplam: ${formatTL(totalValue)}` : (fallbackPriceText ? `Sayfadaki fiyat: ${fallbackPriceText}` : ''),
       note?.value.trim() ? `Not: ${note.value.trim()}` : '',
       '',
       `Ürün sayfası: ${canonicalUrl}`
@@ -359,20 +401,26 @@ if (orderConfig) {
     const href = 'https://wa.me/905302466903?text=' + encodeURIComponent(lines.join('\n'));
     if (send) send.href = href;
     if (mobileSend) mobileSend.href = href;
+    syncTierUi();
   };
   const trackProductOrder = () => {
     const amount = clampQty();
     const selected = option?.value || 'Standart';
+    const t = selectedTier();
     const product = analyticsProductContext();
+    const totalItems = t ? t.packQty * amount : amount;
+    const totalValue = t?.packPrice ? t.packPrice * amount : (product?.price ? product.price * amount : basePriceValue * amount);
     const payload = {
       method: 'product_order_whatsapp',
       item_id: product?.item_id || name,
       item_name: product?.item_name || name,
       option: selected,
-      quantity: amount,
+      quantity: totalItems,
+      set_count: t ? amount : undefined,
+      set_label: t?.label || undefined,
       page_location: canonicalUrl
     };
-    if (product?.price) { payload.value = product.price * amount; payload.currency = 'TRY'; }
+    if (totalValue) { payload.value = totalValue; payload.currency = 'TRY'; }
     trackEvent('whatsapp_order', payload);
     trackEvent('generate_lead', payload);
   };
@@ -394,11 +442,17 @@ if (orderConfig) {
     choiceBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.orderChoice === option.value));
     buildMessage();
   });
+  tier?.addEventListener('change', buildMessage);
   note?.addEventListener('input', buildMessage);
   choiceBtns.forEach(btn => btn.addEventListener('click', () => {
     if (option) option.value = btn.dataset.orderChoice;
     choiceBtns.forEach(item => item.classList.toggle('selected', item === btn));
     buildMessage();
+  }));
+  tierBtns.forEach(btn => btn.addEventListener('click', () => {
+    if (tier) tier.value = btn.dataset.orderTierChoice;
+    buildMessage();
+    orderConfig.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }));
   mobileSend?.addEventListener('click', event => {
     if (mobileSend.getAttribute('href') === '#') {

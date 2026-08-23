@@ -40,3 +40,6 @@ Panel `CNAME`, DNS, GitHub Pages, Analytics ölçüm kimliği veya Cloudflare ay
 - Bir ürün kalıcı silinmeden önce otomatik tam site yedeği alınır.
 - Yedek geri yüklenmeden önce mevcut durum da otomatik tam yedeklenir.
 - `data/backups/` `.gitignore` içinde olduğu için bu yerel yedekler GitHub'a gönderilmez.
+
+## v2.5 — Set / adet fiyatlandırması
+Tekli fiyatın yanında 2’li, 4’lü veya başka paket fiyatları olan ürünler için `Set / adet fiyatlandırması` alanını kullan. Paket adı, ürün adedi, fiyat ve kısa notu panelden yönetebilirsin. Canlı ürün sayfasındaki sipariş seçici ve WhatsApp mesajı bu bilgileri otomatik kullanır.

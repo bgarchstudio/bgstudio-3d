@@ -1,9 +1,11 @@
-# v2.4 kurulumu
-Bu klasörün **içindekileri** GitHub Desktop'taki `bgstudio-3d` repo klasörünün üzerine kopyala.
+# BG Studio 3D v2.5 — Set / Adet Fiyatlandırması
 
-Commit mesajı önerisi:
-`Add NFC and prototype content manager v2.4`
+Bu patch mevcut v2.4.1 yapısının üzerine uygulanır. CNAME içermez.
 
-Ardından **Commit to main → Push origin**.
-
-`CNAME` patch'e dahil değildir; canlı domain ayarına dokunulmaz.
+- Ürün Yöneticisine esnek set fiyatı satırları eklendi.
+- Paket adı, ürün adedi, fiyat ve kısa not panelden düzenlenebilir.
+- Canlı ürün sayfasında set kartları ve paket seçimi oluşur.
+- WhatsApp sipariş mesajı toplam adet ve fiyatı otomatik hesaplar.
+- Product schema set fiyatlarını ayrı Offer olarak yayınlar.
+- Dekoratif Lale 299 / 499 / 899 TL set örneğiyle hazırlandı.
+- Yayın kontrolüne set fiyatı doğrulaması eklendi.

@@ -13,7 +13,7 @@ BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
 
-PANEL_VERSION = '2.4.1'
+PANEL_VERSION = '2.5'
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -147,6 +147,16 @@ def preflight():
         for item in normalize_gallery(prod.get('gallery_images')):
             if not (ROOT / item['path']).exists(): missing.append(f"{prod.get('name')}: galeri")
     checks.append({'status':'fail' if missing else 'pass','label':'Ürün dosyaları','detail':('Eksik: '+', '.join(missing[:8])) if missing else 'Ürün sayfaları ve referans verilen görseller mevcut.'})
+    pricing_bad = []
+    for prod in products:
+        seen = set()
+        for tier in normalize_pricing_tiers(prod.get('pricing_tiers')):
+            qty = tier.get('quantity')
+            if qty in seen or not tier.get('price_value'):
+                pricing_bad.append(prod.get('name'))
+                break
+            seen.add(qty)
+    checks.append({'status':'warn' if pricing_bad else 'pass','label':'Set fiyatları','detail':('Kontrol et: '+', '.join(pricing_bad[:8])) if pricing_bad else 'Tanımlı set / adet fiyatları geçerli.'})
     seo_missing = [p.get('name') for p in active if not p.get('seo_title') or not p.get('seo_description')]
     checks.append({'status':'warn' if seo_missing else 'pass','label':'SEO alanları','detail':('Eksik: '+', '.join(seo_missing[:8])) if seo_missing else 'Yayındaki tüm ürünlerde SEO başlığı ve açıklaması var.'})
     cname = ROOT / 'CNAME'
@@ -203,12 +213,34 @@ def normalize_gallery(value):
     return out[:12]
 
 
+def normalize_pricing_tiers(items):
+    out = []
+    seen = set()
+    for item in (items or []):
+        if not isinstance(item, dict):
+            continue
+        try:
+            qty = int(item.get('quantity') or 0)
+        except Exception:
+            qty = 0
+        raw_price = str(item.get('price_value') or '').strip().replace(',', '.')
+        if qty < 1 or not re.fullmatch(r'\d+(?:\.\d+)?', raw_price):
+            continue
+        if qty in seen:
+            continue
+        seen.add(qty)
+        label = str(item.get('label') or '').strip() or (f"{qty}’li set" if qty > 1 else 'Tekli')
+        note = str(item.get('note') or '').strip()
+        out.append({'label': label[:60], 'quantity': qty, 'price_value': raw_price, 'note': note[:80]})
+    return sorted(out, key=lambda x: x['quantity'])[:12]
+
+
 def clean_product(p):
     allowed = {
         'slug', 'name', 'category', 'price_text', 'price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
@@ -225,6 +257,7 @@ def clean_product(p):
     out['production_note'] = str(out.get('production_note') or '').strip()
     out['options'] = [str(x).strip() for x in (out.get('options') or []) if str(x).strip()]
     out['features'] = [str(x).strip() for x in (out.get('features') or []) if str(x).strip()]
+    out['pricing_tiers'] = normalize_pricing_tiers(out.get('pricing_tiers'))
     out['gallery_images'] = normalize_gallery(out.get('gallery_images'))
     out['featured'] = bool(out.get('featured'))
     out['active'] = bool(out.get('active', True))
