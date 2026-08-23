@@ -50,6 +50,31 @@ try {
         $repo = $null
     }
 
+    # Keep the persistent desktop shortcut icon synced with the current repo artwork.
+    $repoIcon = Join-Path $repo 'assets\brand\bgstudio3d-app.ico'
+    $iconTarget = Join-Path $launchHome 'bgstudio3d.ico'
+    if (Test-Path -LiteralPath $repoIcon) {
+        $needsCopy = -not (Test-Path -LiteralPath $iconTarget)
+        if (-not $needsCopy) {
+            try { $needsCopy = (Get-FileHash -LiteralPath $repoIcon -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $iconTarget -Algorithm SHA256).Hash } catch { $needsCopy = $true }
+        }
+        if ($needsCopy) {
+            Copy-Item -LiteralPath $repoIcon -Destination $iconTarget -Force
+            Unblock-File -LiteralPath $iconTarget -ErrorAction SilentlyContinue
+            try {
+                Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class BG3DShellNotify {
+  [DllImport("shell32.dll")]
+  public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+}
+'@ -ErrorAction SilentlyContinue
+                [BG3DShellNotify]::SHChangeNotify(0x08000000, 0x0000, [IntPtr]::Zero, [IntPtr]::Zero)
+            } catch {}
+        }
+    }
+
     Clear-Host
     Write-Host '===============================================' -ForegroundColor DarkYellow
     Write-Host '       BG STUDIO 3D - KALICI YONETICI' -ForegroundColor White

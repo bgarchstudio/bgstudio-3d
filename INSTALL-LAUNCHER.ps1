@@ -13,6 +13,7 @@ try {
     $launcherSource = Join-Path $packageRoot 'launcher\BG-STUDIO-3D-YONETICI.ps1'
     $launcherTarget = Join-Path $launchHome 'BG-STUDIO-3D-YONETICI.ps1'
     $iconTarget = Join-Path $launchHome 'bgstudio3d.ico'
+    $iconSource = Join-Path $packageRoot 'assets\brand\bgstudio3d-app.ico'
 
     Write-Host ''
     Write-Host '=====================================================' -ForegroundColor DarkYellow
@@ -74,10 +75,12 @@ try {
     Unblock-File -LiteralPath $launcherTarget -ErrorAction SilentlyContinue
     Write-Ok "Kalici launcher olusturuldu: $launcherTarget"
 
-    $repoIcon = Join-Path $repo 'assets\brand\favicon.ico'
-    if (Test-Path -LiteralPath $repoIcon) {
-        Copy-Item -LiteralPath $repoIcon -Destination $iconTarget -Force
+    if (Test-Path -LiteralPath $iconSource) {
+        Copy-Item -LiteralPath $iconSource -Destination $iconTarget -Force
         Unblock-File -LiteralPath $iconTarget -ErrorAction SilentlyContinue
+        Write-Ok "BG Studio 3D uygulama ikonu kuruldu: $iconTarget"
+    } else {
+        Write-Warn "Uygulama ikonu bulunamadi; kisayol varsayilan ikonla olusturulacak."
     }
 
     $desktop = [Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)

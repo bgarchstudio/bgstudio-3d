@@ -43,3 +43,6 @@ Panel `CNAME`, DNS, GitHub Pages, Analytics ölçüm kimliği veya Cloudflare ay
 
 ## v2.5 — Set / adet fiyatlandırması
 Tekli fiyatın yanında 2’li, 4’lü veya başka paket fiyatları olan ürünler için `Set / adet fiyatlandırması` alanını kullan. Paket adı, ürün adedi, fiyat ve kısa notu panelden yönetebilirsin. Canlı ürün sayfasındaki sipariş seçici ve WhatsApp mesajı bu bilgileri otomatik kullanır.
+
+## v2.8.4 Kalıcı launcher
+Paneli repo içindeki CMD yerine masaüstündeki kalıcı kısayoldan açmak için bir kez `KALICI-YONETICI-KUR.cmd` çalıştır. Launcher `%LOCALAPPDATA%\BGStudio3D\launcher` altına kurulur ve gelecekteki ZIP güncellemelerinden etkilenmez.
