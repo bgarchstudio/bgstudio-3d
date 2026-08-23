@@ -359,35 +359,37 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "kask-askiligi",
-    "name": "3D Baskı Kask Askılığı",
-    "category": "fonksiyonel",
-    "price_text": "Fiyat için iletişim",
-    "price_value": null,
-    "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
-    "description": "Motosiklet ekipmanlarını düzenli ve erişilebilir tutmak için tasarlanan duvar tipi 3D baskı askılık; kask taşıma yüzeyi ve anahtar kancası içerir.",
-    "options": [
-      "Glitter Galaxy Black",
-      "Siyah"
-    ],
+    "pricing_tiers": [],
     "features": [
       "Duvara monte",
       "Kask uyumlu",
       "Anahtar kancası",
       "Dayanıklı kullanım"
     ],
+    "category": "fonksiyonel",
+    "description": "Motosiklet ekipmanlarını düzenli ve erişilebilir tutmak için tasarlanan duvar tipi 3D baskı askılık; kask taşıma yüzeyi ve anahtar kancası içerir.",
+    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "kask-askiligi",
+    "name": "3D Baskı Kask Askılığı",
+    "active": true,
+    "price_text": "Fiyat için iletişim",
+    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": null,
+    "featured": false,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 11,
+    "options": [
+      "Glitter Galaxy Black",
+      "Siyah"
+    ],
+    "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
+    "gallery_images": [],
     "main_image": "assets/images/products/kask-askiligi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/kask-askiligi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 11,
-    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "kisiye-ozel-miknatisli-acacak",
