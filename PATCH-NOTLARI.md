@@ -1,11 +1,14 @@
-# BG Studio 3D v2.5 — Set / Adet Fiyatlandırması
+# BG Studio 3D v2.5.1 — Panel Hizalama
 
-Bu patch mevcut v2.4.1 yapısının üzerine uygulanır. CNAME içermez.
+Bu patch yalnızca Ürün Yöneticisi arayüzündeki form hizalarını düzeltir.
 
-- Ürün Yöneticisine esnek set fiyatı satırları eklendi.
-- Paket adı, ürün adedi, fiyat ve kısa not panelden düzenlenebilir.
-- Canlı ürün sayfasında set kartları ve paket seçimi oluşur.
-- WhatsApp sipariş mesajı toplam adet ve fiyatı otomatik hesaplar.
-- Product schema set fiyatlarını ayrı Offer olarak yayınlar.
-- Dekoratif Lale 299 / 499 / 899 TL set örneğiyle hazırlandı.
-- Yayın kontrolüne set fiyatı doğrulaması eklendi.
+- Temel bilgiler bölümündeki iki kolon aynı satır çizgisine oturtuldu.
+- Input/select yükseklikleri eşitlendi.
+- Açıklama/not satırları için iki kolonda eşit alan ayrıldı.
+- Gösterilen fiyat ve Google fiyatı aynı çizgiye alındı.
+- Kategori ve katalog sırası aynı çizgiye alındı.
+- Checkbox satırı düzenlendi.
+- Set/adet fiyat satırlarında input ve sil butonu tabanları eşitlendi.
+- Mobil görünüm korunur.
+
+CNAME, ürün verisi, Analytics ve canlı site dosyalarına dokunmaz.
