@@ -16,7 +16,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '2.8.2'
+PANEL_VERSION = '2.8.3'
 BACKUPS = BACKUPS_ROOT
 ensure_initialized()
 export_to_repo()
