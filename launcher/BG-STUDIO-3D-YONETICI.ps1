@@ -1,0 +1,85 @@
+$ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$Host.UI.RawUI.WindowTitle = 'BG Studio 3D - Kalici Yonetici'
+
+$appHome = Join-Path $env:LOCALAPPDATA 'BGStudio3D'
+$launchHome = Join-Path $appHome 'launcher'
+$repoFile = Join-Path $launchHome 'repo-path.txt'
+$env:PYTHONUTF8 = '1'
+$env:PYTHONIOENCODING = 'utf-8'
+
+function Wait-And-Exit([string]$Message) {
+    Write-Host ''
+    Write-Host $Message -ForegroundColor Red
+    Write-Host ''
+    Read-Host 'Kapatmak icin Enter'
+    exit 1
+}
+
+try {
+    New-Item -ItemType Directory -Path $launchHome -Force | Out-Null
+    $repo = $null
+    if (Test-Path -LiteralPath $repoFile) {
+        $repo = (Get-Content -LiteralPath $repoFile -Raw -ErrorAction SilentlyContinue).Trim().Trim('"')
+    }
+
+    while ($true) {
+        if ($repo) {
+            $server = Join-Path $repo 'tools\product_manager\server.py'
+            $storage = Join-Path $repo 'tools\product_manager\storage_cli.py'
+            if ((Test-Path -LiteralPath $server) -and (Test-Path -LiteralPath $storage)) { break }
+        }
+        Clear-Host
+        Write-Host '===============================================' -ForegroundColor DarkYellow
+        Write-Host '       BG STUDIO 3D - KALICI YONETICI' -ForegroundColor White
+        Write-Host '===============================================' -ForegroundColor DarkYellow
+        Write-Host ''
+        Write-Host 'Kayitli repo bulunamadi veya tasinmis.' -ForegroundColor Yellow
+        Write-Host 'bgstudio-3d klasorunun TAM yolunu yapistir.'
+        $typed = (Read-Host 'Repo yolu').Trim().Trim('"')
+        if (-not $typed) { Wait-And-Exit 'Repo yolu bos birakildi.' }
+        $server = Join-Path $typed 'tools\product_manager\server.py'
+        $storage = Join-Path $typed 'tools\product_manager\storage_cli.py'
+        if ((Test-Path -LiteralPath $server) -and (Test-Path -LiteralPath $storage)) {
+            $repo = (Resolve-Path -LiteralPath $typed).Path
+            Set-Content -LiteralPath $repoFile -Value $repo -Encoding UTF8
+            break
+        }
+        Write-Host '[HATA] Bu klasorde gerekli panel dosyalari yok.' -ForegroundColor Red
+        Start-Sleep -Seconds 1
+        $repo = $null
+    }
+
+    Clear-Host
+    Write-Host '===============================================' -ForegroundColor DarkYellow
+    Write-Host '       BG STUDIO 3D - KALICI YONETICI' -ForegroundColor White
+    Write-Host '===============================================' -ForegroundColor DarkYellow
+    Write-Host ''
+    Write-Host ('Repo : ' + $repo)
+    Write-Host ('Veri : ' + $appHome)
+    Write-Host ''
+    Write-Host 'Kalici veriler hazirlaniyor...' -ForegroundColor DarkYellow
+
+    $pythonCommand = $null
+    $pythonPrefix = @()
+    if (Get-Command py -ErrorAction SilentlyContinue) {
+        $pythonCommand = 'py'; $pythonPrefix = @('-3')
+    } elseif (Get-Command python -ErrorAction SilentlyContinue) {
+        $pythonCommand = 'python'
+    } elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
+        $pythonCommand = 'python3'
+    }
+    if (-not $pythonCommand) { Wait-And-Exit 'Python 3 bulunamadi.' }
+
+    $storage = Join-Path $repo 'tools\product_manager\storage_cli.py'
+    $server = Join-Path $repo 'tools\product_manager\server.py'
+
+    & $pythonCommand @pythonPrefix $storage 'prepare'
+    if ($LASTEXITCODE -ne 0) { Wait-And-Exit 'Kalici veri kasasi hazirlanamadi. Verilerin silinmedi.' }
+
+    & $pythonCommand @pythonPrefix $server
+    if ($LASTEXITCODE -ne 0) { Wait-And-Exit "Panel sunucusu hata koduyla kapandi: $LASTEXITCODE" }
+}
+catch {
+    Wait-And-Exit $_.Exception.Message
+}

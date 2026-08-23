@@ -1,10 +1,14 @@
-BG Studio 3D - Kalici Launcher v2.8.4b
+BG STUDIO 3D v2.8.4c - PowerShell Kalici Launcher Hotfix
 
-ONEMLI:
-1) ZIP'i cikarin.
-2) En garanti baslatma icin KURULUMU-BASLAT.bat dosyasina cift tiklayin.
-3) Bu dosya kurulumu CMD /K ile acik tutar. Bir hata olsa bile pencere kapanmaz.
-4) Repo yolu otomatik bulunamazsa mevcut bgstudio-3d klasorunun TAM yolunu yapistirin.
-5) Basarili olunca Masaustunde "BG Studio 3D Yonetici" kisayolu olusur.
+Bu paket onceki CMD kurulumundaki yol/parantez tirnaklama hatasini kaldirir.
+Ozellikle repo yolu su tur klasorler iceriyorsa guvenlidir:
+  bgstudio-3d (YAYINDAKI SITEM)
 
-Bu paket DATA/urun/fiyat/renk/NFC dosyalarina dokunmaz.
+KURULUM:
+1) ZIP'i cikar.
+2) Icindekileri bgstudio-3d repo kokune kopyala.
+3) KURULUMU-BASLAT.bat dosyasini calistir.
+4) Masaustunde BG Studio 3D Yonetici kisayolu olustugunu kontrol et.
+
+Kurulum artik PowerShell ile yapilir. Kalici launcher da PowerShell tabanlidir.
+Kalici veri kasasina dokunmaz: %LOCALAPPDATA%\BGStudio3D
