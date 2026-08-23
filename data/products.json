@@ -1,29 +1,29 @@
 [
   {
-    "options": [
-      "Full Siyah",
-      "Full Beyaz",
-      "Siyah Fan / Beyaz Gövde"
-    ],
+    "name": "Araç Koku Difüzörü",
+    "price_value": "239",
+    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "active": true,
+    "seo_description": "Araç Koku Difüzörü, Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "sort_order": 1,
+    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "arac-koku-difuzoru",
+    "price_text": "239 TL’den",
+    "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
+    "featured": true,
+    "category": "fonksiyonel",
     "features": [
       "Çıkarılabilir iç kapak",
       "Pamuk haznesi",
       "Klima ızgarasına montaj",
       "Tek renk 239 TL / çift renk 249 TL"
     ],
-    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
-    "featured": true,
-    "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
-    "seo_description": "Araç Koku Difüzörü, Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "category": "fonksiyonel",
-    "price_text": "239 TL’den",
-    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
-    "sort_order": 1,
-    "price_value": "239",
-    "active": true,
-    "slug": "arac-koku-difuzoru",
-    "name": "Araç Koku Difüzörü",
+    "options": [
+      "Full Siyah",
+      "Full Beyaz",
+      "Siyah Fan / Beyaz Gövde"
+    ],
     "gallery_images": [],
     "main_image": "assets/images/products/arac-koku-difuzoru.webp",
     "main_image_width": 1000,
@@ -33,28 +33,28 @@
     "poster_image_height": 1254
   },
   {
-    "options": [
-      "Siyah"
-    ],
+    "name": "Atatürk İmzası",
+    "price_value": null,
+    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "active": true,
+    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "sort_order": 2,
+    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "ataturk-imzasi",
+    "price_text": "Ölçüye göre",
+    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
+    "featured": false,
+    "category": "kisiye-ozel",
     "features": [
       "İstenen ölçüde üretim",
       "40 / 48 / 60 / 80 cm örnekleri",
       "Duvar ve mermer yüzeye uygun",
       "Siyah renk üretim"
     ],
-    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
-    "featured": false,
-    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
-    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "category": "kisiye-ozel",
-    "price_text": "Ölçüye göre",
-    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
-    "sort_order": 2,
-    "price_value": null,
-    "active": true,
-    "slug": "ataturk-imzasi",
-    "name": "Atatürk İmzası",
+    "options": [
+      "Siyah"
+    ],
     "gallery_images": [],
     "main_image": "assets/images/products/ataturk-imzasi.webp",
     "main_image_width": 1000,
