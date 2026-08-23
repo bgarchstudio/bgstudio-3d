@@ -1,28 +1,28 @@
 [
   {
+    "options": [
+      "Full Siyah",
+      "Full Beyaz",
+      "Siyah Fan / Beyaz Gövde"
+    ],
+    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
     "name": "Araç Koku Difüzörü",
-    "price_value": "239",
-    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "category": "fonksiyonel",
+    "featured": true,
     "active": true,
     "seo_description": "Araç Koku Difüzörü, Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "sort_order": 1,
-    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
+    "price_value": "239",
+    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
     "slug": "arac-koku-difuzoru",
-    "price_text": "239 TL’den",
+    "price_text": "239 TL",
     "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
-    "featured": true,
-    "category": "fonksiyonel",
+    "sort_order": 1,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "Çıkarılabilir iç kapak",
       "Pamuk haznesi",
       "Klima ızgarasına montaj",
       "Tek renk 239 TL / çift renk 249 TL"
-    ],
-    "options": [
-      "Full Siyah",
-      "Full Beyaz",
-      "Siyah Fan / Beyaz Gövde"
     ],
     "gallery_images": [],
     "main_image": "assets/images/products/arac-koku-difuzoru.webp",
