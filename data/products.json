@@ -253,13 +253,25 @@
     "poster_image_height": 1254
   },
   {
+    "pricing_tiers": [],
+    "features": [
+      "Çizgili 3D baskı form",
+      "Kalp detayı",
+      "2’li set: 379 TL",
+      "7 renk seçeneği"
+    ],
+    "category": "dekoratif",
+    "description": "Kalp detayıyla tamamlanan tavşan formu; ev, ofis ve hediye kullanımına yönelik modern ve sıcak bir dekoratif parçadır.",
+    "seo_title": "Dekoratif Tavşan Obje | Kuşadası 3D Baskı | BG Studio 3D",
     "slug": "dekoratif-tavsan-obje",
     "name": "Dekoratif Tavşan Obje",
-    "category": "dekoratif",
+    "active": true,
     "price_text": "229 TL",
+    "seo_description": "Dekoratif Tavşan Obje, Kalp detaylı, zarif çizgili tavşan dekor objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "price_value": "229",
-    "card_description": "Kalp detaylı, zarif çizgili tavşan dekor objesi.",
-    "description": "Kalp detayıyla tamamlanan tavşan formu; ev, ofis ve hediye kullanımına yönelik modern ve sıcak bir dekoratif parçadır.",
+    "featured": true,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 8,
     "options": [
       "Bone White",
       "Glitter Galaxy Black",
@@ -269,24 +281,14 @@
       "Avocado Green",
       "Silk Kings Gold"
     ],
-    "features": [
-      "Çizgili 3D baskı form",
-      "Kalp detayı",
-      "2’li set: 379 TL",
-      "7 renk seçeneği"
-    ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "card_description": "Kalp detaylı, zarif çizgili tavşan dekor objesi.",
+    "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-tavsan-obje.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-tavsan-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": true,
-    "active": true,
-    "sort_order": 8,
-    "seo_title": "Dekoratif Tavşan Obje | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Dekoratif Tavşan Obje, Kalp detaylı, zarif çizgili tavşan dekor objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "havuz-icecek-tutucu",
