@@ -220,29 +220,30 @@
     "poster_image_height": 1254
   },
   {
-    "options": [
-      "Bone White",
-      "Diğer filament renkleri talebe göre"
-    ],
-    "seo_title": "Dekoratif Mumluk | Kuşadası 3D Baskı | BG Studio 3D",
-    "name": "Dekoratif Mumluk",
-    "category": "dekoratif",
-    "featured": false,
-    "active": true,
-    "seo_description": "Dekoratif Mumluk, Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "price_value": "349",
-    "description": "Yuvarlak çizgili formdaki 3D baskı mumluk, masa ve komodinlerde sıcak bir atmosfer oluşturmak için pilli mumla birlikte kullanıma hazır sunulur.",
-    "slug": "dekoratif-mumluk",
-    "price_text": "349 TL",
-    "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
-    "sort_order": 7,
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "pricing_tiers": [],
     "features": [
       "Yapay pilli mum dahil",
       "3D baskı gövde",
       "Masa ve komodin kullanımı",
       "Sıcak ambiyans"
     ],
+    "category": "dekoratif",
+    "description": "Yuvarlak çizgili formdaki 3D baskı mumluk, masa ve komodinlerde sıcak bir atmosfer oluşturmak için pilli mumla birlikte kullanıma hazır sunulur.",
+    "seo_title": "Dekoratif Mumluk | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "dekoratif-mumluk",
+    "name": "Dekoratif Mumluk",
+    "active": true,
+    "price_text": "349 TL",
+    "seo_description": "Dekoratif Mumluk, Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "349",
+    "featured": false,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 7,
+    "options": [
+      "Bone White",
+      "Diğer filament renkleri talebe göre"
+    ],
+    "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mumluk.webp",
     "main_image_width": 1000,
