@@ -15,7 +15,7 @@ BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
 
-PANEL_VERSION = '2.6.3'
+PANEL_VERSION = '2.7.0'
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',

@@ -1,18 +1,6 @@
-# BG Studio 3D v2.6.2 — Profil Fotoğrafı Patch
+# v2.7 Premium Panel Patch
 
-Bu patch mevcut ürün, renk, NFC, kurumsal ve prototip JSON verilerini içermez; mevcut panel verilerinin üzerine yazmaz.
+Bu patch yalnızca yerel yönetim panelinin arayüzünü ve panel sürüm eşleşmesini günceller.
+Ürün verileri, renkler, NFC/kurumsal/prototip kayıtları, CNAME, canlı site içerikleri ve Analytics verilerine dokunmaz.
 
-## Kurulum
-1. Ürün yöneticisini ve açık Python/CMD penceresini kapat.
-2. Bu klasörün içindekileri mevcut `bgstudio-3d` repo klasörünün üzerine kopyala.
-3. Ürün yöneticisini yeniden aç.
-4. `Saha & Prototip` bölümüne gir.
-5. NFC veya bağımsız Kurumsal kayıtta `Profil fotoğrafı / işletme logosu` alanını kullan.
-6. `Siteyi yeniden oluştur` çalıştır.
-7. GitHub Desktop: Commit + Push.
-
-## Davranış
-- Profil fotoğrafı yüklenmezse BG Studio monogramı otomatik gösterilir.
-- NFC kaydına bağlı Kurumsal kartlar profil fotoğrafını da NFC kaynağından devralır.
-- `Varsayılan BG logosuna dön` ile yüklenmiş profil fotoğrafı kaldırılabilir.
-- Prototip kartlarında profil fotoğrafı alanı gösterilmez.
+Kurulumdan önce açık Ürün Yöneticisi CMD/Python penceresini kapat. Dosyaları repo üzerine kopyaladıktan sonra `URUN-YONETICI.cmd` ile paneli yeniden başlat.

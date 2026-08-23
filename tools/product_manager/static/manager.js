@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='2.6.3';
+const PANEL_VERSION='2.7.0';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -134,37 +134,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('colorsModal').h
 
 load().catch(e=>toast(e.message,true));
 
-// v2.2.1 — normalize ampersands in product-manager display headings too.
-function normalizePanelAmpersands(root=document){
-  const headings=root?.matches?.('h1,h2,h3')?[root]:[...(root?.querySelectorAll?.('h1,h2,h3')||[])];
-  headings.forEach(heading=>{
-    if(!heading.textContent?.includes('&'))return;
-    const walker=document.createTreeWalker(heading,NodeFilter.SHOW_TEXT);
-    const nodes=[];
-    while(walker.nextNode()){
-      const node=walker.currentNode;
-      if(node.parentElement?.classList.contains('plain-amp'))continue;
-      if(node.nodeValue?.includes('&'))nodes.push(node);
-    }
-    nodes.forEach(node=>{
-      const parts=node.nodeValue.split('&');
-      const frag=document.createDocumentFragment();
-      parts.forEach((part,i)=>{
-        if(part)frag.append(document.createTextNode(part));
-        if(i<parts.length-1){const amp=document.createElement('span');amp.className='plain-amp';amp.textContent='&';frag.append(amp)}
-      });
-      node.replaceWith(frag);
-    });
-  });
-}
-normalizePanelAmpersands();
-const ampObserver=new MutationObserver(mutations=>{
-  mutations.forEach(m=>{
-    if(m.type==='characterData')normalizePanelAmpersands(m.target.parentElement);
-    m.addedNodes?.forEach(node=>{if(node.nodeType===1)normalizePanelAmpersands(node)});
-  });
-});
-ampObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
+// v2.7 — panel headings use native text; no runtime ampersand rewriting.
 
 // v2.3 — publish preflight + local backup/restore center
 function formatBytes(bytes){const n=Number(bytes||0);if(n<1024)return `${n} B`;if(n<1024*1024)return `${(n/1024).toFixed(1)} KB`;return `${(n/1024/1024).toFixed(1)} MB`}
