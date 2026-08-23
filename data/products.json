@@ -193,6 +193,9 @@
     "poster_image_height": 1254
   },
   {
+    "seo_title": "Dekoratif Mirket Obje | Kuşadası 3D Baskı | BG Studio 3D",
+    "category": "dekoratif",
+    "price_text": "229 TL",
     "pricing_tiers": [
       {
         "label": "3'lü Alım",
@@ -201,24 +204,18 @@
         "note": "Set Fiyatı"
       }
     ],
+    "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
+    "slug": "dekoratif-mirket-obje",
+    "featured": true,
+    "active": true,
+    "sort_order": 6,
     "features": [
       "Tek parça 3D baskı",
       "Raf ve masa dekorasyonu",
       "3’lü set: 549 TL",
       "Geniş renk seçeneği"
     ],
-    "category": "dekoratif",
     "description": "Dikey çizgili gövdesiyle modern bir karakter kazanan mirket objesi, raf ve masa dekorasyonu için hafif ve dikkat çekici bir seçenektir.",
-    "seo_title": "Dekoratif Mirket Obje | Kuşadası 3D Baskı | BG Studio 3D",
-    "slug": "dekoratif-mirket-obje",
-    "name": "Dekoratif Mirket Obje",
-    "active": true,
-    "price_text": "229 TL",
-    "seo_description": "Dekoratif Mirket Obje, Sevimli ve minimal mirket formunda 3D baskı dekor. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "price_value": "229",
-    "featured": true,
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
-    "sort_order": 6,
     "options": [
       "Bone White",
       "Glitter Galaxy Black",
@@ -228,7 +225,10 @@
       "Avocado Green",
       "Silk Kings Gold"
     ],
-    "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
+    "name": "Dekoratif Mirket Obje",
+    "price_value": "229",
+    "seo_description": "Dekoratif Mirket Obje, Sevimli ve minimal mirket formunda 3D baskı dekor. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mirket-obje.webp",
     "main_image_width": 1000,
