@@ -64,35 +64,36 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "cerceveli-dalga-lamba",
-    "name": "Çerçeveli Dalga Masa Lambası",
-    "category": "aydinlatma",
-    "price_text": "899 TL",
-    "price_value": "899",
-    "card_description": "Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası.",
-    "description": "Siyah çerçeve içerisinde katmanlı dalga formunu LED ışıkla vurgulayan modern masa lambası; çalışma masası ve dekor köşeleri için tasarlanmıştır.",
     "options": [
       "Siyah çerçeve",
       "Açık ton iç katman"
     ],
+    "seo_title": "Çerçeveli Dalga Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "name": "Çerçeveli Dalga Masa Lambası",
+    "category": "aydinlatma",
+    "featured": false,
+    "active": true,
+    "seo_description": "Çerçeveli Dalga Masa Lambası, Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "price_value": "899",
+    "description": "Siyah çerçeve içerisinde katmanlı dalga formunu LED ışıkla vurgulayan modern masa lambası; çalışma masası ve dekor köşeleri için tasarlanmıştır.",
+    "slug": "cerceveli-dalga-lamba",
+    "price_text": "899 TL",
+    "card_description": "Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası.",
+    "sort_order": 3,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "Özgün çerçeveli tasarım",
       "LED kit dahil",
       "Gün beyaz LED",
       "Ev ve ofis kullanımı"
     ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "gallery_images": [],
     "main_image": "assets/images/products/cerceveli-dalga-lamba.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/cerceveli-dalga-lamba.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 3,
-    "seo_title": "Çerçeveli Dalga Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Çerçeveli Dalga Masa Lambası, Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "poster_image_height": 1254
   },
   {
     "slug": "dekoratif-kus-obje",
