@@ -1,12 +1,5 @@
 [
   {
-    "slug": "arac-koku-difuzoru",
-    "name": "Araç Koku Difüzörü",
-    "category": "fonksiyonel",
-    "price_text": "239 TL’den",
-    "price_value": "239",
-    "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
-    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
     "options": [
       "Full Siyah",
       "Full Beyaz",
@@ -18,18 +11,26 @@
       "Klima ızgarasına montaj",
       "Tek renk 239 TL / çift renk 249 TL"
     ],
+    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": true,
+    "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "seo_description": "Araç Koku Difüzörü, Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "category": "fonksiyonel",
+    "price_text": "239 TL’den",
+    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
+    "sort_order": 1,
+    "price_value": "239",
+    "active": true,
+    "slug": "arac-koku-difuzoru",
+    "name": "Araç Koku Difüzörü",
+    "gallery_images": [],
     "main_image": "assets/images/products/arac-koku-difuzoru.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/arac-koku-difuzoru.webp",
-    "poster_image_width": 1120,
-    "poster_image_height": 1400,
-    "featured": true,
-    "active": true,
-    "sort_order": 1,
-    "seo_title": "Araç Koku Difüzörü | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Araç Koku Difüzörü, Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_width": 1254,
+    "poster_image_height": 1254
   },
   {
     "slug": "ataturk-imzasi",
