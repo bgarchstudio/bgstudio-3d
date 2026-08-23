@@ -366,7 +366,7 @@ if (orderConfig) {
   };
   const syncTierUi = () => {
     const t = selectedTier();
-    tierBtns.forEach(btn => btn.classList.toggle('selected', !!t && btn.dataset.orderTierChoice === t.index));
+    tierBtns.forEach(btn => { const active=!!t && btn.dataset.orderTierChoice===t.index; btn.classList.toggle('selected',active); btn.setAttribute('aria-pressed',active?'true':'false'); });
     const label = t?.priceLabel || fallbackPriceText;
     if (priceDisplay && label) priceDisplay.textContent = label;
     if (mobilePrice && label) mobilePrice.textContent = label;
@@ -452,7 +452,6 @@ if (orderConfig) {
   tierBtns.forEach(btn => btn.addEventListener('click', () => {
     if (tier) tier.value = btn.dataset.orderTierChoice;
     buildMessage();
-    orderConfig.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }));
   mobileSend?.addEventListener('click', event => {
     if (mobileSend.getAttribute('href') === '#') {

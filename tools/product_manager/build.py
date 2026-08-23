@@ -124,6 +124,31 @@ def replace_between(text, start_marker, end_marker, content):
     return pattern.sub(lambda _m: replacement, text, count=1)
 
 
+
+
+def effective_pricing_tiers(p):
+    """Return storefront pricing tiers.
+
+    If a product has set pricing but no explicit 1-piece tier, use the product's
+    numeric base price as the single-item option automatically. This keeps the
+    manager simple while guaranteeing the storefront always starts with Tekli.
+    """
+    tiers = [dict(t) for t in (p.get('pricing_tiers') or []) if t]
+    if not tiers:
+        return []
+    has_single = any(int(t.get('quantity') or 1) == 1 for t in tiers)
+    base = p.get('price_value')
+    if not has_single and base not in (None, ''):
+        tiers.append({
+            'label': 'Tekli',
+            'quantity': 1,
+            'price_value': str(base),
+            'note': 'Tekli fiyat',
+            '_auto': True,
+        })
+    tiers.sort(key=lambda t: (int(t.get('quantity') or 1), str(t.get('label') or '')))
+    return tiers
+
 def render_schema(p):
     obj = {
         '@context': 'https://schema.org',
@@ -134,7 +159,7 @@ def render_schema(p):
         'url': f"{BASE_URL}/urunler/{p['slug']}/",
         'image': f"{BASE_URL}/{p['main_image']}",
     }
-    tiers = p.get('pricing_tiers') or []
+    tiers = effective_pricing_tiers(p)
     if tiers:
         obj['offers'] = [
             {
@@ -214,7 +239,7 @@ def render_product_page(p, related):
         f'<button class="option-choice{" selected" if i == 0 else ""}" data-order-choice="{esc(o)}" type="button">{esc(o)}</button>'
         for i, o in enumerate(options)
     )
-    pricing_tiers = p.get('pricing_tiers') or []
+    pricing_tiers = effective_pricing_tiers(p)
     tier_options_html = ''
     tier_cards_html = ''
     selected_display_price = price
