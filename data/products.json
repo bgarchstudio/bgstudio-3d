@@ -493,33 +493,35 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "spiral-masa-lambasi",
-    "name": "Spiral Masa Lambası",
-    "category": "aydinlatma",
-    "price_text": "1.099 TL",
-    "price_value": "1099",
-    "card_description": "Heykelsi spiral form ve gün beyaz LED ışık.",
-    "description": "Minimal spiral formu ve içten gelen LED aydınlatmasıyla çalışma masası, komodin ve dekor köşelerinde heykelsi bir ışık objesi olarak kullanılır.",
-    "options": [
-      "Bone White"
-    ],
+    "pricing_tiers": [],
     "features": [
       "Özgün spiral tasarım",
       "Gün beyaz LED",
       "LED kit dahil seçenek",
       "Dekoratif masa lambası"
     ],
+    "category": "aydinlatma",
+    "description": "Minimal spiral formu ve içten gelen LED aydınlatmasıyla çalışma masası, komodin ve dekor köşelerinde heykelsi bir ışık objesi olarak kullanılır.",
+    "seo_title": "Spiral Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "spiral-masa-lambasi",
+    "name": "Spiral Masa Lambası",
+    "active": true,
+    "price_text": "1.099 TL",
+    "seo_description": "Spiral Masa Lambası, Heykelsi spiral form ve gün beyaz LED ışık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "1099",
+    "featured": true,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 14,
+    "options": [
+      "Bone White"
+    ],
+    "card_description": "Heykelsi spiral form ve gün beyaz LED ışık.",
+    "gallery_images": [],
     "main_image": "assets/images/products/spiral-masa-lambasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/spiral-masa-lambasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": true,
-    "active": true,
-    "sort_order": 14,
-    "seo_title": "Spiral Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Spiral Masa Lambası, Heykelsi spiral form ve gün beyaz LED ışık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   }
 ]
