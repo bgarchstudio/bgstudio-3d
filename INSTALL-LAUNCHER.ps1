@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 
 function Write-Step([string]$Text) { Write-Host ("[+] " + $Text) -ForegroundColor DarkYellow }
@@ -90,7 +90,7 @@ try {
     }
     if ([string]::IsNullOrWhiteSpace($desktop)) { throw 'Windows masaustu klasoru bulunamadi.' }
 
-    $shortcutPath = Join-Path $desktop 'BG Studio 3D Yonetici.lnk'
+    $shortcutPath = Join-Path $desktop 'BG Studio 3D Yönetici.lnk'
     $wsh = New-Object -ComObject WScript.Shell
     $shortcut = $wsh.CreateShortcut($shortcutPath)
     $powershellExe = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
@@ -98,7 +98,7 @@ try {
     $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -File "' + $launcherTarget + '"'
     $shortcut.WorkingDirectory = $launchHome
     if (Test-Path -LiteralPath $iconTarget) { $shortcut.IconLocation = "$iconTarget,0" }
-    $shortcut.Description = 'BG Studio 3D Kalici Yonetici'
+    $shortcut.Description = 'BG Studio 3D Kalıcı Yönetici'
     $shortcut.Save()
     Unblock-File -LiteralPath $shortcutPath -ErrorAction SilentlyContinue
 
@@ -110,7 +110,7 @@ try {
     Write-Host 'Kalici panel: ' -NoNewline; Write-Host $launcherTarget -ForegroundColor Cyan
     Write-Host 'Repo        : ' -NoNewline; Write-Host $repo -ForegroundColor Cyan
     Write-Host ''
-    Write-Host 'Bundan sonra paneli masaustundeki BG Studio 3D Yonetici kisayolundan ac.' -ForegroundColor Green
+    Write-Host 'Bundan sonra paneli masaustundeki BG Studio 3D Yönetici kısayolundan aç.' -ForegroundColor Green
     Write-Host 'Yeni ZIP paketlerindeki CMD/BAT dosyalari artik launcher icin gerekli degil.'
     Write-Host ''
 

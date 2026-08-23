@@ -11,8 +11,8 @@
     ],
     "active": true,
     "sort_order": 10,
-    "category": "Restoran • QR Stand",
-    "profile_image": "assets/images/references/istavrit-restaurant-profile.webp"
+    "image": null,
+    "category": "Restoran • QR Stand"
   },
   {
     "slug": "koala-petshop",
@@ -26,7 +26,7 @@
     ],
     "active": true,
     "sort_order": 20,
-    "category": "Perakende • Hızlı Stand",
-    "profile_image": "assets/images/references/koala-petshop-profile.webp"
+    "image": null,
+    "category": "Perakende • Hızlı Stand"
   }
 ]

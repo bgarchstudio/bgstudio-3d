@@ -1,6 +1,6 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-$Host.UI.RawUI.WindowTitle = 'BG Studio 3D - Kalici Yonetici'
+$Host.UI.RawUI.WindowTitle = 'BG Studio 3D - Kalıcı Yönetici'
 
 $appHome = Join-Path $env:LOCALAPPDATA 'BGStudio3D'
 $launchHome = Join-Path $appHome 'launcher'
@@ -31,7 +31,7 @@ try {
         }
         Clear-Host
         Write-Host '===============================================' -ForegroundColor DarkYellow
-        Write-Host '       BG STUDIO 3D - KALICI YONETICI' -ForegroundColor White
+        Write-Host '       BG STUDIO 3D - KALICI YÖNETİCİ' -ForegroundColor White
         Write-Host '===============================================' -ForegroundColor DarkYellow
         Write-Host ''
         Write-Host 'Kayitli repo bulunamadi veya tasinmis.' -ForegroundColor Yellow
@@ -49,6 +49,18 @@ try {
         Start-Sleep -Seconds 1
         $repo = $null
     }
+
+    # Keep the visible desktop shortcut name fully Turkish.
+    try {
+        $desktop = [Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)
+        if (-not [string]::IsNullOrWhiteSpace($desktop)) {
+            $legacyShortcut = Join-Path $desktop 'BG Studio 3D Yonetici.lnk'
+            $turkishShortcut = Join-Path $desktop 'BG Studio 3D Yönetici.lnk'
+            if ((Test-Path -LiteralPath $legacyShortcut) -and -not (Test-Path -LiteralPath $turkishShortcut)) {
+                Rename-Item -LiteralPath $legacyShortcut -NewName 'BG Studio 3D Yönetici.lnk' -Force
+            }
+        }
+    } catch {}
 
     # Keep the persistent desktop shortcut icon synced with the current repo artwork.
     $repoIcon = Join-Path $repo 'assets\brand\bgstudio3d-app.ico'
@@ -77,7 +89,7 @@ public static class BG3DShellNotify {
 
     Clear-Host
     Write-Host '===============================================' -ForegroundColor DarkYellow
-    Write-Host '       BG STUDIO 3D - KALICI YONETICI' -ForegroundColor White
+    Write-Host '       BG STUDIO 3D - KALICI YÖNETİCİ' -ForegroundColor White
     Write-Host '===============================================' -ForegroundColor DarkYellow
     Write-Host ''
     Write-Host ('Repo : ' + $repo)

@@ -35,9 +35,18 @@ def sync_persistent_launcher():
             except Exception:
                 shutil.copy2(src, dst)
                 copied.append(str(dst))
-    if copied and os.name == 'nt':
+    if os.name == 'nt':
         try:
+            # Keep the visible shortcut name fully Turkish without requiring reinstall.
+            from pathlib import Path as _Path
             import ctypes
+            desktop = _Path(os.path.join(os.environ.get('USERPROFILE', ''), 'Desktop'))
+            # OneDrive / redirected Desktop is resolved more reliably through Known Folders via PowerShell,
+            # but the common legacy name is also renamed by the persistent launcher itself on next start.
+            legacy = desktop / 'BG Studio 3D Yonetici.lnk'
+            turkish = desktop / 'BG Studio 3D Yönetici.lnk'
+            if legacy.exists() and not turkish.exists():
+                legacy.rename(turkish)
             ctypes.windll.shell32.SHChangeNotify(0x08000000, 0, None, None)
         except Exception:
             pass
