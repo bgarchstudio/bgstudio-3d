@@ -1,0 +1,21 @@
+BG STUDIO 3D v2.6.3 - TAM PAKET
+================================
+
+Bu ZIP sitenin ve yerel Urun Yoneticisinin tum dosyalarini icerir.
+
+ONEMLI:
+- Mevcut repo klasorundeki data/products.json, data/colors.json ve referans JSON'larinda sonradan yaptigin degisiklikler varsa once data klasorunun yedegini al.
+- Tam paketi mevcut repo klasorunun uzerine kopyalarsan ayni isimli dosyalar degisir.
+- CNAME bu tam pakette bulunur ve 3d.bgstudio.com.tr olarak ayarlidir.
+
+URUN YONETICISI:
+1) Acik eski panel sekmelerini kapat.
+2) Acik eski CMD/Python pencerelerini kapat.
+3) URUN-YONETICI.cmd dosyasina cift tikla.
+4) Panel yeni bir 127.0.0.1 portunda otomatik acilir.
+
+Surum eslesmesi:
+- server.py: 2.6.3
+- manager.js: 2.6.3
+
+Sorun olursa URUN-YONETICI-KONTROL.cmd dosyasini calistir.
