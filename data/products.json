@@ -96,13 +96,6 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "dekoratif-kus-obje",
-    "name": "Dekoratif Kuş Obje",
-    "category": "dekoratif",
-    "price_text": "349 TL",
-    "price_value": "349",
-    "card_description": "Modern çizgili, tek parça 3D baskı dekoratif kuş objesi.",
-    "description": "Ev, ofis ve raf dekorasyonları için tasarlanan çizgili kuş formu; sade silueti ve filament renk seçenekleriyle farklı mekanlara uyum sağlar.",
     "options": [
       "Silk Kings Gold",
       "Sakura Pink",
@@ -112,24 +105,32 @@
       "Lavender",
       "Avocado Green"
     ],
+    "seo_title": "Dekoratif Kuş Obje | Kuşadası 3D Baskı | BG Studio 3D",
+    "name": "Dekoratif Kuş Obje",
+    "category": "dekoratif",
+    "featured": true,
+    "active": true,
+    "seo_description": "Dekoratif Kuş Obje, Modern çizgili, tek parça 3D baskı dekoratif kuş objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "349",
+    "description": "Ev, ofis ve raf dekorasyonları için tasarlanan çizgili kuş formu; sade silueti ve filament renk seçenekleriyle farklı mekanlara uyum sağlar.",
+    "slug": "dekoratif-kus-obje",
+    "price_text": "349 TL",
+    "card_description": "Modern çizgili, tek parça 3D baskı dekoratif kuş objesi.",
+    "sort_order": 4,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "Tek parça 3D baskı gövde",
       "Ev, ofis ve raf kullanımı",
       "7 filament renk seçeneği",
       "2’li set seçeneği: 499 TL"
     ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-kus-obje.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-kus-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": true,
-    "active": true,
-    "sort_order": 4,
-    "seo_title": "Dekoratif Kuş Obje | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Dekoratif Kuş Obje, Modern çizgili, tek parça 3D baskı dekoratif kuş objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "dekoratif-lale",
