@@ -2,16 +2,15 @@
   {
     "slug": "istavrit-restaurant",
     "name": "İstavrit Restaurant",
-    "headline": "10 masa, 10 ayrı menü QR.",
+    "headline": "10 masa, 10 NFC Stand + 10 Ayrı Menü QR.",
     "description": "Her masa için ayrı menü QR standı hazırlanıp işletmeye teslim edildi. Masa bazlı erişim, fiziksel standla dijital menüyü bir araya getiriyor.",
     "tags": [
-      "10 stand",
+      "10 Stand",
       "Menü",
       "Restoran"
     ],
     "active": true,
-    "sort_order": 10,
-    "image": null
+    "sort_order": 10
   },
   {
     "slug": "koala-petshop",
@@ -24,7 +23,6 @@
       "WhatsApp"
     ],
     "active": true,
-    "sort_order": 20,
-    "image": null
+    "sort_order": 20
   }
 ]

@@ -424,13 +424,25 @@
     "poster_image_height": 1050
   },
   {
+    "pricing_tiers": [],
+    "features": [
+      "3D baskı gövde",
+      "Zengin renk seçeneği",
+      "Sıcak ışık",
+      "799 TL’den başlayan fiyatlar"
+    ],
+    "category": "aydinlatma",
+    "description": "Modern gövdesi ve yumuşak ışık veren şapkasıyla çalışma masası, komodin ve dekor köşeleri için renkli bir aydınlatma seçeneğidir.",
+    "seo_title": "Renkli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
     "slug": "renkli-masa-lambasi",
     "name": "Renkli Masa Lambası",
-    "category": "aydinlatma",
+    "active": true,
     "price_text": "799 TL’den",
+    "seo_description": "Renkli Masa Lambası, Farklı filament renkleriyle üretilebilen sıcak ışıklı masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "price_value": "799",
-    "card_description": "Farklı filament renkleriyle üretilebilen sıcak ışıklı masa lambası.",
-    "description": "Modern gövdesi ve yumuşak ışık veren şapkasıyla çalışma masası, komodin ve dekor köşeleri için renkli bir aydınlatma seçeneğidir.",
+    "featured": false,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 13,
     "options": [
       "Siyah",
       "Beyaz",
@@ -446,24 +458,14 @@
       "Lavender",
       "Avocado Green"
     ],
-    "features": [
-      "3D baskı gövde",
-      "Zengin renk seçeneği",
-      "Sıcak ışık",
-      "799 TL’den başlayan fiyatlar"
-    ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "card_description": "Farklı filament renkleriyle üretilebilen sıcak ışıklı masa lambası.",
+    "gallery_images": [],
     "main_image": "assets/images/products/renkli-masa-lambasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/renkli-masa-lambasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 13,
-    "seo_title": "Renkli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Renkli Masa Lambası, Farklı filament renkleriyle üretilebilen sıcak ışıklı masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "spiral-masa-lambasi",
