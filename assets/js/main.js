@@ -525,33 +525,30 @@ if (floatingWhatsApp) {
   });
 }
 
-// v2.2.1 — Playfair Display renders a very decorative ampersand.
-// Replace only ampersands inside display headings with a clean brand-safe glyph.
-const normalizeHeadingAmpersands = (root = document) => {
-  const headings = root?.matches?.('h1,h2,h3') ? [root] : [...(root?.querySelectorAll?.('h1,h2,h3') || [])];
-  headings.forEach((heading) => {
-    if (!heading.textContent?.includes('&')) return;
-    const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+// v2.4 — Playfair Display has an ornamental ampersand.
+// Normalize any ampersand rendered with the display serif, not only h1/h2/h3.
+const normalizeDisplayAmpersands = (root = document) => {
+  const candidates = root?.matches?.('h1,h2,h3,h4,a,span,strong,p') ? [root] : [...(root?.querySelectorAll?.('h1,h2,h3,h4,a,span,strong,p') || [])];
+  candidates.forEach((el) => {
+    if (!el.textContent?.includes('&') || el.querySelector?.('.plain-amp')) return;
+    const family = getComputedStyle(el).fontFamily || '';
+    if (!family.toLowerCase().includes('playfair')) return;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     const nodes = [];
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      if (node.parentElement?.classList.contains('plain-amp')) continue;
-      if (node.nodeValue?.includes('&')) nodes.push(node);
-    }
+    while (walker.nextNode()) { const node = walker.currentNode; if (node.nodeValue?.includes('&')) nodes.push(node); }
     nodes.forEach((node) => {
-      const parts = node.nodeValue.split('&');
-      const fragment = document.createDocumentFragment();
+      const parts = node.nodeValue.split('&'); const fragment = document.createDocumentFragment();
       parts.forEach((part, index) => {
         if (part) fragment.append(document.createTextNode(part));
-        if (index < parts.length - 1) {
-          const amp = document.createElement('span');
-          amp.className = 'plain-amp';
-          amp.textContent = '&';
-          fragment.append(amp);
-        }
+        if (index < parts.length - 1) { const amp = document.createElement('span'); amp.className='plain-amp'; amp.textContent='&'; fragment.append(amp); }
       });
       node.replaceWith(fragment);
     });
   });
 };
-normalizeHeadingAmpersands();
+normalizeDisplayAmpersands();
+const displayAmpObserver = new MutationObserver((mutations) => mutations.forEach((m) => {
+  if (m.type === 'characterData') normalizeDisplayAmpersands(m.target.parentElement);
+  m.addedNodes?.forEach((node) => { if (node.nodeType === 1) normalizeDisplayAmpersands(node); });
+}));
+displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterData:true});

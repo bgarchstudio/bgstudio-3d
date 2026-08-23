@@ -7,6 +7,8 @@ import json, base64, re, webbrowser, threading, sys, shutil, traceback, zipfile
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / 'static'
 DATA = ROOT / 'data' / 'products.json'
+NFC_DATA = ROOT / 'data' / 'nfc_references.json'
+PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
 BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
@@ -79,7 +81,9 @@ def full_backup(reason='manual'):
     path = BACKUPS / f"site-{stamp}-{safe_reason}.zip"
     with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as z:
         if DATA.exists(): z.write(DATA, DATA.relative_to(ROOT))
-        for folder in (ROOT / 'assets/images/products', ROOT / 'assets/images/posters'):
+        for content_data in (NFC_DATA, PROTOTYPE_DATA):
+            if content_data.exists(): z.write(content_data, content_data.relative_to(ROOT))
+        for folder in (ROOT / 'assets/images/products', ROOT / 'assets/images/posters', ROOT / 'assets/images/references', ROOT / 'assets/images/prototypes'):
             if folder.exists():
                 for file in folder.rglob('*'):
                     if file.is_file(): z.write(file, file.relative_to(ROOT))
@@ -147,7 +151,7 @@ def preflight():
     cname_ok = cname.exists() and cname.read_text(encoding='utf-8').strip() == '3d.bgstudio.com.tr'
     checks.append({'status':'fail' if not cname_ok else 'pass','label':'Canlı domain','detail':'CNAME = 3d.bgstudio.com.tr' if cname_ok else 'CNAME eksik veya beklenen domain farklı.'})
     sitemap = ROOT / 'sitemap.xml'
-    expected = len(active) + 11
+    expected = len(active) + 12
     locs = sitemap.read_text(encoding='utf-8').count('<loc>') if sitemap.exists() else 0
     checks.append({'status':'pass' if locs == expected else 'warn','label':'Sitemap','detail':f'{locs} URL bulundu; beklenen {expected}.'})
     featured = len([p for p in active if p.get('featured')])
@@ -255,6 +259,61 @@ def duplicate_asset(src_rel, dst_rel):
     return None
 
 
+
+def content_path(kind):
+    if kind == 'nfc': return NFC_DATA
+    if kind == 'prototype': return PROTOTYPE_DATA
+    raise ValueError('İçerik türü geçersiz.')
+
+
+def read_content(kind):
+    path = content_path(kind)
+    if not path.exists(): return []
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def write_content(kind, data):
+    content_path(kind).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+
+
+def clean_content_item(kind, item):
+    name = str(item.get('name') or '').strip()
+    slug = slugify(item.get('slug') or name)
+    if not name or not slug: raise ValueError('İsim zorunlu.')
+    out = {
+        'slug': slug, 'name': name,
+        'headline': str(item.get('headline') or '').strip(),
+        'description': str(item.get('description') or '').strip(),
+        'tags': [str(x).strip() for x in (item.get('tags') or []) if str(x).strip()][:8],
+        'active': bool(item.get('active', True)),
+        'sort_order': int(item.get('sort_order') or 999),
+    }
+    if kind == 'prototype': out['category'] = str(item.get('category') or 'Prototip / özel parça').strip()
+    if item.get('image'): out['image'] = str(item.get('image'))
+    return out
+
+
+def save_content_item(kind, payload):
+    items = read_content(kind)
+    original = str(payload.get('original_slug') or '')
+    item = clean_content_item(kind, payload.get('item') or {})
+    if original and item['slug'] != original: raise ValueError('Mevcut kaydın URL slug alanını değiştirmeyin.')
+    idx = next((i for i,x in enumerate(items) if x.get('slug') == original), None) if original else None
+    if idx is None and any(x.get('slug') == item['slug'] for x in items): raise ValueError('Bu URL slug zaten kullanılıyor.')
+    old = items[idx] if idx is not None else {}
+    image = payload.get('image')
+    if image:
+        folder = 'references' if kind == 'nfc' else 'prototypes'
+        rel = f'assets/images/{folder}/{item["slug"]}.webp'
+        save_data_uri(image.get('data'), ROOT / rel)
+        item['image'] = rel
+    elif old.get('image'):
+        item['image'] = old.get('image')
+    if idx is None: items.append(item)
+    else: items[idx] = item
+    write_content(kind, items)
+    return item, build_site()
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print('[Panel]', fmt % args)
@@ -299,6 +358,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
             return self.send_json(preflight())
+        if u.path == '/api/content':
+            from urllib.parse import parse_qs
+            kind = (parse_qs(u.query).get('kind') or [''])[0]
+            return self.send_json({'items': read_content(kind), 'kind': kind, 'root': str(ROOT)})
         if u.path.startswith('/assets/') or u.path in ('/favicon.ico', '/apple-touch-icon.png'):
             return self.send_file(ROOT / unquote(u.path.lstrip('/')), ROOT)
         path = 'index.html' if u.path in ('/', '') else unquote(u.path.lstrip('/'))
@@ -470,6 +533,26 @@ class Handler(BaseHTTPRequestHandler):
                     shutil.rmtree(folder)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Ürün kalıcı olarak silindi.'})
+
+            if self.path == '/api/content/save':
+                payload = self.read_json()
+                kind = payload.get('kind')
+                full_backup('before-content-save')
+                item, result = save_content_item(kind, payload)
+                return self.send_json({'ok': True, 'message': 'İçerik kaydedildi ve site güncellendi.', 'item': item, 'result': result})
+
+            if self.path == '/api/content/delete':
+                payload = self.read_json()
+                kind = payload.get('kind')
+                slug = str(payload.get('slug') or '')
+                items = read_content(kind)
+                item = next((x for x in items if x.get('slug') == slug), None)
+                if not item: raise ValueError('Kayıt bulunamadı.')
+                full_backup('before-content-delete')
+                remove_file(item.get('image'))
+                write_content(kind, [x for x in items if x.get('slug') != slug])
+                result = build_site()
+                return self.send_json({'ok': True, 'message': 'Kayıt silindi.', 'result': result})
 
             if self.path == '/api/backup':
                 path = full_backup('manual')

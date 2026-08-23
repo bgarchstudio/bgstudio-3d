@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "bot-sisirme-pompasi-ara-parcasi",
+    "name": "Bot Şişirme Pompası Ara Parçası",
+    "category": "Prototip / bağlantı parçası",
+    "headline": "Pompa ile bot arasındaki eksik bağlantıyı yeniden ürettik.",
+    "description": "Şişirme pompası ile bot arasında ihtiyaç duyulan ara parça ölçülendirilerek modellenip 3D baskı ile fonksiyonel prototip olarak üretildi.",
+    "tags": [
+      "Ölçüye göre",
+      "Prototip",
+      "Fonksiyonel parça"
+    ],
+    "active": true,
+    "sort_order": 10,
+    "image": null
+  },
+  {
+    "slug": "cikolata-selalesi-spiral-aksami",
+    "name": "Çikolata Şelalesi Spiral Aksamı",
+    "category": "Yedek parça / makine aksamı",
+    "headline": "Temini zor bir makine aksamını 3D üretimle yeniden oluşturduk.",
+    "description": "Otel kullanımındaki çikolata şelalesi makinesi için spiral aksam, mevcut ölçüler ve çalışma ihtiyacına göre yeniden üretilerek fonksiyonel yedek parça çözümü hazırlandı.",
+    "tags": [
+      "Yedek parça",
+      "Otel ekipmanı",
+      "3D üretim"
+    ],
+    "active": true,
+    "sort_order": 20,
+    "image": null
+  }
+]

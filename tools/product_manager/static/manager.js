@@ -88,3 +88,5 @@ $('refreshPreflight').onclick=refreshPublishCenter;
 $('createBackup').onclick=async()=>{try{const d=await api('/api/backup',{method:'POST',body:'{}'});toast('✅ '+d.message);renderBackups(d.backups||[]);await refreshPublishCenter()}catch(err){toast(err.message,true)}};
 document.addEventListener('click',e=>{if(e.target.matches('[data-close-publish]')){$('publishModal').hidden=true;document.body.classList.remove('modal-open')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('publishModal').hidden){$('publishModal').hidden=true;document.body.classList.remove('modal-open')}});
+
+$('openContent').onclick=()=>location.href='content.html';

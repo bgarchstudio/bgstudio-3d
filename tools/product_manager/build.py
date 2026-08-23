@@ -4,6 +4,8 @@ from datetime import date
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'data' / 'products.json'
+NFC_DATA = ROOT / 'data' / 'nfc_references.json'
+PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
 BASE_URL = 'https://3d.bgstudio.com.tr'
 CATEGORY_LABELS = {
     'dekoratif': 'Dekoratif',
@@ -50,6 +52,31 @@ def load_products():
     data = json.loads(DATA.read_text(encoding='utf-8'))
     return sorted(data, key=lambda p: (int(p.get('sort_order') or 9999), p.get('name', '').casefold()))
 
+
+
+
+def load_managed_content(path):
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding='utf-8'))
+    return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
+
+
+def render_managed_case(item, prefix='../'):
+    name = esc(item.get('name'))
+    headline = esc(item.get('headline') or item.get('name'))
+    desc = esc(item.get('description'))
+    tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
+    kicker = esc(item.get('category') or item.get('name'))
+    image = item.get('image')
+    media = ''
+    klass = 'case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card'
+    if image:
+        src = prefix + str(image)
+        media = f'<div class="case-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(src)}"/></div>'
+        klass += ' has-media'
+    body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    return f'<article class="{klass}">{media}{body}</article>'
 
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
@@ -203,14 +230,14 @@ def render_product_page(p, related):
 <meta content="{robots}" name="robots"/><meta content="strict-origin-when-cross-origin" name="referrer"/><meta content="{w}" property="og:image:width"/><meta content="{h}" property="og:image:height"/><meta content="light" name="color-scheme"/>
 
 </head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>
-<header class="site-header" id="top"><div class="shell nav-shell"><a aria-label="BG Studio 3D ana sayfa" class="brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button><nav aria-label="Ana menü" class="main-nav" id="primary-navigation"><a aria-current="page" class="is-active" href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../hakkimizda/">Hakkımızda</a><a href="../../iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a class="nav-cta" href="https://wa.me/905302466903" rel="noopener" target="_blank">WhatsApp</a></nav></div></header>
+<header class="site-header" id="top"><div class="shell nav-shell"><a aria-label="BG Studio 3D ana sayfa" class="brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button><nav aria-label="Ana menü" class="main-nav" id="primary-navigation"><a aria-current="page" class="is-active" href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../prototip-parca/">Prototip</a><a href="../../hakkimizda/">Hakkımızda</a><a href="../../iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a class="nav-cta" href="https://wa.me/905302466903" rel="noopener" target="_blank">WhatsApp</a></nav></div></header>
 {notice}
 <main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
 <div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p><div class="price-block"><small>Fiyat</small><strong>{price}</strong></div><div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls"><label class="order-field"><span>Seçenek</span><select aria-label="Ürün seçeneği" data-order-option="">{options_html}</select></label><div class="order-field"><span>Adet</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="99" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div><label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. siyah renk, hediye olacak…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(options[0])} • 1 adet</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div><div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>Renk / seçenekler</h2><div class="option-tags">{tags}</div></div><div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
 <section class="order-process shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ SÜRECİ</p><h2>Nasıl ilerliyoruz?</h2></div></div><div class="order-steps"><article class="order-step"><span>01</span><h3>Ürünü seç</h3><p>Renk, adet ve varsa kişiselleştirme isteğini bize ilet.</p></article><article class="order-step"><span>02</span><h3>Detayları netleştir</h3><p>Üretim seçeneği ve teslim/kargo detaylarını sipariş öncesi netleştir.</p></article><article class="order-step"><span>03</span><h3>Üretim</h3><p>Ürün atölyede 3D baskı ile hazırlanır ve kontrol edilir.</p></article><article class="order-step"><span>04</span><h3>Teslim</h3><p>Kuşadası elden teslim veya uygun kargo seçeneğiyle gönderim.</p></article></div></section>
 <section class="product-faq shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ ÖNCESİ</p><h2>Bilmen gerekenler.</h2></div></div><div class="faq">{faq_html}</div></section>
 <section class="related-products shell"><div class="section-title"><div><p class="eyebrow">BUNLAR DA İLGİNİ ÇEKEBİLİR</p><h2>Atölyeden başka seçenekler.</h2></div></div><div class="related-grid">{related_html}</div></section><section class="detail-back shell"><a class="text-cta" href="../">← Tüm ürünlere dön</a></section></main>
-<footer class="footer footer-dark"><div class="shell footer-inner"><div class="footer-topline"><a class="brand footer-brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p class="footer-tagline">Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı ve özel üretim.</p></div><div aria-label="BG Studio 3D sosyal ve marka bağlantıları" class="footer-socials"><a class="footer-social icon-instagram" href="https://instagram.com/bgstudio.3dtr" rel="noopener" target="_blank"><span>bgstudio.3dtr</span></a><a class="footer-social icon-facebook" href="https://www.facebook.com/bgstudio.3dtr" rel="noopener" target="_blank"><span>bgstudio.3dtr</span></a><a class="footer-social icon-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank"><span>WhatsApp</span></a><a class="footer-social icon-architecture" href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>bgstudio.com.tr</span></a></div><nav aria-label="Alt menü" class="footer-links"><a href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../kusadasi-3d-baski/">Kuşadası 3D Baskı</a><a href="../../iletisim/">İletişim</a><a href="../../gizlilik/">Gizlilik</a><a href="../../siparis-bilgilendirme/">Sipariş Bilgilendirme</a></nav><div class="footer-legal"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır. | 3D baskı, özel üretim ve kurumsal çözümler.</p><p class="footer-credit">BG Studio tarafından tasarlanmış ve geliştirilmiştir.</p></div></div></footer>
+<footer class="footer footer-dark"><div class="shell footer-inner"><div class="footer-topline"><a class="brand footer-brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p class="footer-tagline">Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı ve özel üretim.</p></div><div aria-label="BG Studio 3D sosyal ve marka bağlantıları" class="footer-socials"><a class="footer-social icon-instagram" href="https://instagram.com/bgstudio.3dtr" rel="noopener" target="_blank"><span>bgstudio.3dtr</span></a><a class="footer-social icon-facebook" href="https://www.facebook.com/bgstudio.3dtr" rel="noopener" target="_blank"><span>bgstudio.3dtr</span></a><a class="footer-social icon-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank"><span>WhatsApp</span></a><a class="footer-social icon-architecture" href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>bgstudio.com.tr</span></a></div><nav aria-label="Alt menü" class="footer-links"><a href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../prototip-parca/">Prototip &amp; Parça</a><a href="../../kusadasi-3d-baski/">Kuşadası 3D Baskı</a><a href="../../iletisim/">İletişim</a><a href="../../gizlilik/">Gizlilik</a><a href="../../siparis-bilgilendirme/">Sipariş Bilgilendirme</a></nav><div class="footer-legal"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır. | 3D baskı, özel üretim ve kurumsal çözümler.</p><p class="footer-credit">BG Studio tarafından tasarlanmış ve geliştirilmiştir.</p></div></div></footer>
 <script defer="" src="../../assets/js/consent.js"></script><script defer="" src="../../assets/js/main.js"></script><div aria-label="Hızlı işlemler" class="floating-actions"><a aria-label="WhatsApp üzerinden iletişime geç" class="floating-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a><button aria-label="Sayfanın başına dön" class="back-to-top" type="button">↑</button></div><div class="mobile-product-cta"><div><strong>{name}</strong><span>{price}</span></div><a data-mobile-order-whatsapp="" href="#" rel="noopener" target="_blank">Siparişi hazırla</a></div></body></html>'''
 
 
@@ -232,6 +259,20 @@ def build_site():
     home = replace_between(home, '<!-- PRODUCT_MANAGER:FEATURED_START -->', '<!-- PRODUCT_MANAGER:FEATURED_END -->', homecards)
     home_path.write_text(home, encoding='utf-8')
 
+    nfc_items = [x for x in load_managed_content(NFC_DATA) if x.get('active', True)]
+    nfc_path = ROOT / 'nfc-qr/index.html'
+    nfc_html = nfc_path.read_text(encoding='utf-8')
+    nfc_cards = '\n'.join(render_managed_case(x, '../') for x in nfc_items)
+    nfc_html = replace_between(nfc_html, '<!-- CONTENT_MANAGER:NFC_START -->', '<!-- CONTENT_MANAGER:NFC_END -->', nfc_cards)
+    nfc_path.write_text(nfc_html, encoding='utf-8')
+
+    prototype_items = [x for x in load_managed_content(PROTOTYPE_DATA) if x.get('active', True)]
+    prototype_path = ROOT / 'prototip-parca/index.html'
+    prototype_html = prototype_path.read_text(encoding='utf-8')
+    prototype_cards = '\n'.join(render_managed_case(x, '../') for x in prototype_items)
+    prototype_html = replace_between(prototype_html, '<!-- CONTENT_MANAGER:PROTOTYPE_START -->', '<!-- CONTENT_MANAGER:PROTOTYPE_END -->', prototype_cards)
+    prototype_path.write_text(prototype_html, encoding='utf-8')
+
     for p in products:
         folder = ROOT / 'urunler' / p['slug']
         folder.mkdir(parents=True, exist_ok=True)
@@ -240,7 +281,7 @@ def build_site():
     today = date.today().isoformat()
     static = [
         ('/', 1.0), ('/gizlilik/', .6), ('/hakkimizda/', .6), ('/iletisim/', .8),
-        ('/kurumsal/', .9), ('/kusadasi-3d-baski/', .95), ('/nfc-qr/', .9), ('/ozel-uretim/', .9),
+        ('/kurumsal/', .9), ('/kusadasi-3d-baski/', .95), ('/nfc-qr/', .9), ('/prototip-parca/', .9), ('/ozel-uretim/', .9),
         ('/siparis-bilgilendirme/', .6), ('/teklif/', .8), ('/urunler/', .9),
     ]
     urls = [(BASE_URL + path, prio) for path, prio in static] + [(f"{BASE_URL}/urunler/{p['slug']}/", .7) for p in active]
@@ -249,7 +290,7 @@ def build_site():
         lines.append(f'  <url><loc>{url}</loc><lastmod>{today}</lastmod><changefreq>monthly</changefreq><priority>{prio}</priority></url>')
     lines.append('</urlset>')
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    return {'products': len(products), 'active': len(active), 'featured': len(featured), 'sitemap_urls': len(urls)}
+    return {'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':

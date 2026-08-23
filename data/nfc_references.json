@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "istavrit-restaurant",
+    "name": "İstavrit Restaurant",
+    "headline": "10 masa, 10 ayrı menü QR.",
+    "description": "Her masa için ayrı menü QR standı hazırlanıp işletmeye teslim edildi. Masa bazlı erişim, fiziksel standla dijital menüyü bir araya getiriyor.",
+    "tags": [
+      "10 stand",
+      "Menü",
+      "Restoran"
+    ],
+    "active": true,
+    "sort_order": 10,
+    "image": null
+  },
+  {
+    "slug": "koala-petshop",
+    "name": "Koala Petshop",
+    "headline": "Google + Instagram + WhatsApp.",
+    "description": "Üç farklı aksiyonun tek standda buluştuğu hızlı kullanım senaryosu. Müşteri istediği dijital kanala doğrudan erişebiliyor.",
+    "tags": [
+      "Google",
+      "Instagram",
+      "WhatsApp"
+    ],
+    "active": true,
+    "sort_order": 20,
+    "image": null
+  }
+]
