@@ -16,7 +16,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '2.8.0'
+PANEL_VERSION = '2.8.2'
 BACKUPS = BACKUPS_ROOT
 ensure_initialized()
 export_to_repo()
@@ -190,6 +190,72 @@ def preflight():
     expected = len(active) + 12
     locs = sitemap.read_text(encoding='utf-8').count('<loc>') if sitemap.exists() else 0
     checks.append({'status':'pass' if locs == expected else 'warn','label':'Sitemap','detail':f'{locs} URL bulundu; beklenen {expected}.'})
+
+    # Site-wide chrome and internal-link audit. This catches navigation drift before GitHub push.
+    public_html = [p for p in ROOT.rglob('*.html') if 'tools\\product_manager' not in str(p) and 'tools/product_manager' not in p.as_posix()]
+    nav_issues = []
+    active_nav_issues = []
+    title_map = {}
+    h1_issues = []
+    broken_links = []
+    proto_label = 'Prototip &amp; Parça Üretim'
+    expected_active = {
+        'urunler/index.html': 'urunler/',
+        'ozel-uretim/index.html': 'ozel-uretim/',
+        'kurumsal/index.html': 'kurumsal/',
+        'nfc-qr/index.html': 'nfc-qr/',
+        'prototip-parca/index.html': 'prototip-parca/',
+        'hakkimizda/index.html': 'hakkimizda/',
+        'iletisim/index.html': 'iletisim/',
+    }
+    for page in public_html:
+        try:
+            html = page.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        rel_page = page.relative_to(ROOT).as_posix()
+        nav_match = re.search(r'<nav\b[^>]*class="[^"]*main-nav[^"]*"[^>]*>(.*?)</nav>', html, re.S | re.I)
+        if nav_match:
+            nav_html = nav_match.group(1)
+            if 'prototip-parca/' not in nav_html or proto_label not in nav_html:
+                nav_issues.append(rel_page)
+            expected_href = expected_active.get(rel_page)
+            if expected_href:
+                active_match = re.search(r'<a\b[^>]*(?:aria-current="page"|class="[^"]*is-active[^"]*")[^>]*href="([^"]+)"|<a\b[^>]*href="([^"]+)"[^>]*(?:aria-current="page"|class="[^"]*is-active[^"]*")', nav_html, re.I)
+                active_href = next((g for g in (active_match.groups() if active_match else []) if g), '')
+                if expected_href not in active_href:
+                    active_nav_issues.append(rel_page)
+        title_match = re.search(r'<title>(.*?)</title>', html, re.S | re.I)
+        if title_match:
+            title_text = re.sub(r'<[^>]+>', '', title_match.group(1)).strip()
+            title_map.setdefault(title_text, []).append(rel_page)
+        h1_count = len(re.findall(r'<h1\b', html, re.I))
+        if h1_count != 1 and rel_page != '404.html':
+            h1_issues.append(f'{rel_page} ({h1_count} h1)')
+        for href in re.findall(r'href="([^"]+)"', html, re.I):
+            href = href.strip()
+            if not href or href.startswith(('#','http://','https://','mailto:','tel:','javascript:')):
+                continue
+            clean = href.split('#',1)[0].split('?',1)[0]
+            if not clean:
+                continue
+            if clean.startswith('/'):
+                target = ROOT / clean.lstrip('/')
+            else:
+                target = page.parent / clean
+            if clean.endswith('/'):
+                target = target / 'index.html'
+            elif target.is_dir():
+                target = target / 'index.html'
+            if not target.exists():
+                broken_links.append(f'{rel_page} → {href}')
+    duplicate_titles = [f"{title}: {', '.join(pages[:3])}" for title,pages in title_map.items() if title and len(pages) > 1]
+    checks.append({'status':'fail' if nav_issues else 'pass','label':'Ana menü tutarlılığı','detail':('Prototip sekmesi eksik/farklı: '+', '.join(nav_issues[:8])) if nav_issues else 'Tüm sayfalarda Prototip & Parça Üretim sekmesi aynı.'})
+    checks.append({'status':'warn' if active_nav_issues else 'pass','label':'Aktif sekme durumu','detail':('Aktif menü yanlış/eksik: '+', '.join(active_nav_issues[:8])) if active_nav_issues else 'Ana hizmet sayfalarında aktif sekme doğru işaretleniyor.'})
+    checks.append({'status':'warn' if h1_issues else 'pass','label':'Sayfa başlık yapısı','detail':('Kontrol et: '+', '.join(h1_issues[:8])) if h1_issues else 'Tüm ana sayfalarda tek H1 kullanılıyor.'})
+    checks.append({'status':'warn' if duplicate_titles else 'pass','label':'SEO başlık benzersizliği','detail':('Tekrarlanan title: '+ ' | '.join(duplicate_titles[:4])) if duplicate_titles else 'HTML title alanları birbirinden ayrışıyor.'})
+    checks.append({'status':'fail' if broken_links else 'pass','label':'İç bağlantılar','detail':('Kırık: '+', '.join(broken_links[:8])) if broken_links else f'{len(public_html)} HTML sayfada yerel bağlantılar sağlam.'})
+
     featured = len([p for p in active if p.get('featured')])
     checks.append({'status':'warn' if featured > 8 else 'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor.'})
     failures = sum(c['status']=='fail' for c in checks)

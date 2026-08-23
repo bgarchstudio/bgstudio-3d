@@ -1,0 +1,20 @@
+BG Studio 3D v2.8.2
+====================
+
+ÖNERİLEN: SAFE PATCH kullan.
+
+1) Açık BG Studio 3D panel sekmesini kapat.
+2) Açık eski CMD/Python penceresini kapat.
+3) Mevcut AppData kalıcı veri sistemine dokunma.
+4) SAFE PATCH ZIP içeriğini mevcut bgstudio-3d repo klasörünün üzerine kopyala.
+5) URUN-YONETICI.cmd ile paneli yeniden aç.
+6) Yayın kontrolü çalıştır. Hata/uyarı olmamalı.
+7) Siteyi yeniden oluştur.
+8) GitHub Desktop: Commit + Push.
+9) Tarayıcıda Ctrl + F5.
+
+Önerilen commit:
+Fix navigation and complete system audit v2.8.2
+
+Not: data klasörü ve panelden yüklenen medya SAFE PATCH içinde bulunmaz.
+Kalıcı kullanıcı verisi %LOCALAPPDATA%\BGStudio3D kasasında korunur.

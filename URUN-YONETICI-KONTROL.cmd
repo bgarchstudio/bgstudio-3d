@@ -4,7 +4,7 @@ cd /d "%~dp0"
 echo BG Studio 3D Urun Yoneticisi - Kontrol
 echo ======================================
 echo Repo: %CD%
-echo Beklenen panel surumu: 2.8.0
+echo Beklenen panel surumu: 2.8.2
 echo.
 where py 2>nul
 where python 2>nul

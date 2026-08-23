@@ -1,12 +1,12 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title BG Studio 3D - Urun Yoneticisi v2.8.0
+title BG Studio 3D - Urun Yoneticisi v2.8.2
 set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 
 echo.
-echo [BG Studio 3D] Urun Yoneticisi v2.8.0 baslatiliyor...
+echo [BG Studio 3D] Urun Yoneticisi v2.8.2 baslatiliyor...
 echo Klasor: %CD%
 echo Veri: Windows AppData\Local\BGStudio3D
 

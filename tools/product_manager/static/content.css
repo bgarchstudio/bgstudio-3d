@@ -98,3 +98,14 @@
 body.logo-editor-open{overflow:hidden}
 @media(max-width:980px){.logo-editor-shell{grid-template-columns:1fr}.logo-editor-sidebar{padding-right:0}.logo-editor-stage{width:min(100%,480px)}}
 @media(max-width:720px){.profile-card-head{flex-direction:column;align-items:flex-start}.logo-editor-card{border-radius:22px}.logo-editor-shell{padding:18px}.logo-editor-sidebar h3{font-size:28px}.logo-editor-toolbar,.logo-editor-actions{justify-content:flex-start}.logo-editor-stage{width:100%}.profile-drop .profile-preview{min-height:240px}}
+
+
+/* v2.8.1 hotfix — clean logo editor preview + single file picker */
+.profile-drop > input[type="file"]{display:none!important}
+.profile-upload-row{margin:0}
+.logo-editor-dim{display:none!important}
+.logo-editor-cropbox{box-shadow:none!important;background:transparent!important}
+.logo-editor-stage{background:#12100f}
+.logo-editor-stage img{filter:none!important;opacity:1!important}
+.logo-editor-cropbox{border:1px dashed rgba(214,181,108,.78)!important}
+.logo-editor-cropbox::after{box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)!important}

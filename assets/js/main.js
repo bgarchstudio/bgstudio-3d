@@ -665,3 +665,47 @@ const displayAmpObserver = new MutationObserver((mutations) => mutations.forEach
   m.addedNodes?.forEach((node) => { if (node.nodeType === 1) normalizeDisplayAmpersands(node); });
 }));
 displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
+
+// v2.8.2 — navigation self-heal: every page must expose the same Prototip & Parça Üretim tab.
+(() => {
+  const normalizePrototypeNav = () => {
+    const nav = document.querySelector('.main-nav');
+    if (!nav) return;
+    const links = [...nav.querySelectorAll('a[href]')];
+    let prototypeLink = links.find(a => (a.getAttribute('href') || '').includes('prototip-parca/'));
+    const nfcLink = links.find(a => (a.getAttribute('href') || '').includes('nfc-qr/'));
+    if (!prototypeLink && nfcLink) {
+      prototypeLink = document.createElement('a');
+      prototypeLink.href = (nfcLink.getAttribute('href') || '').replace('nfc-qr/', 'prototip-parca/');
+      nfcLink.insertAdjacentElement('afterend', prototypeLink);
+    }
+    if (!prototypeLink) return;
+    prototypeLink.textContent = 'Prototip & Parça Üretim';
+
+    // Active state is also repaired from the URL so static pages cannot drift visually.
+    const path = window.location.pathname.replace(/index\.html$/, '');
+    const routeMap = [
+      ['/urunler/', 'urunler/'],
+      ['/ozel-uretim/', 'ozel-uretim/'],
+      ['/kurumsal/', 'kurumsal/'],
+      ['/nfc-qr/', 'nfc-qr/'],
+      ['/prototip-parca/', 'prototip-parca/'],
+      ['/hakkimizda/', 'hakkimizda/'],
+      ['/iletisim/', 'iletisim/']
+    ];
+    const matched = routeMap.find(([route]) => path.includes(route));
+    if (matched) {
+      nav.querySelectorAll('a[aria-current="page"],a.is-active').forEach(a => {
+        a.removeAttribute('aria-current');
+        a.classList.remove('is-active');
+      });
+      const active = [...nav.querySelectorAll('a[href]')].find(a => (a.getAttribute('href') || '').includes(matched[1]));
+      if (active) {
+        active.setAttribute('aria-current', 'page');
+        active.classList.add('is-active');
+      }
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizePrototypeNav, { once:true });
+  else normalizePrototypeNav();
+})();
