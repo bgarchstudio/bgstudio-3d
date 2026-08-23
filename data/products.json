@@ -33,13 +33,6 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "ataturk-imzasi",
-    "name": "Atatürk İmzası",
-    "category": "kisiye-ozel",
-    "price_text": "Ölçüye göre",
-    "price_value": null,
-    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
-    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
     "options": [
       "Siyah"
     ],
@@ -49,18 +42,26 @@
       "Duvar ve mermer yüzeye uygun",
       "Siyah renk üretim"
     ],
+    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": false,
+    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "category": "kisiye-ozel",
+    "price_text": "Ölçüye göre",
+    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
+    "sort_order": 2,
+    "price_value": null,
+    "active": true,
+    "slug": "ataturk-imzasi",
+    "name": "Atatürk İmzası",
+    "gallery_images": [],
     "main_image": "assets/images/products/ataturk-imzasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/ataturk-imzasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 2,
-    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "cerceveli-dalga-lamba",
