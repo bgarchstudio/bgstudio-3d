@@ -133,13 +133,6 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "dekoratif-lale",
-    "name": "Dekoratif Lale",
-    "category": "dekoratif",
-    "price_text": "299 TL",
-    "price_value": "299",
-    "card_description": "Renkli, çizgili ve modern 3D baskı lale objesi.",
-    "description": "Dekoratif lale, masa ve raf üzerinde tekli veya set halinde kullanılmak üzere tasarlanmış modern bir 3D baskı objesidir.",
     "options": [
       "Sakura Pink",
       "Sarı",
@@ -149,24 +142,32 @@
       "Avocado Green",
       "Silk Kings Gold"
     ],
+    "seo_title": "Dekoratif Lale | Kuşadası 3D Baskı | BG Studio 3D",
+    "name": "Dekoratif Lale",
+    "category": "dekoratif",
+    "featured": true,
+    "active": true,
+    "seo_description": "Dekoratif Lale, Renkli, çizgili ve modern 3D baskı lale objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "299",
+    "description": "Dekoratif lale, masa ve raf üzerinde tekli veya set halinde kullanılmak üzere tasarlanmış modern bir 3D baskı objesidir.",
+    "slug": "dekoratif-lale",
+    "price_text": "299 TL",
+    "card_description": "Renkli, çizgili ve modern 3D baskı lale objesi.",
+    "sort_order": 5,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "3D baskı çizgili gövde",
       "Tekli, 2’li ve 4’lü set",
       "2’li set: 499 TL",
       "4’lü set: 899 TL"
     ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-lale.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-lale.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": true,
-    "active": true,
-    "sort_order": 5,
-    "seo_title": "Dekoratif Lale | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Dekoratif Lale, Renkli, çizgili ve modern 3D baskı lale objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "dekoratif-mirket-obje",
