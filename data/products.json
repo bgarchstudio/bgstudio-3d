@@ -220,35 +220,36 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "dekoratif-mumluk",
-    "name": "Dekoratif Mumluk",
-    "category": "dekoratif",
-    "price_text": "349 TL",
-    "price_value": "349",
-    "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
-    "description": "Yuvarlak çizgili formdaki 3D baskı mumluk, masa ve komodinlerde sıcak bir atmosfer oluşturmak için pilli mumla birlikte kullanıma hazır sunulur.",
     "options": [
       "Bone White",
       "Diğer filament renkleri talebe göre"
     ],
+    "seo_title": "Dekoratif Mumluk | Kuşadası 3D Baskı | BG Studio 3D",
+    "name": "Dekoratif Mumluk",
+    "category": "dekoratif",
+    "featured": false,
+    "active": true,
+    "seo_description": "Dekoratif Mumluk, Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "349",
+    "description": "Yuvarlak çizgili formdaki 3D baskı mumluk, masa ve komodinlerde sıcak bir atmosfer oluşturmak için pilli mumla birlikte kullanıma hazır sunulur.",
+    "slug": "dekoratif-mumluk",
+    "price_text": "349 TL",
+    "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
+    "sort_order": 7,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "Yapay pilli mum dahil",
       "3D baskı gövde",
       "Masa ve komodin kullanımı",
       "Sıcak ambiyans"
     ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mumluk.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-mumluk.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 7,
-    "seo_title": "Dekoratif Mumluk | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Dekoratif Mumluk, Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "dekoratif-tavsan-obje",
