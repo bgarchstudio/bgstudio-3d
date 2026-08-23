@@ -15,7 +15,7 @@ BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
 
-PANEL_VERSION = '2.6.1'
+PANEL_VERSION = '2.6.2'
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -414,6 +414,8 @@ def clean_content_item(kind, item):
     if kind in ('prototype','nfc'): out['category'] = str(item.get('category') or ('Prototip / özel parça' if kind == 'prototype' else 'NFC / QR saha uygulaması')).strip()
     if kind == 'corporate': out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
     if item.get('image'): out['image'] = str(item.get('image'))
+    if kind in ('nfc','corporate') and item.get('profile_image'):
+        out['profile_image'] = str(item.get('profile_image'))
     return out
 
 
@@ -433,6 +435,27 @@ def save_content_item(kind, payload):
         item['image'] = rel
     elif old.get('image'):
         item['image'] = old.get('image')
+
+    # NFC ve bağımsız kurumsal referanslar için ayrı profil fotoğrafı / işletme logosu.
+    # Bağlı kurumsal kartlar profil görselini NFC kaynağından otomatik devralır.
+    if kind in ('nfc', 'corporate') and not (kind == 'corporate' and item.get('source_kind') == 'nfc'):
+        profile = payload.get('profile_image')
+        clear_profile = bool(payload.get('profile_image_clear'))
+        if profile:
+            rel = f'assets/images/references/{item["slug"]}-profile.webp'
+            save_data_uri(profile.get('data'), ROOT / rel)
+            item['profile_image'] = rel
+        elif clear_profile:
+            old_rel = str(old.get('profile_image') or '')
+            if old_rel.startswith('assets/images/references/'):
+                try:
+                    (ROOT / old_rel).unlink(missing_ok=True)
+                except Exception:
+                    pass
+            item.pop('profile_image', None)
+        elif old.get('profile_image'):
+            item['profile_image'] = old.get('profile_image')
+
     if idx is None: items.append(item)
     else: items[idx] = item
     write_content(kind, items)

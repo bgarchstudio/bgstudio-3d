@@ -1,25 +1,18 @@
-# BG Studio 3D v2.6 — Renk, Set ve Kurumsal Senkron
+# BG Studio 3D v2.6.2 — Profil Fotoğrafı Patch
 
-Bu patch kullanıcı tarafından düzenlenen `data/products.json`, `data/nfc_references.json` ve `data/prototypes.json` dosyalarını özellikle içermez. Mevcut ürün/set/saha verilerin korunur.
+Bu patch mevcut ürün, renk, NFC, kurumsal ve prototip JSON verilerini içermez; mevcut panel verilerinin üzerine yazmaz.
 
 ## Kurulum
-1. Paneli tamamen kapat.
-2. Bu patch klasörünün içindekileri repo köküne kopyala ve dosyaları değiştir.
-3. Ürün Yöneticisini yeniden aç.
-4. Bir kez `Siteyi yeniden oluştur` butonuna bas.
-5. `Yayın kontrolü` yap.
-6. GitHub Desktop: Commit + Push.
+1. Ürün yöneticisini ve açık Python/CMD penceresini kapat.
+2. Bu klasörün içindekileri mevcut `bgstudio-3d` repo klasörünün üzerine kopyala.
+3. Ürün yöneticisini yeniden aç.
+4. `Saha & Prototip` bölümüne gir.
+5. NFC veya bağımsız Kurumsal kayıtta `Profil fotoğrafı / işletme logosu` alanını kullan.
+6. `Siteyi yeniden oluştur` çalıştır.
+7. GitHub Desktop: Commit + Push.
 
-## Gelenler
-- Tekli fiyat katalog ve ana ürün fiyatında ana fiyattır; set fiyatı tekli fiyatı ezmez.
-- Set/adet kartları ürünlerin tamamında aynı tasarım/işleyişi kullanır.
-- 2'li/3'lü/4'lü setlerde her fiziksel ürün için ayrı renk seçilebilir.
-- WhatsApp mesajında her ürünün rengi ayrı satırda görünür.
-- `Benim renklerim`: renk adı, swatch tonu, stok açık/kapalı ve isteğe bağlı stok adedi.
-- Ürün düzenlerken global renkler swatch ile açık biçimde seçilir.
-- Müşteriye yalnızca stokta olan ve üründe izin verilen renkler gösterilir.
-- Kurumsal Referanslar paneli eklendi.
-- NFC saha kaydına bağlı Kurumsal kart, aynı kaynak veriyi kullanır. İki kart metin/görsel olarak birbirinden kopmaz.
-- Çikolata Şelalesi Spiral Aksamı Kurumsal kartlardan kaldırılır; Prototip & Parça bölümünde kalır.
-
-`CNAME` patch içinde yoktur.
+## Davranış
+- Profil fotoğrafı yüklenmezse BG Studio monogramı otomatik gösterilir.
+- NFC kaydına bağlı Kurumsal kartlar profil fotoğrafını da NFC kaynağından devralır.
+- `Varsayılan BG logosuna dön` ile yüklenmiş profil fotoğrafı kaldırılabilir.
+- Prototip kartlarında profil fotoğrafı alanı gösterilmez.

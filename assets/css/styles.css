@@ -264,3 +264,7 @@ button{font-family:inherit}
 .option-tags .color-public-chip b{font-weight:600;color:var(--ink-soft)}
 @media(max-width:900px){.order-controls.color-mode.has-tier{grid-template-columns:1fr 118px}.order-color-head{flex-direction:column;gap:4px}.order-color-head small{text-align:left}.color-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.set-pricing-grid{grid-template-columns:1fr}.order-controls.color-mode.has-tier,.order-controls.color-mode:not(.has-tier){grid-template-columns:1fr}.color-choice-grid{grid-template-columns:1fr 1fr}.color-choice{padding:7px}.color-slot-title{align-items:flex-start}}
+
+
+/* v2.6.2 — NFC / kurumsal profil fotoğrafı */
+.case-identity{display:flex;align-items:center;gap:12px;min-height:52px}.case-profile{width:48px;height:48px;flex:0 0 48px;border-radius:50%;overflow:hidden;border:1px solid var(--line);background:#f8f1e7;display:grid;place-items:center}.case-profile img{width:100%;height:100%;object-fit:cover;display:block}.case-profile.is-fallback img{object-fit:contain;padding:8px}.case-card.dark .case-profile{border-color:rgba(255,255,255,.15);background:#f7efe5}.case-identity .case-type{line-height:1.35}.case-card.has-media h3{margin:20px 0 12px}@media(max-width:680px){.case-profile{width:44px;height:44px;flex-basis:44px}.case-profile.is-fallback img{padding:7px}}

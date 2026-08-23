@@ -125,6 +125,14 @@ def case_media(item, prefix, name):
     src = prefix + str(image)
     return f'<div class="case-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(src)}"/></div>', ' has-media'
 
+
+def case_profile(item, prefix, name, label='Profil fotoğrafı'):
+    profile = str(item.get('profile_image') or '').strip()
+    src = prefix + profile if profile else prefix + 'assets/brand/bgstudio3d-monogram.png'
+    fallback = ' is-fallback' if not profile else ''
+    alt = f'{name} {label}' if name else label
+    return f'<span class="case-profile{fallback}"><img alt="{esc(alt)}" decoding="async" loading="lazy" src="{esc(src)}"/></span>'
+
 def render_managed_case(item, prefix='../'):
     """Prototype/default managed card."""
     name = esc(item.get('name'))
@@ -140,12 +148,15 @@ def render_managed_case(item, prefix='../'):
 def render_nfc_case(item, prefix='../'):
     """NFC field card: business identity is primary; shared content stays canonical."""
     name = esc(item.get('name'))
+    raw_name = str(item.get('name') or '')
     desc = esc(item.get('description') or item.get('headline'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     kicker = esc(item.get('category') or 'NFC / QR saha uygulaması')
     media, media_class = case_media(item, prefix, name)
+    profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
     klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
-    body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
+    body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
     return f'<article class="{klass}">{media}{body}</article>'
 
 def resolve_corporate_items():
@@ -174,14 +185,17 @@ def ensure_corporate_markers(text):
 
 def render_corporate_case(item, prefix='../'):
     name = esc(item.get('name'))
+    raw_name = str(item.get('name') or '')
     headline = esc(item.get('headline') or item.get('name'))
     desc = esc(item.get('description'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     media, media_class = case_media(item, prefix, name)
+    profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
     theme = str(item.get('theme') or '').lower()
     klass = ('case-card dark' if theme == 'dark' else 'case-card') + media_class
     # Corporate layout deliberately uses business name as kicker and project headline as title.
-    body = f'<div class="case-body"><span class="case-type">{name}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    identity = f'<div class="case-identity">{profile}<span class="case-type">{name}</span></div>'
+    body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
     return f'<article class="{klass}">{media}{body}</article>'
 
 def category_label(p):
