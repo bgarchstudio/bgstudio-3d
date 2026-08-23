@@ -183,13 +183,6 @@
     ]
   },
   {
-    "slug": "dekoratif-mirket-obje",
-    "name": "Dekoratif Mirket Obje",
-    "category": "dekoratif",
-    "price_text": "229 TL",
-    "price_value": "229",
-    "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
-    "description": "Dikey çizgili gövdesiyle modern bir karakter kazanan mirket objesi, raf ve masa dekorasyonu için hafif ve dikkat çekici bir seçenektir.",
     "options": [
       "Bone White",
       "Glitter Galaxy Black",
@@ -199,24 +192,32 @@
       "Avocado Green",
       "Silk Kings Gold"
     ],
+    "seo_title": "Dekoratif Mirket Obje | Kuşadası 3D Baskı | BG Studio 3D",
+    "name": "Dekoratif Mirket Obje",
+    "category": "dekoratif",
+    "featured": true,
+    "active": true,
+    "seo_description": "Dekoratif Mirket Obje, Sevimli ve minimal mirket formunda 3D baskı dekor. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "price_value": "229",
+    "description": "Dikey çizgili gövdesiyle modern bir karakter kazanan mirket objesi, raf ve masa dekorasyonu için hafif ve dikkat çekici bir seçenektir.",
+    "slug": "dekoratif-mirket-obje",
+    "price_text": "229 TL",
+    "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
+    "sort_order": 6,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "features": [
       "Tek parça 3D baskı",
       "Raf ve masa dekorasyonu",
       "3’lü set: 549 TL",
       "Geniş renk seçeneği"
     ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mirket-obje.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-mirket-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": true,
-    "active": true,
-    "sort_order": 6,
-    "seo_title": "Dekoratif Mirket Obje | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Dekoratif Mirket Obje, Sevimli ve minimal mirket formunda 3D baskı dekor. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo."
+    "poster_image_height": 1254
   },
   {
     "slug": "dekoratif-mumluk",
