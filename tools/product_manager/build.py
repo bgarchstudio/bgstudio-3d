@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, re, html
+import json, re, html, sys
 from datetime import date
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -8,6 +8,9 @@ NFC_DATA = ROOT / 'data' / 'nfc_references.json'
 PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
 CORPORATE_DATA = ROOT / 'data' / 'corporate_references.json'
 COLORS_DATA = ROOT / 'data' / 'colors.json'
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from storage import ensure_initialized, get_collection, export_to_repo
+ensure_initialized()
 BASE_URL = 'https://3d.bgstudio.com.tr'
 CATEGORY_LABELS = {
     'dekoratif': 'Dekoratif',
@@ -64,17 +67,14 @@ def make_seo(p):
 
 
 def load_products():
-    data = json.loads(DATA.read_text(encoding='utf-8'))
+    data = get_collection('products', [])
+    if not isinstance(data, list):
+        data = []
     return sorted(data, key=lambda p: (int(p.get('sort_order') or 9999), p.get('name', '').casefold()))
 
 
 def load_colors():
-    if not COLORS_DATA.exists():
-        return []
-    try:
-        data = json.loads(COLORS_DATA.read_text(encoding='utf-8'))
-    except Exception:
-        return []
+    data = get_collection('colors', [])
     if not isinstance(data, list):
         return []
     return sorted(data, key=lambda c: (int(c.get('sort_order') or 9999), str(c.get('name') or '').casefold()))
@@ -112,9 +112,14 @@ def legacy_order_options(p):
 
 
 def load_managed_content(path):
-    if not path.exists():
+    mapping = {
+        NFC_DATA: 'nfc',
+        PROTOTYPE_DATA: 'prototype',
+        CORPORATE_DATA: 'corporate',
+    }
+    data = get_collection(mapping.get(path, ''), []) if path in mapping else []
+    if not isinstance(data, list):
         return []
-    data = json.loads(path.read_text(encoding='utf-8'))
     return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
 
 
@@ -465,6 +470,8 @@ def render_product_page(p, related):
 
 
 def build_site():
+    # Kalıcı AppData kasasını her build öncesinde repo çıktısına yansıt.
+    export_to_repo()
     products = load_products()
     active = [p for p in products if p.get('active', True)]
 

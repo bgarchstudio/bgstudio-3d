@@ -1,0 +1,19 @@
+BG STUDIO 3D v2.8.0 — İLK GEÇİŞ
+=================================
+
+ÖNEMLİ: İlk geçişte doğrudan TAM PAKETİ mevcut repo üzerine atma.
+Mevcut panelde yaptığın ve ChatGPT'nin bilmediği yerel ürün/fiyat/renk/logo değişikliklerini korumak için önce güvenli patch kullan.
+
+1) Açık paneli ve eski CMD penceresini kapat.
+2) BGStudio3D_v2.8.0_ILK-GECIS-GUVENLI-PATCH.zip dosyasını çıkar.
+3) İçindekileri mevcut bgstudio-3d repo klasörünün üzerine kopyala.
+   Bu paket data/ ve panel görsellerini içermez, mevcut verilerini ezmez.
+4) KALICI-VERIYE-GECIS.cmd dosyasını bir kez çalıştır.
+5) Ekranda ürün/renk/NFC/kurumsal/prototip sayıları görünür ve ilk yedek alınır.
+6) Sonra URUN-YONETICI.cmd ile paneli aç.
+7) Panelde birkaç ürün/fiyatı kontrol et.
+8) Siteyi yeniden oluştur -> Yayın kontrolü -> GitHub Desktop Commit + Push.
+
+BUNDAN SONRA:
+Yeni CMD, server.py veya tam site paketi geldiğinde AppData'daki kalıcı veri kaybolmaz.
+Kalıcı kasa: %LOCALAPPDATA%\BGStudio3D

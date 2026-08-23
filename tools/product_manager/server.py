@@ -2,20 +2,24 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 from datetime import datetime
-import json, base64, re, webbrowser, threading, sys, shutil, traceback, zipfile
+import json, base64, re, webbrowser, threading, sys, shutil, traceback
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / 'static'
-DATA = ROOT / 'data' / 'products.json'
-NFC_DATA = ROOT / 'data' / 'nfc_references.json'
-PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
-CORPORATE_DATA = ROOT / 'data' / 'corporate_references.json'
-COLORS_DATA = ROOT / 'data' / 'colors.json'
-BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from storage import (
+    ensure_initialized, get_collection, set_collection, export_to_repo,
+    save_media, remove_media, copy_media, media_path,
+    create_db_backup, create_full_backup, list_backups as storage_list_backups,
+    restore_backup as storage_restore_backup, status as storage_status,
+    BACKUPS_ROOT
+)
 from build import build_site
 
-PANEL_VERSION = '2.7.1'
+PANEL_VERSION = '2.8.0'
+BACKUPS = BACKUPS_ROOT
+ensure_initialized()
+export_to_repo()
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -57,21 +61,19 @@ def make_seo(name, card_description='', description=''):
 
 
 def read_products():
-    return json.loads(DATA.read_text(encoding='utf-8'))
+    data = get_collection('products', [])
+    return data if isinstance(data, list) else []
 
 
 def write_products(data):
-    DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    set_collection('products', data)
 
 
 def read_colors():
-    if not COLORS_DATA.exists():
-        return []
-    data = json.loads(COLORS_DATA.read_text(encoding='utf-8'))
+    data = get_collection('colors', [])
     if not isinstance(data, list):
         return []
     return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
-
 
 def normalize_hex(value):
     value = str(value or '').strip()
@@ -114,78 +116,26 @@ def clean_colors(items):
 
 
 def write_colors(items):
-    COLORS_DATA.parent.mkdir(parents=True, exist_ok=True)
     clean = clean_colors(items)
-    COLORS_DATA.write_text(json.dumps(clean, ensure_ascii=False, indent=2), encoding='utf-8')
+    set_collection('colors', clean)
     return clean
 
 
 def backup():
-    BACKUPS.mkdir(parents=True, exist_ok=True)
-    if DATA.exists():
-        stamp = datetime.now().strftime('%Y%m%d-%H%M%S-%f')
-        path = BACKUPS / f"products-{stamp}.json"
-        shutil.copy2(DATA, path)
-        # Keep lightweight automatic JSON backups bounded.
-        auto = sorted(BACKUPS.glob('products-*.json'), reverse=True)
-        for old in auto[60:]:
-            old.unlink(missing_ok=True)
-        return path
-    return None
+    return create_db_backup('products-auto')
 
 
 def full_backup(reason='manual'):
-    BACKUPS.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-    safe_reason = re.sub(r'[^a-z0-9-]+', '-', str(reason).lower()).strip('-') or 'manual'
-    path = BACKUPS / f"site-{stamp}-{safe_reason}.zip"
-    with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as z:
-        if DATA.exists(): z.write(DATA, DATA.relative_to(ROOT))
-        for content_data in (NFC_DATA, PROTOTYPE_DATA, CORPORATE_DATA, COLORS_DATA):
-            if content_data.exists(): z.write(content_data, content_data.relative_to(ROOT))
-        for folder in (ROOT / 'assets/images/products', ROOT / 'assets/images/posters', ROOT / 'assets/images/references', ROOT / 'assets/images/prototypes'):
-            if folder.exists():
-                for file in folder.rglob('*'):
-                    if file.is_file(): z.write(file, file.relative_to(ROOT))
-    snaps = sorted(BACKUPS.glob('site-*.zip'), reverse=True)
-    for old in snaps[15:]: old.unlink(missing_ok=True)
-    return path
+    return create_full_backup(reason)
 
 
 def list_backups():
-    BACKUPS.mkdir(parents=True, exist_ok=True)
-    files = sorted([*BACKUPS.glob('site-*.zip'), *BACKUPS.glob('products-*.json')], key=lambda x: x.stat().st_mtime, reverse=True)
-    out = []
-    for file in files[:30]:
-        out.append({
-            'name': file.name,
-            'type': 'full' if file.suffix.lower() == '.zip' else 'products',
-            'size': file.stat().st_size,
-            'modified': datetime.fromtimestamp(file.stat().st_mtime).isoformat(timespec='seconds')
-        })
-    return out
+    return storage_list_backups()
 
 
 def restore_backup(name):
-    file = (BACKUPS / Path(str(name)).name).resolve()
-    if BACKUPS.resolve() not in file.parents or not file.exists():
-        raise ValueError('Yedek bulunamadı.')
-    full_backup('before-restore')
-    if file.suffix.lower() == '.json':
-        data = json.loads(file.read_text(encoding='utf-8'))
-        if not isinstance(data, list): raise ValueError('Yedek ürün verisi geçersiz.')
-        write_products(data)
-    elif file.suffix.lower() == '.zip':
-        with zipfile.ZipFile(file, 'r') as z:
-            for member in z.infolist():
-                target = (ROOT / member.filename).resolve()
-                if ROOT.resolve() not in target.parents and target != ROOT.resolve():
-                    raise ValueError('Yedek içeriği güvenli değil.')
-            z.extractall(ROOT)
-    else:
-        raise ValueError('Desteklenmeyen yedek türü.')
+    storage_restore_backup(name)
     return build_site()
-
 
 def preflight():
     checks = []
@@ -258,16 +208,23 @@ def save_data_uri(uri, path):
         raise ValueError('Görsel çok büyük.')
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
+    try:
+        rel = path.resolve().relative_to(ROOT.resolve()).as_posix()
+        save_media(rel, raw)
+    except ValueError:
+        pass
 
 
 def remove_file(rel):
     if not rel:
         return
-    p = (ROOT / str(rel)).resolve()
+    rel = str(rel).replace('\\', '/').lstrip('/')
+    p = (ROOT / rel).resolve()
     try:
         p.relative_to(ROOT.resolve())
     except ValueError:
         return
+    remove_media(rel)
     if p.exists() and p.is_file():
         p.unlink()
 
@@ -361,32 +318,24 @@ def unique_slug(products, base):
 def duplicate_asset(src_rel, dst_rel):
     if not src_rel:
         return None
-    src = ROOT / src_rel
-    dst = ROOT / dst_rel
-    if src.exists():
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-        return dst_rel
-    return None
+    return dst_rel if copy_media(src_rel, dst_rel) else None
 
 
 
-def content_path(kind):
-    if kind == 'nfc': return NFC_DATA
-    if kind == 'prototype': return PROTOTYPE_DATA
-    if kind == 'corporate': return CORPORATE_DATA
+def content_collection(kind):
+    if kind == 'nfc': return 'nfc'
+    if kind == 'prototype': return 'prototype'
+    if kind == 'corporate': return 'corporate'
     raise ValueError('İçerik türü geçersiz.')
 
 
 def read_content(kind):
-    path = content_path(kind)
-    if not path.exists(): return []
-    return json.loads(path.read_text(encoding='utf-8'))
+    data = get_collection(content_collection(kind), [])
+    return data if isinstance(data, list) else []
 
 
 def write_content(kind, data):
-    content_path(kind).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
-
+    set_collection(content_collection(kind), data)
 
 def clean_content_item(kind, item):
     if kind == 'corporate':
@@ -449,6 +398,7 @@ def save_content_item(kind, payload):
             old_rel = str(old.get('profile_image') or '')
             if old_rel.startswith('assets/images/references/'):
                 try:
+                    remove_media(old_rel)
                     (ROOT / old_rel).unlink(missing_ok=True)
                 except Exception:
                     pass
@@ -500,11 +450,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         if u.path == '/api/products':
-            return self.send_json({'products': read_products(), 'colors': read_colors(), 'root': str(ROOT)})
+            return self.send_json({'products': read_products(), 'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
-            return self.send_json({'colors': read_colors(), 'root': str(ROOT)})
+            return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'storage': storage_status()})
         if u.path == '/api/backups':
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
@@ -512,7 +462,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/content':
             from urllib.parse import parse_qs
             kind = (parse_qs(u.query).get('kind') or [''])[0]
-            return self.send_json({'items': read_content(kind), 'sources': read_content('nfc') if kind == 'corporate' else [], 'kind': kind, 'root': str(ROOT)})
+            return self.send_json({'items': read_content(kind), 'sources': read_content('nfc') if kind == 'corporate' else [], 'kind': kind, 'root': str(ROOT), 'storage': storage_status()})
         if u.path.startswith('/assets/') or u.path in ('/favicon.ico', '/apple-touch-icon.png'):
             return self.send_file(ROOT / unquote(u.path.lstrip('/')), ROOT)
         path = 'index.html' if u.path in ('/', '') else unquote(u.path.lstrip('/'))
@@ -754,7 +704,10 @@ def run():
     url = f'http://127.0.0.1:{port}/'
     print('\nBG Studio 3D Ürün Yöneticisi PRO')
     print('Panel:', url)
+    st = storage_status()
     print('Repo :', ROOT)
+    print('Veri :', st['database'])
+    print('Medya:', st['media'])
     print('Kapatmak için paneldeki "Paneli kapat" butonunu kullan.\n')
     threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:

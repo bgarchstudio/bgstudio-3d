@@ -4,8 +4,7 @@ cd /d "%~dp0"
 echo BG Studio 3D Urun Yoneticisi - Kontrol
 echo ======================================
 echo Repo: %CD%
-echo.
-echo Beklenen panel surumu: 2.7.1
+echo Beklenen panel surumu: 2.8.0
 echo.
 where py 2>nul
 where python 2>nul
@@ -22,7 +21,13 @@ if exist "tools\product_manager\static\manager.js" (
   echo [HATA] manager.js bulunamadi.
 )
 echo.
-echo Bir onceki panel sekmesi aciksa kapat. Yeni paneli URUN-YONETICI.cmd ile ac.
+echo --- Kalici veri kasasi ---
+where py >nul 2>nul && py -3 "%~dp0tools\product_manager\storage_cli.py" status && goto :done
+where python >nul 2>nul && python "%~dp0tools\product_manager\storage_cli.py" status && goto :done
+where python3 >nul 2>nul && python3 "%~dp0tools\product_manager\storage_cli.py" status && goto :done
+:done
+echo.
+echo Panel sekmesi aciksa kapat. Yeni paneli URUN-YONETICI.cmd ile ac.
 echo.
 pause
 endlocal

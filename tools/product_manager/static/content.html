@@ -4,5 +4,67 @@
 <div class="content-layout"><aside class="content-list-panel"><button id="newItem" class="primary full">＋ Yeni kayıt ekle</button><div id="contentList" class="content-list"></div></aside>
 <section class="content-editor"><div class="editor-head"><div><p id="kindEyebrow">NFC SAHA REFERANSI</p><h2 id="editorTitle">Yeni kayıt</h2></div><button id="deleteItem" type="button" class="tiny danger-text" hidden>Sil</button></div>
 <form id="contentForm"><div class="section"><div class="corporate-link-panel corporate-only" hidden><label>Kurumsal kart kaynağı<select id="c_source"><option value="">Bağımsız kurumsal kart</option></select><small>NFC saha kaydını seçersen işletme adı, proje başlığı, açıklama, etiketler ve görsel tek kaynaktan senkron kalır.</small></label><label>Kart tonu<select id="c_theme"><option value="light">Açık</option><option value="dark">Koyu</option></select></label></div><div class="grid two"><label class="shared-copy">İşletme / iş adı<input id="c_name" required placeholder="Örn. Circolo Kuşadası"></label><label class="shared-copy">URL slug<input id="c_slug" required placeholder="circolo-kusadasi"><small>Yeni kayıtta otomatik oluşur.</small></label><label class="category-field">Kart üst etiketi / kategori<input id="c_category" placeholder="Örn. Restoran • QR Stand"></label><label>Sıra<input id="c_sort" type="number" min="1" value="999"></label></div><label class="shared-copy">Başlık<input id="c_headline" required placeholder="Örn. Menü + Google + WhatsApp tek standda."></label><label class="shared-copy">Açıklama<textarea id="c_description" rows="5" required placeholder="Ne yaptık, hangi ihtiyacı çözdük?"></textarea></label><label class="shared-copy">Etiketler<textarea id="c_tags" rows="4" placeholder="Her satıra bir etiket&#10;QR menü&#10;10 masa&#10;Kuşadası"></textarea></label><label class="content-active"><input id="c_active" type="checkbox" checked> Sitede yayınla</label></div>
-<div class="section"><div class="section-head"><div><span>GÖRSELLER</span><h2>Referans görsellerini ekle</h2></div><small>JPG/PNG seçebilirsin. Panel WebP’ye çevirip doğru klasöre kaydeder.</small></div><div class="reference-media-grid"><label class="image-drop"><span id="imageLabel">Saha / prototip görseli</span><input id="c_image" type="file" accept="image/*"><div class="preview"><img id="c_preview" hidden><b id="c_placeholder">Görsel seç</b></div><small>İsteğe bağlı büyük kart / uygulama görseli.</small></label><div id="profileImageField" class="profile-image-field"><label class="image-drop profile-drop"><span>Profil fotoğrafı / işletme logosu</span><input id="c_profile_image" type="file" accept="image/*"><div class="preview profile-preview"><img id="c_profile_preview" alt="Profil önizleme"><b id="c_profile_placeholder" hidden>BG Studio logosu</b></div><small>Boş bırakırsan varsayılan BG Studio logosu kullanılır.</small></label><button id="clearProfileImage" class="ghost profile-reset" type="button">Varsayılan BG logosuna dön</button></div></div></div>
-<div class="form-footer"><div><strong>Kaydettiğinde ne olur?</strong><p>NFC kaydı saha referanslarına, kurumsal kaydı Kurumsal sayfasına, prototip kaydı Prototip & Parça sayfasına otomatik eklenir. Site yeniden oluşturulur; sana yalnızca GitHub Desktop’ta Commit + Push kalır.</p></div><button class="primary save" type="submit">Kaydet ve siteyi hazırla</button></div></form></section></div></main><div id="toast" class="toast" hidden></div><script src="content.js"></script></body></html>
+<div class="section"><div class="section-head"><div><span>GÖRSEL</span><h2>Referans görsellerini ekle</h2></div><small>JPG/PNG seçebilirsin. Panel WebP’ye çevirip doğru klasöre kaydeder.</small></div><div class="reference-media-grid"><label class="image-drop"><span id="imageLabel">Saha / prototip görseli</span><input id="c_image" type="file" accept="image/*"><div class="preview"><img id="c_preview" hidden><b id="c_placeholder">Görsel seç</b></div><small>İsteğe bağlı büyük kart / uygulama görseli.</small></label><div id="profileImageField" class="profile-image-field"><div class="profile-card-head"><div><span class="profile-card-label">Profil fotoğrafı / işletme logosu</span><small>Logo kılavuz çizgileri, ortala ve zoom ile düzenlenir.</small></div><button id="openLogoEditor" class="ghost profile-edit-trigger" type="button">Logoyu düzenle</button></div><label class="image-drop profile-drop"><input id="c_profile_image" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/*"><div class="profile-upload-row"><button id="pickProfileImage" class="ghost file-trigger" type="button">Dosya seç</button><span id="profileFileName" class="file-name">Dosya seçilmedi</span></div><div class="preview profile-preview"><img id="c_profile_preview" alt="Profil önizleme"><b id="c_profile_placeholder" hidden>BG Studio logosu</b></div><small>Boş bırakırsan varsayılan BG Studio logosu kullanılır.</small></label><div class="profile-inline-actions"><button id="clearProfileImage" class="ghost profile-reset" type="button">Varsayılan BG logosuna dön</button></div></div></div></div>
+<div class="form-footer"><div><strong>Kaydettiğinde ne olur?</strong><p>NFC kaydı saha referanslarına, kurumsal kaydı Kurumsal sayfasına, prototip kaydı Prototip & Parça sayfasına otomatik eklenir. Site yeniden oluşturulur; sana yalnızca GitHub Desktop’ta Commit + Push kalır.</p></div><button class="primary save" type="submit">Kaydet ve siteyi hazırla</button></div></form></section></div></main>
+
+<div id="logoEditorModal" class="logo-editor-modal" hidden>
+  <div class="logo-editor-backdrop"></div>
+  <div class="logo-editor-card" role="dialog" aria-modal="true" aria-labelledby="logoEditorTitle">
+    <button id="closeLogoEditor" class="logo-editor-close" type="button" aria-label="Kapat">×</button>
+    <div class="logo-editor-shell">
+      <aside class="logo-editor-sidebar">
+        <p class="logo-editor-eyebrow">İŞLETME LOGOSU</p>
+        <h3 id="logoEditorTitle">Yeni işletme logosunu düzenle</h3>
+        <p class="logo-editor-copy">Tek görsel yükle; kılavuz çizgileri, ortala ve yumuşak zoom ile her sekmede temiz bir logo kadrajı ayarla.</p>
+        <div class="logo-editor-upload-box">
+          <input id="logoEditorInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/*" hidden>
+          <button id="logoEditorPick" class="primary logo-editor-pick" type="button">Dosya seç</button>
+          <span id="logoEditorFileName" class="logo-editor-file">Henüz dosya seçilmedi</span>
+        </div>
+        <div class="logo-editor-note">PNG, JPG veya WebP kullanabilirsin. Yüklenen logo panelde WebP’ye çevrilir ve kaydedilir.</div>
+      </aside>
+      <section class="logo-editor-stage-panel">
+        <div class="logo-editor-stage-wrap">
+          <div id="logoEditorStage" class="logo-editor-stage guide-thirds">
+            <div class="logo-editor-checker"></div>
+            <img id="logoEditorImage" alt="Logo düzenleme önizlemesi" draggable="false">
+            <div class="logo-editor-dim"></div>
+            <div id="logoEditorCropBox" class="logo-editor-cropbox">
+              <div class="guide-line h top"></div>
+              <div class="guide-line h mid"></div>
+              <div class="guide-line h bot"></div>
+              <div class="guide-line v left"></div>
+              <div class="guide-line v mid"></div>
+              <div class="guide-line v right"></div>
+              <div class="guide-line cross-x"></div>
+              <div class="guide-line cross-y"></div>
+            </div>
+          </div>
+        </div>
+        <div class="logo-editor-controls">
+          <div class="zoom-row">
+            <label for="logoZoom">Yakınlaştırma</label>
+            <div class="zoom-inline"><input id="logoZoom" type="range" min="1" max="2.8" step="0.01" value="1"><span id="logoZoomValue">100%</span></div>
+          </div>
+          <div class="logo-editor-toolbar">
+            <button id="logoCenterBtn" class="ghost" type="button">Ortala</button>
+            <button id="logoResetBtn" class="ghost" type="button">Kadrajı sıfırla</button>
+            <div class="guide-toggle" role="group" aria-label="Kılavuz çizgileri">
+              <span>Kılavuz çizgileri</span>
+              <button class="ghost active" type="button" data-guide="off">Kapalı</button>
+              <button class="ghost" type="button" data-guide="center">Merkez</button>
+              <button class="ghost" type="button" data-guide="thirds">3 × 3</button>
+            </div>
+          </div>
+          <p class="logo-editor-help">Logoyu sürükleyerek yerini değiştir. Hassasiyet yumuşatıldı; görüntü takılmadan rahatça yakınlaştırıp konumlandırabilirsin.</p>
+        </div>
+        <div class="logo-editor-actions">
+          <button id="cancelLogoEditor" class="ghost" type="button">Vazgeç</button>
+          <button id="applyLogoCrop" class="primary" type="button">Kırpmayı kullan</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div><script src="content.js"></script></body></html>
