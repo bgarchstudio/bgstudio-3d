@@ -5,8 +5,22 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-async function api(path,opts={}){const r=await fetch(path,{headers:{'Content-Type':'application/json'},...opts});const d=await r.json();if(!r.ok||d.ok===false)throw new Error(d.error||'İşlem başarısız');return d}
-async function load(){const d=await api('/api/products');products=d.products;$('repoPath').textContent='Repo: '+d.root;renderList();resetForm()}
+const PANEL_VERSION='2.4.1';
+async function api(path,opts={}){
+  let r;
+  try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
+  catch(_){throw new Error('Panel servisiyle bağlantı kesildi. “Paneli kapat” ile kapatıp Ürün Yöneticisi’ni yeniden aç.')}
+  const text=await r.text();
+  let d={};
+  try{d=text?JSON.parse(text):{}}catch(_){throw new Error(`Panel beklenmeyen yanıt verdi (${r.status}). Paneli kapatıp yeniden aç.`)}
+  if(!r.ok||d.ok===false)throw new Error(d.error||`İşlem başarısız (${r.status})`);
+  return d
+}
+async function load(){
+  const status=await api('/api/status');
+  if(status.version!==PANEL_VERSION)throw new Error(`Panel sunucusu eski sürüm (${status.version||'bilinmiyor'}). Bu sekmeyi kapat, eski CMD/panel penceresini kapat ve Ürün Yöneticisi’ni yeniden başlat.`);
+  const d=await api('/api/products');products=d.products;$('repoPath').textContent='Repo: '+d.root;renderList();resetForm()
+}
 function stats(){$('countAll').textContent=products.length;$('countLive').textContent=products.filter(p=>p.active!==false).length;$('countFeatured').textContent=products.filter(p=>p.active!==false&&p.featured).length}
 function categoryLabel(k){return {dekoratif:'Dekoratif',aydinlatma:'Aydınlatma',fonksiyonel:'Fonksiyonel','kisiye-ozel':'Kişiye Özel'}[k]||k}
 function sortedProducts(){return [...products].sort((a,b)=>(+a.sort_order||9999)-(+b.sort_order||9999)||a.name.localeCompare(b.name,'tr'))}
@@ -42,6 +56,28 @@ $('deleteProduct').onclick=async()=>{if(!currentSlug)return;const p=products.fin
 $('form').addEventListener('submit',async e=>{e.preventDefault();try{$('saveState').textContent='Hazırlanıyor…';if(!$('seo_title').value.trim()||!$('seo_description').value.trim())autoSeo();const product={};fields.forEach(id=>product[id]=$(id).value);product.options=splitLines($('options').value);product.features=splitLines($('features').value);product.active=$('active').checked;product.featured=$('featured').checked;product.sort_order=+$('sort_order').value||999;const mf=$('main_image').files[0],pf=$('poster_image').files[0],gf=$('gallery_images').files;if(!currentSlug&&!mf)throw new Error('Yeni üründe ana görsel seçmelisin.');const main=mf?await convertImage(mf,1000,760,.88):null;const poster=pf?await convertImage(pf,1254,1254,.88):null;const gallery=gf.length?await convertGallery(gf):[];const d=await api('/api/save',{method:'POST',body:JSON.stringify({original_slug:currentSlug,product,main_image:main,poster_image:poster,gallery_images:gallery,replace_gallery:gf.length>0})});toast('✅ '+d.message);$('saveState').textContent='Kaydedildi · GitHub Desktop’ta Commit + Push';await refreshProducts(d.product.slug)}catch(err){$('saveState').textContent='Hata';toast(err.message,true)}})
 async function refreshProducts(slug){const d=await api('/api/products');products=d.products;renderList();if(slug)editProduct(slug);else resetForm()}
 $('rebuild').onclick=async()=>{try{$('saveState').textContent='Site oluşturuluyor…';const d=await api('/api/rebuild',{method:'POST',body:'{}'});$('saveState').textContent='Hazır';toast(`✅ Site hazır: ${d.result.active} aktif ürün`)}catch(e){toast(e.message,true)}};$('openSite').onclick=()=>window.open('https://3d.bgstudio.com.tr','_blank');$('shutdown').onclick=async()=>{try{await api('/api/shutdown',{method:'POST',body:'{}'});document.body.innerHTML='<div style="font:20px system-ui;padding:60px">BG Studio 3D Ürün Yöneticisi kapatıldı. Bu sekmeyi kapatabilirsin. 👋</div>'}catch{window.close()}};
+
+// v2.4.1 — panel image lightbox. Main, poster and gallery previews open at full size.
+const panelImageLightbox=(()=>{
+  const box=document.createElement('div');
+  box.className='panel-image-lightbox';
+  box.hidden=true;
+  box.innerHTML='<button type="button" aria-label="Görseli kapat">×</button><img alt="Ürün görseli">';
+  document.body.appendChild(box);
+  const image=box.querySelector('img');
+  const close=()=>{box.classList.remove('open');box.hidden=true;document.body.classList.remove('modal-open')};
+  const open=src=>{if(!src)return;image.src=src;box.hidden=false;requestAnimationFrame(()=>box.classList.add('open'));document.body.classList.add('modal-open')};
+  box.querySelector('button').onclick=close;
+  box.addEventListener('click',e=>{if(e.target===box)close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!box.hidden)close()});
+  document.addEventListener('click',e=>{
+    const img=e.target.closest?.('.preview img:not([hidden]), .gallery-mini img, .preview-product-image img');
+    if(!img)return;
+    e.preventDefault();e.stopPropagation();open(img.currentSrc||img.src)
+  });
+  return {open,close};
+})();
+
 load().catch(e=>toast(e.message,true));
 
 // v2.2.1 — normalize ampersands in product-manager display headings too.

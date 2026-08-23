@@ -1,3 +1,15 @@
+
+// v2.4.1 — direct/search-engine landings should start at the top, not at a restored footer position.
+(() => {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const goTop = () => {
+    if (!window.location.hash) window.scrollTo({top:0,left:0,behavior:'auto'});
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', goTop, {once:true});
+  else goTop();
+  window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
+})();
+
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;

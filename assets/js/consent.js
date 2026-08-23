@@ -79,7 +79,6 @@
         ? `Mevcut tercih: ${saved.analytics ? 'Analitik açık' : 'Sadece gerekli'}`
         : 'İsteğe bağlı analitik, yalnızca izin verirseniz etkinleşir.';
     }
-    banner.querySelector('[data-consent-accept]')?.focus();
   };
 
   const mount = () => {
@@ -112,16 +111,18 @@
       button.type = 'button';
       button.className = 'footer-consent-button';
       button.dataset.openConsent = '';
-      button.textContent = 'Çerez tercihleri';
+      button.textContent = 'Analitik tercihleri';
       button.addEventListener('click', () => showBanner(true));
       footerLinks.appendChild(button);
     }
 
-    if (!readChoice()) showBanner(false);
+    // Yeni ziyaretçiye otomatik açılır pencere göstermiyoruz. Varsayılan: yalnızca gerekli.
+    // İsteyen kullanıcı footer'daki Analitik tercihleri bağlantısından açıkça izin verebilir.
   };
 
   const choice = readChoice();
   if (choice?.analytics) loadAnalytics();
+  else removeAnalyticsCookies();
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
   else mount();

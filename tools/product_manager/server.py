@@ -13,6 +13,8 @@ BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
 
+PANEL_VERSION = '2.4.1'
+
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
     '.js': 'application/javascript; charset=utf-8', '.png': 'image/png',
@@ -323,6 +325,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(b)))
+        self.send_header('Cache-Control', 'no-store, max-age=0')
         self.end_headers()
         self.wfile.write(b)
 
@@ -345,6 +348,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-Type', MIME.get(file.suffix.lower(), 'application/octet-stream'))
         self.send_header('Content-Length', str(len(b)))
+        self.send_header('Cache-Control', 'no-store, max-age=0')
         self.end_headers()
         self.wfile.write(b)
 
@@ -353,7 +357,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/products':
             return self.send_json({'products': read_products(), 'root': str(ROOT)})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT)})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION})
         if u.path == '/api/backups':
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
