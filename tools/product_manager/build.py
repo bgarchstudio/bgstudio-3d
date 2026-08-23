@@ -6,6 +6,8 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'data' / 'products.json'
 NFC_DATA = ROOT / 'data' / 'nfc_references.json'
 PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
+CORPORATE_DATA = ROOT / 'data' / 'corporate_references.json'
+COLORS_DATA = ROOT / 'data' / 'colors.json'
 BASE_URL = 'https://3d.bgstudio.com.tr'
 CATEGORY_LABELS = {
     'dekoratif': 'Dekoratif',
@@ -66,6 +68,47 @@ def load_products():
     return sorted(data, key=lambda p: (int(p.get('sort_order') or 9999), p.get('name', '').casefold()))
 
 
+def load_colors():
+    if not COLORS_DATA.exists():
+        return []
+    try:
+        data = json.loads(COLORS_DATA.read_text(encoding='utf-8'))
+    except Exception:
+        return []
+    if not isinstance(data, list):
+        return []
+    return sorted(data, key=lambda c: (int(c.get('sort_order') or 9999), str(c.get('name') or '').casefold()))
+
+
+def color_is_available(color):
+    qty = color.get('stock_qty')
+    return bool(color.get('in_stock', True)) and (qty is None or int(qty or 0) > 0)
+
+
+def product_color_entries(p):
+    colors = load_colors()
+    by_id = {str(c.get('id')): c for c in colors}
+    explicit = [str(x) for x in (p.get('color_ids') or []) if str(x) in by_id]
+    if explicit:
+        return [by_id[cid] for cid in explicit if color_is_available(by_id[cid])]
+    # Legacy compatibility: old products stored colors in `options` as plain names.
+    names = {str(c.get('name') or '').strip().casefold(): c for c in colors}
+    found = []
+    for option in (p.get('options') or []):
+        c = names.get(str(option).strip().casefold())
+        if c and color_is_available(c) and c not in found:
+            found.append(c)
+    return found
+
+
+def legacy_order_options(p):
+    options = [str(x).strip() for x in (p.get('options') or []) if str(x).strip()]
+    colors = load_colors()
+    color_names = {str(c.get('name') or '').strip().casefold() for c in colors}
+    if p.get('color_ids'):
+        return options
+    # When legacy options are recognized as palette colors, do not duplicate them as a generic select.
+    return [x for x in options if x.casefold() not in color_names]
 
 
 def load_managed_content(path):
@@ -75,20 +118,70 @@ def load_managed_content(path):
     return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
 
 
+def case_media(item, prefix, name):
+    image = item.get('image')
+    if not image:
+        return '', ''
+    src = prefix + str(image)
+    return f'<div class="case-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(src)}"/></div>', ' has-media'
+
 def render_managed_case(item, prefix='../'):
+    """Prototype/default managed card."""
     name = esc(item.get('name'))
     headline = esc(item.get('headline') or item.get('name'))
     desc = esc(item.get('description'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     kicker = esc(item.get('category') or item.get('name'))
-    image = item.get('image')
-    media = ''
-    klass = 'case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card'
-    if image:
-        src = prefix + str(image)
-        media = f'<div class="case-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(src)}"/></div>'
-        klass += ' has-media'
+    media, media_class = case_media(item, prefix, name)
+    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
     body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    return f'<article class="{klass}">{media}{body}</article>'
+
+def render_nfc_case(item, prefix='../'):
+    """NFC field card: business identity is primary; shared content stays canonical."""
+    name = esc(item.get('name'))
+    desc = esc(item.get('description') or item.get('headline'))
+    tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
+    kicker = esc(item.get('category') or 'NFC / QR saha uygulaması')
+    media, media_class = case_media(item, prefix, name)
+    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
+    body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    return f'<article class="{klass}">{media}{body}</article>'
+
+def resolve_corporate_items():
+    nfc = {str(x.get('slug')): x for x in load_managed_content(NFC_DATA)}
+    resolved = []
+    for raw in load_managed_content(CORPORATE_DATA):
+        item = dict(raw)
+        if item.get('source_kind') == 'nfc' and item.get('source_slug'):
+            src = nfc.get(str(item.get('source_slug')))
+            if not src:
+                continue
+            # The business copy/image come from one source, so NFC and corporate can never drift.
+            item = {**src, **{k:v for k,v in raw.items() if k in ('slug','source_kind','source_slug','theme','active','sort_order')}}
+        resolved.append(item)
+    return sorted(resolved, key=lambda x:(int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
+
+def ensure_corporate_markers(text):
+    if '<!-- CONTENT_MANAGER:CORPORATE_START -->' in text and '<!-- CONTENT_MANAGER:CORPORATE_END -->' in text:
+        return text
+    pattern = re.compile(r'<div class="case-grid">.*?</div></div></section>', re.S)
+    replacement = '<div class="case-grid"><!-- CONTENT_MANAGER:CORPORATE_START -->\n<!-- CONTENT_MANAGER:CORPORATE_END --></div></div></section>'
+    if not pattern.search(text):
+        raise RuntimeError('Kurumsal referans alanı bulunamadı.')
+    return pattern.sub(replacement, text, count=1)
+
+
+def render_corporate_case(item, prefix='../'):
+    name = esc(item.get('name'))
+    headline = esc(item.get('headline') or item.get('name'))
+    desc = esc(item.get('description'))
+    tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
+    media, media_class = case_media(item, prefix, name)
+    theme = str(item.get('theme') or '').lower()
+    klass = ('case-card dark' if theme == 'dark' else 'case-card') + media_class
+    # Corporate layout deliberately uses business name as kicker and project headline as title.
+    body = f'<div class="case-body"><span class="case-type">{name}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
     return f'<article class="{klass}">{media}{body}</article>'
 
 def category_label(p):
@@ -127,18 +220,16 @@ def replace_between(text, start_marker, end_marker, content):
 
 
 def effective_pricing_tiers(p):
-    """Return storefront pricing tiers.
+    """Return storefront pricing tiers with base price as authoritative Tekli price.
 
-    If a product has set pricing but no explicit 1-piece tier, use the product's
-    numeric base price as the single-item option automatically. This keeps the
-    manager simple while guaranteeing the storefront always starts with Tekli.
+    A multi-buy price must never replace the product's normal catalog price. If
+    price_value exists, quantity=1 is always generated from that base value and
+    any conflicting quantity=1 tier is ignored.
     """
-    tiers = [dict(t) for t in (p.get('pricing_tiers') or []) if t]
-    if not tiers:
-        return []
-    has_single = any(int(t.get('quantity') or 1) == 1 for t in tiers)
+    source = [dict(t) for t in (p.get('pricing_tiers') or []) if isinstance(t, dict)]
+    tiers = []
     base = p.get('price_value')
-    if not has_single and base not in (None, ''):
+    if base not in (None, ''):
         tiers.append({
             'label': 'Tekli',
             'quantity': 1,
@@ -146,8 +237,28 @@ def effective_pricing_tiers(p):
             'note': 'Tekli fiyat',
             '_auto': True,
         })
-    tiers.sort(key=lambda t: (int(t.get('quantity') or 1), str(t.get('label') or '')))
-    return tiers
+        source = [t for t in source if int(t.get('quantity') or 1) > 1]
+    for t in source:
+        try:
+            qty = int(t.get('quantity') or 1)
+        except Exception:
+            qty = 1
+        if qty < 1 or t.get('price_value') in (None, ''):
+            continue
+        tiers.append({
+            'label': str(t.get('label') or (f"{qty}’li set" if qty > 1 else 'Tekli')),
+            'quantity': qty,
+            'price_value': str(t.get('price_value')),
+            'note': str(t.get('note') or ''),
+            '_auto': bool(t.get('_auto')),
+        })
+    # Deduplicate by quantity, preferring the authoritative base tier.
+    dedup = {}
+    for t in tiers:
+        q = int(t.get('quantity') or 1)
+        if q not in dedup or t.get('_auto'):
+            dedup[q] = t
+    return [dedup[q] for q in sorted(dedup)]
 
 def render_schema(p):
     obj = {
@@ -233,16 +344,38 @@ def render_product_page(p, related):
             f'<span>{i + 2}. Görsel</span></button>'
         )
 
-    options = p.get('options') or ['Standart / WhatsApp’ta netleştir']
-    options_html = ''.join(f'<option value="{esc(o)}">{esc(o)}</option>' for o in options)
-    tags = ''.join(
-        f'<button class="option-choice{" selected" if i == 0 else ""}" data-order-choice="{esc(o)}" type="button">{esc(o)}</button>'
-        for i, o in enumerate(options)
+    color_entries = product_color_entries(p)
+    legacy_options = legacy_order_options(p)
+    options_html = ''.join(f'<option value="{esc(o)}">{esc(o)}</option>' for o in legacy_options)
+    option_field_html = ''
+    if legacy_options:
+        option_field_html = f'<label class="order-field"><span>Seçenek</span><select aria-label="Ürün seçeneği" data-order-option="">{options_html}</select></label>'
+
+    color_public = [
+        {'id': str(c.get('id') or ''), 'name': str(c.get('name') or ''), 'hex': str(c.get('hex') or '#c7b9a6')}
+        for c in color_entries
+    ]
+    color_json = json.dumps(color_public, ensure_ascii=False, separators=(',', ':')).replace('<', '\u003c')
+    color_data_html = f'<script type="application/json" data-product-colors>{color_json}</script>' if color_public else ''
+    color_picker_html = ''
+    if color_public:
+        color_picker_html = '<div class="order-color-section"><div class="order-color-head"><span>Renk seçimi</span><small>Setteki her ürünün rengini ayrı ayrı seçebilirsin.</small></div><div class="order-color-slots" data-order-color-slots></div></div>'
+
+    color_tags = ''.join(
+        f'<span class="color-public-chip"><i style="--swatch:{esc(c.get("hex") or "#c7b9a6")}"></i><b>{esc(c.get("name"))}</b></span>'
+        for c in color_entries
     )
+    legacy_tags = ''.join(f'<span>{esc(o)}</span>' for o in legacy_options)
+    tags = color_tags + legacy_tags
+
     pricing_tiers = effective_pricing_tiers(p)
     tier_options_html = ''
     tier_cards_html = ''
+    # The normal product price is authoritative on first paint. Set prices only
+    # replace it after the customer chooses another package.
     selected_display_price = price
+    if p.get('price_value') not in (None, ''):
+        selected_display_price = esc(format_try(p.get('price_value')) or p.get('price_text') or '')
     if pricing_tiers:
         tier_options = []
         tier_cards = []
@@ -256,11 +389,14 @@ def render_product_page(p, related):
                 f'<option value="{i}" data-tier-label="{esc(label_text)}" data-tier-qty="{qty_value}" data-tier-price="{esc(price_value)}" data-tier-price-label="{esc(price_label)}">{esc(label_text)} • {esc(price_label)}</option>'
             )
             tier_cards.append(
-                f'<button class="set-price-choice{" selected" if i == 0 else ""}" data-order-tier-choice="{i}" type="button"><span>{esc(label_text)}</span><strong>{esc(price_label)}</strong>{f'<small>{esc(note_text)}</small>' if note_text else ""}</button>'
+                f'<button aria-pressed="{"true" if i == 0 else "false"}" class="set-price-choice{" selected" if i == 0 else ""}" data-order-tier-choice="{i}" type="button"><span>{esc(label_text)}</span><strong>{esc(price_label)}</strong>{f'<small>{esc(note_text)}</small>' if note_text else ""}</button>'
             )
         tier_options_html = ''.join(tier_options)
         tier_cards_html = '<div class="set-pricing-panel"><div class="set-pricing-head"><span>Set / adet seçenekleri</span><small>Paketi seçtiğinde sipariş özeti ve fiyat otomatik güncellenir.</small></div><div class="set-pricing-grid">' + ''.join(tier_cards) + '</div></div>'
-        selected_display_price = esc(format_try(pricing_tiers[0].get('price_value')))
+    tier_field_html = f'<label class="order-field"><span>Paket / set</span><select aria-label="Paket veya set seçeneği" data-order-tier="">{tier_options_html}</select></label>' if pricing_tiers else ''
+    initial_choice = legacy_options[0] if legacy_options else (color_public[0]['name'] if color_public else 'Standart')
+    initial_summary = f"{initial_choice} • {'1 set' if pricing_tiers else '1 adet'}"
+    detail_options_heading = 'Renk seçenekleri' if color_public else 'Seçenekler'
     feats = ''.join(f'<li>{esc(x)}</li>' for x in (p.get('features') or ['3D baskı üretim', 'Sipariş öncesi detaylandırma']))
     related_html = ''.join(
         f'<a class="related-card" href="../{esc(r["slug"])}/">'
@@ -306,7 +442,7 @@ def render_product_page(p, related):
 <header class="site-header" id="top"><div class="shell nav-shell"><a aria-label="BG Studio 3D ana sayfa" class="brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button><nav aria-label="Ana menü" class="main-nav" id="primary-navigation"><a aria-current="page" class="is-active" href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../prototip-parca/">Prototip</a><a href="../../hakkimizda/">Hakkımızda</a><a href="../../iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a class="nav-cta" href="https://wa.me/905302466903" rel="noopener" target="_blank">WhatsApp</a></nav></div></header>
 {notice}
 <main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
-<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p><div class="price-block"><small>Fiyat</small><strong data-product-price-display="">{selected_display_price}</strong></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(p.get('price_value') or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}"><label class="order-field"><span>Seçenek</span><select aria-label="Ürün seçeneği" data-order-option="">{options_html}</select></label>{f'<label class="order-field"><span>Paket / set</span><select aria-label="Paket veya set seçeneği" data-order-tier="">{tier_options_html}</select></label>' if pricing_tiers else ''}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="99" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div><label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. siyah renk, hediye olacak…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(options[0])} • {'1 set' if pricing_tiers else '1 adet'}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div><div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>Renk / seçenekler</h2><div class="option-tags">{tags}</div></div><div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
+<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p><div class="price-block"><small>Fiyat</small><strong data-product-price-display="">{selected_display_price}</strong></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(p.get('price_value') or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div><div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div><div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
 <section class="order-process shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ SÜRECİ</p><h2>Nasıl ilerliyoruz?</h2></div></div><div class="order-steps"><article class="order-step"><span>01</span><h3>Ürünü seç</h3><p>Renk, adet ve varsa kişiselleştirme isteğini bize ilet.</p></article><article class="order-step"><span>02</span><h3>Detayları netleştir</h3><p>Üretim seçeneği ve teslim/kargo detaylarını sipariş öncesi netleştir.</p></article><article class="order-step"><span>03</span><h3>Üretim</h3><p>Ürün atölyede 3D baskı ile hazırlanır ve kontrol edilir.</p></article><article class="order-step"><span>04</span><h3>Teslim</h3><p>Kuşadası elden teslim veya uygun kargo seçeneğiyle gönderim.</p></article></div></section>
 <section class="product-faq shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ ÖNCESİ</p><h2>Bilmen gerekenler.</h2></div></div><div class="faq">{faq_html}</div></section>
 <section class="related-products shell"><div class="section-title"><div><p class="eyebrow">BUNLAR DA İLGİNİ ÇEKEBİLİR</p><h2>Atölyeden başka seçenekler.</h2></div></div><div class="related-grid">{related_html}</div></section><section class="detail-back shell"><a class="text-cta" href="../">← Tüm ürünlere dön</a></section></main>
@@ -335,9 +471,16 @@ def build_site():
     nfc_items = [x for x in load_managed_content(NFC_DATA) if x.get('active', True)]
     nfc_path = ROOT / 'nfc-qr/index.html'
     nfc_html = nfc_path.read_text(encoding='utf-8')
-    nfc_cards = '\n'.join(render_managed_case(x, '../') for x in nfc_items)
+    nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)
     nfc_html = replace_between(nfc_html, '<!-- CONTENT_MANAGER:NFC_START -->', '<!-- CONTENT_MANAGER:NFC_END -->', nfc_cards)
     nfc_path.write_text(nfc_html, encoding='utf-8')
+
+    corporate_items = [x for x in resolve_corporate_items() if x.get('active', True)]
+    corporate_path = ROOT / 'kurumsal/index.html'
+    corporate_html = ensure_corporate_markers(corporate_path.read_text(encoding='utf-8'))
+    corporate_cards = '\n'.join(render_corporate_case(x, '../') for x in corporate_items)
+    corporate_html = replace_between(corporate_html, '<!-- CONTENT_MANAGER:CORPORATE_START -->', '<!-- CONTENT_MANAGER:CORPORATE_END -->', corporate_cards)
+    corporate_path.write_text(corporate_html, encoding='utf-8')
 
     prototype_items = [x for x in load_managed_content(PROTOTYPE_DATA) if x.get('active', True)]
     prototype_path = ROOT / 'prototip-parca/index.html'
@@ -363,7 +506,7 @@ def build_site():
         lines.append(f'  <url><loc>{url}</loc><lastmod>{today}</lastmod><changefreq>monthly</changefreq><priority>{prio}</priority></url>')
     lines.append('</urlset>')
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    return {'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':

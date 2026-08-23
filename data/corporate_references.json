@@ -1,0 +1,33 @@
+[
+  {
+    "slug": "istavrit-restaurant",
+    "source_kind": "nfc",
+    "source_slug": "istavrit-restaurant",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 10
+  },
+  {
+    "slug": "koala-petshop",
+    "source_kind": "nfc",
+    "source_slug": "koala-petshop",
+    "theme": "light",
+    "active": true,
+    "sort_order": 20
+  },
+  {
+    "slug": "naz-balik-restaurant",
+    "name": "Naz Balık Restaurant",
+    "headline": "QR yorum akışı ve işletmeye özel uygulama.",
+    "description": "Müşteri yorum akışına yönelik QR uygulaması ve fiziksel kullanım senaryosu için işletmeye özel tasarım yaklaşımı.",
+    "tags": [
+      "QR",
+      "Google yorum",
+      "Restoran"
+    ],
+    "category": "Restoran • QR Uygulama",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 30
+  }
+]

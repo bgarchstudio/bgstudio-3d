@@ -1,0 +1,12 @@
+[
+  {"id":"silk-kings-gold","name":"Silk Kings Gold","hex":"#b88a3b","in_stock":true,"stock_qty":null,"sort_order":10},
+  {"id":"sakura-pink","name":"Sakura Pink","hex":"#e6a6b7","in_stock":true,"stock_qty":null,"sort_order":20},
+  {"id":"pastel-cloud-blue","name":"Pastel Cloud Blue","hex":"#b7d7e8","in_stock":true,"stock_qty":null,"sort_order":30},
+  {"id":"bone-white","name":"Bone White","hex":"#eee8dc","in_stock":true,"stock_qty":null,"sort_order":40},
+  {"id":"glitter-galaxy-black","name":"Glitter Galaxy Black","hex":"#1f2022","in_stock":true,"stock_qty":null,"sort_order":50},
+  {"id":"lavender","name":"Lavender","hex":"#b9a7d4","in_stock":true,"stock_qty":null,"sort_order":60},
+  {"id":"avocado-green","name":"Avocado Green","hex":"#64713d","in_stock":true,"stock_qty":null,"sort_order":70},
+  {"id":"sari","name":"Sarı","hex":"#f0bd2c","in_stock":true,"stock_qty":null,"sort_order":80},
+  {"id":"siyah","name":"Siyah","hex":"#151515","in_stock":true,"stock_qty":null,"sort_order":90},
+  {"id":"beyaz","name":"Beyaz","hex":"#f5f3ed","in_stock":true,"stock_qty":null,"sort_order":100}
+]

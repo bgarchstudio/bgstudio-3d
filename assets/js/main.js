@@ -336,18 +336,23 @@ if (orderConfig) {
   const mobileSend = document.querySelector('[data-mobile-order-whatsapp]');
   const priceDisplay = document.querySelector('[data-product-price-display]');
   const mobilePrice = document.querySelector('[data-mobile-price]');
-  const choiceBtns = document.querySelectorAll('[data-order-choice]');
   const tierBtns = document.querySelectorAll('[data-order-tier-choice]');
+  const colorSlotsWrap = orderConfig.querySelector('[data-order-color-slots]');
+  const colorDataNode = orderConfig.querySelector('[data-product-colors]');
+  let colorOptions = [];
+  try { colorOptions = colorDataNode ? JSON.parse(colorDataNode.textContent || '[]') : []; } catch (_) { colorOptions = []; }
+  let colorSelections = [];
 
   const formatTL = value => {
     const n = Number(value);
     if (!Number.isFinite(n)) return '';
     return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(n) + ' TL';
   };
+  const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
   const clampQty = () => {
     let value = parseInt(qty?.value || '1', 10);
     if (!Number.isFinite(value)) value = 1;
-    value = Math.min(99, Math.max(1, value));
+    value = Math.min(12, Math.max(1, value));
     if (qty) qty.value = value;
     return value;
   };
@@ -364,34 +369,83 @@ if (orderConfig) {
       priceLabel: opt.dataset.tierPriceLabel || (Number.isFinite(packPrice) ? formatTL(packPrice) : '')
     };
   };
+  const totalItemCount = () => {
+    const amount = clampQty();
+    const t = selectedTier();
+    return Math.max(1, (t ? t.packQty : 1) * amount);
+  };
   const syncTierUi = () => {
     const t = selectedTier();
-    tierBtns.forEach(btn => { const active=!!t && btn.dataset.orderTierChoice===t.index; btn.classList.toggle('selected',active); btn.setAttribute('aria-pressed',active?'true':'false'); });
-    const label = t?.priceLabel || fallbackPriceText;
+    tierBtns.forEach(btn => {
+      const active = !!t && btn.dataset.orderTierChoice === t.index;
+      btn.classList.toggle('selected', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    const label = t?.priceLabel || (basePriceValue ? formatTL(basePriceValue) : fallbackPriceText);
     if (priceDisplay && label) priceDisplay.textContent = label;
     if (mobilePrice && label) mobilePrice.textContent = label;
   };
-  const buildMessage = () => {
+  const renderColorSlots = () => {
+    if (!colorSlotsWrap || !colorOptions.length) return;
+    const count = totalItemCount();
+    const previous = colorSelections.slice();
+    colorSelections = Array.from({ length: count }, (_, i) => previous[i] || colorOptions[0]?.name || '');
+    colorSlotsWrap.innerHTML = colorSelections.map((selected, index) => {
+      const buttons = colorOptions.map(color => {
+        const active = color.name === selected;
+        return `<button type="button" class="color-choice${active ? ' selected' : ''}" data-color-slot="${index}" data-color-name="${escapeHtml(color.name)}" aria-pressed="${active ? 'true' : 'false'}"><i style="--swatch:${escapeHtml(color.hex || '#c7b9a6')}"></i><span>${escapeHtml(color.name)}</span></button>`;
+      }).join('');
+      return `<div class="color-slot"><div class="color-slot-title"><strong>${index + 1}. ürün</strong><span data-color-slot-value="${index}">${escapeHtml(selected)}</span></div><div class="color-choice-grid">${buttons}</div></div>`;
+    }).join('');
+    colorSlotsWrap.querySelectorAll('.color-choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.dataset.colorSlot || 0);
+        colorSelections[index] = btn.dataset.colorName || colorOptions[0]?.name || '';
+        const slot = btn.closest('.color-slot');
+        slot?.querySelectorAll('.color-choice').forEach(item => {
+          const active = item === btn;
+          item.classList.toggle('selected', active);
+          item.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        const value = slot?.querySelector('[data-color-slot-value]');
+        if (value) value.textContent = colorSelections[index];
+        buildMessage(false);
+      });
+    });
+  };
+  const colorSummaryText = () => {
+    if (!colorSelections.length) return '';
+    if (colorSelections.length === 1) return colorSelections[0];
+    return colorSelections.map((color, i) => `${i + 1}. ${color}`).join(' / ');
+  };
+  const buildMessage = (refreshColors = false) => {
     const amount = clampQty();
-    const selected = option?.value || 'Standart';
+    const selected = option?.value || '';
     const t = selectedTier();
-    let totalItems = amount;
+    const totalItems = t ? t.packQty * amount : amount;
     let totalValue = basePriceValue ? basePriceValue * amount : 0;
-    if (t) {
-      totalItems = t.packQty * amount;
-      totalValue = t.packPrice * amount;
-      if (summary) summary.textContent = `${selected} • ${t.label} • ${amount} set (${totalItems} adet)${totalValue ? ' • ' + formatTL(totalValue) : ''}`;
-    } else if (summary) {
-      summary.textContent = `${selected} • ${amount} adet${totalValue ? ' • ' + formatTL(totalValue) : ''}`;
-    }
+    if (t) totalValue = t.packPrice * amount;
+    if (refreshColors && colorOptions.length) renderColorSlots();
+    const colors = colorSummaryText();
+    const summaryParts = [];
+    if (selected) summaryParts.push(selected);
+    if (t) summaryParts.push(`${t.label} • ${amount} set (${totalItems} adet)`);
+    else summaryParts.push(`${amount} adet`);
+    if (colors) summaryParts.push(colors);
+    if (totalValue) summaryParts.push(formatTL(totalValue));
+    if (summary) summary.textContent = summaryParts.join(' • ');
+
     const lines = [
       'Merhaba BG Studio 3D, web sitesinden sipariş için yazıyorum.',
       '',
       `Ürün: ${name}`,
-      `Seçenek: ${selected}`,
+      selected ? `Seçenek: ${selected}` : '',
       t ? `Paket: ${t.label}` : '',
       t ? `Paket adedi: ${amount}` : `Adet: ${amount}`,
       t ? `Toplam ürün: ${totalItems} adet` : '',
+      colorSelections.length === 1 ? `Renk: ${colorSelections[0]}` : '',
+      colorSelections.length > 1 ? 'Renkler:' : '',
+      ...colorSelections.map((color, i) => colorSelections.length > 1 ? `  ${i + 1}. ürün: ${color}` : '').filter(Boolean),
       t && t.packPrice ? `Paket fiyatı: ${formatTL(t.packPrice)}` : '',
       totalValue ? `Toplam: ${formatTL(totalValue)}` : (fallbackPriceText ? `Sayfadaki fiyat: ${fallbackPriceText}` : ''),
       note?.value.trim() ? `Not: ${note.value.trim()}` : '',
@@ -405,7 +459,7 @@ if (orderConfig) {
   };
   const trackProductOrder = () => {
     const amount = clampQty();
-    const selected = option?.value || 'Standart';
+    const selected = option?.value || '';
     const t = selectedTier();
     const product = analyticsProductContext();
     const totalItems = t ? t.packQty * amount : amount;
@@ -414,7 +468,8 @@ if (orderConfig) {
       method: 'product_order_whatsapp',
       item_id: product?.item_id || name,
       item_name: product?.item_name || name,
-      option: selected,
+      option: selected || undefined,
+      colors: colorSelections.length ? colorSelections.join(' | ') : undefined,
       quantity: totalItems,
       set_count: t ? amount : undefined,
       set_label: t?.label || undefined,
@@ -430,28 +485,20 @@ if (orderConfig) {
   orderConfig.querySelector('[data-qty-minus]')?.addEventListener('click', () => {
     if (qty) qty.value = clampQty() - 1;
     clampQty();
-    buildMessage();
+    buildMessage(true);
   });
   orderConfig.querySelector('[data-qty-plus]')?.addEventListener('click', () => {
     if (qty) qty.value = clampQty() + 1;
     clampQty();
-    buildMessage();
+    buildMessage(true);
   });
-  qty?.addEventListener('input', buildMessage);
-  option?.addEventListener('change', () => {
-    choiceBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.orderChoice === option.value));
-    buildMessage();
-  });
-  tier?.addEventListener('change', buildMessage);
-  note?.addEventListener('input', buildMessage);
-  choiceBtns.forEach(btn => btn.addEventListener('click', () => {
-    if (option) option.value = btn.dataset.orderChoice;
-    choiceBtns.forEach(item => item.classList.toggle('selected', item === btn));
-    buildMessage();
-  }));
+  qty?.addEventListener('input', () => buildMessage(true));
+  option?.addEventListener('change', () => buildMessage(false));
+  tier?.addEventListener('change', () => buildMessage(true));
+  note?.addEventListener('input', () => buildMessage(false));
   tierBtns.forEach(btn => btn.addEventListener('click', () => {
     if (tier) tier.value = btn.dataset.orderTierChoice;
-    buildMessage();
+    buildMessage(true);
   }));
   mobileSend?.addEventListener('click', event => {
     if (mobileSend.getAttribute('href') === '#') {
@@ -459,7 +506,8 @@ if (orderConfig) {
       orderConfig.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   });
-  buildMessage();
+  if (colorOptions.length) renderColorSlots();
+  buildMessage(false);
 }
 
 // Navigation active state

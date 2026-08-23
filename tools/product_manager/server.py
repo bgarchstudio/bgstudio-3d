@@ -9,11 +9,13 @@ STATIC = Path(__file__).resolve().parent / 'static'
 DATA = ROOT / 'data' / 'products.json'
 NFC_DATA = ROOT / 'data' / 'nfc_references.json'
 PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
+CORPORATE_DATA = ROOT / 'data' / 'corporate_references.json'
+COLORS_DATA = ROOT / 'data' / 'colors.json'
 BACKUPS = ROOT / 'data' / 'backups'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build import build_site
 
-PANEL_VERSION = '2.5.3'
+PANEL_VERSION = '2.6.1'
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -62,6 +64,62 @@ def write_products(data):
     DATA.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
+def read_colors():
+    if not COLORS_DATA.exists():
+        return []
+    data = json.loads(COLORS_DATA.read_text(encoding='utf-8'))
+    if not isinstance(data, list):
+        return []
+    return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
+
+
+def normalize_hex(value):
+    value = str(value or '').strip()
+    if re.fullmatch(r'#[0-9a-fA-F]{6}', value):
+        return value.lower()
+    return '#c7b9a6'
+
+
+def clean_colors(items):
+    out = []
+    seen = set()
+    for i, item in enumerate(items or []):
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get('name') or '').strip()
+        if not name:
+            continue
+        color_id = slugify(item.get('id') or name)
+        if not color_id or color_id in seen:
+            continue
+        seen.add(color_id)
+        raw_qty = item.get('stock_qty')
+        if raw_qty in ('', None):
+            qty = None
+        else:
+            try:
+                qty = max(0, int(raw_qty))
+            except Exception:
+                qty = None
+        in_stock = bool(item.get('in_stock', True)) and (qty is None or qty > 0)
+        out.append({
+            'id': color_id,
+            'name': name[:60],
+            'hex': normalize_hex(item.get('hex')),
+            'in_stock': in_stock,
+            'stock_qty': qty,
+            'sort_order': int(item.get('sort_order') or ((i + 1) * 10)),
+        })
+    return sorted(out, key=lambda x: (x['sort_order'], x['name'].casefold()))[:80]
+
+
+def write_colors(items):
+    COLORS_DATA.parent.mkdir(parents=True, exist_ok=True)
+    clean = clean_colors(items)
+    COLORS_DATA.write_text(json.dumps(clean, ensure_ascii=False, indent=2), encoding='utf-8')
+    return clean
+
+
 def backup():
     BACKUPS.mkdir(parents=True, exist_ok=True)
     if DATA.exists():
@@ -83,7 +141,7 @@ def full_backup(reason='manual'):
     path = BACKUPS / f"site-{stamp}-{safe_reason}.zip"
     with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as z:
         if DATA.exists(): z.write(DATA, DATA.relative_to(ROOT))
-        for content_data in (NFC_DATA, PROTOTYPE_DATA):
+        for content_data in (NFC_DATA, PROTOTYPE_DATA, CORPORATE_DATA, COLORS_DATA):
             if content_data.exists(): z.write(content_data, content_data.relative_to(ROOT))
         for folder in (ROOT / 'assets/images/products', ROOT / 'assets/images/posters', ROOT / 'assets/images/references', ROOT / 'assets/images/prototypes'):
             if folder.exists():
@@ -147,6 +205,22 @@ def preflight():
         for item in normalize_gallery(prod.get('gallery_images')):
             if not (ROOT / item['path']).exists(): missing.append(f"{prod.get('name')}: galeri")
     checks.append({'status':'fail' if missing else 'pass','label':'Ürün dosyaları','detail':('Eksik: '+', '.join(missing[:8])) if missing else 'Ürün sayfaları ve referans verilen görseller mevcut.'})
+    colors = read_colors()
+    color_ids = {c.get('id') for c in colors}
+    bad_color_refs = []
+    for prod in products:
+        for cid in (prod.get('color_ids') or []):
+            if cid not in color_ids:
+                bad_color_refs.append(f"{prod.get('name')}: {cid}")
+    stocked = len([c for c in colors if c.get('in_stock')])
+    checks.append({'status':'warn' if bad_color_refs else 'pass','label':'Renk stoğu','detail':('Eksik renk referansı: '+', '.join(bad_color_refs[:8])) if bad_color_refs else f'{len(colors)} renk tanımlı, {stocked} renk stokta.'})
+    try:
+        corp = read_content('corporate')
+        nfc_slugs = {x.get('slug') for x in read_content('nfc')}
+        broken_links = [x.get('source_slug') for x in corp if x.get('source_kind') == 'nfc' and x.get('source_slug') not in nfc_slugs]
+        checks.append({'status':'warn' if broken_links else 'pass','label':'Kurumsal senkron','detail':('Bağlantısı kopuk: '+', '.join(broken_links[:8])) if broken_links else f'{len(corp)} kurumsal kart; NFC bağlantıları senkron.'})
+    except Exception as e:
+        checks.append({'status':'warn','label':'Kurumsal senkron','detail':str(e)})
     pricing_bad = []
     for prod in products:
         seen = set()
@@ -240,7 +314,7 @@ def clean_product(p):
         'slug', 'name', 'category', 'price_text', 'price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
@@ -256,6 +330,8 @@ def clean_product(p):
     out['description'] = str(out.get('description') or '').strip()
     out['production_note'] = str(out.get('production_note') or '').strip()
     out['options'] = [str(x).strip() for x in (out.get('options') or []) if str(x).strip()]
+    valid_color_ids = {c.get('id') for c in read_colors()}
+    out['color_ids'] = [str(x).strip() for x in (out.get('color_ids') or []) if str(x).strip() in valid_color_ids]
     out['features'] = [str(x).strip() for x in (out.get('features') or []) if str(x).strip()]
     out['pricing_tiers'] = normalize_pricing_tiers(out.get('pricing_tiers'))
     out['gallery_images'] = normalize_gallery(out.get('gallery_images'))
@@ -298,6 +374,7 @@ def duplicate_asset(src_rel, dst_rel):
 def content_path(kind):
     if kind == 'nfc': return NFC_DATA
     if kind == 'prototype': return PROTOTYPE_DATA
+    if kind == 'corporate': return CORPORATE_DATA
     raise ValueError('İçerik türü geçersiz.')
 
 
@@ -312,6 +389,17 @@ def write_content(kind, data):
 
 
 def clean_content_item(kind, item):
+    if kind == 'corporate':
+        source_slug = slugify(item.get('source_slug') or '')
+        if source_slug:
+            if not any(x.get('slug') == source_slug for x in read_content('nfc')):
+                raise ValueError('Bağlı NFC saha kaydı bulunamadı.')
+            return {
+                'slug': source_slug, 'source_kind': 'nfc', 'source_slug': source_slug,
+                'theme': 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light',
+                'active': bool(item.get('active', True)),
+                'sort_order': int(item.get('sort_order') or 999),
+            }
     name = str(item.get('name') or '').strip()
     slug = slugify(item.get('slug') or name)
     if not name or not slug: raise ValueError('İsim zorunlu.')
@@ -323,7 +411,8 @@ def clean_content_item(kind, item):
         'active': bool(item.get('active', True)),
         'sort_order': int(item.get('sort_order') or 999),
     }
-    if kind == 'prototype': out['category'] = str(item.get('category') or 'Prototip / özel parça').strip()
+    if kind in ('prototype','nfc'): out['category'] = str(item.get('category') or ('Prototip / özel parça' if kind == 'prototype' else 'NFC / QR saha uygulaması')).strip()
+    if kind == 'corporate': out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
     if item.get('image'): out['image'] = str(item.get('image'))
     return out
 
@@ -338,7 +427,7 @@ def save_content_item(kind, payload):
     old = items[idx] if idx is not None else {}
     image = payload.get('image')
     if image:
-        folder = 'references' if kind == 'nfc' else 'prototypes'
+        folder = 'prototypes' if kind == 'prototype' else 'references'
         rel = f'assets/images/{folder}/{item["slug"]}.webp'
         save_data_uri(image.get('data'), ROOT / rel)
         item['image'] = rel
@@ -388,7 +477,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         if u.path == '/api/products':
-            return self.send_json({'products': read_products(), 'root': str(ROOT)})
+            return self.send_json({'products': read_products(), 'colors': read_colors(), 'root': str(ROOT)})
+        if u.path == '/api/colors':
+            return self.send_json({'colors': read_colors(), 'root': str(ROOT)})
         if u.path == '/api/status':
             return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION})
         if u.path == '/api/backups':
@@ -398,7 +489,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/content':
             from urllib.parse import parse_qs
             kind = (parse_qs(u.query).get('kind') or [''])[0]
-            return self.send_json({'items': read_content(kind), 'kind': kind, 'root': str(ROOT)})
+            return self.send_json({'items': read_content(kind), 'sources': read_content('nfc') if kind == 'corporate' else [], 'kind': kind, 'root': str(ROOT)})
         if u.path.startswith('/assets/') or u.path in ('/favicon.ico', '/apple-touch-icon.png'):
             return self.send_file(ROOT / unquote(u.path.lstrip('/')), ROOT)
         path = 'index.html' if u.path in ('/', '') else unquote(u.path.lstrip('/'))
@@ -406,6 +497,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            if self.path == '/api/colors/save':
+                payload = self.read_json()
+                full_backup('before-colors-save')
+                colors = write_colors(payload.get('colors') or [])
+                result = build_site()
+                return self.send_json({'ok': True, 'message': 'Renk stoğu kaydedildi ve site güncellendi.', 'colors': colors, 'result': result})
+
             if self.path == '/api/save':
                 payload = self.read_json()
                 original = payload.get('original_slug') or ''
@@ -586,7 +684,9 @@ class Handler(BaseHTTPRequestHandler):
                 item = next((x for x in items if x.get('slug') == slug), None)
                 if not item: raise ValueError('Kayıt bulunamadı.')
                 full_backup('before-content-delete')
-                remove_file(item.get('image'))
+                
+                if not (kind == 'corporate' and item.get('source_kind') == 'nfc'):
+                    remove_file(item.get('image'))
                 write_content(kind, [x for x in items if x.get('slug') != slug])
                 result = build_site()
                 return self.send_json({'ok': True, 'message': 'Kayıt silindi.', 'result': result})
