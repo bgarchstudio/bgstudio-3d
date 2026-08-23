@@ -392,34 +392,36 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "kisiye-ozel-miknatisli-acacak",
-    "name": "Kişiye Özel Mıknatıslı Açacak",
-    "category": "kisiye-ozel",
-    "price_text": "Özel üretim",
-    "price_value": null,
-    "card_description": "58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım.",
-    "description": "İsim, figür, tema ve renklerle kişiselleştirilebilen ön yüzü; arka yüzde metal açacak ve mıknatıs ile tamamlanan etkinlik ve hediyelik ürünü.",
-    "options": [
-      "Projeye göre kişiselleştirilir"
-    ],
+    "pricing_tiers": [],
     "features": [
       "58 mm form",
       "Mıknatıs + metal açacak",
       "Çok renkli kişiselleştirme",
       "Toplu üretime uygun"
     ],
+    "category": "kisiye-ozel",
+    "description": "İsim, figür, tema ve renklerle kişiselleştirilebilen ön yüzü; arka yüzde metal açacak ve mıknatıs ile tamamlanan etkinlik ve hediyelik ürünü.",
+    "seo_title": "Kişiye Özel Mıknatıslı Açacak | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "kisiye-ozel-miknatisli-acacak",
+    "name": "Kişiye Özel Mıknatıslı Açacak",
+    "active": true,
+    "price_text": "Özel üretim",
+    "seo_description": "Kişiye Özel Mıknatıslı Açacak, 58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "price_value": null,
+    "featured": true,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 12,
+    "options": [
+      "Projeye göre kişiselleştirilir"
+    ],
+    "card_description": "58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım.",
+    "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-miknatisli-acacak.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/kisiye-ozel-miknatisli-acacak.webp",
     "poster_image_width": 1400,
-    "poster_image_height": 1050,
-    "featured": true,
-    "active": true,
-    "sort_order": 12,
-    "seo_title": "Kişiye Özel Mıknatıslı Açacak | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Kişiye Özel Mıknatıslı Açacak, 58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "poster_image_height": 1050
   },
   {
     "slug": "renkli-masa-lambasi",
