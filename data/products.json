@@ -291,68 +291,72 @@
     "poster_image_height": 1254
   },
   {
-    "slug": "havuz-icecek-tutucu",
-    "name": "Yüzen Havuz İçecek Tutucu",
-    "category": "fonksiyonel",
-    "price_text": "Fiyat için iletişim",
-    "price_value": null,
-    "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
-    "description": "Havuz kullanımında kutu içeceği su üzerinde taşımaya yönelik, hafif ve yüzen gövdeli fonksiyonel 3D baskı aksesuar.",
-    "options": [
-      "Turuncu/Beyaz",
-      "Mavi/Beyaz",
-      "Yeşil",
-      "Pembe"
-    ],
+    "pricing_tiers": [],
     "features": [
       "Yüzen tasarım",
       "İçecek tutucu",
       "Farklı renk seçenekleri",
       "Hafif gövde"
     ],
+    "category": "fonksiyonel",
+    "description": "Havuz kullanımında kutu içeceği su üzerinde taşımaya yönelik, hafif ve yüzen gövdeli fonksiyonel 3D baskı aksesuar.",
+    "seo_title": "Yüzen Havuz İçecek Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "havuz-icecek-tutucu",
+    "name": "Yüzen Havuz İçecek Tutucu",
+    "active": true,
+    "price_text": "Fiyat için iletişim",
+    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "price_value": null,
+    "featured": true,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 9,
+    "options": [
+      "Turuncu/Beyaz",
+      "Mavi/Beyaz",
+      "Yeşil",
+      "Pembe"
+    ],
+    "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
+    "gallery_images": [],
     "main_image": "assets/images/products/havuz-icecek-tutucu.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/havuz-icecek-tutucu.webp",
     "poster_image_width": 1120,
-    "poster_image_height": 1400,
-    "featured": true,
-    "active": true,
-    "sort_order": 9,
-    "seo_title": "Yüzen Havuz İçecek Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "poster_image_height": 1400
   },
   {
-    "slug": "heykel-bust-masa-lambasi",
-    "name": "3D Baskı Heykeli Masa Lambası",
-    "category": "aydinlatma",
-    "price_text": "3.499 TL",
-    "price_value": "3499",
-    "card_description": "Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası.",
-    "description": "Katmanlı heykel görünümü ve sıcak ışık kaynağıyla yaşam alanlarında güçlü bir odak noktası oluşturmak üzere tasarlanan dekoratif masa lambası.",
-    "options": [
-      "Bone White gövde",
-      "Siyah kaide"
-    ],
+    "pricing_tiers": [],
     "features": [
       "Katmanlı 3D baskı gövde",
       "E27 duy uyumlu",
       "Sıcak ambiyans",
       "Lansmana özel 3.499 TL"
     ],
+    "category": "aydinlatma",
+    "description": "Katmanlı heykel görünümü ve sıcak ışık kaynağıyla yaşam alanlarında güçlü bir odak noktası oluşturmak üzere tasarlanan dekoratif masa lambası.",
+    "seo_title": "3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "slug": "heykel-bust-masa-lambasi",
+    "name": "3D Baskı Heykeli Masa Lambası",
+    "active": true,
+    "price_text": "3.499 TL",
+    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "price_value": "3499",
+    "featured": false,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 10,
+    "options": [
+      "Bone White gövde",
+      "Siyah kaide"
+    ],
+    "card_description": "Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası.",
+    "gallery_images": [],
     "main_image": "assets/images/products/heykel-bust-masa-lambasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/heykel-bust-masa-lambasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 10,
-    "seo_title": "3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "poster_image_height": 1254
   },
   {
     "slug": "kask-askiligi",
