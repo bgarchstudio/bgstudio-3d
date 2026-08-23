@@ -1,14 +1,5 @@
-# BG Studio 3D v2.5.1 — Panel Hizalama
+# BG Studio 3D v2.5.2 — Prototip CTA boşluk düzeltmesi
 
-Bu patch yalnızca Ürün Yöneticisi arayüzündeki form hizalarını düzeltir.
-
-- Temel bilgiler bölümündeki iki kolon aynı satır çizgisine oturtuldu.
-- Input/select yükseklikleri eşitlendi.
-- Açıklama/not satırları için iki kolonda eşit alan ayrıldı.
-- Gösterilen fiyat ve Google fiyatı aynı çizgiye alındı.
-- Kategori ve katalog sırası aynı çizgiye alındı.
-- Checkbox satırı düzenlendi.
-- Set/adet fiyat satırlarında input ve sil butonu tabanları eşitlendi.
-- Mobil görünüm korunur.
-
-CNAME, ürün verisi, Analytics ve canlı site dosyalarına dokunmaz.
+- `Prototip & Parça` sayfasında `Fotoğrafını ve ölçülerini gönder.` kartı artık üst bölüm sınırına sıfırdan başlamaz.
+- Kartın üstünde masaüstünde 72 px, mobilde 44 px açık krem nefes alanı bırakılır.
+- Siyah footer, ürünler, Analytics, CNAME, panel ve veri dosyalarına dokunulmaz.

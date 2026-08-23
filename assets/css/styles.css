@@ -212,3 +212,14 @@ button{font-family:inherit}
 .order-controls.has-tier{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 118px}.order-controls.has-tier .order-qty-field{min-width:0}
 @media(max-width:900px){.order-controls.has-tier{grid-template-columns:1fr 1fr}.order-controls.has-tier .order-qty-field{grid-column:1/3}.set-pricing-head{align-items:flex-start;flex-direction:column}.set-pricing-head small{text-align:left}}
 @media(max-width:680px){.order-controls.has-tier{grid-template-columns:1fr}.order-controls.has-tier .order-qty-field{grid-column:auto}.set-pricing-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+/* v2.5.2 — Prototype CTA breathing room
+   The light cream page background should be visible above the final offer card,
+   instead of the card starting flush against the previous section boundary. */
+.prototype-offer-section{
+  padding-top:72px;
+}
+@media(max-width:680px){
+  .prototype-offer-section{padding-top:44px;}
+}
