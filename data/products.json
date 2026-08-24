@@ -743,5 +743,51 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "featured": true,
+    "active": true,
+    "features": [
+      "Katmanlı 3D yüz tasarımı",
+      "Derinlik ve gölge etkisi",
+      "Batman temalı dekor",
+      "Duvar tipi dekoratif tasarım",
+      "Gaming odalarına uygun",
+      "Çok parçalı 3D baskı",
+      "Modern siyah görünüm"
+    ],
+    "seo_title": "Batman Katmanlı Duvar Dekoru | Kuşadası 3D Baskı | BG Studio 3D",
+    "category": "dekoratif-duvar",
+    "pricing_tiers": [],
+    "tags": [
+      "Batman",
+      "Katmanlı Dekor",
+      "3D Duvar Dekoru",
+      "Süper Kahraman",
+      "Gaming Odası",
+      "Gaming",
+      "Duvar Dekoru",
+      "Hediye"
+    ],
+    "production_note": "Ürün çok parçalı 3D baskı yöntemiyle üretilir ve katmanlar belirli aralıklarla bir araya getirilir. 3D baskı yüzeylerinde görülen ince katman izleri üretim yönteminin doğal bir parçasıdır.",
+    "color_ids": [
+      "siyah"
+    ],
+    "card_description": "Katmanlı 3D yapısıyla Batman siluetini duvarda hacimli ve gölgeli bir görünüme taşıyan dekoratif yüz tasarımı.",
+    "options": [
+      "Standart Boy",
+      "Büyük Boy"
+    ],
+    "price_value": "2399",
+    "slug": "batman-katmanli-yuz-dekor",
+    "sort_order": 18,
+    "name": "Batman Katmanlı Yüz Dekor",
+    "description": "Batman yüz formunu art arda dizilen katmanlarla üç boyutlu hale getiren dekoratif duvar tasarımı. Siyah katmanlar arasındaki boşluklar derinlik ve gölge etkisi verir. Minimal formu sayesinde gaming odası, çalışma odası, genç odası ve modern iç mekân dekorasyonlarına uyum sağlar. 3D baskı yöntemiyle üretilir ve duvar dekoru olarak sergilenir.",
+    "price_text": "2399 TL",
+    "seo_description": "Batman katmanlı duvar dekoru, üç boyutlu yüz formu ve siyah 3D baskı katmanlarıyla gaming odası ve modern dekorasyonlar için tasarlanır.",
+    "gallery_images": [],
+    "main_image": "assets/images/products/batman-katmanli-yuz-dekor.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
