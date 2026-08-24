@@ -2,14 +2,15 @@
   {
     "slug": "istavrit-restaurant",
     "name": "İstavrit Restaurant",
-    "headline": "10 Masada Aktif BG Studio NFC + QR Menü Sistemi",
-    "description": "İstavrit Restaurant’ın 10 masasına BG Studio NFC sistemi entegre edildi. Her masa için özel olarak üretilen toplam 10 adet NFC + QR stand işletmeye teslim edildi. Misafirler telefonlarını standa yaklaştırarak NFC üzerinden veya QR kodu okutarak dijital menüye saniyeler içinde erişebiliyor. Sistem; masa bazlı NFC + QR etkileşimlerinin takibi, dijital menü yönetimi, analiz ve işletme paneli altyapısıyla fiziksel standın ötesinde uçtan uca bir dijital restoran deneyimi sunuyor.",
+    "headline": "Başlangıç Paketi · 10 Masada BG Studio NFC + QR Menü Sistemi",
+    "description": "İstavrit Restaurant için 10 masalık BG Studio NFC Başlangıç Paketi kuruldu. Her masa için özel üretilen toplam 10 adet NFC + QR stand tasarlanıp üretilerek işletmeye teslim edildi. Misafirler telefonlarını standa yaklaştırarak NFC üzerinden veya QR kodu okutarak dijital menüye saniyeler içinde erişebiliyor. İşletme tarafında masa bazlı NFC + QR etkileşimleri, kullanım verileri ve dijital menü BG Studio NFC işletme paneli üzerinden yönetilip takip edilebiliyor.",
     "tags": [
       "BG Studio NFC",
-      "NFC + QR",
+      "Başlangıç Paketi",
       "10 Masa",
-      "10 NFC Stand",
+      "10 NFC + QR Stand",
       "Dijital Menü",
+      "NFC + QR",
       "Restoran",
       "Kuşadası"
     ],
@@ -23,7 +24,7 @@
     "slug": "koala-petshop",
     "name": "Koala Petshop",
     "headline": "Google, Instagram ve WhatsApp İçin NFC + QR Hızlı Bağlantı Standı",
-    "description": "Koala Petshop için BG Studio NFC altyapısına entegre, Google, Instagram ve WhatsApp erişimlerini tek noktada buluşturan özel NFC + QR stand tasarlanıp üretilerek işletmeye teslim edildi. Müşteriler stand üzerinden işletmenin Google profiline, Instagram hesabına veya WhatsApp iletişim kanalına hızlıca erişebiliyor. Fiziksel stand ile dijital iletişim kanalları tek bir kompakt sistemde bir araya getirildi.",
+    "description": "Koala Petshop için BG Studio NFC altyapısına entegre, Google, Instagram ve WhatsApp erişimlerini tek noktada buluşturan özel NFC + QR hızlı bağlantı standı tasarlanıp üretilerek işletmeye teslim edildi. Müşteriler telefonlarını standa yaklaştırarak NFC üzerinden veya QR kodu okutarak işletmenin Google profiline, Instagram hesabına ve WhatsApp iletişim kanalına saniyeler içinde erişebiliyor. Fiziksel stand ile dijital iletişim kanalları tek bir kompakt sistemde bir araya getirildi.",
     "tags": [
       "BG Studio NFC",
       "NFC + QR",
@@ -31,6 +32,7 @@
       "Instagram",
       "WhatsApp",
       "Petshop",
+      "Hızlı Bağlantı Standı",
       "Kuşadası"
     ],
     "active": true,
