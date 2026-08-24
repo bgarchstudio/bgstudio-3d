@@ -715,3 +715,13 @@ button{font-family:inherit}
 .mobile-price-wrap .price-list{font-size:.62rem}
 .mobile-price-wrap b{font-size:.72rem;color:var(--brown)}
 @media(max-width:680px){.product-topline .sale-price{justify-content:flex-start;margin-top:5px}.sale-price em{font-size:.5rem;padding:4px 6px}.price-display-row{gap:8px}.price-list{font-size:.95rem}.discount-badge{font-size:.58rem;padding:5px 8px}.mobile-price-wrap{line-height:1.1}}
+
+
+/* v3.1.21 — field-work content hierarchy: no empty canyon between identity and title */
+.field-work-card h3{margin:0 0 12px!important}
+.field-work-card .field-work-top{margin-bottom:26px}
+.field-work-card .field-work-link{margin-top:auto;padding-top:24px}
+@media(max-width:680px){
+  .field-work-card .field-work-top{margin-bottom:22px}
+  .field-work-card .field-work-link{padding-top:20px}
+}

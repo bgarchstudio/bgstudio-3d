@@ -1,8 +1,9 @@
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, unquote
+from urllib.request import urlopen, Request
 from datetime import datetime
-import json, base64, re, webbrowser, threading, sys, shutil, traceback
+import json, base64, re, webbrowser, threading, sys, shutil, traceback, time
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / 'static'
@@ -16,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.20'
+PANEL_VERSION = '3.1.21'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
@@ -880,7 +881,43 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({'ok': False, 'error': str(e)}, 400)
 
 
+def _shutdown_stale_panel_servers():
+    """Close older BG Studio panel processes before binding the current one.
+
+    A previously-open CMD can keep 127.0.0.1:8765 alive after repository files
+    are updated. The browser then loads the new static UI from disk through the
+    old Python process, producing a version/schema mismatch and an empty panel.
+    Only endpoints that identify themselves as BG Studio product-manager status
+    responses are touched.
+    """
+    stopped = []
+    for port in range(8765, 8780):
+        try:
+            with urlopen(f'http://127.0.0.1:{port}/api/status', timeout=0.18) as response:
+                payload = json.loads(response.read().decode('utf-8', errors='replace') or '{}')
+            if not isinstance(payload, dict) or 'version' not in payload or 'root' not in payload:
+                continue
+            request = Request(
+                f'http://127.0.0.1:{port}/api/shutdown',
+                data=b'{}',
+                headers={'Content-Type': 'application/json'},
+                method='POST',
+            )
+            try:
+                with urlopen(request, timeout=0.35) as response:
+                    response.read()
+                stopped.append((port, str(payload.get('version') or '?')))
+            except Exception:
+                pass
+        except Exception:
+            continue
+    if stopped:
+        print('Eski panel oturumu kapatıldı:', ', '.join(f'{p} / v{v}' for p, v in stopped))
+        time.sleep(0.65)
+
+
 def run():
+    _shutdown_stale_panel_servers()
     server = None
     port = None
     for p in range(8765, 8780):

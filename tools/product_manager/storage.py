@@ -456,6 +456,10 @@ def ensure_initialized():
                     old_version = 1
                 if old_version < SCHEMA_VERSION:
                     _upgrade_schema(con, old_version)
+                # Mandatory shipped field reference. This is intentionally
+                # idempotent so an already-current AppData schema cannot keep
+                # Kuşadası Asansör missing after an older partial patch/update.
+                _ensure_kusadasi_asansor_reference(con)
                 _meta_set(con, 'schema_version', SCHEMA_VERSION)
                 con.commit()
         write_info_file()
