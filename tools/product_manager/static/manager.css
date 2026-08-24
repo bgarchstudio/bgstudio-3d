@@ -374,3 +374,27 @@ textarea{line-height:1.55;resize:vertical}
 .image-spec-status.ok{color:#28704e!important;border-color:rgba(40,112,78,.22);background:#edf8f1}
 .image-spec-status.warn{color:#9a5b19!important;border-color:rgba(154,91,25,.24);background:#fff4df}
 .gallery-upload>span{font-weight:600;font-size:12px}
+
+
+/* v3.1.10 — product list alignment cleanup */
+.product-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 4px 12px;color:var(--muted);font-size:10px}
+.product-legend span{display:inline-flex;align-items:center;gap:6px}
+.legend-star{font-style:normal;color:#b27738;font-size:12px;line-height:1}
+.legend-live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4b9c70;box-shadow:0 0 0 2px rgba(75,156,112,.12)}
+.product-item{display:grid!important;grid-template-columns:16px minmax(0,1fr) 28px!important;gap:8px!important;padding:7px!important;align-items:center;min-height:64px}
+.drag-handle{display:grid;place-items:center;align-self:stretch;color:#b2a294;cursor:grab;font-size:12px;letter-spacing:-3px}
+.product-main{display:grid;grid-template-columns:46px minmax(0,1fr)!important;gap:10px;align-items:center;width:100%;min-width:0;text-align:left;border:0;background:transparent;color:inherit;padding:2px 3px;cursor:pointer}
+.product-text{display:block;min-width:0}
+.product-main strong{display:block;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-main small{display:block;color:var(--muted);font-size:10px;line-height:1.25;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-flags{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;align-self:stretch;min-width:28px}
+.feature-toggle{display:grid;place-items:center;align-self:auto;border:0;background:transparent;color:#c6b9ad;font-size:14px;padding:0;width:20px;height:20px;line-height:1;border-radius:50%}
+.feature-toggle:hover{background:rgba(178,119,56,.08)}
+.feature-toggle.on{color:#b27738}
+.status-dot{display:block;width:8px;height:8px;border-radius:50%;background:#bfb0a1;box-shadow:0 0 0 2px rgba(191,176,161,.12)}
+.status-dot.live{background:#4b9c70;box-shadow:0 0 0 2px rgba(75,156,112,.12)}
+.status-dot.draft{background:#c7b8aa;box-shadow:0 0 0 2px rgba(199,184,170,.12)}
+@media(max-width:900px){
+  .product-list{grid-template-columns:1fr!important}
+  .product-item{min-height:66px}
+}
