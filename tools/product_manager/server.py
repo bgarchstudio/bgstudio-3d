@@ -16,23 +16,26 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.19'
+PANEL_VERSION = '3.1.20'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
     'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
-    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel'
+    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel',
+    'pet-urunleri'
 }
 CATEGORY_ALIASES = {
     'dekoratif': 'dekoratif-duvar',
     'aydinlatma': 'aydinlatma',
     'fonksiyonel': 'pratik-fonksiyonel',
     'kisiye-ozel': 'hediye-kisiye-ozel',
+    'pet': 'pet-urunleri',
 }
 TAG_PRESETS = [
     'Kişiye Özel', 'Kurumsal', 'Adetli Üretim', 'Logolu', 'Hediye',
     'Gaming', 'PlayStation', 'Xbox', 'Masaüstü', 'Anahtarlık', 'Organizer',
-    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap'
+    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap',
+    'Pet', 'Kedi', 'Köpek', 'Mama', 'Mama Küreği', 'Su Kabı', 'Oyuncak', 'Petshop'
 ]
 ensure_initialized()
 export_to_repo()
@@ -273,7 +276,7 @@ def preflight():
     checks.append({'status':'fail' if broken_links else 'pass','label':'İç bağlantılar','detail':('Kırık: '+', '.join(broken_links[:8])) if broken_links else f'{len(public_html)} HTML sayfada yerel bağlantılar sağlam.'})
 
     featured = len([p for p in active if p.get('featured')])
-    checks.append({'status':'warn' if featured > 8 else 'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor.'})
+    checks.append({'status':'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor; sabit ürün limiti uygulanmıyor.'})
     failures = sum(c['status']=='fail' for c in checks)
     warnings = sum(c['status']=='warn' for c in checks)
     return {'ok': failures == 0, 'checks':checks, 'summary':{'products':len(products),'active':len(active),'failures':failures,'warnings':warnings}}
@@ -350,7 +353,7 @@ def normalize_pricing_tiers(items):
 
 def clean_product(p):
     allowed = {
-        'slug', 'name', 'category', 'price_text', 'price_value', 'card_description', 'description',
+        'slug', 'name', 'category', 'price_text', 'price_value', 'sale_price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
         'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'tags'
@@ -368,6 +371,17 @@ def clean_product(p):
     out['price_text'] = str(out.get('price_text') or 'Fiyat için iletişim').strip()
     pv = str(out.get('price_value') or '').strip().replace(',', '.')
     out['price_value'] = pv if re.fullmatch(r'\d+(?:\.\d+)?', pv) else None
+    sale_raw = str(out.get('sale_price_value') or '').strip().replace(',', '.')
+    if sale_raw:
+        if not re.fullmatch(r'\d+(?:\.\d+)?', sale_raw):
+            raise ValueError('İndirimli fiyat geçersiz.')
+        if out['price_value'] is None:
+            raise ValueError('İndirim için normal sayısal fiyat zorunlu.')
+        if float(sale_raw) <= 0 or float(sale_raw) >= float(out['price_value']):
+            raise ValueError('İndirimli fiyat normal fiyattan düşük olmalı.')
+        out['sale_price_value'] = sale_raw
+    else:
+        out['sale_price_value'] = None
     out['card_description'] = str(out.get('card_description') or '').strip()
     out['description'] = str(out.get('description') or '').strip()
     out['production_note'] = str(out.get('production_note') or '').strip()
@@ -622,6 +636,7 @@ class Handler(BaseHTTPRequestHandler):
                 {'id':'anahtarlik-aksesuar','label':'Anahtarlık & Aksesuar'},
                 {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
                 {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
+                {'id':'pet-urunleri','label':'Pet Ürünleri'},
             ]
             return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
@@ -725,7 +740,7 @@ class Handler(BaseHTTPRequestHandler):
                 p['slug'] = unique_slug(products, f"{src.get('slug', 'urun')}-kopya")
                 p['active'] = False
                 p['featured'] = False
-                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 10
+                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 1
                 p['seo_title'], p['seo_description'] = make_seo(p['name'], p.get('card_description'), p.get('description'))
                 main = f"assets/images/products/{p['slug']}.webp"
                 if duplicate_asset(src.get('main_image'), main):
@@ -789,7 +804,7 @@ class Handler(BaseHTTPRequestHandler):
                 ordered += [p for p in sorted(products, key=lambda x: int(x.get('sort_order') or 9999)) if p.get('slug') not in seen]
                 backup()
                 for i, p in enumerate(ordered, 1):
-                    p['sort_order'] = i * 10
+                    p['sort_order'] = i
                 write_products(products)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Katalog sırası güncellendi.', 'products': products})

@@ -398,3 +398,14 @@ textarea{line-height:1.55;resize:vertical}
   .product-list{grid-template-columns:1fr!important}
   .product-item{min-height:66px}
 }
+
+
+/* v3.1.20 — discount price management */
+.discount-price-field{position:relative}
+.discount-price-field input{border-color:rgba(166,100,31,.24)}
+.discount-price-hint{display:block!important;margin-top:7px!important;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.36);color:#887666!important;font-weight:600}
+.discount-price-hint.active{color:#28704e!important;border-color:rgba(40,112,78,.22);background:#edf8f1}
+.discount-price-hint.invalid{color:#9a5b19!important;border-color:rgba(154,91,25,.24);background:#fff4df}
+.pv-price del{display:block;font-size:.7em;color:#998879;font-weight:500;text-decoration-thickness:1.5px}
+.pv-price b{display:block;color:#9a5b19;font:inherit}
+.pv-price em{display:inline-block;margin-top:5px;padding:4px 7px;border-radius:999px;background:#251a13;color:#fff;font-size:.52em;font-style:normal;letter-spacing:.04em}

@@ -690,3 +690,28 @@ button{font-family:inherit}
 .case-card.reference-jump-focus{animation:bgReferenceTarget 1.35s ease-out 1;box-shadow:0 0 0 2px rgba(181,117,52,.34),0 20px 56px rgba(52,35,22,.10)}
 @media(max-width:760px){.case-card[id^="referans-"],.case-card[data-reference-key]{scroll-margin-top:94px}}
 @media(prefers-reduced-motion:reduce){.case-card.reference-jump-focus{animation:none}}
+
+
+/* v3.1.14 — managed reference viewport centering */
+.case-card[data-reference-id]{scroll-margin-top:0!important;scroll-margin-bottom:0!important}
+.case-card.reference-jump-focus{position:relative;z-index:2;animation:bgReferenceTarget 1.35s ease-out 1;box-shadow:0 0 0 2px rgba(181,117,52,.34),0 20px 56px rgba(52,35,22,.10)}
+@media(prefers-reduced-motion:reduce){.case-card.reference-jump-focus{animation:none}}
+
+
+/* v3.1.20 — storefront discounts */
+.sale-price{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;line-height:1}
+.sale-price del{color:#9b8a7b;font-size:.7rem;font-weight:500;text-decoration-thickness:1.5px}
+.sale-price strong{color:#a75d18!important;font-size:.82rem!important}
+.sale-price em{font-style:normal;font-weight:800;font-size:.56rem;letter-spacing:.04em;background:#251a13;color:#fff;border-radius:999px;padding:5px 7px}
+.price-display-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-top:5px}
+.price-block .price-display-row>strong{margin-top:0}
+.price-list{color:#8e7f73;font-size:1.15rem;text-decoration-thickness:2px;text-decoration-color:#9a5b19}
+.discount-badge{display:inline-flex;align-items:center;min-height:28px;padding:6px 10px;border-radius:999px;background:#251a13;color:#fff;font-size:.67rem;font-weight:800;letter-spacing:.05em}
+.discount-badge[hidden],.price-list[hidden]{display:none!important}
+.related-price{display:flex!important;align-items:center;gap:5px;flex-wrap:wrap}
+.related-price>.sale-price{justify-content:flex-start}
+.related-price .sale-price em{font-size:.5rem;padding:4px 6px}
+.mobile-price-wrap{display:flex!important;align-items:center;gap:6px;flex-wrap:wrap}
+.mobile-price-wrap .price-list{font-size:.62rem}
+.mobile-price-wrap b{font-size:.72rem;color:var(--brown)}
+@media(max-width:680px){.product-topline .sale-price{justify-content:flex-start;margin-top:5px}.sale-price em{font-size:.5rem;padding:4px 6px}.price-display-row{gap:8px}.price-list{font-size:.95rem}.discount-badge{font-size:.58rem;padding:5px 8px}.mobile-price-wrap{line-height:1.1}}

@@ -518,6 +518,8 @@ if (orderConfig) {
   const mobileSend = document.querySelector('[data-mobile-order-whatsapp]');
   const priceDisplay = document.querySelector('[data-product-price-display]');
   const mobilePrice = document.querySelector('[data-mobile-price]');
+  const discountListPrices = document.querySelectorAll('[data-discount-list-price]');
+  const discountBadges = document.querySelectorAll('[data-discount-badge]');
   const tierBtns = document.querySelectorAll('[data-order-tier-choice]');
   const colorSlotsWrap = orderConfig.querySelector('[data-order-color-slots]');
   const colorDataNode = orderConfig.querySelector('[data-product-colors]');
@@ -558,6 +560,9 @@ if (orderConfig) {
   };
   const syncTierUi = () => {
     const t = selectedTier();
+    const baseSaleSelected = !t || t.packQty === 1;
+    discountListPrices.forEach(el => { el.hidden = !baseSaleSelected; });
+    discountBadges.forEach(el => { el.hidden = !baseSaleSelected; });
     tierBtns.forEach(btn => {
       const active = !!t && btn.dataset.orderTierChoice === t.index;
       btn.classList.toggle('selected', active);
