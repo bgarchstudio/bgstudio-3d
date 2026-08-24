@@ -17,7 +17,6 @@
   {
     "slug": "cikolata-selalesi-spiral-aksami",
     "name": "Çikolata Şelalesi Spiral Aksamı",
-    "category": "Yedek parça / makine aksamı",
     "headline": "Temini zor bir makine aksamını 3D üretimle yeniden oluşturduk.",
     "description": "Otel kullanımındaki çikolata şelalesi makinesi için spiral aksam, mevcut ölçüler ve çalışma ihtiyacına göre yeniden üretilerek fonksiyonel yedek parça çözümü hazırlandı.",
     "tags": [
@@ -27,6 +26,7 @@
     ],
     "active": true,
     "sort_order": 20,
-    "image": null
+    "category": "Yedek parça / makine aksamı",
+    "image": "assets/images/prototypes/cikolata-selalesi-spiral-aksami.webp"
   }
 ]
