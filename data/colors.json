@@ -78,5 +78,13 @@
     "in_stock": true,
     "stock_qty": null,
     "sort_order": 100
+  },
+  {
+    "id": "kirmizi",
+    "name": "Kırmızı",
+    "hex": "#ff0000",
+    "in_stock": true,
+    "stock_qty": null,
+    "sort_order": 110
   }
 ]

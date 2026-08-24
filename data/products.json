@@ -536,7 +536,7 @@
     "pricing_tiers": [],
     "sort_order": 24,
     "price_text": "949 TL",
-    "price_value": null,
+    "price_value": "949",
     "active": true,
     "options": [
       "Xbox logo",
@@ -567,5 +567,38 @@
     "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
     "poster_image_width": 1254,
     "poster_image_height": 1254
+  },
+  {
+    "category": "aydinlatma",
+    "name": "Iron Man Eli Masa Lambası",
+    "card_description": "Iron Man’ın ikonik elinden ilham alan, ışıklı masaüstü dekor lambası. Gaming setup ve çalışma masaları için dikkat çekici bir tasarım.",
+    "pricing_tiers": [],
+    "sort_order": 34,
+    "price_text": "1.499 TL",
+    "price_value": "1499",
+    "active": true,
+    "options": [],
+    "description": "Iron Man’ın ikonik zırhlı el tasarımından ilham alan masa lambası, avuç içindeki aydınlatmasıyla gaming setup, çalışma masası ve dekoratif alanlara güçlü bir atmosfer kazandırır. 3D baskı teknolojisiyle üretilen gövdesi, parçalı zırh detayları ve karakteristik kırmızı görünümüyle hem aydınlatma hem de koleksiyonluk dekor ürünü olarak kullanılabilir.",
+    "seo_description": "Iron Man El Masa Lambası, ışıklı avuç içi ve detaylı 3D baskı tasarımıyla gaming setup ve masaüstü dekoru için üretilir. Kuşadası 3D baskı.",
+    "slug": "iron-man-eli-masa-lambasi",
+    "seo_title": "Iron Man El Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "features": [
+      "Işıklı avuç içi tasarımı",
+      "Iron Man temalı masaüstü dekor",
+      "3D baskı üretim",
+      "Gaming setup ve çalışma masalarına uygun",
+      "Dekoratif ambiyans aydınlatması",
+      "Detaylı zırh görünümü",
+      "Masaüstü kullanıma uygun"
+    ],
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir ve aydınlatma bileşenleriyle birlikte kullanıma hazır olarak hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "featured": true,
+    "color_ids": [
+      "kirmizi"
+    ],
+    "gallery_images": [],
+    "main_image": "assets/images/products/iron-man-eli-masa-lambasi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
