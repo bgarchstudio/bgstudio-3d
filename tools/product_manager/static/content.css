@@ -143,3 +143,11 @@ body.logo-editor-open{overflow:hidden}
 .reference-media-grid .image-spec{margin:7px 0 10px}
 .profile-drop .image-spec{margin:0 0 10px}
 .logo-editor-note strong{display:block;color:#d6af78;margin-bottom:4px}
+
+
+/* v3.1.15 — corporate source/theme vertical alignment */
+.corporate-link-panel{align-items:start!important}
+.corporate-link-panel>label{align-self:start!important;align-content:start!important;grid-auto-rows:max-content!important}
+.corporate-link-panel>label>select{margin:0!important}
+.corporate-link-panel>label>small{margin-top:0!important;line-height:1.4}
+@media(min-width:701px){.corporate-link-panel>label{min-height:0!important}}
