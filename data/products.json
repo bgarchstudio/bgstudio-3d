@@ -952,5 +952,54 @@
     "main_image": "assets/images/products/masaustu-telefon-tutucu-stand.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "249 TL",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Çevirmeli diş macunu tüp sıkacağı, tüpü düzenli sararak içeride kalan macunun daha verimli kullanılmasına yardımcı olur. Kuşadası 3D baskı.",
+    "card_description": "Diş macunu ve tüp ambalajları düzenli biçimde sıkarak içeriğin sonuna kadar değerlendirilmesini sağlayan çevirmeli tüp sıkacağı.",
+    "name": "Diş Macunu Tüp Sıkacağı",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "pratik-fonksiyonel",
+    "seo_title": "Diş Macunu Tüp Sıkacağı | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Diş Macunu",
+      "Tüp Sıkacağı",
+      "Banyo",
+      "Pratik Ürün",
+      "Ev Düzeni",
+      "İsraf Önleyici",
+      "Çevirmeli"
+    ],
+    "price_value": "249",
+    "options": [],
+    "active": true,
+    "slug": "dis-macunu-tup-sikacagi",
+    "features": [
+      "Çevirmeli sıkma mekanizması",
+      "Diş macunu tüplerine uygun",
+      "Tüpü düzenli biçimde sarar",
+      "İçeriğin sonuna kadar kullanılmasına yardımcı olur",
+      "Kolay kullanım",
+      "Banyo ve lavabo kullanımına uygun",
+      "3D baskı üretim"
+    ],
+    "sort_order": 22,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Tüp uyumluluğu ambalajın genişliği ve yapısına göre değişebilir. 3D baskı yüzeylerinde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "description": "Diş macunu tüpünü kolayca sıkmak ve içeride kalan ürünü daha verimli değerlendirmek için tasarlanan çevirmeli tüp sıkacağıdır. Tüpün ucunu mekanizmaya yerleştirip yan kolu çevirerek ambalajı düzenli biçimde sarar. Böylece tüp dağılmaz, kullanım kolaylaşır ve içeride kalan macuna erişmek daha pratik hale gelir.\n\nBanyo ve lavabo çevresinde düzenli kullanım için uygundur. Diş macununun yanı sıra uygun ölçülerdeki benzer tüp ambalajlarla da kullanılabilir.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/dis-macunu-tup-sikacagi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
