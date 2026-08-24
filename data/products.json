@@ -679,5 +679,66 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "card_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekleriyle çok renkli 3D baskı futbol takımı anahtarlığı.",
+    "price_value": "99",
+    "options": [
+      "Galatasaray",
+      "Fenerbahçe",
+      "Beşiktaş",
+      "Trabzonspor"
+    ],
+    "seo_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor logolu 3D baskı anahtarlıklar. Canlı renkli tasarım, Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "slug": "futbol-takimi-logolu-anahtarlik",
+    "production_note": "Ürün çok renkli 3D baskı yöntemiyle üretilir. Takım logosu ve renkleri seçilen modele göre hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "features": [
+      "4 takım seçeneği",
+      "Çok renkli 3D baskı",
+      "Detaylı takım logosu",
+      "Metal anahtarlık halkası",
+      "Hafif ve günlük kullanıma uygun",
+      "Anahtar ve çantalarda kullanıma uygun",
+      "Hediye seçeneği"
+    ],
+    "color_ids": [],
+    "active": true,
+    "sort_order": 17,
+    "tags": [
+      "Logolu",
+      "Hediye",
+      "Anahtarlık",
+      "Futbol"
+    ],
+    "featured": false,
+    "category": "anahtarlik-aksesuar",
+    "seo_title": "Takım Logolu Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D",
+    "price_text": "99 TL",
+    "description": "Takımını her yerde yanında taşı. Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekleriyle hazırlanan futbol takımı anahtarlıkları, çok renkli 3D baskı teknolojisiyle üretilir. Takımların karakteristik renkleri ve logo detaylarıyla tasarlanan anahtarlıklar; anahtar, çanta ve sırt çantası kullanımına uygundur.",
+    "pricing_tiers": [
+      {
+        "label": "2’li alım",
+        "quantity": 2,
+        "price_value": "179",
+        "note": "Avantajlı Fiyat"
+      },
+      {
+        "label": "3’lü alım",
+        "quantity": 3,
+        "price_value": "249",
+        "note": "Avantajlı Fiyat"
+      },
+      {
+        "label": "4’lü alım",
+        "quantity": 4,
+        "price_value": "319",
+        "note": "Set Fiyatı"
+      }
+    ],
+    "name": "Futbol Takımı Logolu Anahtarlık",
+    "gallery_images": [],
+    "main_image": "assets/images/products/futbol-takimi-logolu-anahtarlik.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
