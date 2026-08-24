@@ -2,7 +2,6 @@
   {
     "slug": "bot-sisirme-pompasi-ara-parcasi",
     "name": "Bot Şişirme Pompası Ara Parçası",
-    "category": "Prototip / bağlantı parçası",
     "headline": "Pompa ile bot arasındaki eksik bağlantıyı yeniden ürettik.",
     "description": "Şişirme pompası ile bot arasında ihtiyaç duyulan ara parça ölçülendirilerek modellenip 3D baskı ile fonksiyonel prototip olarak üretildi.",
     "tags": [
@@ -12,7 +11,8 @@
     ],
     "active": true,
     "sort_order": 10,
-    "image": null
+    "category": "Prototip / bağlantı parçası",
+    "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp"
   },
   {
     "slug": "cikolata-selalesi-spiral-aksami",
