@@ -394,76 +394,83 @@
     ]
   },
   {
-    "slug": "heykel-bust-masa-lambasi",
-    "name": "3D Baskı Heykeli Masa Lambası",
-    "category": "aydinlatma",
     "price_text": "3.499 TL",
-    "price_value": "3499",
+    "color_ids": [],
+    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
     "card_description": "Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası.",
-    "description": "Katmanlı heykel görünümü ve sıcak ışık kaynağıyla yaşam alanlarında güçlü bir odak noktası oluşturmak üzere tasarlanan dekoratif masa lambası.",
+    "name": "Heykel Masa Lambası",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "aydinlatma",
+    "seo_title": "3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Masa Lambası",
+      "Dekoratif"
+    ],
+    "price_value": "3499",
     "options": [
       "Bone White gövde",
       "Siyah kaide"
     ],
+    "active": true,
+    "slug": "heykel-bust-masa-lambasi",
     "features": [
       "Katmanlı 3D baskı gövde",
       "E27 duy uyumlu",
       "Sıcak ambiyans",
       "Lansmana özel 3.499 TL"
     ],
+    "sort_order": 10,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "description": "Katmanlı heykel görünümü ve sıcak ışık kaynağıyla yaşam alanlarında güçlü bir odak noktası oluşturmak üzere tasarlanan dekoratif masa lambası.",
+    "sale_price_value": null,
+    "gallery_images": [],
     "main_image": "assets/images/products/heykel-bust-masa-lambasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/heykel-bust-masa-lambasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 10,
-    "seo_title": "3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
-    "tags": [
-      "Masa Lambası",
-      "Dekoratif"
-    ]
+    "poster_image_height": 1254
   },
   {
-    "slug": "kask-askiligi",
-    "name": "3D Baskı Kask Askılığı",
-    "category": "ev-duzen",
     "price_text": "Fiyat için iletişim",
-    "price_value": null,
+    "color_ids": [
+      "glitter-galaxy-black",
+      "siyah"
+    ],
+    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
-    "description": "Motosiklet ekipmanlarını düzenli ve erişilebilir tutmak için tasarlanan duvar tipi 3D baskı askılık; kask taşıma yüzeyi ve anahtar kancası içerir.",
+    "name": "Kask Askılığı",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "ev-duzen",
+    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Motosiklet",
+      "Duvar Düzeni",
+      "Pratik"
+    ],
+    "price_value": null,
     "options": [],
+    "active": true,
+    "slug": "kask-askiligi",
     "features": [
       "Duvara monte",
       "Kask uyumlu",
       "Anahtar kancası",
       "Dayanıklı kullanım"
     ],
+    "sort_order": 11,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "description": "Motosiklet ekipmanlarını düzenli ve erişilebilir tutmak için tasarlanan duvar tipi 3D baskı askılık; kask taşıma yüzeyi ve anahtar kancası içerir.",
+    "sale_price_value": null,
+    "gallery_images": [],
     "main_image": "assets/images/products/kask-askiligi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/kask-askiligi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 11,
-    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "color_ids": [
-      "glitter-galaxy-black",
-      "siyah"
-    ],
-    "tags": [
-      "Motosiklet",
-      "Duvar Düzeni",
-      "Pratik"
-    ]
+    "poster_image_height": 1254
   },
   {
     "category": "hediye-kisiye-ozel",
@@ -896,6 +903,53 @@
     "price_value": "99",
     "gallery_images": [],
     "main_image": "assets/images/products/flexi-kopekbaligi-anahtarlik.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
+  },
+  {
+    "price_text": "449 TL",
+    "color_ids": [
+      "bone-white",
+      "glitter-galaxy-black",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Masaüstü telefon tutucu stand, açılı gövdesi ve 3D baskı tasarımıyla çalışma masası ve gaming setup için üretilir. Kuşadası 3D baskı.",
+    "card_description": "Telefonu dik konumda sabit tutan, boşluklu organik yüzeye sahip 3D baskı masaüstü telefon standı.",
+    "name": "Masaüstü Telefon Tutucu Stand",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "gaming-masaustu",
+    "seo_title": "Telefon Tutucu Stand | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Masaüstü",
+      "Organizer",
+      "Hediye",
+      "Telefon Standı",
+      "Telefon Tutucu",
+      "Masa Aksesuarı",
+      "Gaming Setup",
+      "Çalışma Masası"
+    ],
+    "price_value": "449",
+    "options": [],
+    "active": true,
+    "slug": "masaustu-telefon-tutucu-stand",
+    "features": [
+      "Masaüstü telefon standı",
+      "Açılı ve dengeli gövde",
+      "Telefon ekranını rahat görüş açısında tutar",
+      "Boşluklu organik tasarım",
+      "Gaming ve çalışma masalarına uygun",
+      "Hafif 3D baskı yapı",
+      "Birçok telefon modeliyle uyumlu"
+    ],
+    "sort_order": 21,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Boşluklu gövde tasarımı ürünün formunun bir parçasıdır. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Telefonunuzu çalışma masası, gaming setup veya komodin üzerinde dik ve düzenli biçimde konumlandırmak için tasarlanan masaüstü telefon standıdır. Açılı gövdesi ekranın rahat görülmesini sağlar. Boşluklu organik yapısı ürüne hafif ve karakteristik bir görünüm kazandırır. Telefon görüşmeleri, video izleme, bildirim takibi ve masaüstü kullanım için uygundur.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/masaustu-telefon-tutucu-stand.webp",
     "main_image_width": 1000,
     "main_image_height": 760
   }
