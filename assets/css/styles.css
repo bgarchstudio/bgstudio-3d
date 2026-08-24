@@ -670,3 +670,8 @@ button{font-family:inherit}
 .corporate-nfc-note p{margin:0;color:var(--ink-soft);font-size:.8rem;line-height:1.6}
 @media(max-width:900px){.service-seo-link,.corporate-nfc-note{align-items:flex-start;flex-direction:column}.field-work-links{justify-content:flex-start}.service-seo-link{margin-bottom:68px}}
 @media(max-width:680px){.service-seo-link{width:min(100% - 24px,1360px);margin-top:12px;margin-bottom:56px;padding:16px}.field-work-links{gap:12px}.corporate-nfc-note{padding:16px}}
+
+
+/* v3.1.11 — remove media/body seam from managed reference cards */
+.case-media{border-bottom:0!important}
+.case-card.has-media .case-media{box-shadow:none!important}
