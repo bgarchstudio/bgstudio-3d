@@ -25,9 +25,9 @@
       "Google yorum",
       "Restoran"
     ],
-    "active": true,
-    "sort_order": 30,
+    "category": "Restoran • QR Uygulama",
     "theme": "dark",
-    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+    "active": true,
+    "sort_order": 30
   }
 ]
