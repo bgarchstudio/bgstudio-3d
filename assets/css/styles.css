@@ -363,3 +363,35 @@ button{font-family:inherit}
 .contact>div:first-child::after{content:"";position:absolute;left:0;bottom:2px;width:min(270px,27vw);aspect-ratio:1100/440;background:url("../brand/bgstudio-signature-clean.png") left center/contain no-repeat;opacity:.30;pointer-events:none;mix-blend-mode:multiply}
 @media(max-width:1040px){.contact>div:first-child{padding-bottom:62px}.contact>div:first-child::after{width:min(250px,42vw);opacity:.27}}
 @media(max-width:680px){.contact>div:first-child{padding-bottom:54px}.contact>div:first-child::after{width:min(220px,62vw);opacity:.24}}
+
+
+/* v2.9.4 — signature moved away from headline; compact maker's mark under CTA buttons */
+.contact>div:first-child{padding-bottom:0!important}
+.contact>div:first-child::after{content:none!important;display:none!important}
+.contact-actions{position:relative;padding-bottom:64px}
+.contact-actions::after{
+  content:"";
+  position:absolute;
+  right:6px;
+  bottom:2px;
+  width:172px;
+  aspect-ratio:2.55/1;
+  background:url("../brand/bgstudio-signature-mark.png") right center/contain no-repeat;
+  opacity:.18;
+  pointer-events:none;
+  mix-blend-mode:multiply;
+}
+@media(max-width:1040px){
+  .contact-actions{padding-bottom:58px}
+  .contact-actions::after{right:auto;left:0;width:158px;opacity:.17}
+}
+@media(max-width:680px){
+  .contact-actions{padding-bottom:54px}
+  .contact-actions::after{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    width:148px;
+    opacity:.15;
+  }
+}
