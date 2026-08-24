@@ -151,3 +151,9 @@ body.logo-editor-open{overflow:hidden}
 .corporate-link-panel>label>select{margin:0!important}
 .corporate-link-panel>label>small{margin-top:0!important;line-height:1.4}
 @media(min-width:701px){.corporate-link-panel>label{min-height:0!important}}
+
+/* v3.1.16 — card theme autosave feedback */
+#themeSaveHint{min-height:14px}
+#themeSaveHint.saving{color:#a16b2e}
+#themeSaveHint.saved{color:#347858}
+#themeSaveHint.error{color:#a3453e}
