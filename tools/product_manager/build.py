@@ -522,7 +522,7 @@ def build_site():
 
     home_path = ROOT / 'index.html'
     home = home_path.read_text(encoding='utf-8')
-    featured = [p for p in active if p.get('featured')][:8]
+    featured = [p for p in active if p.get('featured')]
     homecards = '\n'.join(render_card(p, '') for p in featured)
     home = replace_between(home, '<!-- PRODUCT_MANAGER:FEATURED_START -->', '<!-- PRODUCT_MANAGER:FEATURED_END -->', homecards)
     home_path.write_text(home, encoding='utf-8')

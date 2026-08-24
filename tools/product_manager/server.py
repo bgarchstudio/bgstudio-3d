@@ -16,7 +16,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.0'
+PANEL_VERSION = '3.1.1'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
@@ -273,7 +273,7 @@ def preflight():
     checks.append({'status':'fail' if broken_links else 'pass','label':'İç bağlantılar','detail':('Kırık: '+', '.join(broken_links[:8])) if broken_links else f'{len(public_html)} HTML sayfada yerel bağlantılar sağlam.'})
 
     featured = len([p for p in active if p.get('featured')])
-    checks.append({'status':'warn' if featured > 8 else 'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor.'})
+    checks.append({'status':'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor; sabit ürün limiti uygulanmıyor.'})
     failures = sum(c['status']=='fail' for c in checks)
     warnings = sum(c['status']=='warn' for c in checks)
     return {'ok': failures == 0, 'checks':checks, 'summary':{'products':len(products),'active':len(active),'failures':failures,'warnings':warnings}}
@@ -655,7 +655,7 @@ class Handler(BaseHTTPRequestHandler):
                 p['slug'] = unique_slug(products, f"{src.get('slug', 'urun')}-kopya")
                 p['active'] = False
                 p['featured'] = False
-                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 10
+                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 1
                 p['seo_title'], p['seo_description'] = make_seo(p['name'], p.get('card_description'), p.get('description'))
                 main = f"assets/images/products/{p['slug']}.webp"
                 if duplicate_asset(src.get('main_image'), main):
@@ -719,7 +719,7 @@ class Handler(BaseHTTPRequestHandler):
                 ordered += [p for p in sorted(products, key=lambda x: int(x.get('sort_order') or 9999)) if p.get('slug') not in seen]
                 backup()
                 for i, p in enumerate(ordered, 1):
-                    p['sort_order'] = i * 10
+                    p['sort_order'] = i
                 write_products(products)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Katalog sırası güncellendi.', 'products': products})
@@ -804,6 +804,13 @@ def run():
         print('Uygun port bulunamadı.')
         input('Enter...')
         return
+    # V3.1.1: panel açılırken kalıcı veriyi repo çıktısına bir kez yansıt.
+    # Böylece katalog sıra migrasyonu ve sınırsız öne çıkan listesi ekstra işlem gerektirmeden uygulanır.
+    try:
+        build_site()
+    except Exception as exc:
+        print('Başlangıç site senkronizasyonu uyarısı:', exc)
+
     url = f'http://127.0.0.1:{port}/'
     print('\nBG Studio 3D Ürün Yöneticisi PRO')
     print('Panel:', url)

@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -117,6 +117,39 @@ def _upgrade_products_v2(con):
             (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
         )
 
+def _normalize_product_sort_orders(products):
+    """Return products in the same visual order with contiguous 1..N sort values."""
+    if not isinstance(products, list):
+        return products
+    ordered = sorted(
+        [p for p in products if isinstance(p, dict)],
+        key=lambda p: (int(p.get('sort_order') or 999999), str(p.get('name') or '').casefold())
+    )
+    for i, product in enumerate(ordered, 1):
+        product['sort_order'] = i
+    return ordered
+
+
+def _upgrade_products_v3(con):
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
+    if not row:
+        return
+    try:
+        products = json.loads(row[0])
+    except Exception:
+        return
+    if not isinstance(products, list):
+        return
+    before = [int(p.get('sort_order') or 999999) for p in products if isinstance(p, dict)]
+    products = _normalize_product_sort_orders(products)
+    after = [int(p.get('sort_order') or 999999) for p in products]
+    if before != after:
+        con.execute(
+            'UPDATE collections SET json_text=?, updated_at=? WHERE name=?',
+            (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
+        )
+
+
 def _sync_smaller_repo_media():
     """Keep V3.1 optimized repo images in the persistent media vault.
 
@@ -149,6 +182,8 @@ def _upgrade_schema(con, old_version):
     if old_version < 2:
         _upgrade_products_v2(con)
         _sync_smaller_repo_media()
+    if old_version < 3:
+        _upgrade_products_v3(con)
 
 _lock = threading.RLock()
 
@@ -214,6 +249,8 @@ def _initial_import(con):
     defaults = {name: [] for name in COLLECTIONS}
     for name, repo_path in COLLECTIONS.items():
         data = _read_repo_json(repo_path, defaults[name])
+        if name == 'products':
+            data = _normalize_product_sort_orders(data)
         con.execute(
             'INSERT OR REPLACE INTO collections(name,json_text,updated_at) VALUES(?,?,?)',
             (name, json.dumps(data, ensure_ascii=False, indent=2), _now())
