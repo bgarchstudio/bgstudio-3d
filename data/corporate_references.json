@@ -18,12 +18,16 @@
   {
     "slug": "naz-balik-restaurant",
     "name": "Naz Balık Restaurant",
-    "headline": "QR yorum akışı ve işletmeye özel uygulama.",
-    "description": "Müşteri yorum akışına yönelik QR uygulaması ve fiziksel kullanım senaryosu için işletmeye özel tasarım yaklaşımı.",
+    "headline": "Google + Tripadvisor için özel QR yorum kartı",
+    "description": "Naz Balık Restaurant için Google Reviews ve Tripadvisor yorum yönlendirmesine odaklanan, işletmeye özel masaüstü değerlendirme kartı tasarlanıp uygulandı. Fiziksel kart üzerinde her iki platform için ayrı QR alanları kurgulanarak misafirlerin hızlıca yorum bırakabileceği net ve şık bir deneyim oluşturuldu. Restoranın marka diliyle uyumlu tasarım yaklaşımı sayesinde kart, masa üzerinde hem yönlendirici hem de kurumsal görünümü destekleyen bir temas noktasına dönüştürüldü.",
     "tags": [
-      "QR",
-      "Google yorum",
-      "Restoran"
+      "Google Reviews",
+      "Tripadvisor",
+      "QR Yorum Kartı",
+      "Restoran",
+      "Masaüstü Kart Tasarımı",
+      "Kuşadası",
+      "Naz Balık Restaurant"
     ],
     "active": true,
     "sort_order": 30,
