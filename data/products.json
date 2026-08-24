@@ -789,5 +789,49 @@
     "main_image": "assets/images/products/batman-katmanli-yuz-dekor.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "featured": false,
+    "active": true,
+    "features": [
+      "2 vida ile masa altı montaj",
+      "Gaming ve çalışma masalarına uygun",
+      "Masa üstünde yer kaplamaz",
+      "Bardak ve kutu içecek kullanımı",
+      "3D baskı üretim",
+      "Hafif ve dayanıklı yapı",
+      "Montaj vidaları dahil"
+    ],
+    "seo_title": "Masa Altı Bardak Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
+    "category": "gaming-masaustu",
+    "pricing_tiers": [],
+    "tags": [
+      "Gaming",
+      "Masaüstü",
+      "Organizatör",
+      "Bardak Tutucu",
+      "Masa Altı Aksesuar",
+      "Çalışma Masası",
+      "Gaming Setup",
+      "Vidalı Montaj"
+    ],
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir ve masa altına sabit montaj için uygun şekilde hazırlanır. Montaj vidaları pakete dahil değildir. 3D baskı yüzeylerinde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "card_description": "Gaming ve çalışma masaları için tasarlanan, 2 vida ile masa altına sabitlenen bardak tutucu.",
+    "options": [],
+    "price_value": "599",
+    "slug": "masa-alti-bardak-tutucu",
+    "sort_order": 19,
+    "name": "Masa Altı Bardak Tutucu",
+    "description": "Masa üstünde yer kaplamadan içeceğinizi güvenli şekilde konumlandırmak için tasarlanan masa altı bardak tutucu, gaming ve çalışma masalarına pratik bir kullanım kazandırır. 2 vida ile masa altına monte edilir ve bardak, kutu içecek veya benzeri günlük kullanım ürünlerini masa yüzeyinden uzak tutarak daha düzenli bir alan oluşturur.\n\n3D baskı yöntemiyle üretilen yapı, hafif ve dayanıklı formuyla masa altına sabit kullanım için uygundur. Özellikle gaming setup, home office ve çalışma masalarında masa yüzeyini boş tutmak isteyen kullanıcılar için işlevsel bir çözümdür. Montaj vidaları dahildir.",
+    "price_text": "599 TL",
+    "seo_description": "Gaming ve çalışma masaları için masa altı bardak tutucu. 2 vida ile sabitlenir, masa üstünü boş tutar. Kuşadası 3D baskı.",
+    "gallery_images": [],
+    "main_image": "assets/images/products/masa-alti-bardak-tutucu.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
