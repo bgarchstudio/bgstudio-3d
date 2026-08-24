@@ -525,5 +525,44 @@
     "color_ids": [
       "bone-white"
     ]
+  },
+  {
+    "category": "dekoratif",
+    "name": "Kişiye Özel Gaming Stand",
+    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
+    "pricing_tiers": [],
+    "sort_order": 24,
+    "price_text": "949 TL",
+    "price_value": null,
+    "active": true,
+    "options": [
+      "Xbox logo",
+      "PlayStation logo"
+    ],
+    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
+    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
+    "slug": "kisiye-ozel-gaming-stand",
+    "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
+    "features": [
+      "Kişiye özel isim veya kısa yazı",
+      "Xbox veya PlayStation logo seçeneği",
+      "Kulaklık için özel askı alanı",
+      "2 kontrolcü için stand alanı",
+      "Masaüstü kullanım",
+      "Siparişe özel 3D üretim"
+    ],
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "featured": false,
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "gallery_images": [],
+    "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
+    "poster_image_width": 1254,
+    "poster_image_height": 1254
   }
 ]
