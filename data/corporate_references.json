@@ -5,7 +5,7 @@
     "source_slug": "istavrit-restaurant",
     "theme": "dark",
     "active": true,
-    "sort_order": 10
+    "sort_order": 1
   },
   {
     "slug": "koala-petshop",
@@ -13,28 +13,15 @@
     "source_slug": "koala-petshop",
     "theme": "light",
     "active": true,
-    "sort_order": 20
+    "sort_order": 2
   },
   {
     "slug": "naz-balik-restaurant",
-    "name": "Naz Balık Restaurant",
-    "headline": "15 Masa İçin Google + Tripadvisor QR Yorum Kartı",
-    "description": "Naz Balık Restaurant’ın 15 masası için Google Reviews ve Tripadvisor yorum yönlendirmesine özel toplam 15 adet masaüstü QR yorum kartı tasarlanıp uygulandı. Her kartta iki platform için ayrı QR yönlendirmeleri kurgulandı ve tasarım restoranın marka kimliğine özel olarak hazırlandı. Misafirlerin masa üzerinden hızlıca Google veya Tripadvisor yorum sayfasına ulaşabildiği bu sistem, fiziksel kart ile dijital değerlendirme akışını tek noktada bir araya getiriyor.",
-    "tags": [
-      "15 Masa",
-      "15 QR Yorum Kartı",
-      "Google Reviews",
-      "Tripadvisor",
-      "QR Yorum Sistemi",
-      "Restoran",
-      "Masaüstü Kart",
-      "Kuşadası"
-    ],
-    "active": true,
-    "sort_order": 30,
+    "source_kind": "nfc",
+    "source_slug": "naz-balik-restaurant",
     "theme": "dark",
-    "image": "assets/images/references/naz-balik-restaurant.webp",
-    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+    "active": true,
+    "sort_order": 3
   },
   {
     "slug": "kusadasi-asansor",
@@ -50,7 +37,7 @@
       "Kuşadası"
     ],
     "active": true,
-    "sort_order": 40,
+    "sort_order": 4,
     "theme": "light",
     "image": "assets/images/references/kusadasi-asansor.webp",
     "profile_image": "assets/images/references/kusadasi-asansor-profile.webp"

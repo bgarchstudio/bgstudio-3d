@@ -15,7 +15,7 @@
       "Kuşadası"
     ],
     "active": true,
-    "sort_order": 10,
+    "sort_order": 1,
     "category": "Restoran · BG Studio NFC",
     "image": "assets/images/references/istavrit-restaurant.webp",
     "profile_image": "assets/images/references/istavrit-restaurant-profile.webp"
@@ -36,9 +36,30 @@
       "Kuşadası"
     ],
     "active": true,
-    "sort_order": 20,
+    "sort_order": 2,
     "category": "Petshop · BG Studio NFC",
     "image": "assets/images/references/koala-petshop.webp",
     "profile_image": "assets/images/references/koala-petshop-profile.webp"
+  },
+  {
+    "slug": "naz-balik-restaurant",
+    "name": "Naz Balık Restaurant",
+    "headline": "15 Masa İçin Google + Tripadvisor QR Yorum Kartı",
+    "description": "Naz Balık Restaurant’ın 15 masası için Google Reviews ve Tripadvisor yorum yönlendirmesine özel toplam 15 adet masaüstü QR yorum kartı tasarlanıp uygulandı. Her kartta iki platform için ayrı QR yönlendirmeleri kurgulandı ve tasarım restoranın marka kimliğine özel olarak hazırlandı. Misafirlerin masa üzerinden hızlıca Google veya Tripadvisor yorum sayfasına ulaşabildiği bu sistem, fiziksel kart ile dijital değerlendirme akışını tek noktada bir araya getiriyor.",
+    "category": "Restoran • QR Yorum Sistemi",
+    "tags": [
+      "15 Masa",
+      "15 QR Yorum Kartı",
+      "Google Reviews",
+      "Tripadvisor",
+      "QR Yorum Sistemi",
+      "Restoran",
+      "Masaüstü Kart",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 3,
+    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp",
+    "image": "assets/images/references/naz-balik-restaurant.webp"
   }
 ]

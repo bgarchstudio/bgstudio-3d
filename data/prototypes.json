@@ -10,7 +10,7 @@
       "Fonksiyonel parça"
     ],
     "active": true,
-    "sort_order": 10,
+    "sort_order": 1,
     "category": "Prototip / bağlantı parçası",
     "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp"
   },
@@ -25,7 +25,7 @@
       "3D üretim"
     ],
     "active": true,
-    "sort_order": 20,
+    "sort_order": 2,
     "category": "Yedek parça / makine aksamı",
     "image": "assets/images/prototypes/cikolata-selalesi-spiral-aksami.webp"
   }
