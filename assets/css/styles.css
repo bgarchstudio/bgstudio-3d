@@ -353,3 +353,13 @@ button{font-family:inherit}
 .brand-branch-3d .branch-logo-wrap img{width:90%;height:auto;filter:drop-shadow(0 7px 13px rgba(33,24,16,.08))}
 @media(max-width:1120px){.brand-branch-architecture .branch-logo-wrap img{width:80%}.brand-branch-3d .branch-logo-wrap img{width:88%}}
 @media(max-width:560px){.brand-branch-architecture .branch-logo-wrap img{width:79%}.brand-branch-3d .branch-logo-wrap img{width:87%}}
+
+
+/* v2.9.3 — signature placement refinement */
+/* The signature no longer floats in the brand gateway or repeats in the footer. */
+.brand-gateway-panel::after{display:none!important}
+.footer-topline::after{display:none!important}
+.contact>div:first-child{position:relative;padding-bottom:68px}
+.contact>div:first-child::after{content:"";position:absolute;left:0;bottom:2px;width:min(270px,27vw);aspect-ratio:1100/440;background:url("../brand/bgstudio-signature-clean.png") left center/contain no-repeat;opacity:.30;pointer-events:none;mix-blend-mode:multiply}
+@media(max-width:1040px){.contact>div:first-child{padding-bottom:62px}.contact>div:first-child::after{width:min(250px,42vw);opacity:.27}}
+@media(max-width:680px){.contact>div:first-child{padding-bottom:54px}.contact>div:first-child::after{width:min(220px,62vw);opacity:.24}}
