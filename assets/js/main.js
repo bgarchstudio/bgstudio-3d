@@ -10,82 +10,183 @@
   window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
 })();
 
-// v3.1.13 — robust managed-reference deep links.
-// The clicked homepage card is remembered before navigation. On the destination page
-// we resolve by exact anchor first, then by managed reference key, then by matching
-// the project headline. Repeated passes absorb image/layout shifts after page load.
+// v3.1.17 — stronger managed-reference deep jump.
+// “İşi incele” links now land on the exact managed card on every listing page,
+// including NFC & QR. Native anchor jumps are normalized and then re-positioned
+// with repeated center/alignment passes so the target never stays clipped under
+// the sticky header on desktop or mobile.
 (() => {
-  const STORE_KEY = 'bgstudio3d.referenceJump';
+  const STORE_KEY = 'bgstudio3d.referenceJump.v3';
   const clean = value => String(value || '').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
+  const cssEsc = value => {
+    try { return CSS.escape(String(value || '')); }
+    catch (_) { X }
+  };
+  const canonicalFromHash = value => String(value || '').replace(/^#/, '').replace(/^referans-/, '').trim();
+  const normalizedPath = value => {
+    const raw = String(value || '').trim() || '/';
+    const noOrigin = raw.replace(/^https?:\/\/[^/]+/i, '');
+    const noIndex = noOrigin.replace(/\/index\.html$/i, '/');
+    const tidy = noIndex.replace(/\/+/g, '/').replace(/\/$/, '');
+    return tidy || '/';
+  };
 
-  const findTarget = (key, headline) => {
-    if (key) {
-      const byId = document.getElementById(key);
-      if (byId) return byId;
+  const findTarget = data => {
+    const id = canonicalFromHash(data?.id || data?.key || data?.ref || '');
+    const hashKey = id ? 'referans-' + id : String(data?.key || '');
+    if (id) {
       try {
-        const byKey = document.querySelector(`[data-reference-key="${CSS.escape(key)}"]`);
-        if (byKey) return byKey;
+        const byIdentity = document.querySelector(`.case-card[data-reference-id="${cssEsc(id)}"]`);
+        if (byIdentity) return byIdentity;
       } catch (_) {}
+      const byId = document.getElementById(hashKey) || document.getElementById(id);
+      if (byId) return byId;
     }
-    const wanted = clean(headline);
-    if (!wanted) return null;
-    const cards = [...document.querySelectorAll('.case-card')];
-    return cards.find(card => clean(card.querySelector('h3')?.textContent) === wanted)
-      || cards.find(card => {
+
+    const wantedName = clean(data?.name);
+    if (wantedName) {
+      const cards = [...document.querySelectorAll('.case-card')];
+      const exactName = cards.find(card => clean(card.dataset.referenceName) === wantedName);
+      if (exactName) return exactName;
+      const headingName = cards.find(card => clean(card.querySelector('.case-identity .case-type')?.textContent) === wantedName || clean(card.querySelector('h3')?.textContent) === wantedName);
+      if (headingName) return headingName;
+    }
+
+    const wantedHeadline = clean(data?.headline);
+    if (!wantedHeadline) return null;
+    return [...document.querySelectorAll('.case-card')].find(card => clean(card.querySelector('h3')?.textContent) === wantedHeadline)
+      || [...document.querySelectorAll('.case-card')].find(card => {
         const title = clean(card.querySelector('h3')?.textContent);
-        return title && (title.includes(wanted) || wanted.includes(title));
+        return title && (title.includes(wantedHeadline) || wantedHeadline.includes(title));
       }) || null;
   };
 
-  const jump = data => {
-    const target = findTarget(data?.key, data?.headline);
-    if (!target) return false;
-    target.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
+  const headerHeight = () => {
+    const header = document.querySelector('.site-header');
+    if (!header) return 0;
+    return Math.max(0, Math.round(header.getBoundingClientRect().height));
+  };
+
+  const viewportGap = () => (window.innerWidth <= 760 ? 14 : 18);
+
+  const computeScrollTop = target => {
+    const header = headerHeight();
+    const gap = viewportGap();
+    const rect = target.getBoundingClientRect();
+    const usableHeight = Math.max(120, window.innerHeight - header - gap * 2);
+    const targetTopAbs = window.scrollY + rect.top;
+    const desiredTop = rect.height <= usableHeight
+      ? header + gap + Math.max(0, (usableHeight - rect.height) / 2)
+      : header + gap;
+    const docMax = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return Math.max(0, Math.min(docMax, Math.round(targetTopAbs - desiredTop)));
+  };
+
+  const highlightTarget = target => {
     target.classList.add('reference-jump-focus');
-    window.setTimeout(() => target.classList.remove('reference-jump-focus'), 1500);
+    window.clearTimeout(target.__bgRefFocusTimer);
+    target.__bgRefFocusTimer = window.setTimeout(() => target.classList.remove('reference-jump-focus'), 1700);
+  };
+
+  const placeTarget = target => {
+    if (!target) return false;
+    const top = computeScrollTop(target);
+    window.scrollTo({ top, left: 0, behavior: 'auto' });
+    highlightTarget(target);
+    return true;
+  };
+
+  const jump = data => {
+    const target = findTarget(data);
+    if (!target) return false;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => placeTarget(target)));
     return true;
   };
 
   const scheduleJump = data => {
     if (!data) return;
-    [0, 70, 220, 520, 1000].forEach(delay => {
-      window.setTimeout(() => jump(data), delay);
+    document.documentElement.classList.add('reference-jump-active');
+    // Neutralize native anchor placement first, then center precisely.
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    [0, 40, 120, 260, 520, 900, 1400, 2100].forEach(delay => window.setTimeout(() => jump(data), delay));
+
+    const target = findTarget(data);
+    if (target && typeof ResizeObserver === 'function') {
+      const ro = new ResizeObserver(() => placeTarget(target));
+      ro.observe(target);
+      window.setTimeout(() => ro.disconnect(), 2400);
+    }
+
+    const imgs = [...document.querySelectorAll('.case-card img')];
+    imgs.forEach(img => {
+      if (img.complete) return;
+      img.addEventListener('load', () => jump(data), { once: true });
+      img.addEventListener('error', () => jump(data), { once: true });
     });
   };
 
+  const buildPayloadFromLink = link => {
+    const card = link.closest('.field-work-card, .case-card, [data-reference-id], [data-reference-target]');
+    let url;
+    try { url = new URL(link.href, window.location.href); } catch (_) { return null; }
+    const id = card?.dataset.referenceId || canonicalFromHash(url.hash) || canonicalFromHash(card?.dataset.referenceTarget);
+    const name = card?.dataset.referenceName || card?.querySelector('.case-profile img')?.alt?.replace(/\s+profil(?:\s+fotoğrafı|\s+görseli)?$/i, '') || '';
+    const headline = card?.querySelector('h3')?.textContent?.trim() || '';
+    const pathname = normalizedPath(url.pathname);
+    return { id, ref: id, key: id ? 'referans-' + id : canonicalFromHash(url.hash), name, headline, pathname, at: Date.now() };
+  };
+
   document.addEventListener('click', event => {
-    const link = event.target.closest('.field-work-link');
+    const link = event.target.closest('.field-work-link, a[href*="#referans-"]');
     if (!link) return;
-    const card = link.closest('.field-work-card');
+    const payload = buildPayloadFromLink(link);
+    if (!payload?.id) return;
+
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify(payload)); } catch (_) {}
+
     let url;
     try { url = new URL(link.href, window.location.href); } catch (_) { return; }
-    const key = decodeURIComponent((url.hash || '').replace(/^#/, '')) || card?.dataset.referenceTarget || '';
-    const headline = card?.querySelector('h3')?.textContent?.trim() || '';
-    const payload = { key, headline, pathname: url.pathname.replace(/\/+$/, '') || '/', at: Date.now() };
-    try { sessionStorage.setItem(STORE_KEY, JSON.stringify(payload)); } catch (_) {}
+    if (/^https?:$/.test(url.protocol) && url.origin === window.location.origin) {
+      event.preventDefault();
+      url.hash = 'referans-' + payload.id;
+      url.searchParams.set('ref', payload.id);
+      window.location.assign(url.href);
+    }
   }, true);
 
   const resolveIncomingJump = () => {
-    const hashKey = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    const params = new URLSearchParams(window.location.search);
+    const hashRaw = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    const hashId = canonicalFromHash(hashRaw);
+    const queryRef = canonicalFromHash(params.get('ref') || '');
     let stored = null;
     try { stored = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null'); } catch (_) {}
-    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
-    const storedIsFresh = stored && Date.now() - Number(stored.at || 0) < 30000;
-    const storedMatches = storedIsFresh && (String(stored.pathname || '').replace(/\/+$/, '') || '/') === currentPath;
-    const payload = hashKey ? { key: hashKey, headline: storedMatches ? stored.headline : '' } : (storedMatches ? stored : null);
-    if (!payload) return;
+    const currentPath = normalizedPath(window.location.pathname);
+    const storedIsFresh = stored && Date.now() - Number(stored.at || 0) < 60000;
+    const storedMatches = storedIsFresh && normalizedPath(stored.pathname || '/') === currentPath;
+
+    const id = hashId || queryRef || canonicalFromHash(stored?.id || '');
+    const payload = id
+      ? { ...(storedMatches ? stored : {}), id, ref: id, key: 'referans-' + id }
+      : (storedMatches ? stored : null);
+    if (!payload?.id) return;
     scheduleJump(payload);
-    if (storedMatches) {
-      window.setTimeout(() => {
-        try { sessionStorage.removeItem(STORE_KEY); } catch (_) {}
-      }, 1300);
-    }
+    window.setTimeout(() => {
+      try { sessionStorage.removeItem(STORE_KEY); } catch (_) {}
+      if (params.has('ref')) {
+        params.delete('ref');
+        const qs = params.toString();
+        const nextUrl = `${window.location.pathname}${qs ? '?' + qs : ''}${window.location.hash || ('#referans-' + payload.id)}`;
+        history.replaceState(null, '', nextUrl);
+      }
+    }, 2600);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', resolveIncomingJump, { once: true });
   else resolveIncomingJump();
   window.addEventListener('load', resolveIncomingJump, { once: true });
   window.addEventListener('pageshow', resolveIncomingJump);
+  window.addEventListener('hashchange', resolveIncomingJump);
 })();
 
 const menuButton = document.querySelector('.menu-toggle');
