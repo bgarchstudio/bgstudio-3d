@@ -16,26 +16,23 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.10'
+PANEL_VERSION = '3.1.19'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
     'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
-    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel',
-    'pet-urunleri'
+    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel'
 }
 CATEGORY_ALIASES = {
     'dekoratif': 'dekoratif-duvar',
     'aydinlatma': 'aydinlatma',
     'fonksiyonel': 'pratik-fonksiyonel',
     'kisiye-ozel': 'hediye-kisiye-ozel',
-    'pet': 'pet-urunleri',
 }
 TAG_PRESETS = [
     'Kişiye Özel', 'Kurumsal', 'Adetli Üretim', 'Logolu', 'Hediye',
     'Gaming', 'PlayStation', 'Xbox', 'Masaüstü', 'Anahtarlık', 'Organizer',
-    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap',
-    'Pet', 'Kedi', 'Köpek', 'Mama', 'Mama Küreği', 'Su Kabı', 'Oyuncak', 'Petshop'
+    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap'
 ]
 ensure_initialized()
 export_to_repo()
@@ -276,7 +273,7 @@ def preflight():
     checks.append({'status':'fail' if broken_links else 'pass','label':'İç bağlantılar','detail':('Kırık: '+', '.join(broken_links[:8])) if broken_links else f'{len(public_html)} HTML sayfada yerel bağlantılar sağlam.'})
 
     featured = len([p for p in active if p.get('featured')])
-    checks.append({'status':'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor; sabit ürün limiti uygulanmıyor.'})
+    checks.append({'status':'warn' if featured > 8 else 'pass','label':'Öne çıkanlar','detail':f'{featured} ürün ana sayfada öne çıkıyor.'})
     failures = sum(c['status']=='fail' for c in checks)
     warnings = sum(c['status']=='warn' for c in checks)
     return {'ok': failures == 0, 'checks':checks, 'summary':{'products':len(products),'active':len(active),'failures':failures,'warnings':warnings}}
@@ -434,6 +431,59 @@ def read_content(kind):
 def write_content(kind, data):
     set_collection(content_collection(kind), data)
 
+
+def resequence_content(items, preferred_slug='', desired_position=None):
+    """Treat sort_order as a 1-based position and keep every value unique."""
+    rows = [dict(x) for x in (items or []) if isinstance(x, dict)]
+    preferred_slug = str(preferred_slug or '')
+    preferred = next((x for x in rows if str(x.get('slug') or '') == preferred_slug), None) if preferred_slug else None
+    others = [x for x in rows if x is not preferred]
+    others.sort(key=lambda x: (int(x.get('sort_order') or 999999), str(x.get('name') or x.get('slug') or '').casefold()))
+    if preferred is not None:
+        try:
+            pos = int(desired_position or preferred.get('sort_order') or len(rows))
+        except Exception:
+            pos = len(rows)
+        pos = max(1, min(len(others) + 1, pos))
+        others.insert(pos - 1, preferred)
+    for i, row in enumerate(others, 1):
+        row['sort_order'] = i
+    return others
+
+
+def sync_nfc_to_corporate(nfc_items=None, corporate_items=None):
+    """All NFC & QR references are automatically represented on the corporate page."""
+    nfc_items = resequence_content(nfc_items if nfc_items is not None else read_content('nfc'))
+    corporate_items = list(corporate_items if corporate_items is not None else read_content('corporate'))
+    nfc_slugs = {str(x.get('slug') or '') for x in nfc_items if x.get('slug')}
+    existing_links = {}
+    independent = []
+    for row in corporate_items:
+        if row.get('source_kind') == 'nfc' and row.get('source_slug'):
+            slug = str(row.get('source_slug'))
+            if slug in nfc_slugs and slug not in existing_links:
+                existing_links[slug] = dict(row)
+            continue
+        slug = str(row.get('slug') or '')
+        if slug in nfc_slugs and slug not in existing_links:
+            existing_links[slug] = {
+                'slug': slug, 'source_kind': 'nfc', 'source_slug': slug,
+                'theme': 'dark' if str(row.get('theme') or '').lower() == 'dark' else 'light',
+                'active': bool(row.get('active', True)), 'sort_order': int(row.get('sort_order') or 999)
+            }
+        else:
+            independent.append(dict(row))
+    linked = []
+    for idx, src in enumerate(nfc_items, 1):
+        slug = str(src.get('slug') or '')
+        row = existing_links.get(slug) or {
+            'slug': slug, 'source_kind': 'nfc', 'source_slug': slug,
+            'theme': 'dark' if idx % 2 else 'light', 'active': bool(src.get('active', True)), 'sort_order': idx
+        }
+        row.update({'slug': slug, 'source_kind': 'nfc', 'source_slug': slug})
+        linked.append(row)
+    return resequence_content(linked + independent)
+
 def clean_content_item(kind, item):
     if kind == 'corporate':
         source_slug = slugify(item.get('source_slug') or '')
@@ -468,10 +518,13 @@ def clean_content_item(kind, item):
 def save_content_item(kind, payload):
     items = read_content(kind)
     original = str(payload.get('original_slug') or '')
-    item = clean_content_item(kind, payload.get('item') or {})
-    if original and item['slug'] != original: raise ValueError('Mevcut kaydın URL slug alanını değiştirmeyin.')
+    raw_item = payload.get('item') or {}
+    item = clean_content_item(kind, raw_item)
+    if original and item['slug'] != original:
+        raise ValueError('Mevcut kaydın URL slug alanını değiştirmeyin.')
     idx = next((i for i,x in enumerate(items) if x.get('slug') == original), None) if original else None
-    if idx is None and any(x.get('slug') == item['slug'] for x in items): raise ValueError('Bu URL slug zaten kullanılıyor.')
+    if idx is None and any(x.get('slug') == item['slug'] for x in items):
+        raise ValueError('Bu URL slug zaten kullanılıyor.')
     old = items[idx] if idx is not None else {}
     image = payload.get('image')
     if image:
@@ -482,8 +535,6 @@ def save_content_item(kind, payload):
     elif old.get('image'):
         item['image'] = old.get('image')
 
-    # NFC ve bağımsız kurumsal referanslar için ayrı profil fotoğrafı / işletme logosu.
-    # Bağlı kurumsal kartlar profil görselini NFC kaynağından otomatik devralır.
     if kind in ('nfc', 'corporate') and not (kind == 'corporate' and item.get('source_kind') == 'nfc'):
         profile = payload.get('profile_image')
         clear_profile = bool(payload.get('profile_image_clear'))
@@ -503,9 +554,25 @@ def save_content_item(kind, payload):
         elif old.get('profile_image'):
             item['profile_image'] = old.get('profile_image')
 
-    if idx is None: items.append(item)
-    else: items[idx] = item
+    requested_position = int(raw_item.get('sort_order') or (len(items) + 1))
+    if idx is None:
+        items.append(item)
+    else:
+        items[idx] = item
+    items = resequence_content(items, item['slug'], requested_position)
+    item = next(x for x in items if x.get('slug') == item['slug'])
     write_content(kind, items)
+
+    if kind == 'nfc':
+        # Every NFC & QR reference automatically appears in Corporate References.
+        corporate = sync_nfc_to_corporate(items, read_content('corporate'))
+        write_content('corporate', corporate)
+    elif kind == 'corporate':
+        # Preserve the automatic NFC coverage even after corporate-specific edits.
+        corporate = sync_nfc_to_corporate(read_content('nfc'), items)
+        write_content('corporate', corporate)
+        item = next((x for x in corporate if x.get('slug') == item['slug']), item)
+
     return item, build_site()
 
 class Handler(BaseHTTPRequestHandler):
@@ -555,7 +622,6 @@ class Handler(BaseHTTPRequestHandler):
                 {'id':'anahtarlik-aksesuar','label':'Anahtarlık & Aksesuar'},
                 {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
                 {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
-                {'id':'pet-urunleri','label':'Pet Ürünleri'},
             ]
             return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
@@ -659,7 +725,7 @@ class Handler(BaseHTTPRequestHandler):
                 p['slug'] = unique_slug(products, f"{src.get('slug', 'urun')}-kopya")
                 p['active'] = False
                 p['featured'] = False
-                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 1
+                p['sort_order'] = max([int(x.get('sort_order') or 0) for x in products] + [0]) + 10
                 p['seo_title'], p['seo_description'] = make_seo(p['name'], p.get('card_description'), p.get('description'))
                 main = f"assets/images/products/{p['slug']}.webp"
                 if duplicate_asset(src.get('main_image'), main):
@@ -723,7 +789,7 @@ class Handler(BaseHTTPRequestHandler):
                 ordered += [p for p in sorted(products, key=lambda x: int(x.get('sort_order') or 9999)) if p.get('slug') not in seen]
                 backup()
                 for i, p in enumerate(ordered, 1):
-                    p['sort_order'] = i
+                    p['sort_order'] = i * 10
                 write_products(products)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Katalog sırası güncellendi.', 'products': products})
@@ -767,7 +833,12 @@ class Handler(BaseHTTPRequestHandler):
                 
                 if not (kind == 'corporate' and item.get('source_kind') == 'nfc'):
                     remove_file(item.get('image'))
-                write_content(kind, [x for x in items if x.get('slug') != slug])
+                remaining = resequence_content([x for x in items if x.get('slug') != slug])
+                write_content(kind, remaining)
+                if kind == 'nfc':
+                    write_content('corporate', sync_nfc_to_corporate(remaining, read_content('corporate')))
+                elif kind == 'corporate':
+                    write_content('corporate', sync_nfc_to_corporate(read_content('nfc'), remaining))
                 result = build_site()
                 return self.send_json({'ok': True, 'message': 'Kayıt silindi.', 'result': result})
 
@@ -808,13 +879,6 @@ def run():
         print('Uygun port bulunamadı.')
         input('Enter...')
         return
-    # V3.1.1: panel açılırken kalıcı veriyi repo çıktısına bir kez yansıt.
-    # Böylece katalog sıra migrasyonu ve sınırsız öne çıkan listesi ekstra işlem gerektirmeden uygulanır.
-    try:
-        build_site()
-    except Exception as exc:
-        print('Başlangıç site senkronizasyonu uyarısı:', exc)
-
     url = f'http://127.0.0.1:{port}/'
     print('\nBG Studio 3D Ürün Yöneticisi PRO')
     print('Panel:', url)

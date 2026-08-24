@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -47,7 +47,6 @@ LEGACY_CATEGORY_MAP = {
     'aydinlatma': 'aydinlatma',
     'fonksiyonel': 'pratik-fonksiyonel',
     'kisiye-ozel': 'hediye-kisiye-ozel',
-    'pet': 'pet-urunleri',
 }
 SPECIAL_CATEGORY_MAP = {
     'arac-koku-difuzoru': 'pratik-fonksiyonel',
@@ -86,6 +85,191 @@ SPECIAL_PRODUCT_TAGS = {
     'iron-man-eli-masa-lambasi': ['Masa Lambası', 'Gaming', 'Dekoratif', 'Hediye'],
 }
 
+
+KUSADASI_ASANSOR_REFERENCE = {
+    "slug": "kusadasi-asansor",
+    "name": "Kuşadası Asansör",
+    "headline": "100 Adet Logolu Kurumsal Anahtarlık",
+    "description": "Kuşadası Asansör için işletmenin isteğine göre mavi-beyaz kurumsal renklerde, logolu 100 adet 3D baskı anahtarlık üretildi. Tasarım marka kimliğine göre hazırlanıp seri üretime alınarak teslim edildi.",
+    "category": "Kurumsal üretim",
+    "tags": ["100 Adet", "Kurumsal Anahtarlık", "Logolu Üretim", "Mavi & Beyaz", "Kuşadası"],
+    "active": True,
+    "sort_order": 40,
+    "theme": "light",
+    "image": "assets/images/references/kusadasi-asansor-100-anahtarlik.webp",
+    "profile_image": "assets/images/references/kusadasi-asansor-profile.webp"
+}
+
+def _ensure_kusadasi_asansor_reference(con):
+    """Restore the Kuşadası Asansör field reference without touching other records.
+
+    The homepage field-work section is generated from the corporate collection.
+    Older persistent stores predate this reference, so a rebuild could drop the
+    card. Add/update this single record once during schema migration.
+    """
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('corporate',)).fetchone()
+    try:
+        items = json.loads(row[0]) if row else []
+    except Exception:
+        items = []
+    if not isinstance(items, list):
+        items = []
+    changed = False
+    found = None
+    for item in items:
+        if isinstance(item, dict) and str(item.get('slug') or '').strip() == KUSADASI_ASANSOR_REFERENCE['slug']:
+            found = item
+            break
+    if found is None:
+        items.append(dict(KUSADASI_ASANSOR_REFERENCE))
+        changed = True
+    else:
+        # One-time restoration: preserve user-edited copy but restore fields that
+        # are required for rendering and make the missing card active again.
+        for key in ('name','headline','description','category','tags','sort_order','theme','image','profile_image'):
+            if not found.get(key):
+                found[key] = KUSADASI_ASANSOR_REFERENCE[key]
+                changed = True
+        if found.get('active') is not True:
+            found['active'] = True
+            changed = True
+    if changed:
+        con.execute(
+            'INSERT INTO collections(name,json_text,updated_at) VALUES(?,?,?) ON CONFLICT(name) DO UPDATE SET json_text=excluded.json_text, updated_at=excluded.updated_at',
+            ('corporate', json.dumps(items, ensure_ascii=False, indent=2), _now())
+        )
+
+    # Keep packaged reference media in the persistent media vault so later
+    # export/build cycles cannot lose it. Never overwrite an existing user file.
+    for rel in (KUSADASI_ASANSOR_REFERENCE['image'], KUSADASI_ASANSOR_REFERENCE['profile_image']):
+        repo_file = ROOT / rel
+        vault_file = MEDIA_ROOT / rel
+        if repo_file.exists() and not vault_file.exists():
+            vault_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(repo_file, vault_file)
+
+
+NAZ_BALIK_NFC_FALLBACK = {
+    "slug": "naz-balik-restaurant",
+    "name": "Naz Balık Restaurant",
+    "headline": "15 Masa İçin Google + Tripadvisor QR Yorum Kartı",
+    "description": "Naz Balık Restaurant’ın 15 masası için Google Reviews ve Tripadvisor yorum yönlendirmesine özel toplam 15 adet masaüstü QR yorum kartı tasarlanıp uygulandı. Her kartta iki platform için ayrı QR yönlendirmeleri kurgulandı ve tasarım restoranın marka kimliğine özel olarak hazırlandı.",
+    "category": "Restoran • QR Yorum Sistemi",
+    "tags": ["15 Masa", "15 QR Yorum Kartı", "Google Reviews", "Tripadvisor", "QR Yorum Sistemi", "Restoran", "Kuşadası"],
+    "active": True,
+    "sort_order": 3,
+    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+}
+
+
+def _load_collection_json(con, name):
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', (name,)).fetchone()
+    try:
+        value = json.loads(row[0]) if row else []
+    except Exception:
+        value = []
+    return value if isinstance(value, list) else []
+
+
+def _save_collection_json(con, name, items):
+    con.execute(
+        'INSERT INTO collections(name,json_text,updated_at) VALUES(?,?,?) ON CONFLICT(name) DO UPDATE SET json_text=excluded.json_text, updated_at=excluded.updated_at',
+        (name, json.dumps(items, ensure_ascii=False, indent=2), _now())
+    )
+
+
+def _resequence_collection(items):
+    """Keep each content collection on a clean 1..N position sequence."""
+    clean_items = [x for x in items if isinstance(x, dict)]
+    clean_items.sort(key=lambda x: (int(x.get('sort_order') or 999999), str(x.get('name') or x.get('slug') or '').casefold()))
+    for index, item in enumerate(clean_items, 1):
+        item['sort_order'] = index
+    return clean_items
+
+
+def _upgrade_references_v4(con):
+    """Move Naz Balık to NFC & QR and make every NFC reference corporate-visible."""
+    nfc = _load_collection_json(con, 'nfc')
+    corporate = _load_collection_json(con, 'corporate')
+    prototype = _load_collection_json(con, 'prototype')
+
+    # Move the existing independent Naz Balık corporate record into NFC & QR.
+    naz_corp = next((x for x in corporate if str(x.get('slug') or '') == 'naz-balik-restaurant' and not x.get('source_slug')), None)
+    naz_nfc = next((x for x in nfc if str(x.get('slug') or '') == 'naz-balik-restaurant'), None)
+    source = dict(NAZ_BALIK_NFC_FALLBACK)
+    if naz_corp:
+        for key in ('name','headline','description','category','tags','active','image','profile_image'):
+            value = naz_corp.get(key)
+            if value not in (None, '', []):
+                source[key] = value
+        # Corporate title historically had a shorter sentence; use the richer known NFC title.
+        if source.get('headline') == 'QR yorum akışı ve işletmeye özel uygulama.':
+            source['headline'] = NAZ_BALIK_NFC_FALLBACK['headline']
+        if not source.get('category') or source.get('category') == 'Kurumsal üretim':
+            source['category'] = NAZ_BALIK_NFC_FALLBACK['category']
+    if naz_nfc:
+        for key, value in source.items():
+            if naz_nfc.get(key) in (None, '', []):
+                naz_nfc[key] = value
+    else:
+        # Naz was historically corporate-only; append it after existing NFC cards
+        # before normalizing the collection to 1..N.
+        source['sort_order'] = max([int(x.get('sort_order') or 0) for x in nfc if isinstance(x, dict)] + [0]) + 1
+        nfc.append(source)
+
+    # Remove only the independent Naz copy; it will reappear as an NFC-synced corporate card.
+    corporate = [x for x in corporate if not (str(x.get('slug') or '') == 'naz-balik-restaurant' and not x.get('source_slug'))]
+
+    # Every NFC record gets exactly one linked corporate card. Existing theme/active choices are preserved.
+    nfc_by_slug = {str(x.get('slug') or ''): x for x in nfc if x.get('slug')}
+    linked = {}
+    independent = []
+    for item in corporate:
+        if item.get('source_kind') == 'nfc' and item.get('source_slug'):
+            slug = str(item.get('source_slug'))
+            if slug in nfc_by_slug and slug not in linked:
+                linked[slug] = item
+            continue
+        # If an older independent corporate card has the same slug as an NFC record, convert it to a link.
+        slug = str(item.get('slug') or '')
+        if slug in nfc_by_slug and slug not in linked:
+            linked[slug] = {
+                'slug': slug,
+                'source_kind': 'nfc',
+                'source_slug': slug,
+                'theme': 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light',
+                'active': bool(item.get('active', True)),
+                'sort_order': int(item.get('sort_order') or 999),
+            }
+        else:
+            independent.append(item)
+
+    synced = []
+    for idx, nfc_item in enumerate(_resequence_collection(nfc), 1):
+        slug = str(nfc_item.get('slug') or '')
+        card = linked.get(slug) or {
+            'slug': slug,
+            'source_kind': 'nfc',
+            'source_slug': slug,
+            'theme': 'dark' if idx % 2 else 'light',
+            'active': bool(nfc_item.get('active', True)),
+            'sort_order': idx,
+        }
+        card['slug'] = slug
+        card['source_kind'] = 'nfc'
+        card['source_slug'] = slug
+        # On migration, mirror the NFC order first; corporate can be reordered later.
+        card['sort_order'] = idx
+        synced.append(card)
+
+    # NFC cards first in their NFC order, then independent corporate jobs.
+    corporate = _resequence_collection(synced + independent)
+    prototype = _resequence_collection(prototype)
+
+    _save_collection_json(con, 'nfc', nfc)
+    _save_collection_json(con, 'corporate', corporate)
+    _save_collection_json(con, 'prototype', prototype)
+
 def _upgrade_products_v2(con):
     row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
     if not row:
@@ -117,39 +301,6 @@ def _upgrade_products_v2(con):
             'UPDATE collections SET json_text=?, updated_at=? WHERE name=?',
             (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
         )
-
-def _normalize_product_sort_orders(products):
-    """Return products in the same visual order with contiguous 1..N sort values."""
-    if not isinstance(products, list):
-        return products
-    ordered = sorted(
-        [p for p in products if isinstance(p, dict)],
-        key=lambda p: (int(p.get('sort_order') or 999999), str(p.get('name') or '').casefold())
-    )
-    for i, product in enumerate(ordered, 1):
-        product['sort_order'] = i
-    return ordered
-
-
-def _upgrade_products_v3(con):
-    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
-    if not row:
-        return
-    try:
-        products = json.loads(row[0])
-    except Exception:
-        return
-    if not isinstance(products, list):
-        return
-    before = [int(p.get('sort_order') or 999999) for p in products if isinstance(p, dict)]
-    products = _normalize_product_sort_orders(products)
-    after = [int(p.get('sort_order') or 999999) for p in products]
-    if before != after:
-        con.execute(
-            'UPDATE collections SET json_text=?, updated_at=? WHERE name=?',
-            (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
-        )
-
 
 def _sync_smaller_repo_media():
     """Keep V3.1 optimized repo images in the persistent media vault.
@@ -184,7 +335,9 @@ def _upgrade_schema(con, old_version):
         _upgrade_products_v2(con)
         _sync_smaller_repo_media()
     if old_version < 3:
-        _upgrade_products_v3(con)
+        _ensure_kusadasi_asansor_reference(con)
+    if old_version < 4:
+        _upgrade_references_v4(con)
 
 _lock = threading.RLock()
 
@@ -250,8 +403,6 @@ def _initial_import(con):
     defaults = {name: [] for name in COLLECTIONS}
     for name, repo_path in COLLECTIONS.items():
         data = _read_repo_json(repo_path, defaults[name])
-        if name == 'products':
-            data = _normalize_product_sort_orders(data)
         con.execute(
             'INSERT OR REPLACE INTO collections(name,json_text,updated_at) VALUES(?,?,?)',
             (name, json.dumps(data, ensure_ascii=False, indent=2), _now())
@@ -273,6 +424,9 @@ def _initial_import(con):
                 if not target.exists():
                     shutil.copy2(f, target)
 
+    # Seed mandatory shipped references on a fresh install as well.
+    _ensure_kusadasi_asansor_reference(con)
+    _upgrade_references_v4(con)
     _meta_set(con, 'initialized', '1')
     _meta_set(con, 'schema_version', SCHEMA_VERSION)
     _meta_set(con, 'initialized_at', _now())

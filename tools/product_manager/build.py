@@ -161,16 +161,36 @@ def case_anchor(item, slug_override=None):
     return 'referans-' + safe
 
 
+def reference_identity(item, slug_override=None):
+    """Canonical identity shared by homepage links and every destination card.
+
+    NFC-backed corporate cards prefer source_slug so copies of the same business
+    resolve to the same stable identity across pages.
+    """
+    raw = str(slug_override or item.get('source_slug') or item.get('slug') or item.get('name') or 'referans').strip().lower()
+    raw = raw.replace('_', '-')
+    safe = re.sub(r'[^a-z0-9-]+', '-', raw).strip('-')
+    return re.sub(r'-{2,}', '-', safe) or 'referans'
+
+
+def reference_attrs(item, slug_override=None):
+    ref_id = reference_identity(item, slug_override)
+    name = str(item.get('name') or '').strip()
+    return f'data-reference-id="{esc(ref_id)}" data-reference-name="{esc(name)}"'
+
+
 def home_case_link(item):
     """Point homepage “İşi incele” links to the exact managed card, not page top."""
     link = str(item.get('home_link') or ('nfc-qr/' if item.get('source_kind') == 'nfc' else 'kurumsal/')).strip()
-    if '#' in link or link.startswith(('http://', 'https://', 'mailto:', 'tel:')):
+    if link.startswith(('http://', 'https://', 'mailto:', 'tel:')):
         return link
+    # Remove stale hashes from older data. The canonical reference identity below
+    # is authoritative and is rebuilt every time the site is generated.
+    link = link.split('#', 1)[0]
     normalized = link.lstrip('/')
-    target_slug = item.get('slug')
-    if normalized.startswith('nfc-qr') and item.get('source_kind') == 'nfc':
-        target_slug = item.get('source_slug') or item.get('slug')
-    return link.rstrip('/') + '/#' + case_anchor(item, target_slug)
+    target_slug = item.get('source_slug') if normalized.startswith('nfc-qr') and item.get('source_kind') == 'nfc' else item.get('slug')
+    target_id = reference_identity(item, target_slug)
+    return link.rstrip('/') + '/#referans-' + target_id
 
 
 def render_managed_case(item, prefix='../'):
@@ -181,9 +201,9 @@ def render_managed_case(item, prefix='../'):
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     kicker = esc(item.get('category') or item.get('name'))
     media, media_class = case_media(item, prefix, name)
-    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
+    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 2 == 1 else 'case-card') + media_class
     body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
 
 def render_nfc_case(item, prefix='../'):
     """NFC field card: business identity is primary; shared content stays canonical."""
@@ -194,23 +214,43 @@ def render_nfc_case(item, prefix='../'):
     kicker = esc(item.get('category') or 'NFC / QR saha uygulaması')
     media, media_class = case_media(item, prefix, name)
     profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
-    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
+    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 2 == 1 else 'case-card') + media_class
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
 
 def resolve_corporate_items():
-    nfc = {str(x.get('slug')): x for x in load_managed_content(NFC_DATA)}
+    nfc_items = load_managed_content(NFC_DATA)
+    nfc = {str(x.get('slug')): x for x in nfc_items}
     resolved = []
+    seen_nfc = set()
     for raw in load_managed_content(CORPORATE_DATA):
         item = dict(raw)
         if item.get('source_kind') == 'nfc' and item.get('source_slug'):
-            src = nfc.get(str(item.get('source_slug')))
+            source_slug = str(item.get('source_slug'))
+            src = nfc.get(source_slug)
             if not src:
                 continue
-            # The business copy/image come from one source, so NFC and corporate can never drift.
+            seen_nfc.add(source_slug)
             item = {**src, **{k:v for k,v in raw.items() if k in ('slug','source_kind','source_slug','theme','active','sort_order','home_link')}}
         resolved.append(item)
+
+    # Safety net: an NFC record can never disappear from Corporate even if an
+    # older database is missing its linked corporate row.
+    for idx, src in enumerate(nfc_items, 1):
+        slug = str(src.get('slug') or '')
+        if not slug or slug in seen_nfc:
+            continue
+        resolved.append({
+            **src,
+            'slug': slug,
+            'source_kind': 'nfc',
+            'source_slug': slug,
+            'theme': 'dark' if idx % 2 else 'light',
+            'active': bool(src.get('active', True)),
+            'sort_order': idx,
+        })
+
     return sorted(resolved, key=lambda x:(int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
 
 def ensure_corporate_markers(text):
@@ -236,7 +276,7 @@ def render_corporate_case(item, prefix='../'):
     # Corporate layout deliberately uses business name as kicker and project headline as title.
     identity = f'<div class="case-identity">{profile}<span class="case-type">{name}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
 
 
 def render_home_field_case(item, index, prefix=''):
@@ -249,8 +289,9 @@ def render_home_field_case(item, index, prefix=''):
     theme = ' dark' if str(item.get('theme') or '').lower() == 'dark' else ''
     category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
     link = home_case_link(item)
-    target_key = link.split('#', 1)[1] if '#' in link else case_anchor(item)
-    return f'<article class="field-work-card{theme}" data-reference-target="{esc(target_key)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
+    target_key = link.split('#', 1)[1] if '#' in link else 'referans-' + reference_identity(item)
+    ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
+    return f'<article class="field-work-card{theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
 
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
@@ -526,7 +567,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.13'
+SITE_ASSET_VERSION = '3.1.19'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
