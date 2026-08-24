@@ -589,3 +589,72 @@ button{font-family:inherit}
   body.has-mobile-product-cta .wa-quick-panel{bottom:145px}
 }
 @media(prefers-reduced-motion:reduce){.floating-whatsapp{animation:none!important}}
+
+
+/* v3.1.4 — precise WhatsApp centering + visible hover ripple */
+.floating-whatsapp{
+  display:block!important;
+  overflow:visible!important;
+  transform:none!important;
+  animation:bgWaIdleRipple 2.45s cubic-bezier(.2,.7,.25,1) infinite!important;
+  will-change:box-shadow,transform;
+}
+.floating-whatsapp.has-brand-icon::before{
+  content:""!important;
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:27px!important;
+  height:27px!important;
+  margin:0!important;
+  display:block!important;
+  background:#fff!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-position:center!important;
+  -webkit-mask-position:center!important;
+  mask-size:contain!important;
+  -webkit-mask-size:contain!important;
+  transform:translate(-50%,-50%)!important;
+  transform-origin:center!important;
+  transition:transform .18s ease!important;
+}
+.floating-whatsapp:hover{
+  background:#20c75e!important;
+  transform:translateY(-2px)!important;
+  animation:bgWaHoverRipple 1.05s cubic-bezier(.18,.7,.25,1) infinite!important;
+}
+.floating-whatsapp:hover.has-brand-icon::before{
+  transform:translate(-50%,-50%) scale(1.07)!important;
+}
+.floating-whatsapp.wa-seen{
+  animation:none!important;
+}
+/* Even after the attention badge has been seen, hovering always produces the green wave. */
+.floating-whatsapp.wa-seen:hover{
+  animation:bgWaHoverRipple 1.05s cubic-bezier(.18,.7,.25,1) infinite!important;
+}
+.floating-whatsapp.is-open,
+.floating-whatsapp.is-open:hover{
+  animation:none!important;
+  transform:none!important;
+}
+.floating-whatsapp.is-open.has-brand-icon::before{
+  left:50%!important;
+  top:50%!important;
+  margin:0!important;
+  transform:translate(-50%,-52%)!important;
+}
+@keyframes bgWaIdleRipple{
+  0%{box-shadow:0 9px 26px rgba(17,111,54,.28),0 0 0 0 rgba(37,211,102,.30),0 0 0 0 rgba(37,211,102,.18)}
+  58%{box-shadow:0 9px 26px rgba(17,111,54,.28),0 0 0 11px rgba(37,211,102,.09),0 0 0 20px rgba(37,211,102,0)}
+  82%,100%{box-shadow:0 9px 26px rgba(17,111,54,.28),0 0 0 18px rgba(37,211,102,0),0 0 0 28px rgba(37,211,102,0)}
+}
+@keyframes bgWaHoverRipple{
+  0%{box-shadow:0 13px 32px rgba(17,111,54,.34),0 0 0 0 rgba(37,211,102,.48),0 0 0 0 rgba(37,211,102,.26)}
+  55%{box-shadow:0 13px 32px rgba(17,111,54,.34),0 0 0 12px rgba(37,211,102,.13),0 0 0 22px rgba(37,211,102,.05)}
+  100%{box-shadow:0 13px 32px rgba(17,111,54,.34),0 0 0 20px rgba(37,211,102,0),0 0 0 34px rgba(37,211,102,0)}
+}
+@media(prefers-reduced-motion:reduce){
+  .floating-whatsapp,.floating-whatsapp:hover,.floating-whatsapp.wa-seen:hover{animation:none!important}
+}
