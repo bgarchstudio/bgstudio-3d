@@ -16,7 +16,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.2'
+PANEL_VERSION = '3.1.3'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {

@@ -558,6 +558,8 @@ document.querySelectorAll('a[href^="https://bgstudio.com.tr"]').forEach(link => 
   }
 });
 
+if (document.querySelector('.mobile-product-cta')) document.body.classList.add('has-mobile-product-cta');
+
 const floatingWhatsApp = document.querySelector('.floating-whatsapp');
 if (floatingWhatsApp) {
   const originalHref = floatingWhatsApp.href;
@@ -617,11 +619,19 @@ if (floatingWhatsApp) {
     trackEvent('generate_lead', payload);
   });
 
+  const seenKey = 'bgstudio-wa-seen-v1';
+  try { if (sessionStorage.getItem(seenKey)) floatingWhatsApp.classList.add('wa-seen'); } catch (_) {}
+  floatingWhatsApp.title = 'WhatsApp ile hızlı iletişim';
   const setPanel = (open) => {
     panel.classList.toggle('open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    floatingWhatsApp.classList.toggle('is-open', open);
     floatingWhatsApp.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
+    if (open) {
+      floatingWhatsApp.classList.add('wa-seen');
+      try { sessionStorage.setItem(seenKey, '1'); } catch (_) {}
+      trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
+    }
   };
   floatingWhatsApp.setAttribute('aria-haspopup', 'dialog');
   floatingWhatsApp.setAttribute('aria-expanded', 'false');
