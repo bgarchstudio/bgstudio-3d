@@ -137,3 +137,9 @@ body.logo-editor-open{overflow:hidden}
   border-color:#d2ad65;
 }
 #toggleCenterGuides:not(.active)[aria-pressed="false"]{background:rgba(255,255,255,.03);color:#f6ede3}
+
+
+/* v3.1.9 — media dimension guide alignment */
+.reference-media-grid .image-spec{margin:7px 0 10px}
+.profile-drop .image-spec{margin:0 0 10px}
+.logo-editor-note strong{display:block;color:#d6af78;margin-bottom:4px}

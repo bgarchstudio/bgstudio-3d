@@ -364,3 +364,13 @@ textarea{line-height:1.55;resize:vertical}
 .tag-custom-label{display:block;font-size:9px;font-weight:700;color:var(--ink)}
 .tag-custom-label textarea{display:block;width:100%;min-height:88px;margin-top:7px;resize:vertical}
 @media(max-width:620px){.product-tag-head{display:block}.tag-presets{gap:6px}.tag-presets button{padding:7px 9px}}
+
+
+/* v3.1.9 — explicit image size guides */
+.image-spec{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 7px;padding:8px 10px;border-radius:11px;background:#efe3d3;border:1px solid rgba(157,99,35,.14);font-size:10px;font-weight:500;color:#6d5948}
+.image-spec b{font-size:11px;color:#8f571f;letter-spacing:.025em}
+.image-spec span{font-weight:500;color:#7c6b5d}
+.image-spec-status{display:block!important;margin-top:5px!important;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.38);border:1px solid var(--line);color:#807063!important}
+.image-spec-status.ok{color:#28704e!important;border-color:rgba(40,112,78,.22);background:#edf8f1}
+.image-spec-status.warn{color:#9a5b19!important;border-color:rgba(154,91,25,.24);background:#fff4df}
+.gallery-upload>span{font-weight:600;font-size:12px}
