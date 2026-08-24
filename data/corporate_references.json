@@ -11,7 +11,7 @@
     "slug": "koala-petshop",
     "source_kind": "nfc",
     "source_slug": "koala-petshop",
-    "theme": "light",
+    "theme": "dark",
     "active": true,
     "sort_order": 2
   },
@@ -19,7 +19,7 @@
     "slug": "naz-balik-restaurant",
     "source_kind": "nfc",
     "source_slug": "naz-balik-restaurant",
-    "theme": "dark",
+    "theme": "light",
     "active": true,
     "sort_order": 3
   },
