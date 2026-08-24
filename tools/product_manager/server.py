@@ -16,23 +16,26 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.1'
+PANEL_VERSION = '3.1.2'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
     'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
-    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel'
+    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel',
+    'pet-urunleri'
 }
 CATEGORY_ALIASES = {
     'dekoratif': 'dekoratif-duvar',
     'aydinlatma': 'aydinlatma',
     'fonksiyonel': 'pratik-fonksiyonel',
     'kisiye-ozel': 'hediye-kisiye-ozel',
+    'pet': 'pet-urunleri',
 }
 TAG_PRESETS = [
     'Kişiye Özel', 'Kurumsal', 'Adetli Üretim', 'Logolu', 'Hediye',
     'Gaming', 'PlayStation', 'Xbox', 'Masaüstü', 'Anahtarlık', 'Organizer',
-    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap'
+    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap',
+    'Pet', 'Kedi', 'Köpek', 'Mama', 'Mama Küreği', 'Su Kabı', 'Oyuncak', 'Petshop'
 ]
 ensure_initialized()
 export_to_repo()
@@ -552,6 +555,7 @@ class Handler(BaseHTTPRequestHandler):
                 {'id':'anahtarlik-aksesuar','label':'Anahtarlık & Aksesuar'},
                 {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
                 {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
+                {'id':'pet-urunleri','label':'Pet Ürünleri'},
             ]
             return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':

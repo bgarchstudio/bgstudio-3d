@@ -47,6 +47,7 @@ LEGACY_CATEGORY_MAP = {
     'aydinlatma': 'aydinlatma',
     'fonksiyonel': 'pratik-fonksiyonel',
     'kisiye-ozel': 'hediye-kisiye-ozel',
+    'pet': 'pet-urunleri',
 }
 SPECIAL_CATEGORY_MAP = {
     'arac-koku-difuzoru': 'pratik-fonksiyonel',

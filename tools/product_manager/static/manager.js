@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='3.1.0';
+const PANEL_VERSION='3.1.2';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -22,7 +22,7 @@ async function load(){
   const d=await api('/api/products');products=d.products;colors=d.colors||[];const vault=d.storage?.app_home||status.storage?.app_home||'';$('repoPath').textContent='Repo: '+d.root+(vault?' · Kalıcı veri: '+vault:'');renderList();resetForm()
 }
 function stats(){$('countAll').textContent=products.length;$('countLive').textContent=products.filter(p=>p.active!==false).length;$('countFeatured').textContent=products.filter(p=>p.active!==false&&p.featured).length}
-function categoryLabel(k){return {'dekoratif-duvar':'Dekoratif & Duvar',aydinlatma:'Aydınlatma','ev-duzen':'Ev & Düzen','gaming-masaustu':'Gaming & Masaüstü','anahtarlik-aksesuar':'Anahtarlık & Aksesuar','hediye-kisiye-ozel':'Hediye & Kişiye Özel','pratik-fonksiyonel':'Pratik & Fonksiyonel',dekoratif:'Dekoratif & Duvar',fonksiyonel:'Pratik & Fonksiyonel','kisiye-ozel':'Hediye & Kişiye Özel'}[k]||k}
+function categoryLabel(k){return {'dekoratif-duvar':'Dekoratif & Duvar',aydinlatma:'Aydınlatma','ev-duzen':'Ev & Düzen','gaming-masaustu':'Gaming & Masaüstü','anahtarlik-aksesuar':'Anahtarlık & Aksesuar','hediye-kisiye-ozel':'Hediye & Kişiye Özel','pratik-fonksiyonel':'Pratik & Fonksiyonel','pet-urunleri':'Pet Ürünleri',dekoratif:'Dekoratif & Duvar',fonksiyonel:'Pratik & Fonksiyonel','kisiye-ozel':'Hediye & Kişiye Özel',pet:'Pet Ürünleri'}[k]||k}
 function formatTL(value){const n=Number(String(value??'').replace(',','.'));return Number.isFinite(n)?new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(n)+' TL':''}
 function colorById(id){return colors.find(c=>c.id===id)}
 function colorIdsForProduct(p){

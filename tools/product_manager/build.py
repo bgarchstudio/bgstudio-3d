@@ -20,14 +20,17 @@ CATEGORY_LABELS = {
     'anahtarlik-aksesuar': 'Anahtarlık & Aksesuar',
     'hediye-kisiye-ozel': 'Hediye & Kişiye Özel',
     'pratik-fonksiyonel': 'Pratik & Fonksiyonel',
+    'pet-urunleri': 'Pet Ürünleri',
     # Legacy values are kept readable for old backups.
     'dekoratif': 'Dekoratif & Duvar',
     'fonksiyonel': 'Pratik & Fonksiyonel',
     'kisiye-ozel': 'Hediye & Kişiye Özel',
+    'pet': 'Pet Ürünleri',
 }
 CATEGORY_ORDER = [
     'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
-    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel'
+    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel',
+    'pet-urunleri'
 ]
 FAQ = [
     ('Renk seçebilir miyim?', 'Mevcut filament seçenekleri ürüne göre değişir. Sipariş öncesinde uygun renkleri WhatsApp üzerinden birlikte netleştiriyoruz.'),
