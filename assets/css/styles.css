@@ -415,3 +415,45 @@ button{font-family:inherit}
     transform:translateY(1px);
   }
 }
+
+
+/* v2.9.6 — mobile branch-card parity / Architecture icon grid fix */
+/* main.js used to inject a tiny Architecture icon directly onto the card anchor.
+   Because the anchor is a CSS grid, that pseudo-element became an extra grid item
+   and broke only the Architecture card layout on mobile. */
+.brand-branch-card.has-brand-icon::before{
+  content:none!important;
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+@media(max-width:560px){
+  .brand-branch-card{
+    grid-template-columns:1fr!important;
+    grid-auto-flow:row;
+    text-align:center;
+    justify-items:center;
+    align-items:start;
+  }
+  .brand-branch-card .branch-logo-wrap{
+    grid-column:1;
+    grid-row:1;
+    justify-self:center;
+  }
+  .brand-branch-card .branch-card-copy{
+    grid-column:1;
+    grid-row:2;
+    width:100%;
+    justify-items:center;
+    text-align:center;
+  }
+}
+
+
+/* v2.9.7 — signature placed directly under “Birlikte üretelim.” */
+.contact>div:first-child{position:relative;padding-bottom:74px!important}
+.contact>div:first-child::after{content:""!important;display:block!important;position:absolute;left:4px;bottom:6px;width:188px;aspect-ratio:2.55/1;background:url("../brand/bgstudio-signature-mark.png") left center/contain no-repeat;opacity:.18;pointer-events:none;mix-blend-mode:multiply}
+.contact-actions{padding-bottom:0!important}
+.contact-actions::after{content:none!important;display:none!important}
+@media(max-width:1040px){.contact>div:first-child{padding-bottom:68px!important}.contact>div:first-child::after{width:176px;opacity:.17}}
+@media(max-width:680px){.contact>div:first-child{padding-bottom:58px!important}.contact>div:first-child::after{left:0;bottom:2px;width:154px;opacity:.16}}
