@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -270,6 +270,84 @@ def _upgrade_references_v4(con):
     _save_collection_json(con, 'corporate', corporate)
     _save_collection_json(con, 'prototype', prototype)
 
+
+
+def _repair_nfc_corporate_visibility(con):
+    """Keep NFC and corporate reference collections mutually consistent.
+
+    This is intentionally idempotent and safe to run on every panel startup.
+    It fixes the class of bug where a reference is visible in the manager but
+    the last generated NFC page still contains an older two-card snapshot.
+    NFC is authoritative for NFC jobs; every NFC job gets one linked corporate
+    card while independent corporate jobs are preserved.
+    """
+    nfc = _load_collection_json(con, 'nfc')
+    corporate = _load_collection_json(con, 'corporate')
+
+    # Naz Balık historically lived only in Corporate. Make sure its canonical
+    # NFC record exists even on stores that were already marked schema-current
+    # before the migration arrived.
+    naz_slug = 'naz-balik-restaurant'
+    if not any(str(x.get('slug') or '') == naz_slug for x in nfc if isinstance(x, dict)):
+        legacy = next((x for x in corporate if isinstance(x, dict) and str(x.get('slug') or '') == naz_slug and not x.get('source_slug')), None)
+        row = dict(NAZ_BALIK_NFC_FALLBACK)
+        if legacy:
+            for key in ('name','headline','description','category','tags','active','image','profile_image'):
+                value = legacy.get(key)
+                if value not in (None, '', []):
+                    row[key] = value
+        row['sort_order'] = len(nfc) + 1
+        nfc.append(row)
+
+    nfc = _resequence_collection(nfc)
+    nfc_slugs = {str(x.get('slug') or '') for x in nfc if isinstance(x, dict) and x.get('slug')}
+
+    linked = {}
+    independent = []
+    for item in corporate:
+        if not isinstance(item, dict):
+            continue
+        source_slug = str(item.get('source_slug') or '') if item.get('source_kind') == 'nfc' else ''
+        slug = str(item.get('slug') or '')
+        if source_slug and source_slug in nfc_slugs:
+            linked.setdefault(source_slug, dict(item))
+            continue
+        if slug in nfc_slugs:
+            # Convert old duplicate standalone corporate card to an NFC link.
+            linked.setdefault(slug, {
+                'slug': slug, 'source_kind': 'nfc', 'source_slug': slug,
+                'theme': 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light',
+                'active': bool(item.get('active', True)),
+                'sort_order': int(item.get('sort_order') or 999),
+            })
+            continue
+        independent.append(item)
+
+    synced = []
+    for idx, src in enumerate(nfc, 1):
+        slug = str(src.get('slug') or '')
+        if not slug:
+            continue
+        row = linked.get(slug) or {
+            'slug': slug, 'source_kind': 'nfc', 'source_slug': slug,
+            'theme': 'dark' if idx % 2 else 'light',
+            'active': bool(src.get('active', True)), 'sort_order': idx,
+        }
+        row['slug'] = slug
+        row['source_kind'] = 'nfc'
+        row['source_slug'] = slug
+        row['active'] = bool(row.get('active', src.get('active', True)))
+        row['sort_order'] = idx
+        synced.append(row)
+
+    corporate_new = _resequence_collection(synced + independent)
+
+    # Avoid needless DB churn on every start.
+    if nfc != _load_collection_json(con, 'nfc'):
+        _save_collection_json(con, 'nfc', nfc)
+    if corporate_new != _load_collection_json(con, 'corporate'):
+        _save_collection_json(con, 'corporate', corporate_new)
+
 def _upgrade_products_v2(con):
     row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
     if not row:
@@ -338,6 +416,8 @@ def _upgrade_schema(con, old_version):
         _ensure_kusadasi_asansor_reference(con)
     if old_version < 4:
         _upgrade_references_v4(con)
+    if old_version < 5:
+        _repair_nfc_corporate_visibility(con)
 
 _lock = threading.RLock()
 
@@ -427,6 +507,7 @@ def _initial_import(con):
     # Seed mandatory shipped references on a fresh install as well.
     _ensure_kusadasi_asansor_reference(con)
     _upgrade_references_v4(con)
+    _repair_nfc_corporate_visibility(con)
     _meta_set(con, 'initialized', '1')
     _meta_set(con, 'schema_version', SCHEMA_VERSION)
     _meta_set(con, 'initialized_at', _now())
@@ -460,6 +541,7 @@ def ensure_initialized():
                 # idempotent so an already-current AppData schema cannot keep
                 # Kuşadası Asansör missing after an older partial patch/update.
                 _ensure_kusadasi_asansor_reference(con)
+                _repair_nfc_corporate_visibility(con)
                 _meta_set(con, 'schema_version', SCHEMA_VERSION)
                 con.commit()
         write_info_file()

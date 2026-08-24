@@ -137,6 +137,15 @@ def load_managed_content(path):
     return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
 
 
+def resolve_nfc_items():
+    """Canonical NFC list used by the public NFC & QR page.
+
+    Storage repair runs before this, so the manager list and generated page
+    always read the same persistent collection.
+    """
+    return [x for x in load_managed_content(NFC_DATA) if x.get('active', True)]
+
+
 def case_media(item, prefix, name):
     image = item.get('image')
     if not image:
@@ -608,7 +617,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.21'
+SITE_ASSET_VERSION = '3.1.22'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -653,7 +662,7 @@ def build_site():
     home = replace_between(home, '<!-- PRODUCT_MANAGER:FEATURED_START -->', '<!-- PRODUCT_MANAGER:FEATURED_END -->', homecards)
     home_path.write_text(home, encoding='utf-8')
 
-    nfc_items = [x for x in load_managed_content(NFC_DATA) if x.get('active', True)]
+    nfc_items = resolve_nfc_items()
     nfc_path = ROOT / 'nfc-qr/index.html'
     nfc_html = nfc_path.read_text(encoding='utf-8')
     nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)

@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.21'
+PANEL_VERSION = '3.1.22'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
@@ -191,6 +191,17 @@ def preflight():
         checks.append({'status':'warn' if broken_links else 'pass','label':'Kurumsal senkron','detail':('Bağlantısı kopuk: '+', '.join(broken_links[:8])) if broken_links else f'{len(corp)} kurumsal kart; NFC bağlantıları senkron.'})
     except Exception as e:
         checks.append({'status':'warn','label':'Kurumsal senkron','detail':str(e)})
+    try:
+        nfc_rows = [x for x in read_content('nfc') if x.get('active', True)]
+        nfc_page = (ROOT / 'nfc-qr' / 'index.html').read_text(encoding='utf-8')
+        rendered = len(re.findall(r'data-reference-id="[^"]+"', nfc_page))
+        checks.append({
+            'status':'pass' if rendered == len(nfc_rows) else 'fail',
+            'label':'NFC sayfa senkronu',
+            'detail':f'Panelde {len(nfc_rows)} aktif NFC referansı, sitede {rendered} kart render edildi.'
+        })
+    except Exception as e:
+        checks.append({'status':'warn','label':'NFC sayfa senkronu','detail':str(e)})
     pricing_bad = []
     for prod in products:
         seen = set()
@@ -918,6 +929,16 @@ def _shutdown_stale_panel_servers():
 
 def run():
     _shutdown_stale_panel_servers()
+    # Always regenerate public pages from the persistent AppData collections
+    # before opening the manager. This prevents a correct panel record set from
+    # coexisting with a stale nfc-qr/index.html from an earlier build.
+    try:
+        ensure_initialized()
+        export_to_repo()
+        result = build_site()
+        print(f"Site başlangıçta senkronlandı: {result.get('nfc_references', 0)} NFC, {result.get('corporate_references', 0)} kurumsal referans.")
+    except Exception as exc:
+        print('Başlangıç site senkronu uyarısı:', exc)
     server = None
     port = None
     for p in range(8765, 8780):
