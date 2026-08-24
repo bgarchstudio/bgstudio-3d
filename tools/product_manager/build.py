@@ -183,7 +183,7 @@ def render_managed_case(item, prefix='../'):
     media, media_class = case_media(item, prefix, name)
     klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
     body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
 
 def render_nfc_case(item, prefix='../'):
     """NFC field card: business identity is primary; shared content stays canonical."""
@@ -197,7 +197,7 @@ def render_nfc_case(item, prefix='../'):
     klass = ('case-card dark' if int(item.get('sort_order') or 0) % 20 == 10 else 'case-card') + media_class
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
 
 def resolve_corporate_items():
     nfc = {str(x.get('slug')): x for x in load_managed_content(NFC_DATA)}
@@ -236,7 +236,7 @@ def render_corporate_case(item, prefix='../'):
     # Corporate layout deliberately uses business name as kicker and project headline as title.
     identity = f'<div class="case-identity">{profile}<span class="case-type">{name}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="{case_anchor(item)}">{media}{body}</article>'
+    return f'<article class="{klass}" id="{case_anchor(item)}" data-reference-key="{case_anchor(item)}">{media}{body}</article>'
 
 
 def render_home_field_case(item, index, prefix=''):
@@ -249,7 +249,8 @@ def render_home_field_case(item, index, prefix=''):
     theme = ' dark' if str(item.get('theme') or '').lower() == 'dark' else ''
     category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
     link = home_case_link(item)
-    return f'<article class="field-work-card{theme}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
+    target_key = link.split('#', 1)[1] if '#' in link else case_anchor(item)
+    return f'<article class="field-work-card{theme}" data-reference-target="{esc(target_key)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
 
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
@@ -525,7 +526,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.12'
+SITE_ASSET_VERSION = '3.1.13'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""

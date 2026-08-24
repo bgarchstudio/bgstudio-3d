@@ -683,3 +683,10 @@ button{font-family:inherit}
 @keyframes bgReferenceTarget{0%{box-shadow:0 0 0 7px rgba(181,117,52,.28),0 20px 56px rgba(52,35,22,.14)}100%{box-shadow:0 0 0 2px rgba(181,117,52,.34),0 20px 56px rgba(52,35,22,.10)}}
 @media(max-width:760px){.case-card[id^="referans-"]{scroll-margin-top:88px}}
 @media(prefers-reduced-motion:reduce){.case-card[id^="referans-"]:target{animation:none}}
+
+
+/* v3.1.13 — robust reference jump positioning */
+.case-card[id^="referans-"],.case-card[data-reference-key]{scroll-margin-top:118px}
+.case-card.reference-jump-focus{animation:bgReferenceTarget 1.35s ease-out 1;box-shadow:0 0 0 2px rgba(181,117,52,.34),0 20px 56px rgba(52,35,22,.10)}
+@media(max-width:760px){.case-card[id^="referans-"],.case-card[data-reference-key]{scroll-margin-top:94px}}
+@media(prefers-reduced-motion:reduce){.case-card.reference-jump-focus{animation:none}}

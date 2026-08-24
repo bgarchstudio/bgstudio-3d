@@ -10,6 +10,84 @@
   window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
 })();
 
+// v3.1.13 — robust managed-reference deep links.
+// The clicked homepage card is remembered before navigation. On the destination page
+// we resolve by exact anchor first, then by managed reference key, then by matching
+// the project headline. Repeated passes absorb image/layout shifts after page load.
+(() => {
+  const STORE_KEY = 'bgstudio3d.referenceJump';
+  const clean = value => String(value || '').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
+
+  const findTarget = (key, headline) => {
+    if (key) {
+      const byId = document.getElementById(key);
+      if (byId) return byId;
+      try {
+        const byKey = document.querySelector(`[data-reference-key="${CSS.escape(key)}"]`);
+        if (byKey) return byKey;
+      } catch (_) {}
+    }
+    const wanted = clean(headline);
+    if (!wanted) return null;
+    const cards = [...document.querySelectorAll('.case-card')];
+    return cards.find(card => clean(card.querySelector('h3')?.textContent) === wanted)
+      || cards.find(card => {
+        const title = clean(card.querySelector('h3')?.textContent);
+        return title && (title.includes(wanted) || wanted.includes(title));
+      }) || null;
+  };
+
+  const jump = data => {
+    const target = findTarget(data?.key, data?.headline);
+    if (!target) return false;
+    target.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
+    target.classList.add('reference-jump-focus');
+    window.setTimeout(() => target.classList.remove('reference-jump-focus'), 1500);
+    return true;
+  };
+
+  const scheduleJump = data => {
+    if (!data) return;
+    [0, 70, 220, 520, 1000].forEach(delay => {
+      window.setTimeout(() => jump(data), delay);
+    });
+  };
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest('.field-work-link');
+    if (!link) return;
+    const card = link.closest('.field-work-card');
+    let url;
+    try { url = new URL(link.href, window.location.href); } catch (_) { return; }
+    const key = decodeURIComponent((url.hash || '').replace(/^#/, '')) || card?.dataset.referenceTarget || '';
+    const headline = card?.querySelector('h3')?.textContent?.trim() || '';
+    const payload = { key, headline, pathname: url.pathname.replace(/\/+$/, '') || '/', at: Date.now() };
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify(payload)); } catch (_) {}
+  }, true);
+
+  const resolveIncomingJump = () => {
+    const hashKey = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    let stored = null;
+    try { stored = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null'); } catch (_) {}
+    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    const storedIsFresh = stored && Date.now() - Number(stored.at || 0) < 30000;
+    const storedMatches = storedIsFresh && (String(stored.pathname || '').replace(/\/+$/, '') || '/') === currentPath;
+    const payload = hashKey ? { key: hashKey, headline: storedMatches ? stored.headline : '' } : (storedMatches ? stored : null);
+    if (!payload) return;
+    scheduleJump(payload);
+    if (storedMatches) {
+      window.setTimeout(() => {
+        try { sessionStorage.removeItem(STORE_KEY); } catch (_) {}
+      }, 1300);
+    }
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', resolveIncomingJump, { once: true });
+  else resolveIncomingJump();
+  window.addEventListener('load', resolveIncomingJump, { once: true });
+  window.addEventListener('pageshow', resolveIncomingJump);
+})();
+
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
