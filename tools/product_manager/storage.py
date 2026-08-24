@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -38,6 +38,117 @@ MUTABLE_MEDIA_PREFIXES = (
     'assets/images/references/',
     'assets/images/prototypes/',
 )
+
+
+# V3.1 product taxonomy migration. Legacy values stay readable in older backups,
+# but the persistent manager store is upgraded once without deleting any product.
+LEGACY_CATEGORY_MAP = {
+    'dekoratif': 'dekoratif-duvar',
+    'aydinlatma': 'aydinlatma',
+    'fonksiyonel': 'pratik-fonksiyonel',
+    'kisiye-ozel': 'hediye-kisiye-ozel',
+}
+SPECIAL_CATEGORY_MAP = {
+    'arac-koku-difuzoru': 'pratik-fonksiyonel',
+    'ataturk-imzasi': 'dekoratif-duvar',
+    'cerceveli-dalga-lamba': 'aydinlatma',
+    'dekoratif-kus-obje': 'dekoratif-duvar',
+    'dekoratif-lale': 'dekoratif-duvar',
+    'dekoratif-mirket-obje': 'dekoratif-duvar',
+    'dekoratif-mumluk': 'dekoratif-duvar',
+    'dekoratif-tavsan-obje': 'dekoratif-duvar',
+    'havuz-icecek-tutucu': 'pratik-fonksiyonel',
+    'heykel-bust-masa-lambasi': 'aydinlatma',
+    'kask-askiligi': 'ev-duzen',
+    'kisiye-ozel-miknatisli-acacak': 'hediye-kisiye-ozel',
+    'renkli-masa-lambasi': 'aydinlatma',
+    'spiral-masa-lambasi': 'aydinlatma',
+    'kisiye-ozel-gaming-stand': 'gaming-masaustu',
+    'iron-man-eli-masa-lambasi': 'aydinlatma',
+}
+SPECIAL_PRODUCT_TAGS = {
+    'arac-koku-difuzoru': ['Araç', 'Pratik'],
+    'ataturk-imzasi': ['Duvar Dekoru', 'Hediye'],
+    'cerceveli-dalga-lamba': ['Masa Lambası', 'Masaüstü', 'Dekoratif'],
+    'dekoratif-kus-obje': ['Dekoratif', 'Hediye'],
+    'dekoratif-lale': ['Dekoratif', 'Hediye'],
+    'dekoratif-mirket-obje': ['Dekoratif', 'Hediye'],
+    'dekoratif-mumluk': ['Dekoratif', 'Ev'],
+    'dekoratif-tavsan-obje': ['Dekoratif', 'Hediye'],
+    'havuz-icecek-tutucu': ['Pratik', 'Yaz'],
+    'heykel-bust-masa-lambasi': ['Masa Lambası', 'Dekoratif'],
+    'kask-askiligi': ['Motosiklet', 'Duvar Düzeni', 'Pratik'],
+    'kisiye-ozel-miknatisli-acacak': ['Kişiye Özel', 'Açacak', 'Mıknatıslı', 'Hediye', 'Adetli Üretim'],
+    'renkli-masa-lambasi': ['Masa Lambası', 'Masaüstü', 'Dekoratif'],
+    'spiral-masa-lambasi': ['Masa Lambası', 'Masaüstü', 'Dekoratif'],
+    'kisiye-ozel-gaming-stand': ['Gaming', 'Kişiye Özel', 'PlayStation', 'Xbox', 'Masaüstü'],
+    'iron-man-eli-masa-lambasi': ['Masa Lambası', 'Gaming', 'Dekoratif', 'Hediye'],
+}
+
+def _upgrade_products_v2(con):
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
+    if not row:
+        return
+    try:
+        products = json.loads(row[0])
+    except Exception:
+        return
+    if not isinstance(products, list):
+        return
+    changed = False
+    for product in products:
+        if not isinstance(product, dict):
+            continue
+        slug = str(product.get('slug') or '')
+        old_category = str(product.get('category') or '')
+        new_category = SPECIAL_CATEGORY_MAP.get(slug, LEGACY_CATEGORY_MAP.get(old_category, old_category))
+        if new_category and new_category != old_category:
+            product['category'] = new_category
+            changed = True
+        if not isinstance(product.get('tags'), list):
+            product['tags'] = list(SPECIAL_PRODUCT_TAGS.get(slug, []))
+            changed = True
+        elif not product.get('tags') and slug in SPECIAL_PRODUCT_TAGS:
+            product['tags'] = list(SPECIAL_PRODUCT_TAGS[slug])
+            changed = True
+    if changed:
+        con.execute(
+            'UPDATE collections SET json_text=?, updated_at=? WHERE name=?',
+            (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
+        )
+
+def _sync_smaller_repo_media():
+    """Keep V3.1 optimized repo images in the persistent media vault.
+
+    The vault is authoritative and normally exports over the repo on startup.
+    During this one-time upgrade we only replace a vault file when the packaged
+    repo counterpart is at least 25% smaller, which preserves user media while
+    carrying forward lossless-looking image optimization.
+    """
+    for prefix in MUTABLE_MEDIA_PREFIXES:
+        repo_dir = ROOT / prefix.rstrip('/')
+        if not repo_dir.exists():
+            continue
+        for repo_file in repo_dir.rglob('*'):
+            if not repo_file.is_file():
+                continue
+            rel = repo_file.relative_to(ROOT)
+            vault_file = MEDIA_ROOT / rel
+            if not vault_file.exists() or not vault_file.is_file():
+                continue
+            try:
+                repo_size = repo_file.stat().st_size
+                vault_size = vault_file.stat().st_size
+            except OSError:
+                continue
+            if repo_size > 0 and vault_size > 0 and repo_size <= vault_size * 0.75:
+                vault_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(repo_file, vault_file)
+
+def _upgrade_schema(con, old_version):
+    if old_version < 2:
+        _upgrade_products_v2(con)
+        _sync_smaller_repo_media()
 
 _lock = threading.RLock()
 
@@ -147,6 +258,12 @@ def ensure_initialized():
                     if not row:
                         data = _read_repo_json(repo_path, [])
                         con.execute('INSERT INTO collections(name,json_text,updated_at) VALUES(?,?,?)', (name, json.dumps(data, ensure_ascii=False, indent=2), _now()))
+                try:
+                    old_version = int(_meta_get(con, 'schema_version', '1') or 1)
+                except Exception:
+                    old_version = 1
+                if old_version < SCHEMA_VERSION:
+                    _upgrade_schema(con, old_version)
                 _meta_set(con, 'schema_version', SCHEMA_VERSION)
                 con.commit()
         write_info_file()

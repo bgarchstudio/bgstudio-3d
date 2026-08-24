@@ -482,3 +482,8 @@ button{font-family:inherit}
 .quote-form .field input[name="olcu"],.quote-form .field input[name="renk"]{background:#fffaf4}
 @media(max-width:900px){.field-work-heading{grid-template-columns:1fr;gap:18px}.field-work-grid{grid-template-columns:1fr}.field-work-card{min-height:295px}.field-work-footer{align-items:flex-start;flex-direction:column;gap:10px}}
 @media(max-width:680px){.field-work{padding-bottom:80px}.field-work-heading{margin-bottom:22px}.field-work-heading h2{font-size:3.15rem}.field-work-card{min-height:275px;border-radius:22px;padding:24px}.field-work-card .case-profile{width:50px;height:50px;flex-basis:50px}.field-work-card h3{font-size:2.2rem}.field-work-footer{padding-top:17px}}
+
+/* v3.1.0 — expanded product taxonomy / metadata */
+.product-meta-tags{gap:8px}
+.product-meta-tag{background:rgba(181,122,62,.08)!important;border-color:rgba(181,122,62,.18)!important;color:var(--brown)!important}
+.catalog-filters{flex-wrap:wrap}

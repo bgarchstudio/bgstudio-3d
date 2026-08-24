@@ -16,8 +16,24 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '2.8.6'
+PANEL_VERSION = '3.1.0'
 BACKUPS = BACKUPS_ROOT
+
+PRODUCT_CATEGORIES = {
+    'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
+    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel'
+}
+CATEGORY_ALIASES = {
+    'dekoratif': 'dekoratif-duvar',
+    'aydinlatma': 'aydinlatma',
+    'fonksiyonel': 'pratik-fonksiyonel',
+    'kisiye-ozel': 'hediye-kisiye-ozel',
+}
+TAG_PRESETS = [
+    'Kişiye Özel', 'Kurumsal', 'Adetli Üretim', 'Logolu', 'Hediye',
+    'Gaming', 'PlayStation', 'Xbox', 'Masaüstü', 'Anahtarlık', 'Organizer',
+    'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap'
+]
 ensure_initialized()
 export_to_repo()
 
@@ -337,15 +353,18 @@ def clean_product(p):
         'slug', 'name', 'category', 'price_text', 'price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'tags'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
     out['slug'] = slugify(str(out.get('slug') or out['name']))
     if not out['name'] or not out['slug']:
         raise ValueError('Ürün adı ve URL slug zorunlu.')
-    if out.get('category') not in ('dekoratif', 'aydinlatma', 'fonksiyonel', 'kisiye-ozel'):
+    category = str(out.get('category') or '').strip()
+    category = CATEGORY_ALIASES.get(category, category)
+    if category not in PRODUCT_CATEGORIES:
         raise ValueError('Kategori geçersiz.')
+    out['category'] = category
     out['price_text'] = str(out.get('price_text') or 'Fiyat için iletişim').strip()
     pv = str(out.get('price_value') or '').strip().replace(',', '.')
     out['price_value'] = pv if re.fullmatch(r'\d+(?:\.\d+)?', pv) else None
@@ -356,6 +375,15 @@ def clean_product(p):
     valid_color_ids = {c.get('id') for c in read_colors()}
     out['color_ids'] = [str(x).strip() for x in (out.get('color_ids') or []) if str(x).strip() in valid_color_ids]
     out['features'] = [str(x).strip() for x in (out.get('features') or []) if str(x).strip()]
+    clean_tags = []
+    seen_tags = set()
+    for value in (out.get('tags') or []):
+        tag = re.sub(r'\s+', ' ', str(value or '')).strip()[:40]
+        key = tag.casefold()
+        if tag and key not in seen_tags:
+            seen_tags.add(key)
+            clean_tags.append(tag)
+    out['tags'] = clean_tags[:16]
     out['pricing_tiers'] = normalize_pricing_tiers(out.get('pricing_tiers'))
     out['gallery_images'] = normalize_gallery(out.get('gallery_images'))
     out['featured'] = bool(out.get('featured'))
@@ -516,7 +544,16 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         if u.path == '/api/products':
-            return self.send_json({'products': read_products(), 'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
+            categories = [
+                {'id':'dekoratif-duvar','label':'Dekoratif & Duvar'},
+                {'id':'aydinlatma','label':'Aydınlatma'},
+                {'id':'ev-duzen','label':'Ev & Düzen'},
+                {'id':'gaming-masaustu','label':'Gaming & Masaüstü'},
+                {'id':'anahtarlik-aksesuar','label':'Anahtarlık & Aksesuar'},
+                {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
+                {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
+            ]
+            return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':

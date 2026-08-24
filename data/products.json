@@ -23,7 +23,7 @@
     ],
     "price_text": "239 TL",
     "slug": "arac-koku-difuzoru",
-    "category": "fonksiyonel",
+    "category": "pratik-fonksiyonel",
     "price_value": "239",
     "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
     "gallery_images": [],
@@ -32,12 +32,16 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/arac-koku-difuzoru.webp",
     "poster_image_width": 1120,
-    "poster_image_height": 1400
+    "poster_image_height": 1400,
+    "tags": [
+      "Araç",
+      "Pratik"
+    ]
   },
   {
     "slug": "ataturk-imzasi",
     "name": "Atatürk İmzası",
-    "category": "kisiye-ozel",
+    "category": "dekoratif-duvar",
     "price_text": "Ölçüye göre",
     "price_value": null,
     "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
@@ -63,6 +67,10 @@
     "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "color_ids": [
       "siyah"
+    ],
+    "tags": [
+      "Duvar Dekoru",
+      "Hediye"
     ]
   },
   {
@@ -94,7 +102,12 @@
     "active": true,
     "sort_order": 3,
     "seo_title": "Çerçeveli Dalga Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Çerçeveli Dalga Masa Lambası, Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "seo_description": "Çerçeveli Dalga Masa Lambası, Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "tags": [
+      "Masa Lambası",
+      "Masaüstü",
+      "Dekoratif"
+    ]
   },
   {
     "color_ids": [
@@ -129,7 +142,7 @@
     "seo_description": "Dekoratif Kuş Obje, Modern çizgili, tek parça 3D baskı dekoratif kuş objesi. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "price_text": "349 TL",
     "options": [],
-    "category": "dekoratif",
+    "category": "dekoratif-duvar",
     "description": "Ev, ofis ve raf dekorasyonları için tasarlanan çizgili kuş formu; sade silueti ve filament renk seçenekleriyle farklı mekanlara uyum sağlar.",
     "card_description": "Modern çizgili, tek parça 3D baskı dekoratif kuş objesi.",
     "seo_title": "Dekoratif Kuş Obje | Kuşadası 3D Baskı | BG Studio 3D",
@@ -140,7 +153,11 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-kus-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Dekoratif",
+      "Hediye"
+    ]
   },
   {
     "name": "Dekoratif Lale",
@@ -187,7 +204,7 @@
     ],
     "price_text": "299 TL",
     "slug": "dekoratif-lale",
-    "category": "dekoratif",
+    "category": "dekoratif-duvar",
     "price_value": "299",
     "card_description": "Renkli, çizgili ve modern 3D baskı lale objesi.",
     "gallery_images": [],
@@ -196,7 +213,11 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-lale.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Dekoratif",
+      "Hediye"
+    ]
   },
   {
     "name": "Dekoratif Mirket Obje",
@@ -233,7 +254,7 @@
     ],
     "price_text": "229 TL",
     "slug": "dekoratif-mirket-obje",
-    "category": "dekoratif",
+    "category": "dekoratif-duvar",
     "price_value": "229",
     "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
     "gallery_images": [],
@@ -242,12 +263,16 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-mirket-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Dekoratif",
+      "Hediye"
+    ]
   },
   {
     "slug": "dekoratif-mumluk",
     "name": "Dekoratif Mumluk",
-    "category": "dekoratif",
+    "category": "dekoratif-duvar",
     "price_text": "349 TL",
     "price_value": "349",
     "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
@@ -275,6 +300,10 @@
     "seo_description": "Dekoratif Mumluk, Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "color_ids": [
       "bone-white"
+    ],
+    "tags": [
+      "Dekoratif",
+      "Ev"
     ]
   },
   {
@@ -312,7 +341,7 @@
     ],
     "price_text": "229 TL",
     "slug": "dekoratif-tavsan-obje",
-    "category": "dekoratif",
+    "category": "dekoratif-duvar",
     "price_value": "229",
     "card_description": "Kalp detaylı, zarif çizgili tavşan dekor objesi.",
     "gallery_images": [],
@@ -321,12 +350,16 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/dekoratif-tavsan-obje.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Dekoratif",
+      "Hediye"
+    ]
   },
   {
     "slug": "havuz-icecek-tutucu",
     "name": "Yüzen Havuz İçecek Tutucu",
-    "category": "fonksiyonel",
+    "category": "pratik-fonksiyonel",
     "price_text": "Fiyat için iletişim",
     "price_value": null,
     "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
@@ -354,7 +387,11 @@
     "active": true,
     "sort_order": 9,
     "seo_title": "Yüzen Havuz İçecek Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "tags": [
+      "Pratik",
+      "Yaz"
+    ]
   },
   {
     "slug": "heykel-bust-masa-lambasi",
@@ -385,12 +422,16 @@
     "active": true,
     "sort_order": 10,
     "seo_title": "3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli."
+    "seo_description": "3D Baskı Heykeli Masa Lambası, Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "tags": [
+      "Masa Lambası",
+      "Dekoratif"
+    ]
   },
   {
     "slug": "kask-askiligi",
     "name": "3D Baskı Kask Askılığı",
-    "category": "fonksiyonel",
+    "category": "ev-duzen",
     "price_text": "Fiyat için iletişim",
     "price_value": null,
     "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
@@ -417,10 +458,15 @@
     "color_ids": [
       "glitter-galaxy-black",
       "siyah"
+    ],
+    "tags": [
+      "Motosiklet",
+      "Duvar Düzeni",
+      "Pratik"
     ]
   },
   {
-    "category": "kisiye-ozel",
+    "category": "hediye-kisiye-ozel",
     "name": "Kişiye Özel Mıknatıslı Açacak",
     "card_description": "58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım.",
     "pricing_tiers": [],
@@ -450,7 +496,14 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/kisiye-ozel-miknatisli-acacak.webp",
     "poster_image_width": 1400,
-    "poster_image_height": 1050
+    "poster_image_height": 1050,
+    "tags": [
+      "Kişiye Özel",
+      "Açacak",
+      "Mıknatıslı",
+      "Hediye",
+      "Adetli Üretim"
+    ]
   },
   {
     "name": "Renkli Masa Lambası",
@@ -496,7 +549,12 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/renkli-masa-lambasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Masa Lambası",
+      "Masaüstü",
+      "Dekoratif"
+    ]
   },
   {
     "slug": "spiral-masa-lambasi",
@@ -527,10 +585,15 @@
     "seo_description": "Spiral Masa Lambası, Heykelsi spiral form ve gün beyaz LED ışık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
     "color_ids": [
       "bone-white"
+    ],
+    "tags": [
+      "Masa Lambası",
+      "Masaüstü",
+      "Dekoratif"
     ]
   },
   {
-    "category": "dekoratif",
+    "category": "gaming-masaustu",
     "name": "Kişiye Özel Gaming Stand",
     "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
     "pricing_tiers": [],
@@ -566,7 +629,14 @@
     "main_image_height": 760,
     "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "poster_image_height": 1254,
+    "tags": [
+      "Gaming",
+      "Kişiye Özel",
+      "PlayStation",
+      "Xbox",
+      "Masaüstü"
+    ]
   },
   {
     "category": "aydinlatma",
@@ -599,6 +669,12 @@
     "gallery_images": [],
     "main_image": "assets/images/products/iron-man-eli-masa-lambasi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760
+    "main_image_height": 760,
+    "tags": [
+      "Masa Lambası",
+      "Gaming",
+      "Dekoratif",
+      "Hediye"
+    ]
   }
 ]
