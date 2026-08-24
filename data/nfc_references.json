@@ -3,16 +3,16 @@
     "slug": "istavrit-restaurant",
     "name": "İstavrit Restaurant",
     "headline": "Başlangıç Paketi · 10 Masada BG Studio NFC + QR Menü Sistemi",
-    "description": "İstavrit Restaurant için 10 masalık BG Studio NFC Başlangıç Paketi kuruldu. Her masa için özel üretilen toplam 10 adet NFC + QR stand tasarlanıp üretilerek işletmeye teslim edildi. Misafirler telefonlarını standa yaklaştırarak NFC üzerinden veya QR kodu okutarak dijital menüye saniyeler içinde erişebiliyor. İşletme tarafında masa bazlı NFC + QR etkileşimleri, kullanım verileri ve dijital menü BG Studio NFC işletme paneli üzerinden yönetilip takip edilebiliyor.",
+    "description": "İstavrit Restaurant için 10 masalık BG Studio NFC Başlangıç Paketi kuruldu. Her masa için özel üretilen toplam 10 adet NFC + QR stand tasarlanıp işletmeye teslim edildi.\nMisafirler telefonlarını standa yaklaştırarak veya QR kodu okutarak dijital menüye, Instagram hesabına ve değerlendirme akışına erişebiliyor. Değerlendirme sürecinde misafir önce BG Studio değerlendirme paneline yönlendiriliyor, ardından Google yorum adımına geçiyor.\nİşletme tarafında masa bazlı NFC + QR etkileşimleri, dijital menü ve sistem verileri BG Studio NFC işletme paneli üzerinden takip ediliyor.",
     "tags": [
       "BG Studio NFC",
       "Başlangıç Paketi",
       "10 Masa",
       "10 NFC + QR Stand",
       "Dijital Menü",
-      "NFC + QR",
-      "Restoran",
-      "Kuşadası"
+      "Instagram",
+      "Değerlendirme Paneli",
+      "Google Yorum"
     ],
     "active": true,
     "sort_order": 1,
