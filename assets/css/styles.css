@@ -450,13 +450,13 @@ button{font-family:inherit}
 }
 
 
-/* v3.1.5 — signature enlarged and anchored under the main contact heading */
-.contact>div:first-child{position:relative;padding-bottom:126px!important}
-.contact>div:first-child::after{content:""!important;display:block!important;position:absolute;left:16px;bottom:12px;width:min(410px,42vw);aspect-ratio:2.55/1;background:url("../brand/bgstudio-signature-mark.png") left center/contain no-repeat;opacity:.22;pointer-events:none;mix-blend-mode:multiply}
+/* v3.1.7 — signature breathes below the contact heading; never overlaps it */
+.contact>div:first-child{position:relative;padding-bottom:0!important}
+.contact>div:first-child::after{content:""!important;display:block!important;position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:min(410px,42vw);aspect-ratio:2.55/1;margin:24px 0 0 0;background:url("../brand/bgstudio-signature-mark.png") left center/contain no-repeat;opacity:.22;pointer-events:none;mix-blend-mode:multiply}
 .contact-actions{padding-bottom:0!important}
 .contact-actions::after{content:none!important;display:none!important}
-@media(max-width:1040px){.contact>div:first-child{padding-bottom:104px!important}.contact>div:first-child::after{left:10px;bottom:8px;width:min(320px,46vw);opacity:.20}}
-@media(max-width:680px){.contact>div:first-child{padding-bottom:76px!important}.contact>div:first-child::after{left:0;bottom:4px;width:min(220px,62vw);opacity:.17}}
+@media(max-width:1040px){.contact>div:first-child::after{width:min(320px,46vw);margin-top:22px;opacity:.20}}
+@media(max-width:680px){.contact>div:first-child::after{width:min(220px,62vw);margin-top:18px;opacity:.17}}
 
 
 /* v3.0.0 — homepage field proof + lead form refinement */
@@ -658,3 +658,15 @@ button{font-family:inherit}
 @media(prefers-reduced-motion:reduce){
   .floating-whatsapp,.floating-whatsapp:hover,.floating-whatsapp.wa-seen:hover{animation:none!important}
 }
+
+
+/* v3.1.7 — internal navigation emphasis for NFC & QR and branded social links */
+.service-seo-link{width:min(100% - 48px,1360px);margin:18px auto 86px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:18px 22px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.22)}
+.service-seo-link span{font-size:.67rem;letter-spacing:.13em;font-weight:700;color:#8b6b4d;text-transform:uppercase}
+.service-seo-link a,.why-inline-link{color:var(--brown);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(137,78,28,.28);padding-bottom:2px}
+.why-grid article:nth-child(3) .why-inline-link{display:inline-block;color:#d7a66e;border-color:rgba(215,166,110,.36);margin-top:18px}
+.field-work-links{display:flex;align-items:center;justify-content:flex-end;gap:18px;flex-wrap:wrap}
+.corporate-nfc-note{margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:22px;padding:18px 20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.22)}
+.corporate-nfc-note p{margin:0;color:var(--ink-soft);font-size:.8rem;line-height:1.6}
+@media(max-width:900px){.service-seo-link,.corporate-nfc-note{align-items:flex-start;flex-direction:column}.field-work-links{justify-content:flex-start}.service-seo-link{margin-bottom:68px}}
+@media(max-width:680px){.service-seo-link{width:min(100% - 24px,1360px);margin-top:12px;margin-bottom:56px;padding:16px}.field-work-links{gap:12px}.corporate-nfc-note{padding:16px}}
