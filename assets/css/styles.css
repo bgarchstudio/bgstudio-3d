@@ -344,3 +344,12 @@ button{font-family:inherit}
 /* v2.9.1 — cleaned branch logo assets (black ring removed) */
 .branch-logo-wrap{background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.98) 0%,rgba(251,248,243,.98) 60%,rgba(242,236,228,.96) 100%);border:1px solid rgba(102,78,50,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 18px 34px rgba(36,25,17,.12)}
 .branch-logo-wrap img{width:88%;height:88%;border-radius:0;filter:drop-shadow(0 8px 16px rgba(33,24,16,.08))}
+
+
+/* v2.9.2 — branch logos optically fitted inside circular holders */
+.brand-branch-card .branch-logo-wrap{overflow:hidden;isolation:isolate}
+.brand-branch-card .branch-logo-wrap img{max-width:none;height:auto;object-fit:contain;object-position:center;border-radius:0}
+.brand-branch-architecture .branch-logo-wrap img{width:82%;height:auto;filter:drop-shadow(0 7px 13px rgba(33,24,16,.08))}
+.brand-branch-3d .branch-logo-wrap img{width:90%;height:auto;filter:drop-shadow(0 7px 13px rgba(33,24,16,.08))}
+@media(max-width:1120px){.brand-branch-architecture .branch-logo-wrap img{width:80%}.brand-branch-3d .branch-logo-wrap img{width:88%}}
+@media(max-width:560px){.brand-branch-architecture .branch-logo-wrap img{width:79%}.brand-branch-3d .branch-logo-wrap img{width:87%}}
