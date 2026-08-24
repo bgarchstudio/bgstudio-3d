@@ -593,22 +593,8 @@
     ]
   },
   {
-    "category": "gaming-masaustu",
-    "name": "Kişiye Özel Gaming Stand",
-    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
-    "pricing_tiers": [],
-    "sort_order": 24,
-    "price_text": "949 TL",
-    "price_value": "949",
-    "active": true,
-    "options": [
-      "Xbox logo",
-      "PlayStation logo"
-    ],
-    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
-    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
     "slug": "kisiye-ozel-gaming-stand",
-    "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
+    "sort_order": 24,
     "features": [
       "Kişiye özel isim veya kısa yazı",
       "Xbox veya PlayStation logo seçeneği",
@@ -617,41 +603,44 @@
       "Masaüstü kullanım",
       "Siparişe özel 3D üretim"
     ],
-    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
-    "featured": false,
-    "color_ids": [
-      "siyah",
-      "beyaz"
-    ],
-    "gallery_images": [],
-    "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
-    "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254,
+    "name": "Kişiye Özel Gaming Stand",
+    "price_text": "949 TL",
+    "active": true,
+    "pricing_tiers": [],
+    "category": "gaming-masaustu",
     "tags": [
       "Gaming",
       "Kişiye Özel",
       "PlayStation",
       "Xbox",
       "Masaüstü"
-    ]
+    ],
+    "options": [
+      "Xbox logo",
+      "PlayStation logo"
+    ],
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "featured": true,
+    "price_value": "949",
+    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
+    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
+    "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
+    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
+    "gallery_images": [],
+    "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
+    "poster_image_width": 1254,
+    "poster_image_height": 1254
   },
   {
-    "category": "aydinlatma",
-    "name": "Iron Man Eli Masa Lambası",
-    "card_description": "Iron Man’ın ikonik elinden ilham alan, ışıklı masaüstü dekor lambası. Gaming setup ve çalışma masaları için dikkat çekici bir tasarım.",
-    "pricing_tiers": [],
-    "sort_order": 34,
-    "price_text": "1.499 TL",
-    "price_value": "1499",
-    "active": true,
-    "options": [],
-    "description": "Iron Man’ın ikonik zırhlı el tasarımından ilham alan masa lambası, avuç içindeki aydınlatmasıyla gaming setup, çalışma masası ve dekoratif alanlara güçlü bir atmosfer kazandırır. 3D baskı teknolojisiyle üretilen gövdesi, parçalı zırh detayları ve karakteristik kırmızı görünümüyle hem aydınlatma hem de koleksiyonluk dekor ürünü olarak kullanılabilir.",
-    "seo_description": "Iron Man El Masa Lambası, ışıklı avuç içi ve detaylı 3D baskı tasarımıyla gaming setup ve masaüstü dekoru için üretilir. Kuşadası 3D baskı.",
     "slug": "iron-man-eli-masa-lambasi",
-    "seo_title": "Iron Man El Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "sort_order": 34,
     "features": [
       "Işıklı avuç içi tasarımı",
       "Iron Man temalı masaüstü dekor",
@@ -661,20 +650,34 @@
       "Detaylı zırh görünümü",
       "Masaüstü kullanıma uygun"
     ],
-    "production_note": "Ürün 3D baskı yöntemiyle üretilir ve aydınlatma bileşenleriyle birlikte kullanıma hazır olarak hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
-    "featured": true,
-    "color_ids": [
-      "kirmizi"
-    ],
-    "gallery_images": [],
-    "main_image": "assets/images/products/iron-man-eli-masa-lambasi.webp",
-    "main_image_width": 1000,
-    "main_image_height": 760,
+    "name": "Iron Man Eli Masa Lambası",
+    "price_text": "1.499 TL",
+    "active": true,
+    "pricing_tiers": [],
+    "category": "aydinlatma",
     "tags": [
       "Masa Lambası",
       "Gaming",
       "Dekoratif",
       "Hediye"
-    ]
+    ],
+    "options": [],
+    "color_ids": [
+      "kirmizi"
+    ],
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir ve aydınlatma bileşenleriyle birlikte kullanıma hazır olarak hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "featured": true,
+    "price_value": "1499",
+    "card_description": "Iron Man’ın ikonik elinden ilham alan, ışıklı masaüstü dekor lambası. Gaming setup ve çalışma masaları için dikkat çekici bir tasarım.",
+    "description": "Iron Man’ın ikonik zırhlı el tasarımından ilham alan masa lambası, avuç içindeki aydınlatmasıyla gaming setup, çalışma masası ve dekoratif alanlara güçlü bir atmosfer kazandırır. 3D baskı teknolojisiyle üretilen gövdesi, parçalı zırh detayları ve karakteristik kırmızı görünümüyle hem aydınlatma hem de koleksiyonluk dekor ürünü olarak kullanılabilir.",
+    "seo_title": "Iron Man El Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D",
+    "seo_description": "Iron Man El Masa Lambası, ışıklı avuç içi ve detaylı 3D baskı tasarımıyla gaming setup ve masaüstü dekoru için üretilir. Kuşadası 3D baskı.",
+    "gallery_images": [],
+    "main_image": "assets/images/products/iron-man-eli-masa-lambasi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": null,
+    "poster_image_width": null,
+    "poster_image_height": null
   }
 ]
