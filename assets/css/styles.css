@@ -395,3 +395,23 @@ button{font-family:inherit}
     opacity:.15;
   }
 }
+
+
+/* v2.9.5 — Architecture logo optical-size balance */
+.brand-branch-architecture .branch-logo-wrap img{
+  width:74%;
+  height:auto;
+  transform:translateY(2px);
+}
+@media(max-width:1120px){
+  .brand-branch-architecture .branch-logo-wrap img{
+    width:73%;
+    transform:translateY(1px);
+  }
+}
+@media(max-width:560px){
+  .brand-branch-architecture .branch-logo-wrap img{
+    width:72%;
+    transform:translateY(1px);
+  }
+}
