@@ -35,5 +35,23 @@
     "theme": "dark",
     "image": "assets/images/references/naz-balik-restaurant.webp",
     "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+  },
+  {
+    "slug": "kusadasi-asansor",
+    "name": "Kuşadası Asansör",
+    "headline": "100 adet logolu kurumsal anahtarlık üretimi.",
+    "description": "Kuşadası Asansör için marka logosu ve iletişim bilgilerine özel 100 adet kurumsal anahtarlık tasarlanıp 3D baskı ile üretildi. Anahtarlıklar, işletmenin isteği üzerine mavi-beyaz renklerde hazırlanarak metal halka detaylarıyla kurumsal dağıtıma uygun şekilde tamamlandı.",
+    "tags": [
+      "100 adet",
+      "Kurumsal üretim",
+      "Logolu anahtarlık",
+      "3D baskı",
+      "Çok renkli baskı",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 40,
+    "theme": "light",
+    "image": "assets/images/references/kusadasi-asansor.webp"
   }
 ]
