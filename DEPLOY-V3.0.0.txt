@@ -1,0 +1,9 @@
+BG STUDIO 3D V3.0.0 — REPO-SAFE DEPLOY
+
+1) Bu pakette .git klasörü YOKTUR.
+2) Aktif bgstudio-3d repo klasörünü SİLMEYİN.
+3) Paketteki bgstudio-3d klasörünün İÇERİĞİNİ mevcut repo klasörünün üzerine kopyalayın ve dosyaları değiştirin.
+4) GitHub Desktop: Changes kontrolü > Commit to main > Push origin.
+5) Normal kullanımda Pull/merge gerekmez; GitHub üzerinde başka bir cihaz/yerden ayrıca commit yapılmadığı sürece doğrudan push düzeninde devam edin.
+
+Baz: 2026-08-24 tarihinde yüklenen bgstudio-3d(2).rar.

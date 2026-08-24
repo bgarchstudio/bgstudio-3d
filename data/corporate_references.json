@@ -28,6 +28,24 @@
     "active": true,
     "sort_order": 30,
     "theme": "dark",
-    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp",
+    "category": "Restoran • QR uygulaması",
+    "home_link": "nfc-qr/"
+  },
+  {
+    "slug": "sealight-resort-spiral-parca",
+    "name": "Sealight Resort",
+    "headline": "Çikolata şelalesi makinesi için spiral aksam.",
+    "description": "Otel ekipmanındaki ihtiyaç için yalnızca çikolata şelalesi makinesinin spiral bileşeni 3D baskıyla yeniden üretildi.",
+    "tags": [
+      "Yedek parça",
+      "Otel ekipmanı",
+      "3D üretim"
+    ],
+    "active": true,
+    "sort_order": 40,
+    "theme": "light",
+    "category": "Otel ekipmanı • Yedek parça",
+    "home_link": "prototip-parca/"
   }
 ]

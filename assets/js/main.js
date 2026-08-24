@@ -252,6 +252,7 @@ if (quoteForm) {
       'kisiye-ozel': 'Kişiye özel üretim',
       'kurumsal': 'Kurumsal / toplu üretim',
       'nfc': 'NFC & QR sistemi',
+      'prototip': 'Prototip / parça üretimi',
       'urun': 'Mevcut ürün hakkında',
       'diger': 'Diğer'
     };
@@ -262,6 +263,8 @@ if (quoteForm) {
       `Ad / Soyad: ${data.get('ad') || '-'}`,
       `İşletme / Marka: ${data.get('isletme') || '-'}`,
       `Adet: ${data.get('adet') || '-'}`,
+      `Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,
+      `Renk / malzeme: ${data.get('renk') || '-'}`,
       `Şehir: ${data.get('sehir') || '-'}`,
       '',
       `Talep: ${data.get('detay') || '-'}`
@@ -550,7 +553,9 @@ document.querySelectorAll('a[href*="wa.me/"]').forEach(link => link.classList.ad
 document.querySelectorAll('a[href*="instagram.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-instagram'));
 document.querySelectorAll('a[href*="facebook.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-facebook'));
 document.querySelectorAll('a[href^="https://bgstudio.com.tr"]').forEach(link => {
-  if (!link.closest('.footer-socials')) link.classList.add('has-brand-icon', 'icon-architecture');
+  if (!link.closest('.footer-socials') && !link.classList.contains('brand-branch-card')) {
+    link.classList.add('has-brand-icon', 'icon-architecture');
+  }
 });
 
 const floatingWhatsApp = document.querySelector('.floating-whatsapp');
@@ -564,6 +569,7 @@ if (floatingWhatsApp) {
     ['Ürün siparişi', productName ? `Merhaba BG Studio 3D, ${productName} hakkında bilgi almak istiyorum.` : 'Merhaba BG Studio 3D, bir ürün hakkında bilgi almak istiyorum.'],
     ['Kişiye özel üretim', 'Merhaba BG Studio 3D, kişiye özel 3D baskı üretim için teklif almak istiyorum.'],
     ['Toplu / kurumsal', 'Merhaba BG Studio 3D, işletmem için toplu veya kurumsal üretim hakkında görüşmek istiyorum.'],
+    ['Prototip / parça', 'Merhaba BG Studio 3D, prototip veya yedek parça üretimi için görüşmek istiyorum. Parçanın fotoğrafını ve yaklaşık ölçülerini paylaşacağım.'],
     ['NFC & QR', 'Merhaba BG Studio 3D, NFC & QR sistemleri hakkında bilgi almak istiyorum.']
   ];
 
@@ -573,7 +579,7 @@ if (floatingWhatsApp) {
   panel.setAttribute('aria-hidden', 'true');
   panel.innerHTML = `
     <div class="wa-panel-head">
-      <div><h2>Merhaba 👋</h2><p>Ürün, özel üretim veya işletme çözümü için mesajını birkaç saniyede hazırla.</p></div>
+      <div><h2>Merhaba 👋</h2><p>Ürün, özel üretim, prototip veya işletme çözümü için mesajını birkaç saniyede hazırla.</p></div>
       <button class="wa-panel-close" type="button" aria-label="WhatsApp panelini kapat">×</button>
     </div>
     <span class="wa-panel-label">HIZLI SEÇENEKLER</span>
@@ -595,7 +601,7 @@ if (floatingWhatsApp) {
     optionWrap.querySelectorAll('.wa-panel-option').forEach(btn => btn.classList.toggle('active', btn === activeButton));
   };
   setMessage(defaultMessage);
-  const contactTypeMap = ['product', 'custom_production', 'corporate', 'nfc_qr'];
+  const contactTypeMap = ['product', 'custom_production', 'corporate', 'prototype_part', 'nfc_qr'];
   options.forEach(([label, message], index) => {
     const btn = document.createElement('button');
     btn.type = 'button';
