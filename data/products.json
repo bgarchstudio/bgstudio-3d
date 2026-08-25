@@ -1563,6 +1563,9 @@
     "gallery_images": [],
     "main_image": "assets/images/products/sonsuzluk-kupu-fidget-oyuncak.webp",
     "main_image_width": 1000,
-    "main_image_height": 760
+    "main_image_height": 760,
+    "poster_image": null,
+    "poster_image_width": null,
+    "poster_image_height": null
   }
 ]
