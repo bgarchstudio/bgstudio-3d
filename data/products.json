@@ -1365,5 +1365,52 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "price_text": "349 TL",
+    "color_ids": [
+      "bone-white",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Xiaomi Smart Band 8 Pro ve 9 Pro için 3D baskı masaüstü şarj standı. Mevcut manyetik şarj kablonuzu sabit tutar. Kablo ve saat dahil değildir.",
+    "card_description": "Xiaomi Smart Band 8 Pro ve 9 Pro için masaüstü şarj standı. Mevcut manyetik şarj kablonuzu düzenli ve sabit biçimde konumlandırır.",
+    "name": "Xiaomi Smart Band 8 Pro / 9 Pro Şarj Standı",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "gaming-masaustu",
+    "seo_title": "Xiaomi Smart Band 8 Pro / 9 Pro Şarj Standı | BG Studio 3D",
+    "tags": [
+      "Masaüstü",
+      "Organizer",
+      "Xiaomi",
+      "Smart Band",
+      "Mi Band",
+      "Şarj Standı",
+      "Saat Standı",
+      "Akıllı Bileklik",
+      "Masaüstü Aksesuar"
+    ],
+    "price_value": "349",
+    "options": [],
+    "active": true,
+    "slug": "xiaomi-smart-band-8-pro-9-pro-sarj-standi",
+    "features": [
+      "Xiaomi Smart Band 8 Pro uyumlu",
+      "Xiaomi Smart Band 9 Pro uyumlu",
+      "Masaüstü şarj standı",
+      "Manyetik şarj kablosunu sabit tutar",
+      "Saati dik konumda konumlandırır",
+      "Kompakt masaüstü tasarım",
+      "2 renk 3D baskı üretim"
+    ],
+    "sort_order": 30,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal birÜrün 3D baskı yöntemiyle üretilir ve Xiaomi Smart Band 8 Pro / 9 Pro manyetik şarj kablosuna göre tasarlanmıştır. Şarj kablosu ve akıllı saat ürüne dahil değildir. Paket içeriğinde yalnızca 3D baskı stand bulunur. 3D baskı yüzeylerinde ince katman izleri görülebilir. parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "description": "Xiaomi Smart Band 8 Pro ve 9 Pro modelleri için tasarlanan masaüstü şarj standı, saatin kendi manyetik şarj kablosunu stand üzerinde sabit biçimde konumlandırır. Saat şarj sırasında dik durur ve ekran masa üzerinden rahatça görülebilir.\n\nKompakt yapısı çalışma masası, komodin ve gaming setup üzerinde düzenli bir görünüm sağlar. Şarj kablosu stand içerisine yerleştirilerek saatinizi her şarjda kablo aramak zorunda kalmadan aynı noktaya yerleştirmenizi sağlar.\n\nŞarj kablosu ve akıllı saat ürüne dahil değildir. Ürün yalnızca 3D baskı şarj standından oluşur.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/xiaomi-smart-band-8-pro-9-pro-sarj-standi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
