@@ -1,0 +1,53 @@
+{
+  "announcement_bar": {
+    "enabled": true,
+    "speed": "fast",
+    "separator": "✦",
+    "messages": [
+      {
+        "id": "ucretsiz-kargo",
+        "text": "1.000 TL üzeri ücretsiz kargo",
+        "url": "",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
+      },
+      {
+        "id": "kusadasi-teslim",
+        "text": "Kuşadası elden teslim",
+        "url": "",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
+      },
+      {
+        "id": "kisiye-ozel",
+        "text": "Kişiye özel 3D üretim",
+        "url": "/ozel-uretim/",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
+      },
+      {
+        "id": "kurumsal",
+        "text": "Kurumsal toplu sipariş",
+        "url": "/kurumsal/",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
+      },
+      {
+        "id": "nfc-qr",
+        "text": "NFC + QR işletme çözümleri",
+        "url": "/nfc-qr/",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
+      }
+    ],
+    "integration": {
+      "discounts_enabled": false,
+      "mode": "manual"
+    }
+  }
+}
