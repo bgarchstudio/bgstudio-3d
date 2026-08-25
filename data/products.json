@@ -1412,5 +1412,57 @@
     "main_image": "assets/images/products/xiaomi-smart-band-8-pro-9-pro-sarj-standi.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "399 TL",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Makyaj pamuğu ve pamuklu çubukları ayrı haznelerde düzenleyen çift bölmeli 3D baskı organizer. Banyo ve makyaj masası için pratik tasarım.",
+    "card_description": "Makyaj pamukları ve pamuklu çubukları ayrı haznelerde düzenli tutan çift bölmeli masaüstü organizer.",
+    "name": "Makyaj Pamuğu & Pamuklu Çubuk Organizer",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "ev-duzen",
+    "seo_title": "Makyaj Pamuğu & Pamuklu Çubuk Organizer | BG Studio 3D",
+    "tags": [
+      "Organizer",
+      "Masaüstü",
+      "Hediye",
+      "Makyaj Pamuğu",
+      "Pamuklu Çubuk",
+      "Banyo Organizeri",
+      "Makyaj Organizeri",
+      "Kişisel Bakım",
+      "Çift Bölmeli",
+      "Tezgâh Düzeni"
+    ],
+    "price_value": "399",
+    "options": [],
+    "active": true,
+    "slug": "makyaj-pamugu-pamuklu-cubuk-organizer",
+    "features": [
+      "Çift bölmeli organizer",
+      "Makyaj pamuğu haznesi",
+      "Pamuklu çubuk haznesi",
+      "Kolay erişimli açık ön tasarım",
+      "Banyo ve makyaj masasına uygun",
+      "Kompakt masaüstü form",
+      "3D baskı üretim"
+    ],
+    "sort_order": 31,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. İki ayrı haznesi makyaj pamuğu ve pamuklu çubukların düzenlenmesine göre tasarlanmıştır. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Makyaj pamuğu ve pamuklu çubukları tek noktada düzenlemek için tasarlanan çift bölmeli organizer. Açık ön yüzlü geniş hazne, yuvarlak makyaj pamuklarına kolay erişim sağlar. Yan hazne ise pamuklu çubukların dik ve düzenli biçimde saklanmasına uygundur.\n\nBanyo tezgâhı, makyaj masası ve kişisel bakım köşelerinde düzenli bir görünüm sağlar. Kompakt yapısı günlük bakım ürünlerini el altında tutarken tezgâhtaki dağınıklığı azaltır.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/makyaj-pamugu-pamuklu-cubuk-organizer.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
