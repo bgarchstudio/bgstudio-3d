@@ -1154,5 +1154,59 @@
     "main_image": "assets/images/products/iplerle-asili-insan-figuru-dekor.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "1499 TL",
+    "color_ids": [
+      "bone-white",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Kaktüs kulaklık ve saat standı; kulaklık, akıllı saat, yüzük ve takıları düzenleyen alt tepsili 3D baskı masaüstü standdır. Kuşadası.",
+    "card_description": "Kulaklık, akıllı saat ve takıları düzenleyen; alt tepsili, kaktüs formunda 3D baskı masaüstü stand.",
+    "name": "Kaktüs Kulaklık & Saat Standı",
+    "pricing_tiers": [],
+    "featured": true,
+    "category": "gaming-masaustu",
+    "seo_title": "Kaktüs Kulaklık & Saat Standı | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Gaming",
+      "Masaüstü",
+      "Organizer",
+      "Hediye",
+      "Kulaklık Standı",
+      "Saat Standı",
+      "Takı Düzenleyici",
+      "Kaktüs Stand",
+      "Masa Aksesuarı",
+      "Akıllı Saat Standı"
+    ],
+    "price_value": "1499",
+    "options": [
+      "Bone White gövde + Siyah taban",
+      "Beyaz gövde + Siyah taban",
+      "Avocado Green gövde + Bone White taban",
+      "Tam Siyah"
+    ],
+    "active": true,
+    "slug": "kaktus-kulaklik-saat-standi",
+    "features": [
+      "Kulaklık askısı",
+      "Akıllı saat askısı",
+      "Alt takı tepsisi",
+      "Kaktüs formunda tasarım",
+      "Yüzük ve kolye bölümü",
+      "Gaming ve çalışma masasına uygun",
+      "3D baskı masaüstü stand"
+    ],
+    "sort_order": 26,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Kulaklık, saat ve takıların düzenlenmesine yönelik farklı bölümler içerir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Kaktüs formundaki masaüstü stand; kulaklık, akıllı saat ve günlük takıları tek noktada düzenlemek için tasarlanmıştır. Büyük yan kollar kulaklık askısı görevi görürken küçük kol akıllı saat veya bileklik için uygundur. Alt tabladaki tepsi; yüzük, kolye, küpe ve küçük masa aksesuarlarının düzenli tutulmasını sağlar.\n\nGaming masası, çalışma masası, yatak odası ve giyinme masasında dekoratif görünüm ile işlevi bir araya getirir. Dikey formu sayesinde masa yüzeyinde fazla yer kaplamadan birden fazla ürünü taşır.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/kaktus-kulaklik-saat-standi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
