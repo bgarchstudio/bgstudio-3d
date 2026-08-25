@@ -193,6 +193,55 @@ const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
+const announcementBarConfig = {
+  enabled: true,
+  items: [
+    '1.000 TL üzeri ücretsiz kargo',
+    'Kuşadası elden teslim',
+    'Kişiye özel 3D üretim',
+    'Kurumsal toplu sipariş',
+    'NFC + QR işletme çözümleri'
+  ],
+  separator: '✦'
+};
+
+const mountAnnouncementBar = () => {
+  if (!announcementBarConfig.enabled) return;
+  const header = document.querySelector('.site-header');
+  const navShell = header?.querySelector('.nav-shell');
+  if (!header || !navShell || header.querySelector('.announcement-marquee')) return;
+
+  const items = (announcementBarConfig.items || []).map(item => String(item || '').trim()).filter(Boolean);
+  if (!items.length) return;
+
+  const makeSequence = () => items.map(item => {
+    const safeText = item
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    return `<span class="announcement-marquee-item">${safeText}</span>`;
+  }).join(`<span class="announcement-marquee-separator" aria-hidden="true">${announcementBarConfig.separator}</span>`);
+
+  const bar = document.createElement('div');
+  bar.className = 'announcement-marquee';
+  bar.setAttribute('role', 'region');
+  bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
+  bar.innerHTML = `
+    <div class="announcement-marquee-viewport">
+      <div class="announcement-marquee-track">
+        <div class="announcement-marquee-group">${makeSequence()}</div>
+        <div class="announcement-marquee-group" aria-hidden="true">${makeSequence()}</div>
+      </div>
+    </div>`;
+
+  header.insertBefore(bar, navShell);
+};
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAnnouncementBar, { once: true });
+else mountAnnouncementBar();
+
+
 
 // Google Analytics helper. gtag is defined in every page head and queues events until GA4 loads.
 const trackEvent = (name, params = {}) => {
