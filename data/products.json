@@ -1464,5 +1464,50 @@
     "main_image": "assets/images/products/makyaj-pamugu-pamuklu-cubuk-organizer.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "149 TL",
+    "color_ids": [],
+    "seo_description": "Kedili kitap ayracı, sayfaların arasına yerleşen ince gövdesi ve kitabın üstünden görünen sevimli kedi figürüyle 3D baskı olarak üretilir.",
+    "card_description": "Kitabın sayfaları arasına yerleşen, üst kısmından sevimli kedi yüzü ve patileri görünen 3D baskı kitap ayracı.",
+    "name": "Kedili Kitap Ayracı",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "hediye-kisiye-ozel",
+    "seo_title": "Kedili Kitap Ayracı | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Kitap",
+      "Kedi",
+      "Hediye",
+      "Kitap Ayracı",
+      "Kedili Kitap Ayracı",
+      "Kitap Sever",
+      "Okuma Aksesuarı",
+      "3D Baskı"
+    ],
+    "price_value": "149",
+    "options": [],
+    "active": true,
+    "slug": "kedili-kitap-ayraci",
+    "features": [
+      "Sevimli kedi figürü",
+      "Sayfa arasına giren ince gövde",
+      "Kitabın üstünden görünen kedi tasarımı",
+      "Hafif yapı",
+      "Kitap severler için hediye",
+      "Sabit siyah-beyaz tasarım",
+      "3D baskı üretim"
+    ],
+    "sort_order": 32,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Siyah-beyaz renk düzeni tasarımın parçasıdır ve renk seçimi sunulmaz. İnce gövde kitap sayfalarının arasına yerleşecek şekilde tasarlanmıştır. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Kedili Kitap Ayracı, okuduğun sayfayı işaretlerken kitabın üst kısmından görünen sevimli kedi yüzü ve patileriyle eğlenceli bir görünüm sunar. İnce gövdesi sayfaların arasına yerleşir, kedi figürü ise kitabın üst kısmında görünür kalır.\n\nKitap severler, öğrenciler ve kedi temalı ürünleri sevenler için günlük bir aksesuar ve küçük hediye seçeneğidir.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/kedili-kitap-ayraci.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": "assets/images/posters/kedili-kitap-ayraci.webp",
+    "poster_image_width": 1254,
+    "poster_image_height": 1254
   }
 ]
