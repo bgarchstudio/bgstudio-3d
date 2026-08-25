@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.24'
+PANEL_VERSION = '3.1.25'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -351,6 +351,39 @@ def normalize_gallery(value):
     return out[:12]
 
 
+
+
+def normalize_price_input(value):
+    """Normalize Turkish/English TL input to canonical decimal text."""
+    raw = str(value or '').strip().upper().replace('TL', '').replace('₺', '')
+    raw = re.sub(r'\s+', '', raw)
+    if not raw or not re.fullmatch(r'[0-9.,]+', raw):
+        return None
+    if '.' in raw and ',' in raw:
+        if raw.rfind(',') > raw.rfind('.'):
+            raw = raw.replace('.', '').replace(',', '.')
+        else:
+            raw = raw.replace(',', '')
+    elif '.' in raw:
+        if re.fullmatch(r'\d{1,3}(?:\.\d{3})+', raw):
+            raw = raw.replace('.', '')
+    elif ',' in raw:
+        if re.fullmatch(r'\d{1,3}(?:,\d{3})+', raw):
+            raw = raw.replace(',', '')
+        else:
+            raw = raw.replace(',', '.')
+    if not re.fullmatch(r'\d+(?:\.\d+)?', raw):
+        return None
+    try:
+        n = float(raw)
+    except Exception:
+        return None
+    if not (n > 0):
+        return None
+    if n.is_integer():
+        return str(int(n))
+    return ('%.2f' % n).rstrip('0').rstrip('.')
+
 def normalize_pricing_tiers(items):
     out = []
     seen = set()
@@ -361,8 +394,8 @@ def normalize_pricing_tiers(items):
             qty = int(item.get('quantity') or 0)
         except Exception:
             qty = 0
-        raw_price = str(item.get('price_value') or '').strip().replace(',', '.')
-        if qty < 1 or not re.fullmatch(r'\d+(?:\.\d+)?', raw_price):
+        raw_price = normalize_price_input(item.get('price_value'))
+        if qty < 1 or raw_price is None:
             continue
         if qty in seen:
             continue
@@ -391,15 +424,18 @@ def clean_product(p):
         raise ValueError('Kategori geçersiz.')
     out['category'] = category
     out['price_text'] = str(out.get('price_text') or 'Fiyat için iletişim').strip()
-    pv = str(out.get('price_value') or '').strip().replace(',', '.')
-    out['price_value'] = pv if re.fullmatch(r'\d+(?:\.\d+)?', pv) else None
-    sale_raw = str(out.get('sale_price_value') or '').strip().replace(',', '.')
-    if sale_raw:
-        if not re.fullmatch(r'\d+(?:\.\d+)?', sale_raw):
+    raw_base = str(out.get('price_value') or '').strip()
+    out['price_value'] = normalize_price_input(raw_base) if raw_base else None
+    if raw_base and out['price_value'] is None:
+        raise ValueError('Normal sayısal fiyat geçersiz.')
+    raw_sale = str(out.get('sale_price_value') or '').strip()
+    sale_raw = normalize_price_input(raw_sale) if raw_sale else None
+    if raw_sale:
+        if sale_raw is None:
             raise ValueError('İndirimli fiyat geçersiz.')
         if out['price_value'] is None:
             raise ValueError('İndirim için normal sayısal fiyat zorunlu.')
-        if float(sale_raw) <= 0 or float(sale_raw) >= float(out['price_value']):
+        if float(sale_raw) >= float(out['price_value']):
             raise ValueError('İndirimli fiyat normal fiyattan düşük olmalı.')
         out['sale_price_value'] = sale_raw
     else:

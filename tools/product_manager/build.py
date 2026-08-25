@@ -44,10 +44,40 @@ FAQ = [
 def esc(v):
     return html.escape(str(v or ''), quote=True)
 
-def format_try(value):
+def parse_price_number(value):
+    raw = str(value or '').strip().upper().replace('TL', '').replace('₺', '')
+    raw = re.sub(r'\s+', '', raw)
+    if not raw or not re.fullmatch(r'[0-9.,]+', raw):
+        return None
+    if '.' in raw and ',' in raw:
+        if raw.rfind(',') > raw.rfind('.'):
+            raw = raw.replace('.', '').replace(',', '.')
+        else:
+            raw = raw.replace(',', '')
+    elif '.' in raw:
+        if re.fullmatch(r'\d{1,3}(?:\.\d{3})+', raw):
+            raw = raw.replace('.', '')
+    elif ',' in raw:
+        if re.fullmatch(r'\d{1,3}(?:,\d{3})+', raw):
+            raw = raw.replace(',', '')
+        else:
+            raw = raw.replace(',', '.')
     try:
-        n = float(str(value).replace(',', '.'))
+        return float(raw)
     except Exception:
+        return None
+
+def canonical_price_value(value):
+    n = parse_price_number(value)
+    if n is None or n <= 0:
+        return None
+    if n.is_integer():
+        return str(int(n))
+    return ('%.2f' % n).rstrip('0').rstrip('.')
+
+def format_try(value):
+    n = parse_price_number(value)
+    if n is None:
         return ''
     if n.is_integer():
         text = f"{int(n):,}".replace(',', '.')
@@ -309,12 +339,9 @@ def category_label(p):
 
 
 def sale_price_info(p):
-    try:
-        base = float(str(p.get('price_value') or '').replace(',', '.'))
-        sale = float(str(p.get('sale_price_value') or '').replace(',', '.'))
-    except Exception:
-        return None
-    if base <= 0 or sale <= 0 or sale >= base:
+    base = parse_price_number(p.get('price_value'))
+    sale = parse_price_number(p.get('sale_price_value'))
+    if base is None or sale is None or base <= 0 or sale <= 0 or sale >= base:
         return None
     percent = max(1, round((1 - sale / base) * 100))
     return {'base': base, 'sale': sale, 'percent': percent}
@@ -322,7 +349,7 @@ def sale_price_info(p):
 
 def active_price_value(p):
     info = sale_price_info(p)
-    return str(p.get('sale_price_value')) if info else p.get('price_value')
+    return canonical_price_value(p.get('sale_price_value')) if info else canonical_price_value(p.get('price_value'))
 
 
 def active_price_text(p):
@@ -402,7 +429,7 @@ def effective_pricing_tiers(p):
         tiers.append({
             'label': str(t.get('label') or (f"{qty}’li set" if qty > 1 else 'Tekli')),
             'quantity': qty,
-            'price_value': str(t.get('price_value')),
+            'price_value': canonical_price_value(t.get('price_value')),
             'note': str(t.get('note') or ''),
             '_auto': bool(t.get('_auto')),
         })
@@ -619,7 +646,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.24'
+SITE_ASSET_VERSION = '3.1.25'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
