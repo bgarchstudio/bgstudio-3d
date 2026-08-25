@@ -1108,19 +1108,25 @@
     "main_image_height": 760
   },
   {
-    "price_text": "1.499 TL",
+    "sale_price_value": null,
+    "features": [
+      "İplerle asılı insan figürü görünümü",
+      "Heykelsi 3D kompozisyon",
+      "Havada süzülme etkisi",
+      "El ve insan figürü tasarımı",
+      "Siyah taşıyıcı stand",
+      "Modern masaüstü dekor",
+      "2 plaka 3D baskı üretim"
+    ],
+    "description": "İplerle asılı görünüm veren ince baskı bağlantılarıyla tasarlanan bu dekoratif figür, üstte yer alan el formu ve alttaki insan figürüyle güçlü bir görsel kompozisyon oluşturur. Havada süzülüyormuş etkisi veren yapısı sayesinde modern yaşam alanları, çalışma odaları ve dikkat çekici dekor objeleri kullanılan iç mekânlarda öne çıkar.\n\nSiyah stand ve açık renkli figür kontrastı ürünü daha heykelsi ve premium gösterir. Masaüstünde, raf üzerinde veya dekoratif sergileme alanlarında kullanılabilecek özgün bir 3D baskı tasarımıdır.",
+    "price_value": "1499",
+    "card_description": "El formundan aşağı uzanan ince bağlantılarla havada asılı görünen insan figürünü bir araya getiren heykelsi masaüstü dekor.",
     "color_ids": [
       "bone-white",
       "siyah",
       "beyaz"
     ],
-    "seo_description": "El formundan aşağı uzanan ince baskı bağlantılarıyla asılı görünen insan figürü dekoru, modern masaüstü kullanım için 3D baskı ile üretilir.",
-    "card_description": "El formundan aşağı uzanan ince bağlantılarla havada asılı görünen insan figürünü bir araya getiren heykelsi masaüstü dekor.",
-    "name": "İplerle Asılı İnsan Figürü Dekor",
-    "pricing_tiers": [],
-    "featured": true,
     "category": "dekoratif-duvar",
-    "seo_title": "İplerle Asılı İnsan Figürü Dekor | Kuşadası 3D Baskı | BG Studio 3D",
     "tags": [
       "Hediye",
       "Masaüstü",
@@ -1132,31 +1138,28 @@
       "Figür",
       "İpli Tasarım"
     ],
-    "price_value": "1.499",
+    "seo_description": "El formundan aşağı uzanan ince baskı bağlantılarıyla asılı görünen insan figürü dekoru, modern masaüstü kullanım için 3D baskı ile üretilir.",
+    "slug": "iplerle-asili-insan-figuru-dekor",
+    "price_text": "1499 TL",
+    "sort_order": 25,
     "options": [
       "Beyaz figür + Siyah stand",
       "Bone White figür + Siyah stand",
       "Siyah figür + Siyah stand"
     ],
     "active": true,
-    "slug": "iplerle-asili-insan-figuru-dekor",
-    "features": [
-      "İplerle asılı insan figürü görünümü",
-      "Heykelsi 3D kompozisyon",
-      "Havada süzülme etkisi",
-      "El ve insan figürü tasarımı",
-      "Siyah taşıyıcı stand",
-      "Modern masaüstü dekor",
-      "2 plaka 3D baskı üretim"
-    ],
-    "sort_order": 25,
+    "pricing_tiers": [],
+    "seo_title": "İplerle Asılı İnsan Figürü Dekor | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": true,
     "production_note": "Ürün 2 plaka halinde 3D baskı yöntemiyle üretilir. Figürü taşıyan ince bağlantılar baskı sırasında ürünün parçası olarak basılır. Ek ip bağlama işlemi yoktur. 3D baskı yüzeylerinde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
-    "description": "İplerle asılı görünüm veren ince baskı bağlantılarıyla tasarlanan bu dekoratif figür, üstte yer alan el formu ve alttaki insan figürüyle güçlü bir görsel kompozisyon oluşturur. Havada süzülüyormuş etkisi veren yapısı sayesinde modern yaşam alanları, çalışma odaları ve dikkat çekici dekor objeleri kullanılan iç mekânlarda öne çıkar.\n\nSiyah stand ve açık renkli figür kontrastı ürünü daha heykelsi ve premium gösterir. Masaüstünde, raf üzerinde veya dekoratif sergileme alanlarında kullanılabilecek özgün bir 3D baskı tasarımıdır.",
-    "sale_price_value": null,
+    "name": "İplerle Asılı İnsan Figürü Dekor",
     "gallery_images": [],
     "main_image": "assets/images/products/iplerle-asili-insan-figuru-dekor.webp",
     "main_image_width": 1000,
-    "main_image_height": 760
+    "main_image_height": 760,
+    "poster_image": null,
+    "poster_image_width": null,
+    "poster_image_height": null
   },
   {
     "price_text": "1499 TL",
