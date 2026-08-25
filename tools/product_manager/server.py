@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.22'
+PANEL_VERSION = '3.1.23'
 BACKUPS = BACKUPS_ROOT
 
 PRODUCT_CATEGORIES = {
@@ -649,6 +649,8 @@ class Handler(BaseHTTPRequestHandler):
                 {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
                 {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
                 {'id':'pet-urunleri','label':'Pet Ürünleri'},
+                {'id':'taki-makyaj','label':'Takı & Makyaj'},
+                {'id':'oyun-oyuncak','label':'Oyun & Oyuncak'},
             ]
             return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
