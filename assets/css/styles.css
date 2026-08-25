@@ -725,3 +725,7 @@ button{font-family:inherit}
   .field-work-card .field-work-top{margin-bottom:22px}
   .field-work-card .field-work-link{padding-top:20px}
 }
+
+
+/* v3.1.26 — WhatsApp fake notification badge removed */
+.floating-whatsapp::after{content:none!important;display:none!important}
