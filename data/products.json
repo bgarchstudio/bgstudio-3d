@@ -39,39 +39,42 @@
     ]
   },
   {
-    "slug": "ataturk-imzasi",
-    "name": "Atatürk İmzası",
-    "category": "dekoratif-duvar",
-    "price_text": "Ölçüye göre",
-    "price_value": null,
-    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
-    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
-    "options": [],
+    "sale_price_value": null,
     "features": [
       "İstenen ölçüde üretim",
       "40 / 48 / 60 / 80 cm örnekleri",
       "Duvar ve mermer yüzeye uygun",
       "Siyah renk üretim"
     ],
+    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
+    "price_value": null,
+    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
+    "color_ids": [
+      "siyah"
+    ],
+    "category": "dekoratif-duvar",
+    "tags": [
+      "Duvar Dekoru",
+      "Hediye"
+    ],
+    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "slug": "ataturk-imzasi",
+    "price_text": "Ölçüye göre fiyatlandırma",
+    "sort_order": 2,
+    "options": [],
+    "active": true,
+    "pricing_tiers": [],
+    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": false,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "name": "Atatürk İmzası",
+    "gallery_images": [],
     "main_image": "assets/images/products/ataturk-imzasi.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/ataturk-imzasi.webp",
     "poster_image_width": 1254,
-    "poster_image_height": 1254,
-    "featured": false,
-    "active": true,
-    "sort_order": 2,
-    "seo_title": "Atatürk İmzası | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Atatürk İmzası, İstenen ölçülerde 3D baskı siyah Atatürk imzası. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "color_ids": [
-      "siyah"
-    ],
-    "tags": [
-      "Duvar Dekoru",
-      "Hediye"
-    ]
+    "poster_image_height": 1254
   },
   {
     "slug": "cerceveli-dalga-lamba",
@@ -357,41 +360,45 @@
     ]
   },
   {
-    "slug": "havuz-icecek-tutucu",
-    "name": "Yüzen Havuz İçecek Tutucu",
-    "category": "pratik-fonksiyonel",
-    "price_text": "Fiyat için iletişim",
-    "price_value": null,
-    "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
-    "description": "Havuz kullanımında kutu içeceği su üzerinde taşımaya yönelik, hafif ve yüzen gövdeli fonksiyonel 3D baskı aksesuar.",
-    "options": [
-      "Turuncu/Beyaz",
-      "Mavi/Beyaz",
-      "Yeşil",
-      "Pembe"
-    ],
+    "sale_price_value": null,
     "features": [
       "Yüzen tasarım",
       "İçecek tutucu",
       "Farklı renk seçenekleri",
       "Hafif gövde"
     ],
+    "description": "Havuz kullanımında kutu içeceği su üzerinde taşımaya yönelik, hafif ve yüzen gövdeli fonksiyonel 3D baskı aksesuar.",
+    "price_value": "599",
+    "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
+    "color_ids": [],
+    "category": "pratik-fonksiyonel",
+    "tags": [
+      "Pratik",
+      "Yaz"
+    ],
+    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "slug": "havuz-icecek-tutucu",
+    "price_text": "599 TL",
+    "sort_order": 9,
+    "options": [
+      "Turuncu/Beyaz",
+      "Mavi/Beyaz",
+      "Yeşil",
+      "Pembe"
+    ],
+    "active": true,
+    "pricing_tiers": [],
+    "seo_title": "Yüzen Havuz İçecek Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": true,
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "name": "Yüzen Havuz İçecek Tutucu",
+    "gallery_images": [],
     "main_image": "assets/images/products/havuz-icecek-tutucu.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": "assets/images/posters/havuz-icecek-tutucu.webp",
     "poster_image_width": 1120,
-    "poster_image_height": 1400,
-    "featured": true,
-    "active": true,
-    "sort_order": 9,
-    "seo_title": "Yüzen Havuz İçecek Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Yüzen Havuz İçecek Tutucu, İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
-    "tags": [
-      "Pratik",
-      "Yaz"
-    ]
+    "poster_image_height": 1400
   },
   {
     "price_text": "3.499 TL",
