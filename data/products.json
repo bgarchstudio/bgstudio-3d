@@ -1208,5 +1208,62 @@
     "main_image": "assets/images/products/kaktus-kulaklik-saat-standi.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "349 TL",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "beyaz"
+    ],
+    "seo_description": "Kedi ve köpekler için kişiye özel mama küreği; sap kısmına evcil hayvanın adı yazılarak 3D baskı ile üretilir. Kuşadası 3D baskı.",
+    "card_description": "Kedi veya köpek maması için kullanılan, üzerine evcil hayvanın adı yazılan kişiye özel mama küreği.",
+    "name": "Hayvanınızın İsmine Özel Mama Küreği",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "pet-urunleri",
+    "seo_title": "Hayvanıza Özel Mama Küreği | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Kişiye Özel",
+      "Pet",
+      "Kedi",
+      "Köpek",
+      "Mama",
+      "Mama Küreği",
+      "Hediye",
+      "İsimli Mama Küreği",
+      "Kişiselleştirilmiş Pet Ürünü",
+      "Kedi Maması",
+      "Köpek Maması",
+      "Pet Aksesuarı"
+    ],
+    "price_value": "349",
+    "options": [
+      "İsim kişiselleştirme dahil",
+      "Kedi için kullanım",
+      "Köpek için kullanım"
+    ],
+    "active": true,
+    "slug": "hayvaninizin-ismine-ozel-mama-kuregi",
+    "features": [
+      "İsme özel üretim",
+      "Kedi ve köpek kullanımına uygun",
+      "Pratik mama servis formu",
+      "Kişiselleştirilmiş sap tasarımı",
+      "Hediye için uygun",
+      "3D baskı üretim",
+      "Farklı renk seçenekleri"
+    ],
+    "sort_order": 27,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "description": "Kedi ve köpek mamasını pratik şekilde servis etmek için tasarlanan kişiye özel mama küreği, tutma kısmındaki isim alanıyla evcil hayvanınıza özel hale getirilir. Sap bölümüne istenilen isim yazılarak hazırlanır ve günlük kullanımda mama kabına ölçülü aktarım sağlar.\n\nHem işlevsel hem de sevimli bir pet aksesuarı olan bu ürün; kedi ve köpek sahipleri için kişisel kullanımın yanında hediye olarak da tercih edilebilir. Mama küreği formu ve isim detayı sayesinde pet alanında düzenli ve özel bir kullanım sunar.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/hayvaninizin-ismine-ozel-mama-kuregi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
