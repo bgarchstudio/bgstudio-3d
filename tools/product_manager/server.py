@@ -17,14 +17,23 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.23'
+PANEL_VERSION = '3.1.24'
 BACKUPS = BACKUPS_ROOT
 
-PRODUCT_CATEGORIES = {
-    'dekoratif-duvar', 'aydinlatma', 'ev-duzen', 'gaming-masaustu',
-    'anahtarlik-aksesuar', 'hediye-kisiye-ozel', 'pratik-fonksiyonel',
-    'pet-urunleri'
-}
+# Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
+CATEGORY_OPTIONS = (
+    ('dekoratif-duvar', 'Dekoratif & Duvar'),
+    ('aydinlatma', 'Aydınlatma'),
+    ('ev-duzen', 'Ev & Düzen'),
+    ('gaming-masaustu', 'Gaming & Masaüstü'),
+    ('anahtarlik-aksesuar', 'Anahtarlık & Aksesuar'),
+    ('hediye-kisiye-ozel', 'Hediye & Kişiye Özel'),
+    ('pratik-fonksiyonel', 'Pratik & Fonksiyonel'),
+    ('pet-urunleri', 'Pet Ürünleri'),
+    ('taki-makyaj', 'Takı & Makyaj'),
+    ('oyun-oyuncak', 'Oyun & Oyuncak'),
+)
+PRODUCT_CATEGORIES = {category_id for category_id, _ in CATEGORY_OPTIONS}
 CATEGORY_ALIASES = {
     'dekoratif': 'dekoratif-duvar',
     'aydinlatma': 'aydinlatma',
@@ -36,7 +45,8 @@ TAG_PRESETS = [
     'Kişiye Özel', 'Kurumsal', 'Adetli Üretim', 'Logolu', 'Hediye',
     'Gaming', 'PlayStation', 'Xbox', 'Masaüstü', 'Anahtarlık', 'Organizer',
     'Duvar Dekoru', 'Açacak', 'Telefon', 'Saat / Şarj', 'Futbol', 'Flexi', 'Kitap',
-    'Pet', 'Kedi', 'Köpek', 'Mama', 'Mama Küreği', 'Su Kabı', 'Oyuncak', 'Petshop'
+    'Pet', 'Kedi', 'Köpek', 'Mama', 'Mama Küreği', 'Su Kabı', 'Oyuncak', 'Petshop',
+    'Takı', 'Makyaj', 'Takı Standı', 'Kolye', 'Bileklik', 'Oyun', 'Oyuncak', 'Stres Oyuncağı'
 ]
 ensure_initialized()
 export_to_repo()
@@ -640,18 +650,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         if u.path == '/api/products':
-            categories = [
-                {'id':'dekoratif-duvar','label':'Dekoratif & Duvar'},
-                {'id':'aydinlatma','label':'Aydınlatma'},
-                {'id':'ev-duzen','label':'Ev & Düzen'},
-                {'id':'gaming-masaustu','label':'Gaming & Masaüstü'},
-                {'id':'anahtarlik-aksesuar','label':'Anahtarlık & Aksesuar'},
-                {'id':'hediye-kisiye-ozel','label':'Hediye & Kişiye Özel'},
-                {'id':'pratik-fonksiyonel','label':'Pratik & Fonksiyonel'},
-                {'id':'pet-urunleri','label':'Pet Ürünleri'},
-                {'id':'taki-makyaj','label':'Takı & Makyaj'},
-                {'id':'oyun-oyuncak','label':'Oyun & Oyuncak'},
-            ]
+            categories = [{'id': category_id, 'label': label} for category_id, label in CATEGORY_OPTIONS]
             return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
