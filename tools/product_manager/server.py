@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.26'
+PANEL_VERSION = '3.1.28'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -151,6 +151,104 @@ def write_colors(items):
     return clean
 
 
+def default_site_settings():
+    return {
+        'announcement_bar': {
+            'enabled': True,
+            'speed': 'normal',
+            'separator': '✦',
+            'messages': [
+                {'id':'ucretsiz-kargo','text':'1.000 TL üzeri ücretsiz kargo','url':'','enabled':True,'source_type':'manual','source_ref':''},
+                {'id':'kusadasi-teslim','text':'Kuşadası elden teslim','url':'','enabled':True,'source_type':'manual','source_ref':''},
+                {'id':'kisiye-ozel','text':'Kişiye özel 3D üretim','url':'/ozel-uretim/','enabled':True,'source_type':'manual','source_ref':''},
+                {'id':'kurumsal','text':'Kurumsal toplu sipariş','url':'/kurumsal/','enabled':True,'source_type':'manual','source_ref':''},
+                {'id':'nfc-qr','text':'NFC + QR işletme çözümleri','url':'/nfc-qr/','enabled':True,'source_type':'manual','source_ref':''},
+            ],
+            'integration': {'discounts_enabled': False, 'mode': 'manual'},
+        }
+    }
+
+
+def read_site_settings():
+    data = get_collection('site_settings', default_site_settings())
+    return data if isinstance(data, dict) else default_site_settings()
+
+
+def _safe_campaign_url(value):
+    url = str(value or '').strip()[:500]
+    if not url:
+        return ''
+    low = url.lower()
+    if low.startswith(('javascript:', 'data:', 'vbscript:')):
+        raise ValueError('Kampanya bağlantısı güvenli değil.')
+    if url.startswith(('/', '#')) or low.startswith(('https://', 'http://')):
+        return url
+    # Plain site-relative paths such as urunler/... are accepted and normalized.
+    if re.fullmatch(r'[A-Za-z0-9_./?=&%+#-]+', url):
+        return '/' + url.lstrip('/')
+    raise ValueError('Kampanya bağlantısı http(s) adresi veya site içi / ile başlayan yol olmalı.')
+
+
+def clean_site_settings(value):
+    payload = value if isinstance(value, dict) else {}
+    current = read_site_settings()
+    current_bar = current.get('announcement_bar') if isinstance(current.get('announcement_bar'), dict) else {}
+    incoming = payload.get('announcement_bar') if isinstance(payload.get('announcement_bar'), dict) else {}
+    speed = str(incoming.get('speed') or current_bar.get('speed') or 'normal').strip().lower()
+    if speed not in ('slow', 'normal', 'fast'):
+        speed = 'normal'
+    rows = incoming.get('messages') if isinstance(incoming.get('messages'), list) else []
+    messages = []
+    used = set()
+    for index, row in enumerate(rows[:30], 1):
+        if not isinstance(row, dict):
+            continue
+        text = re.sub(r'\s+', ' ', str(row.get('text') or '')).strip()[:180]
+        if not text:
+            continue
+        raw_id = slugify(row.get('id') or text) or f'mesaj-{index}'
+        item_id = raw_id
+        suffix = 2
+        while item_id in used:
+            item_id = f'{raw_id}-{suffix}'; suffix += 1
+        used.add(item_id)
+        source_type = str(row.get('source_type') or 'manual').strip().lower()
+        if source_type not in ('manual', 'discount', 'campaign'):
+            source_type = 'manual'
+        messages.append({
+            'id': item_id,
+            'text': text,
+            'url': _safe_campaign_url(row.get('url')),
+            'enabled': bool(row.get('enabled', True)),
+            'source_type': source_type,
+            'source_ref': str(row.get('source_ref') or '').strip()[:120],
+        })
+    settings = {
+        'announcement_bar': {
+            'enabled': bool(incoming.get('enabled', True)),
+            'speed': speed,
+            'separator': '✦',
+            'messages': messages,
+            # Reserved bridge: future discount rules can inject generated messages
+            # without changing the manual message schema.
+            'integration': {
+                'discounts_enabled': bool((incoming.get('integration') or {}).get('discounts_enabled', False)) if isinstance(incoming.get('integration'), dict) else False,
+                'mode': str((incoming.get('integration') or {}).get('mode') or 'manual')[:40] if isinstance(incoming.get('integration'), dict) else 'manual',
+            },
+        }
+    }
+    # No active message means nothing can be displayed; keep data but hide the bar.
+    if not any(x.get('enabled', True) and x.get('text') for x in messages):
+        settings['announcement_bar']['enabled'] = False
+    return settings
+
+
+def write_site_settings(value):
+    clean = clean_site_settings(value)
+    set_collection('site_settings', clean)
+    return clean
+
+
 def backup():
     return create_db_backup('products-auto')
 
@@ -212,6 +310,17 @@ def preflight():
         })
     except Exception as e:
         checks.append({'status':'warn','label':'NFC sayfa senkronu','detail':str(e)})
+    try:
+        settings = read_site_settings()
+        bar = settings.get('announcement_bar') if isinstance(settings, dict) else {}
+        messages = [x for x in (bar.get('messages') or []) if isinstance(x, dict) and x.get('enabled', True) and str(x.get('text') or '').strip()] if isinstance(bar, dict) else []
+        if bar.get('enabled'):
+            checks.append({'status':'pass' if messages else 'fail','label':'Kampanya şeridi','detail':f'Şerit açık · {len(messages)} aktif mesaj · hız: {bar.get("speed") or "normal"}.' if messages else 'Şerit açık ama aktif mesaj yok.'})
+        else:
+            checks.append({'status':'pass','label':'Kampanya şeridi','detail':f'Şerit kapalı · {len(messages)} mesaj kayıtlı.'})
+    except Exception as e:
+        checks.append({'status':'warn','label':'Kampanya şeridi','detail':str(e)})
+
     pricing_bad = []
     for prod in products:
         seen = set()
@@ -692,6 +801,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
             return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'storage': storage_status()})
+        if u.path == '/api/site-settings':
+            return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/backups':
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
@@ -707,6 +818,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            if self.path == '/api/site-settings/save':
+                payload = self.read_json()
+                full_backup('before-site-settings-save')
+                settings = write_site_settings(payload.get('settings') or {})
+                result = build_site()
+                return self.send_json({'ok': True, 'message': 'Kampanya şeridi ayarları kaydedildi ve site güncellendi.', 'settings': settings, 'result': result})
+
             if self.path == '/api/colors/save':
                 payload = self.read_json()
                 full_backup('before-colors-save')

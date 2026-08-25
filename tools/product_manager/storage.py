@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -30,6 +30,7 @@ COLLECTIONS = {
     'nfc': ROOT / 'data' / 'nfc_references.json',
     'corporate': ROOT / 'data' / 'corporate_references.json',
     'prototype': ROOT / 'data' / 'prototypes.json',
+    'site_settings': ROOT / 'data' / 'site_settings.json',
 }
 
 MUTABLE_MEDIA_PREFIXES = (
@@ -38,6 +39,88 @@ MUTABLE_MEDIA_PREFIXES = (
     'assets/images/references/',
     'assets/images/prototypes/',
 )
+
+DEFAULT_SITE_SETTINGS = {
+    'announcement_bar': {
+        'enabled': True,
+        'speed': 'normal',
+        'separator': '✦',
+        'messages': [
+            {'id': 'ucretsiz-kargo', 'text': '1.000 TL üzeri ücretsiz kargo', 'url': '', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
+            {'id': 'kusadasi-teslim', 'text': 'Kuşadası elden teslim', 'url': '', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
+            {'id': 'kisiye-ozel', 'text': 'Kişiye özel 3D üretim', 'url': '/ozel-uretim/', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
+            {'id': 'kurumsal', 'text': 'Kurumsal toplu sipariş', 'url': '/kurumsal/', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
+            {'id': 'nfc-qr', 'text': 'NFC + QR işletme çözümleri', 'url': '/nfc-qr/', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
+        ],
+        # Reserved for a later automatic bridge to product discounts/campaign rules.
+        'integration': {'discounts_enabled': False, 'mode': 'manual'},
+    }
+}
+
+
+def _merge_site_settings(value):
+    """Return a safe, forward-compatible site-settings document."""
+    source = value if isinstance(value, dict) else {}
+    out = json.loads(json.dumps(DEFAULT_SITE_SETTINGS, ensure_ascii=False))
+    bar_in = source.get('announcement_bar') if isinstance(source.get('announcement_bar'), dict) else {}
+    bar = out['announcement_bar']
+    if 'enabled' in bar_in:
+        bar['enabled'] = bool(bar_in.get('enabled'))
+    speed = str(bar_in.get('speed') or '').strip().lower()
+    if speed in ('slow', 'normal', 'fast'):
+        bar['speed'] = speed
+    bar['separator'] = '✦'
+    if isinstance(bar_in.get('messages'), list):
+        messages = []
+        seen = set()
+        for index, item in enumerate(bar_in.get('messages') or []):
+            if not isinstance(item, dict):
+                continue
+            text = str(item.get('text') or '').strip()[:180]
+            if not text:
+                continue
+            raw_id = str(item.get('id') or '').strip().lower()
+            safe_id = ''.join(ch if ch.isalnum() or ch in '-_' else '-' for ch in raw_id).strip('-_')
+            if not safe_id:
+                safe_id = f'mesaj-{index + 1}'
+            base = safe_id
+            suffix = 2
+            while safe_id in seen:
+                safe_id = f'{base}-{suffix}'; suffix += 1
+            seen.add(safe_id)
+            url = str(item.get('url') or '').strip()[:500]
+            source_type = str(item.get('source_type') or 'manual').strip().lower()
+            if source_type not in ('manual', 'discount', 'campaign'):
+                source_type = 'manual'
+            messages.append({
+                'id': safe_id,
+                'text': text,
+                'url': url,
+                'enabled': bool(item.get('enabled', True)),
+                'source_type': source_type,
+                'source_ref': str(item.get('source_ref') or '').strip()[:120],
+            })
+        bar['messages'] = messages[:30]
+    integration_in = bar_in.get('integration') if isinstance(bar_in.get('integration'), dict) else {}
+    bar['integration'] = {
+        'discounts_enabled': bool(integration_in.get('discounts_enabled', False)),
+        'mode': str(integration_in.get('mode') or 'manual')[:40],
+    }
+    return out
+
+
+def _ensure_site_settings(con):
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('site_settings',)).fetchone()
+    try:
+        current = json.loads(row[0]) if row else {}
+    except Exception:
+        current = {}
+    merged = _merge_site_settings(current)
+    if current != merged or not row:
+        con.execute(
+            'INSERT INTO collections(name,json_text,updated_at) VALUES(?,?,?) ON CONFLICT(name) DO UPDATE SET json_text=excluded.json_text, updated_at=excluded.updated_at',
+            ('site_settings', json.dumps(merged, ensure_ascii=False, indent=2), _now())
+        )
 
 
 # V3.1 product taxonomy migration. Legacy values stay readable in older backups,
@@ -418,6 +501,8 @@ def _upgrade_schema(con, old_version):
         _upgrade_references_v4(con)
     if old_version < 5:
         _repair_nfc_corporate_visibility(con)
+    if old_version < 6:
+        _ensure_site_settings(con)
 
 _lock = threading.RLock()
 
@@ -480,7 +565,7 @@ def _copy_tree_contents(src: Path, dst: Path):
 
 
 def _initial_import(con):
-    defaults = {name: [] for name in COLLECTIONS}
+    defaults = {name: ([] if name != 'site_settings' else DEFAULT_SITE_SETTINGS) for name in COLLECTIONS}
     for name, repo_path in COLLECTIONS.items():
         data = _read_repo_json(repo_path, defaults[name])
         con.execute(
@@ -508,6 +593,7 @@ def _initial_import(con):
     _ensure_kusadasi_asansor_reference(con)
     _upgrade_references_v4(con)
     _repair_nfc_corporate_visibility(con)
+    _ensure_site_settings(con)
     _meta_set(con, 'initialized', '1')
     _meta_set(con, 'schema_version', SCHEMA_VERSION)
     _meta_set(con, 'initialized_at', _now())
@@ -529,7 +615,7 @@ def ensure_initialized():
                 for name, repo_path in COLLECTIONS.items():
                     row = con.execute('SELECT 1 FROM collections WHERE name=?', (name,)).fetchone()
                     if not row:
-                        data = _read_repo_json(repo_path, [])
+                        data = _read_repo_json(repo_path, DEFAULT_SITE_SETTINGS if name == 'site_settings' else [])
                         con.execute('INSERT INTO collections(name,json_text,updated_at) VALUES(?,?,?)', (name, json.dumps(data, ensure_ascii=False, indent=2), _now()))
                 try:
                     old_version = int(_meta_get(con, 'schema_version', '1') or 1)
@@ -542,6 +628,7 @@ def ensure_initialized():
                 # Kuşadası Asansör missing after an older partial patch/update.
                 _ensure_kusadasi_asansor_reference(con)
                 _repair_nfc_corporate_visibility(con)
+                _ensure_site_settings(con)
                 _meta_set(con, 'schema_version', SCHEMA_VERSION)
                 con.commit()
         write_info_file()
@@ -637,7 +724,8 @@ def export_to_repo():
     with _lock:
         for name, repo_path in COLLECTIONS.items():
             repo_path.parent.mkdir(parents=True, exist_ok=True)
-            repo_path.write_text(json.dumps(get_collection(name, []), ensure_ascii=False, indent=2), encoding='utf-8')
+            default_value = DEFAULT_SITE_SETTINGS if name == 'site_settings' else []
+            repo_path.write_text(json.dumps(get_collection(name, default_value), ensure_ascii=False, indent=2), encoding='utf-8')
         for prefix in MUTABLE_MEDIA_PREFIXES:
             src = MEDIA_ROOT / prefix.rstrip('/')
             dst = ROOT / prefix.rstrip('/')

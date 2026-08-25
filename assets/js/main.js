@@ -20,7 +20,7 @@
   const clean = value => String(value || '').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
   const cssEsc = value => {
     try { return CSS.escape(String(value || '')); }
-    catch (_) { X }
+    catch (_) { return String(value || '').replace(/[\"\\]/g, '\\$&'); }
   };
   const canonicalFromHash = value => String(value || '').replace(/^#/, '').replace(/^referans-/, '').trim();
   const normalizedPath = value => {
@@ -193,52 +193,88 @@ const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
-const announcementBarConfig = {
+const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
   enabled: true,
-  items: [
-    '1.000 TL üzeri ücretsiz kargo',
-    'Kuşadası elden teslim',
-    'Kişiye özel 3D üretim',
-    'Kurumsal toplu sipariş',
-    'NFC + QR işletme çözümleri'
-  ],
-  separator: '✦'
+  speed: 'normal',
+  separator: '✦',
+  messages: [
+    { text: '1.000 TL üzeri ücretsiz kargo', url: '', enabled: true },
+    { text: 'Kuşadası elden teslim', url: '', enabled: true },
+    { text: 'Kişiye özel 3D üretim', url: '/ozel-uretim/', enabled: true },
+    { text: 'Kurumsal toplu sipariş', url: '/kurumsal/', enabled: true },
+    { text: 'NFC + QR işletme çözümleri', url: '/nfc-qr/', enabled: true }
+  ]
 };
 
-const mountAnnouncementBar = () => {
-  if (!announcementBarConfig.enabled) return;
+const announcementSpeedSeconds = speed => ({ slow: 42, normal: 28, fast: 18 }[String(speed || '').toLowerCase()] || 28);
+
+const safeAnnouncementHref = value => {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (/^(?:javascript|data|vbscript):/i.test(raw)) return '';
+  if (raw.startsWith('/') || raw.startsWith('#') || /^https?:\/\//i.test(raw)) return raw;
+  return '/' + raw.replace(/^\/+/, '');
+};
+
+const loadAnnouncementBarConfig = async () => {
+  try {
+    const response = await fetch('/data/site_settings.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('site settings unavailable');
+    const settings = await response.json();
+    const config = settings?.announcement_bar;
+    if (!config || typeof config !== 'object') throw new Error('announcement settings unavailable');
+    return config;
+  } catch (_) {
+    return DEFAULT_ANNOUNCEMENT_BAR_CONFIG;
+  }
+};
+
+const mountAnnouncementBar = async () => {
   const header = document.querySelector('.site-header');
   const navShell = header?.querySelector('.nav-shell');
   if (!header || !navShell || header.querySelector('.announcement-marquee')) return;
 
-  const items = (announcementBarConfig.items || []).map(item => String(item || '').trim()).filter(Boolean);
-  if (!items.length) return;
+  const config = await loadAnnouncementBarConfig();
+  if (config?.enabled === false) return;
+  const messages = (Array.isArray(config?.messages) ? config.messages : [])
+    .filter(item => item && item.enabled !== false && String(item.text || '').trim())
+    .slice(0, 30);
+  if (!messages.length) return;
 
-  const makeSequence = () => items.map(item => {
-    const safeText = item
+  const separator = '✦';
+  const makeSequence = duplicate => messages.map(item => {
+    const text = String(item.text || '').trim();
+    const safeText = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-    return `<span class="announcement-marquee-item">${safeText}</span>`;
-  }).join(`<span class="announcement-marquee-separator" aria-hidden="true">${announcementBarConfig.separator}</span>`);
+    const href = safeAnnouncementHref(item.url);
+    if (!href) return `<span class="announcement-marquee-item">${safeText}</span>`;
+    const external = /^https?:\/\//i.test(href) && !href.startsWith(window.location.origin);
+    const attrs = duplicate ? ' tabindex="-1"' : '';
+    const target = external ? ' target="_blank" rel="noopener"' : '';
+    const safeHref = href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<a class="announcement-marquee-item is-link" href="${safeHref}"${target}${attrs}>${safeText}</a>`;
+  }).join(`<span class="announcement-marquee-separator" aria-hidden="true">${separator}</span>`);
 
   const bar = document.createElement('div');
   bar.className = 'announcement-marquee';
   bar.setAttribute('role', 'region');
   bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
+  bar.style.setProperty('--announcement-duration', `${announcementSpeedSeconds(config?.speed)}s`);
   bar.innerHTML = `
     <div class="announcement-marquee-viewport">
       <div class="announcement-marquee-track">
-        <div class="announcement-marquee-group">${makeSequence()}</div>
-        <div class="announcement-marquee-group" aria-hidden="true">${makeSequence()}</div>
+        <div class="announcement-marquee-group">${makeSequence(false)}</div>
+        <div class="announcement-marquee-group" aria-hidden="true">${makeSequence(true)}</div>
       </div>
     </div>`;
 
   header.insertBefore(bar, navShell);
 };
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAnnouncementBar, { once: true });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { mountAnnouncementBar(); }, { once: true });
 else mountAnnouncementBar();
 
 

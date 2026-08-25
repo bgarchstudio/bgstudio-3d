@@ -1,11 +1,11 @@
-let products=[], colors=[], currentSlug=null, slugLocked=false, listFilter='all', draggedSlug=null;
+let products=[], colors=[], siteSettings=null, currentSlug=null, slugLocked=false, listFilter='all', draggedSlug=null;
 const $=id=>document.getElementById(id);
 const fields=['name','slug','category','price_text','price_value','sale_price_value','card_description','description','options','features','tags','production_note','sort_order','seo_title','seo_description'];
 const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className='toast'+(error?' error':'');t.hidden=false;clearTimeout(window.__tt);window.__tt=setTimeout(()=>t.hidden=true,4200)};
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='3.1.26';
+const PANEL_VERSION='3.1.28';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -205,6 +205,28 @@ $('addColor').onclick=()=>{$('colorInventoryList').append(colorInventoryRow({in_
 $('saveColors').onclick=async()=>{try{const selectedBefore=selectedProductColorIds();const d=await api('/api/colors/save',{method:'POST',body:JSON.stringify({colors:collectColors()})});colors=d.colors||[];renderProductColors(selectedBefore.filter(id=>colorById(id)));$('colorsModal').hidden=true;document.body.classList.remove('modal-open');syncTagPresetState();updateQuality();toast('✅ '+d.message+' Formdaki ürün bilgileri korundu.')}catch(err){toast(err.message,true)}};
 document.addEventListener('click',e=>{if(e.target.matches('[data-close-colors]')){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('colorsModal').hidden){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
+
+// v3.1.28 — campaign / announcement marquee manager
+function campaignMessageRow(item={}){
+  const row=document.createElement('div');row.className='campaign-message-row';
+  row.dataset.sourceType=item.source_type||'manual';row.dataset.sourceRef=item.source_ref||'';row.dataset.messageId=item.id||'';
+  row.innerHTML=`<label class="campaign-message-enabled" title="Mesajı yayınla"><input type="checkbox" ${item.enabled!==false?'checked':''}></label><input class="campaign-text" maxlength="180" placeholder="Örn. Seçili ürünlerde %20 indirim" value="${esc(item.text||'')}"><input class="campaign-link" maxlength="500" placeholder="İsteğe bağlı: /urunler/... veya https://..." value="${esc(item.url||'')}"><span class="campaign-source-chip">${esc((item.source_type||'manual')==='manual'?'MANUEL':'BAĞLI')}</span><button class="campaign-message-remove" type="button" aria-label="Mesajı kaldır">×</button>`;
+  row.querySelectorAll('input').forEach(input=>input.addEventListener('input',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'}));
+  row.querySelector('input[type="checkbox"]').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+  row.querySelector('.campaign-message-remove').onclick=()=>{row.remove();updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
+  return row
+}
+function renderCampaignMessages(items=[]){const wrap=$('campaignMessageList');wrap.innerHTML='';(items||[]).forEach(item=>wrap.append(campaignMessageRow(item)));if(!wrap.children.length)wrap.innerHTML='<div class="campaign-empty">Henüz mesaj yok. “+ Mesaj ekle” ile ilk duyuruyu ekle.</div>';updateCampaignPreview()}
+function collectCampaignMessages(){return [...$('campaignMessageList').querySelectorAll('.campaign-message-row')].map((row,index)=>({id:row.dataset.messageId||`mesaj-${index+1}`,text:row.querySelector('.campaign-text').value.trim(),url:row.querySelector('.campaign-link').value.trim(),enabled:row.querySelector('input[type="checkbox"]').checked,source_type:row.dataset.sourceType||'manual',source_ref:row.dataset.sourceRef||''})).filter(x=>x.text)}
+function updateCampaignPreview(){const out=$('campaignPreviewLine');if(!out)return;const enabled=$('campaignEnabled')?.checked;const texts=collectCampaignMessages().filter(x=>x.enabled).map(x=>x.text);if(!enabled){out.textContent='ŞERİT KAPALI';return}out.textContent=texts.length?texts.join('   ✦   '):'AKTİF MESAJ YOK · ŞERİT SİTEDE GİZLENİR'}
+async function openCampaignModal(){try{const d=await api('/api/site-settings');siteSettings=d.settings||{};const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=['slow','normal','fast'].includes(bar.speed)?bar.speed:'normal';renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Ayarlar yüklendi.';$('campaignModal').hidden=false;document.body.classList.add('modal-open')}catch(err){toast(err.message,true)}}
+$('manageCampaign').onclick=openCampaignModal;
+$('addCampaignMessage').onclick=()=>{const wrap=$('campaignMessageList');wrap.querySelector('.campaign-empty')?.remove();const row=campaignMessageRow({enabled:true,source_type:'manual'});wrap.append(row);row.querySelector('.campaign-text').focus();updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
+$('campaignEnabled').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+$('campaignSpeed').addEventListener('change',()=>{$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+$('saveCampaign').onclick=async()=>{try{const messages=collectCampaignMessages();const settings={announcement_bar:{enabled:$('campaignEnabled').checked,speed:$('campaignSpeed').value,separator:'✦',messages,integration:siteSettings?.announcement_bar?.integration||{discounts_enabled:false,mode:'manual'}}};$('campaignSaveState').textContent='Kaydediliyor ve site hazırlanıyor…';const d=await api('/api/site-settings/save',{method:'POST',body:JSON.stringify({settings})});siteSettings=d.settings||settings;const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=bar.speed||'normal';renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Kaydedildi · GitHub Desktop’ta Commit + Push hazır.';toast('✅ '+d.message)}catch(err){$('campaignSaveState').textContent='Hata';toast(err.message,true)}};
+document.addEventListener('click',e=>{if(e.target.matches('[data-close-campaign]')){$('campaignModal').hidden=true;document.body.classList.remove('modal-open')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('campaignModal').hidden){$('campaignModal').hidden=true;document.body.classList.remove('modal-open')}});
 
 function normalizedTags(){const seen=new Set(),out=[];splitLines($('tags').value).forEach(tag=>{const clean=tag.replace(/\s+/g,' ').trim();const key=clean.toLocaleLowerCase('tr-TR');if(clean&&!seen.has(key)){seen.add(key);out.push(clean)}});return out.slice(0,16)}
 function syncTagPresetState(){const selected=new Set(normalizedTags().map(x=>x.toLocaleLowerCase('tr-TR')));document.querySelectorAll('#tagPresets [data-tag]').forEach(b=>b.classList.toggle('active',selected.has(String(b.dataset.tag||'').toLocaleLowerCase('tr-TR'))))}
