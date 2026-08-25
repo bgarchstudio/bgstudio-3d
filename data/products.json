@@ -440,37 +440,37 @@
     "poster_image_height": 1254
   },
   {
-    "price_text": "Fiyat için iletişim",
-    "color_ids": [
-      "glitter-galaxy-black",
-      "siyah"
-    ],
-    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
-    "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
-    "name": "Kask Askılığı",
-    "pricing_tiers": [],
-    "featured": false,
-    "category": "ev-duzen",
-    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
-    "tags": [
-      "Motosiklet",
-      "Duvar Düzeni",
-      "Pratik"
-    ],
-    "price_value": null,
-    "options": [],
-    "active": true,
-    "slug": "kask-askiligi",
+    "sale_price_value": null,
     "features": [
       "Duvara monte",
       "Kask uyumlu",
       "Anahtar kancası",
       "Dayanıklı kullanım"
     ],
-    "sort_order": 11,
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
     "description": "Motosiklet ekipmanlarını düzenli ve erişilebilir tutmak için tasarlanan duvar tipi 3D baskı askılık; kask taşıma yüzeyi ve anahtar kancası içerir.",
-    "sale_price_value": null,
+    "price_value": "549",
+    "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
+    "color_ids": [
+      "glitter-galaxy-black",
+      "siyah"
+    ],
+    "category": "ev-duzen",
+    "tags": [
+      "Motosiklet",
+      "Duvar Düzeni",
+      "Pratik"
+    ],
+    "seo_description": "3D Baskı Kask Askılığı, Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.",
+    "slug": "kask-askiligi",
+    "price_text": "549 TL",
+    "sort_order": 11,
+    "options": [],
+    "active": true,
+    "pricing_tiers": [],
+    "seo_title": "3D Baskı Kask Askılığı | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": false,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "name": "Kask Askılığı",
     "gallery_images": [],
     "main_image": "assets/images/products/kask-askiligi.webp",
     "main_image_width": 1000,
