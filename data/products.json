@@ -1509,5 +1509,60 @@
     "poster_image": "assets/images/posters/kedili-kitap-ayraci.webp",
     "poster_image_width": 1254,
     "poster_image_height": 1254
+  },
+  {
+    "price_text": "249 TL",
+    "color_ids": [
+      "silk-kings-gold",
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "glitter-galaxy-black",
+      "lavender",
+      "avocado-green",
+      "sari",
+      "siyah",
+      "beyaz",
+      "kirmizi"
+    ],
+    "seo_description": "Sonsuzluk Küpü fidget oyuncak, sürekli katlanıp açılabilen hareketli 3D baskı yapısıyla masa başında elde oynamaya uygun kompakt tasarım.",
+    "card_description": "Elde tekrar tekrar katlanıp açılan hareketli yapısıyla masa başında oynamaya uygun Sonsuzluk Küpü fidget oyuncak.",
+    "name": "Sonsuzluk Küpü Fidget Oyuncak",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "pratik-fonksiyonel",
+    "seo_title": "Sonsuzluk Küpü Fidget Oyuncak | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Gaming",
+      "Masaüstü",
+      "Hediye",
+      "Fidget",
+      "Sonsuzluk Küpü",
+      "Infinity Cube",
+      "Hareketli Oyuncak",
+      "Masaüstü Oyuncak",
+      "El Oyuncağı"
+    ],
+    "price_value": "249",
+    "options": [],
+    "active": true,
+    "slug": "sonsuzluk-kupu-fidget-oyuncak",
+    "features": [
+      "Sürekli katlanabilen hareketli yapı",
+      "Infinity Cube tasarımı",
+      "Tek elle oynanabilen kompakt form",
+      "Eklemli 3D baskı yapı",
+      "Masaüstünde elde oynamaya uygun",
+      "Farklı renk seçenekleri",
+      "Tek parça hareketli üretim"
+    ],
+    "sort_order": 33,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "description": "Sonsuzluk Küpü, birbirine bağlı hareketli parçaları sayesinde farklı yönlere sürekli katlanıp açılabilen kompakt bir fidget oyuncaktır. Tek elle veya iki elle çevrilerek aynı hareket döngüsüne tekrar tekrar devam edilebilir.\n\nÇalışma masasında, okulda veya günlük molalarda elde oynamalık küçük bir masaüstü aksesuarıdır. Eklemli yapısı sayesinde ayrı parçalara ayırmadan sürekli hareket ettirilebilir.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/sonsuzluk-kupu-fidget-oyuncak.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
