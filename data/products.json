@@ -1053,5 +1053,55 @@
     "main_image": "assets/images/products/cok-bolmeli-masaustu-organizer.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "399 TL",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "Drenajlı lavabo düzenleyici; sünger, sabun ve temizlik ekipmanlarını toplar, biriken suyu lavaboya yönlendirir. Kuşadası 3D baskı.",
+    "card_description": "Sünger, sabun ve bulaşık ekipmanlarını lavabo kenarında düzenleyen, biriken suyu lavaboya yönlendiren drenajlı tezgâh düzenleyici.",
+    "name": "Drenajlı Lavabo Düzenleyici",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "ev-duzen",
+    "seo_title": "Drenajlı Lavabo Düzenleyici | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Organizer",
+      "Mutfak",
+      "Lavabo Düzenleyici",
+      "Süngerlik",
+      "Sabunluk",
+      "Drenajlı",
+      "Tezgah Düzeni",
+      "Mutfak Aksesuarı"
+    ],
+    "price_value": "399",
+    "options": [],
+    "active": true,
+    "slug": "drenajli-lavabo-duzenleyici",
+    "features": [
+      "Drenajlı lavabo kenarı tasarımı",
+      "Suyu lavaboya yönlendiren tahliye ağzı",
+      "Sünger ve sabun için geniş yüzey",
+      "Kanallı üst yüzey",
+      "Mutfak tezgahını düzenler",
+      "Kolay temizlenen form",
+      "3D baskı üretim"
+    ],
+    "sort_order": 24,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Lavabo ve tezgâh ölçülerine göre tahliye ağzının konumu farklılık gösterebilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Mutfak lavabosu çevresindeki sünger, sabun ve temizlik ekipmanlarını tek noktada toplamak için tasarlanan drenajlı lavabo düzenleyici. Eğimi ve tahliye ağzı sayesinde yüzeyde biriken su doğrudan lavaboya doğru akar.\n\nKanallı üst yüzey, ıslak sünger ve benzeri ürünlerin tabanda biriken suyun içinde kalmasını azaltır. Mutfak tezgâhında daha temiz ve düzenli bir görünüm sağlar.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/drenajli-lavabo-duzenleyici.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
