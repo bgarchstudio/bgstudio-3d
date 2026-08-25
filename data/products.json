@@ -1313,5 +1313,54 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "price_text": "649 TL",
+    "color_ids": [
+      "pastel-cloud-blue",
+      "bone-white",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "seo_description": "TV, klima ve diğer kumandaları tek yerde düzenleyen 3 bölmeli masaüstü kumandalık. Salon ve sehpa düzeni için 3D baskı ile üretilir. Kuşadası.",
+    "card_description": "TV, klima ve diğer kumandaları tek noktada düzenleyen 3 bölmeli masaüstü kumanda organizeri.",
+    "name": "3 Bölmeli Kumanda Düzenleyici",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "ev-duzen",
+    "seo_title": "3 Bölmeli Kumanda Düzenleyici | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Organizer",
+      "Masaüstü",
+      "Kumanda Düzenleyici",
+      "Kumandalık",
+      "Ev Düzeni",
+      "TV Kumandası",
+      "Klima Kumandası",
+      "3 Bölmeli",
+      "Masaüstü Organizer"
+    ],
+    "price_value": "649",
+    "options": [],
+    "active": true,
+    "slug": "3-bolmeli-kumanda-duzenleyici",
+    "features": [
+      "3 ayrı kumanda bölmesi",
+      "TV ve klima kumandalarına uygun",
+      "Masaüstü ve sehpa tipi tasarım",
+      "Kumandaları tek noktada toplar",
+      "Kompakt gövde",
+      "3D baskı üretim",
+      "Farklı renk seçenekleri"
+    ],
+    "sort_order": 29,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Üç ayrı bölmesi farklı boyutlardaki kumandaların düzenlenmesi için tasarlanmıştır. Kumanda ölçülerine göre yerleşim farklılık gösterebilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "TV, klima, uydu alıcısı ve benzeri cihazların kumandalarını düzenli şekilde bir arada tutmak için tasarlanan 3 bölmeli kumanda düzenleyici. Farklı boyutlardaki üç gözü sayesinde birden fazla kumandayı dik konumda saklar ve kaybolmalarını önlemeye yardımcı olur.\n\nSalon, oturma odası, yatak odası ve çalışma masasında düzenli bir görünüm sağlar. Kompakt formu sayesinde sehpa veya masa üzerinde fazla yer kaplamaz.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/3-bolmeli-kumanda-duzenleyici.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
