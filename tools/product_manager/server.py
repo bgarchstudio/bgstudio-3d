@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.28'
+PANEL_VERSION = '3.1.29'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -156,6 +156,7 @@ def default_site_settings():
         'announcement_bar': {
             'enabled': True,
             'speed': 'normal',
+            'direction': 'rtl',
             'separator': '✦',
             'messages': [
                 {'id':'ucretsiz-kargo','text':'1.000 TL üzeri ücretsiz kargo','url':'','enabled':True,'source_type':'manual','source_ref':''},
@@ -197,6 +198,9 @@ def clean_site_settings(value):
     speed = str(incoming.get('speed') or current_bar.get('speed') or 'normal').strip().lower()
     if speed not in ('slow', 'normal', 'fast'):
         speed = 'normal'
+    direction = str(incoming.get('direction') or current_bar.get('direction') or 'rtl').strip().lower()
+    if direction not in ('rtl', 'ltr'):
+        direction = 'rtl'
     rows = incoming.get('messages') if isinstance(incoming.get('messages'), list) else []
     messages = []
     used = set()
@@ -227,6 +231,7 @@ def clean_site_settings(value):
         'announcement_bar': {
             'enabled': bool(incoming.get('enabled', True)),
             'speed': speed,
+            'direction': direction,
             'separator': '✦',
             'messages': messages,
             # Reserved bridge: future discount rules can inject generated messages
@@ -315,7 +320,7 @@ def preflight():
         bar = settings.get('announcement_bar') if isinstance(settings, dict) else {}
         messages = [x for x in (bar.get('messages') or []) if isinstance(x, dict) and x.get('enabled', True) and str(x.get('text') or '').strip()] if isinstance(bar, dict) else []
         if bar.get('enabled'):
-            checks.append({'status':'pass' if messages else 'fail','label':'Kampanya şeridi','detail':f'Şerit açık · {len(messages)} aktif mesaj · hız: {bar.get("speed") or "normal"}.' if messages else 'Şerit açık ama aktif mesaj yok.'})
+            checks.append({'status':'pass' if messages else 'fail','label':'Kampanya şeridi','detail':f'Şerit açık · {len(messages)} aktif mesaj · hız: {bar.get("speed") or "normal"} · yön: {bar.get("direction") or "rtl"}.' if messages else 'Şerit açık ama aktif mesaj yok.'})
         else:
             checks.append({'status':'pass','label':'Kampanya şeridi','detail':f'Şerit kapalı · {len(messages)} mesaj kayıtlı.'})
     except Exception as e:

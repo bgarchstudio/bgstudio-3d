@@ -196,6 +196,7 @@ const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || wi
 const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
   enabled: true,
   speed: 'normal',
+  direction: 'rtl',
   separator: '✦',
   messages: [
     { text: '1.000 TL üzeri ücretsiz kargo', url: '', enabled: true },
@@ -242,6 +243,7 @@ const mountAnnouncementBar = async () => {
   if (!messages.length) return;
 
   const separator = '✦';
+  const direction = ['rtl', 'ltr'].includes(String(config?.direction || '').toLowerCase()) ? String(config.direction).toLowerCase() : 'rtl';
   const makeSequence = duplicate => messages.map(item => {
     const text = String(item.text || '').trim();
     const safeText = text
@@ -250,28 +252,67 @@ const mountAnnouncementBar = async () => {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
     const href = safeAnnouncementHref(item.url);
-    if (!href) return `<span class="announcement-marquee-item">${safeText}</span>`;
-    const external = /^https?:\/\//i.test(href) && !href.startsWith(window.location.origin);
-    const attrs = duplicate ? ' tabindex="-1"' : '';
-    const target = external ? ' target="_blank" rel="noopener"' : '';
-    const safeHref = href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<a class="announcement-marquee-item is-link" href="${safeHref}"${target}${attrs}>${safeText}</a>`;
-  }).join(`<span class="announcement-marquee-separator" aria-hidden="true">${separator}</span>`);
+    let itemHtml = '';
+    if (!href) itemHtml = `<span class="announcement-marquee-item">${safeText}</span>`;
+    else {
+      const external = /^https?:\/\//i.test(href) && !href.startsWith(window.location.origin);
+      const attrs = duplicate ? ' tabindex="-1"' : '';
+      const target = external ? ' target="_blank" rel="noopener"' : '';
+      const safeHref = href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      itemHtml = `<a class="announcement-marquee-item is-link" href="${safeHref}"${target}${attrs}>${safeText}</a>`;
+    }
+    // A trailing separator is intentional. It makes the boundary between the end
+    // of one segment and the beginning of the next visually identical to every
+    // internal boundary, so the animation never looks like it restarts.
+    return `${itemHtml}<span class="announcement-marquee-separator" aria-hidden="true">${separator}</span>`;
+  }).join('');
 
   const bar = document.createElement('div');
   bar.className = 'announcement-marquee';
+  bar.dataset.direction = direction;
   bar.setAttribute('role', 'region');
   bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
   bar.style.setProperty('--announcement-duration', `${announcementSpeedSeconds(config?.speed)}s`);
   bar.innerHTML = `
     <div class="announcement-marquee-viewport">
       <div class="announcement-marquee-track">
-        <div class="announcement-marquee-group">${makeSequence(false)}</div>
-        <div class="announcement-marquee-group" aria-hidden="true">${makeSequence(true)}</div>
+        <div class="announcement-marquee-group" data-marquee-primary></div>
+        <div class="announcement-marquee-group" data-marquee-clone aria-hidden="true"></div>
       </div>
     </div>`;
 
   header.insertBefore(bar, navShell);
+
+  const viewport = bar.querySelector('.announcement-marquee-viewport');
+  const primary = bar.querySelector('[data-marquee-primary]');
+  const clone = bar.querySelector('[data-marquee-clone]');
+  const firstSequence = makeSequence(false);
+  const duplicateSequence = makeSequence(true);
+  primary.innerHTML = firstSequence;
+  clone.innerHTML = duplicateSequence;
+
+  // A segment must be at least viewport-width so there is never empty space.
+  // Repeat the same message sequence inside each half, keeping both halves visually identical.
+  const fitSegments = () => {
+    primary.innerHTML = firstSequence;
+    clone.innerHTML = duplicateSequence;
+    requestAnimationFrame(() => {
+      const baseWidth = Math.max(1, primary.scrollWidth);
+      const viewportWidth = Math.max(1, viewport.clientWidth);
+      const repeats = Math.max(1, Math.ceil((viewportWidth * 1.15) / baseWidth));
+      primary.innerHTML = firstSequence + duplicateSequence.repeat(repeats - 1);
+      clone.innerHTML = duplicateSequence.repeat(repeats);
+    });
+  };
+  fitSegments();
+  if (typeof ResizeObserver === 'function') {
+    let resizeTimer = 0;
+    const observer = new ResizeObserver(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(fitSegments, 80);
+    });
+    observer.observe(viewport);
+  }
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { mountAnnouncementBar(); }, { once: true });

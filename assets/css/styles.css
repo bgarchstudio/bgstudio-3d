@@ -19,13 +19,15 @@ img{display:block;width:100%;height:auto}
 .site-header{position:sticky;top:0;z-index:50;background:rgba(244,237,227,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 .announcement-marquee{position:relative;z-index:1;overflow:hidden;background:linear-gradient(90deg,#e4c79f 0%,#eed9bc 50%,#e4c79f 100%);color:#5a3513;border-bottom:1px solid rgba(90,53,19,.12)}
 .announcement-marquee-viewport{display:flex;align-items:center;overflow:hidden;min-height:34px}
-.announcement-marquee-track{display:flex;align-items:center;gap:0;width:max-content;min-width:100%;animation:announcement-marquee-scroll var(--announcement-duration,28s) linear infinite;will-change:transform}
+.announcement-marquee-track{display:flex;align-items:center;gap:0;width:max-content;min-width:100%;animation-duration:var(--announcement-duration,28s);animation-timing-function:linear;animation-iteration-count:infinite;will-change:transform}
 .announcement-marquee-group{display:flex;align-items:center;flex:0 0 auto}
 .announcement-marquee-item,.announcement-marquee-separator{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;white-space:nowrap}
 .announcement-marquee-item{padding:0 14px;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:inherit;text-decoration:none}.announcement-marquee-item.is-link{cursor:pointer}.announcement-marquee-item.is-link:hover{text-decoration:underline;text-underline-offset:3px}.announcement-marquee-item.is-link:focus-visible{outline:2px solid currentColor;outline-offset:-2px;border-radius:4px}
 .announcement-marquee-separator{font-size:.74rem;opacity:.7;padding:0 4px}
+.announcement-marquee[data-direction="rtl"] .announcement-marquee-track{animation-name:announcement-marquee-rtl}.announcement-marquee[data-direction="ltr"] .announcement-marquee-track{animation-name:announcement-marquee-ltr}
 .announcement-marquee:hover .announcement-marquee-track{animation-play-state:paused}
-@keyframes announcement-marquee-scroll{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@keyframes announcement-marquee-rtl{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes announcement-marquee-ltr{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 .nav-shell{height:82px;display:flex;align-items:center;justify-content:space-between;gap:28px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:max-content}
 .brand-monogram{display:inline-block;width:38px;height:38px;flex:0 0 38px;font-size:0;line-height:0;background:url("../brand/bgstudio3d-monogram.png") center/contain no-repeat}

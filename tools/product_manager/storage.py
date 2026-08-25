@@ -44,6 +44,7 @@ DEFAULT_SITE_SETTINGS = {
     'announcement_bar': {
         'enabled': True,
         'speed': 'normal',
+        'direction': 'rtl',
         'separator': '✦',
         'messages': [
             {'id': 'ucretsiz-kargo', 'text': '1.000 TL üzeri ücretsiz kargo', 'url': '', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
@@ -69,6 +70,9 @@ def _merge_site_settings(value):
     speed = str(bar_in.get('speed') or '').strip().lower()
     if speed in ('slow', 'normal', 'fast'):
         bar['speed'] = speed
+    direction = str(bar_in.get('direction') or '').strip().lower()
+    if direction in ('rtl', 'ltr'):
+        bar['direction'] = direction
     bar['separator'] = '✦'
     if isinstance(bar_in.get('messages'), list):
         messages = []
