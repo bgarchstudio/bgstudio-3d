@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='3.1.29';
+const PANEL_VERSION='3.1.30';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -206,49 +206,67 @@ $('saveColors').onclick=async()=>{try{const selectedBefore=selectedProductColorI
 document.addEventListener('click',e=>{if(e.target.matches('[data-close-colors]')){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('colorsModal').hidden){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
 
-// v3.1.29 — campaign / announcement marquee manager: animated preview + direction + seamless loop
+// v3.1.30 — campaign manager performance pass: debounced preview + no layout-thrash
 const campaignPreviewSeconds=speed=>({slow:42,normal:28,fast:18}[String(speed||'').toLowerCase()]||28);
+let campaignPreviewTimer=0;
+let campaignPreviewLastSignature='';
+let campaignPreviewResizeTimer=0;
+
 function campaignMessageRow(item={}){
   const row=document.createElement('div');row.className='campaign-message-row';
   row.dataset.sourceType=item.source_type||'manual';row.dataset.sourceRef=item.source_ref||'';row.dataset.messageId=item.id||'';
   row.innerHTML=`<label class="campaign-message-enabled" title="Mesajı yayınla"><input type="checkbox" ${item.enabled!==false?'checked':''}></label><input class="campaign-text" maxlength="180" placeholder="Örn. Seçili ürünlerde %20 indirim" value="${esc(item.text||'')}"><input class="campaign-link" maxlength="500" placeholder="İsteğe bağlı: /urunler/... veya https://..." value="${esc(item.url||'')}"><span class="campaign-source-chip">${esc((item.source_type||'manual')==='manual'?'MANUEL':'BAĞLI')}</span><button class="campaign-message-remove" type="button" aria-label="Mesajı kaldır">×</button>`;
-  row.querySelectorAll('input').forEach(input=>input.addEventListener('input',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'}));
-  row.querySelector('input[type="checkbox"]').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
-  row.querySelector('.campaign-message-remove').onclick=()=>{row.remove();updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
+  const textInput=row.querySelector('.campaign-text');
+  const linkInput=row.querySelector('.campaign-link');
+  textInput.addEventListener('input',()=>{scheduleCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+  linkInput.addEventListener('input',()=>{$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+  row.querySelector('input[type="checkbox"]').addEventListener('change',()=>{scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+  row.querySelector('.campaign-message-remove').onclick=()=>{row.remove();scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
   return row
 }
-function renderCampaignMessages(items=[]){const wrap=$('campaignMessageList');wrap.innerHTML='';(items||[]).forEach(item=>wrap.append(campaignMessageRow(item)));if(!wrap.children.length)wrap.innerHTML='<div class="campaign-empty">Henüz mesaj yok. “+ Mesaj ekle” ile ilk duyuruyu ekle.</div>';updateCampaignPreview()}
+function renderCampaignMessages(items=[]){const wrap=$('campaignMessageList');wrap.innerHTML='';(items||[]).forEach(item=>wrap.append(campaignMessageRow(item)));if(!wrap.children.length)wrap.innerHTML='<div class="campaign-empty">Henüz mesaj yok. “+ Mesaj ekle” ile ilk duyuruyu ekle.</div>';campaignPreviewLastSignature='';scheduleCampaignPreview(0)}
 function collectCampaignMessages(){return [...$('campaignMessageList').querySelectorAll('.campaign-message-row')].map((row,index)=>({id:row.dataset.messageId||`mesaj-${index+1}`,text:row.querySelector('.campaign-text').value.trim(),url:row.querySelector('.campaign-link').value.trim(),enabled:row.querySelector('input[type="checkbox"]').checked,source_type:row.dataset.sourceType||'manual',source_ref:row.dataset.sourceRef||''})).filter(x=>x.text)}
 function campaignPreviewSequence(texts){return texts.map(text=>`<span class="campaign-preview-item">${esc(text)}</span><span class="campaign-preview-separator" aria-hidden="true">✦</span>`).join('')}
-function updateCampaignPreview(){
-  const out=$('campaignPreviewLine'),viewport=$('campaignPreviewViewport'),meta=$('campaignPreviewMeta');if(!out||!viewport)return;
-  const enabled=$('campaignEnabled')?.checked;const texts=collectCampaignMessages().filter(x=>x.enabled).map(x=>x.text);
-  if(!enabled){out.removeAttribute('data-direction');out.style.animation='none';out.innerHTML='<span class="campaign-preview-placeholder">ŞERİT KAPALI</span>';if(meta)meta.textContent='Şerit sitede görünmez';return}
-  if(!texts.length){out.removeAttribute('data-direction');out.style.animation='none';out.innerHTML='<span class="campaign-preview-placeholder">AKTİF MESAJ YOK · ŞERİT SİTEDE GİZLENİR</span>';if(meta)meta.textContent='Aktif mesaj bekleniyor';return}
+function campaignPreviewRepeatCount(texts,viewportWidth){
+  const chars=Math.max(1,texts.reduce((sum,text)=>sum+String(text||'').length+3,0));
+  const estimatedSequenceWidth=Math.max(150,chars*7.2);
+  return Math.max(1,Math.min(14,Math.ceil((Math.max(320,viewportWidth)*1.15)/estimatedSequenceWidth)));
+}
+function scheduleCampaignPreview(delay=120){
+  clearTimeout(campaignPreviewTimer);
+  campaignPreviewTimer=setTimeout(()=>{campaignPreviewTimer=0;updateCampaignPreview()},Math.max(0,delay));
+}
+function updateCampaignPreview(force=false){
+  const modal=$('campaignModal'),out=$('campaignPreviewLine'),viewport=$('campaignPreviewViewport'),meta=$('campaignPreviewMeta');
+  if(!out||!viewport||!modal||modal.hidden)return;
+  const enabled=$('campaignEnabled')?.checked;
+  const texts=collectCampaignMessages().filter(x=>x.enabled).map(x=>x.text);
+  if(!enabled){campaignPreviewLastSignature='disabled';out.removeAttribute('data-direction');out.style.animation='none';out.innerHTML='<span class="campaign-preview-placeholder">ŞERİT KAPALI</span>';if(meta)meta.textContent='Şerit sitede görünmez';return}
+  if(!texts.length){campaignPreviewLastSignature='empty';out.removeAttribute('data-direction');out.style.animation='none';out.innerHTML='<span class="campaign-preview-placeholder">AKTİF MESAJ YOK · ŞERİT SİTEDE GİZLENİR</span>';if(meta)meta.textContent='Aktif mesaj bekleniyor';return}
   const direction=['rtl','ltr'].includes($('campaignDirection')?.value)?$('campaignDirection').value:'rtl';
   const speed=['slow','normal','fast'].includes($('campaignSpeed')?.value)?$('campaignSpeed').value:'normal';
   const speedLabel={slow:'Yavaş',normal:'Normal',fast:'Hızlı'}[speed];const directionLabel=direction==='rtl'?'Sağdan sola':'Soldan sağa';
   if(meta)meta.textContent=`${speedLabel} · ${directionLabel} · üzerine gelince durur`;
-  const sequence=campaignPreviewSequence(texts);
-  out.style.animation='';out.style.setProperty('--campaign-preview-duration',`${campaignPreviewSeconds(speed)}s`);out.dataset.direction=direction;
+  out.style.setProperty('--campaign-preview-duration',`${campaignPreviewSeconds(speed)}s`);out.dataset.direction=direction;out.style.animation='';out.style.animationPlayState='running';
+  const viewportWidth=Math.round(viewport.getBoundingClientRect().width||viewport.clientWidth||900);
+  const repeatCount=campaignPreviewRepeatCount(texts,viewportWidth);
+  const signature=JSON.stringify([texts,direction,repeatCount]);
+  if(!force&&signature===campaignPreviewLastSignature)return;
+  campaignPreviewLastSignature=signature;
+  const sequence=campaignPreviewSequence(texts).repeat(repeatCount);
   out.innerHTML=`<div class="campaign-preview-group">${sequence}</div><div class="campaign-preview-group" aria-hidden="true">${sequence}</div>`;
-  requestAnimationFrame(()=>{
-    const groups=out.querySelectorAll('.campaign-preview-group');if(groups.length!==2)return;
-    const baseWidth=Math.max(1,groups[0].scrollWidth),viewportWidth=Math.max(1,viewport.clientWidth);
-    const repeats=Math.max(1,Math.ceil((viewportWidth*1.15)/baseWidth));
-    const segment=sequence.repeat(repeats);
-    groups[0].innerHTML=segment;groups[1].innerHTML=segment;
-  });
 }
-async function openCampaignModal(){try{const d=await api('/api/site-settings');siteSettings=d.settings||{};const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=['slow','normal','fast'].includes(bar.speed)?bar.speed:'normal';$('campaignDirection').value=['rtl','ltr'].includes(bar.direction)?bar.direction:'rtl';renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Ayarlar yüklendi.';$('campaignModal').hidden=false;document.body.classList.add('modal-open');requestAnimationFrame(updateCampaignPreview)}catch(err){toast(err.message,true)}}
+async function openCampaignModal(){try{const d=await api('/api/site-settings');siteSettings=d.settings||{};const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=['slow','normal','fast'].includes(bar.speed)?bar.speed:'normal';$('campaignDirection').value=['rtl','ltr'].includes(bar.direction)?bar.direction:'rtl';$('campaignModal').hidden=false;document.body.classList.add('modal-open');renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Ayarlar yüklendi.';requestAnimationFrame(()=>updateCampaignPreview(true))}catch(err){toast(err.message,true)}}
 $('manageCampaign').onclick=openCampaignModal;
-$('addCampaignMessage').onclick=()=>{const wrap=$('campaignMessageList');wrap.querySelector('.campaign-empty')?.remove();const row=campaignMessageRow({enabled:true,source_type:'manual'});wrap.append(row);row.querySelector('.campaign-text').focus();updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
-$('campaignEnabled').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
-$('campaignSpeed').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
-$('campaignDirection').addEventListener('change',()=>{updateCampaignPreview();$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+$('addCampaignMessage').onclick=()=>{const wrap=$('campaignMessageList');wrap.querySelector('.campaign-empty')?.remove();const row=campaignMessageRow({enabled:true,source_type:'manual'});wrap.append(row);row.querySelector('.campaign-text').focus();campaignPreviewLastSignature='';scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'};
+$('campaignEnabled').addEventListener('change',()=>{campaignPreviewLastSignature='';scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+$('campaignSpeed').addEventListener('change',()=>{scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
+$('campaignDirection').addEventListener('change',()=>{campaignPreviewLastSignature='';scheduleCampaignPreview(0);$('campaignSaveState').textContent='Kaydedilmemiş değişiklik var.'});
 $('saveCampaign').onclick=async()=>{try{const messages=collectCampaignMessages();const settings={announcement_bar:{enabled:$('campaignEnabled').checked,speed:$('campaignSpeed').value,direction:$('campaignDirection').value,separator:'✦',messages,integration:siteSettings?.announcement_bar?.integration||{discounts_enabled:false,mode:'manual'}}};$('campaignSaveState').textContent='Kaydediliyor ve site hazırlanıyor…';const d=await api('/api/site-settings/save',{method:'POST',body:JSON.stringify({settings})});siteSettings=d.settings||settings;const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=bar.speed||'normal';$('campaignDirection').value=bar.direction||'rtl';renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Kaydedildi · GitHub Desktop’ta Commit + Push hazır.';toast('✅ '+d.message)}catch(err){$('campaignSaveState').textContent='Hata';toast(err.message,true)}};
-document.addEventListener('click',e=>{if(e.target.matches('[data-close-campaign]')){$('campaignModal').hidden=true;document.body.classList.remove('modal-open')}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('campaignModal').hidden){$('campaignModal').hidden=true;document.body.classList.remove('modal-open')}});
+function closeCampaignModal(){clearTimeout(campaignPreviewTimer);$('campaignModal').hidden=true;document.body.classList.remove('modal-open');const track=$('campaignPreviewLine');if(track)track.style.animationPlayState='paused'}
+document.addEventListener('click',e=>{if(e.target.matches('[data-close-campaign]'))closeCampaignModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('campaignModal').hidden)closeCampaignModal()});
+window.addEventListener('resize',()=>{if($('campaignModal')?.hidden)return;clearTimeout(campaignPreviewResizeTimer);campaignPreviewResizeTimer=setTimeout(()=>{campaignPreviewLastSignature='';updateCampaignPreview(true)},180)},{passive:true});
 
 function normalizedTags(){const seen=new Set(),out=[];splitLines($('tags').value).forEach(tag=>{const clean=tag.replace(/\s+/g,' ').trim();const key=clean.toLocaleLowerCase('tr-TR');if(clean&&!seen.has(key)){seen.add(key);out.push(clean)}});return out.slice(0,16)}
 function syncTagPresetState(){const selected=new Set(normalizedTags().map(x=>x.toLocaleLowerCase('tr-TR')));document.querySelectorAll('#tagPresets [data-tag]').forEach(b=>b.classList.toggle('active',selected.has(String(b.dataset.tag||'').toLocaleLowerCase('tr-TR'))))}
