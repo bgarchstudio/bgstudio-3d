@@ -2,6 +2,7 @@
   "announcement_bar": {
     "enabled": true,
     "speed": "fast",
+    "direction": "rtl",
     "separator": "✦",
     "messages": [
       {
