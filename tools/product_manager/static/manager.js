@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='3.1.30';
+const PANEL_VERSION='3.1.31';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -207,7 +207,7 @@ document.addEventListener('click',e=>{if(e.target.matches('[data-close-colors]')
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('colorsModal').hidden){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
 
 // v3.1.30 — campaign manager performance pass: debounced preview + no layout-thrash
-const campaignPreviewSeconds=speed=>({slow:42,normal:28,fast:18}[String(speed||'').toLowerCase()]||28);
+const campaignPreviewSeconds=speed=>({slow:34,normal:22,fast:14}[String(speed||'').toLowerCase()]||22);
 let campaignPreviewTimer=0;
 let campaignPreviewLastSignature='';
 let campaignPreviewResizeTimer=0;

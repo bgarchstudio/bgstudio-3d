@@ -207,7 +207,7 @@ const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
   ]
 };
 
-const announcementSpeedSeconds = speed => ({ slow: 42, normal: 28, fast: 18 }[String(speed || '').toLowerCase()] || 28);
+const announcementSpeedSeconds = speed => ({ slow: 34, normal: 22, fast: 14 }[String(speed || '').toLowerCase()] || 22);
 
 const safeAnnouncementHref = value => {
   const raw = String(value || '').trim();

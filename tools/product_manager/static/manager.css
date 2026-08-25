@@ -420,7 +420,7 @@ textarea{line-height:1.55;resize:vertical}
 .campaign-preview-box{border:1px solid rgba(157,99,35,.18);background:linear-gradient(90deg,#e7cba5,#f1ddc2,#e7cba5);border-radius:16px;padding:10px 0 11px;margin:4px 0 18px;overflow:hidden}
 .campaign-preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px 7px}.campaign-preview-head>span{font-size:8px;letter-spacing:.14em;font-weight:800;color:#8f5b22}.campaign-preview-head>small{font-size:9px;color:#76512e}
 .campaign-preview-viewport{overflow:hidden;width:100%;min-height:24px;display:flex;align-items:center}
-.campaign-preview-track{display:flex;align-items:center;width:max-content;will-change:transform;animation-duration:var(--campaign-preview-duration,28s);animation-timing-function:linear;animation-iteration-count:infinite}
+.campaign-preview-track{display:flex;align-items:center;width:max-content;will-change:transform;animation-duration:var(--campaign-preview-duration,22s);animation-timing-function:linear;animation-iteration-count:infinite}
 .campaign-preview-track[data-direction="rtl"]{animation-name:campaign-preview-rtl}.campaign-preview-track[data-direction="ltr"]{animation-name:campaign-preview-ltr}
 .campaign-preview-viewport:hover .campaign-preview-track{animation-play-state:paused}
 .campaign-preview-group{display:flex;align-items:center;flex:0 0 auto}.campaign-preview-item,.campaign-preview-separator{display:inline-flex;align-items:center;flex:0 0 auto;white-space:nowrap;color:#593613;font-size:11px;font-weight:700;letter-spacing:.045em;text-transform:uppercase}.campaign-preview-item{padding:0 12px}.campaign-preview-separator{padding:0 4px;opacity:.68}.campaign-preview-placeholder{padding:0 14px;color:#76512e;font-size:10px}
