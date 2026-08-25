@@ -1001,5 +1001,57 @@
     "main_image": "assets/images/products/dis-macunu-tup-sikacagi.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "price_text": "799 TL",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "siyah",
+      "beyaz",
+      "kirmizi"
+    ],
+    "seo_description": "Çok bölmeli masaüstü organizer; makyaj, kozmetik, fırça, kalem ve küçük aksesuarları düzenlemek için 3D baskı ile üretilir. Kuşadası.",
+    "card_description": "Makyaj ürünleri, fırçalar, kalemler, takılar ve günlük aksesuarları düzenli tutan çok bölmeli masaüstü organizer.",
+    "name": "Çok Bölmeli Masaüstü Organizer",
+    "pricing_tiers": [],
+    "featured": false,
+    "category": "dekoratif-duvar",
+    "seo_title": "Masaüstü Makyaj Organizeri | Kuşadası 3D Baskı | BG Studio 3D",
+    "tags": [
+      "Organizer",
+      "Masaüstü",
+      "Hediye",
+      "Makyaj Organizeri",
+      "Kozmetik Düzenleyici",
+      "Masa Düzeni",
+      "Kalemlik",
+      "Takı Organizeri",
+      "Çok Bölmeli"
+    ],
+    "price_value": "799",
+    "options": [],
+    "active": true,
+    "slug": "cok-bolmeli-masaustu-organizer",
+    "features": [
+      "Çok bölmeli organizer tasarımı",
+      "Makyaj ve kozmetik ürünlerine uygun",
+      "Fırça ve kalem bölmeleri",
+      "Ön aksesuar tepsisi",
+      "Masaüstü düzenleyici",
+      "3D baskı üretim",
+      "Farklı renk seçenekleri"
+    ],
+    "sort_order": 23,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Bölmeli yapısı kozmetik, kırtasiye ve küçük aksesuarların düzenlenmesine uygundur. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "description": "Makyaj malzemeleri, fırçalar, kalemler ve küçük aksesuarları tek yerde düzenlemek için tasarlanan çok bölmeli masaüstü organizer. Farklı boyutlardaki bölmeleri sayesinde kozmetik ürünleri, kalemler ve günlük eşyalar ayrı şekilde yerleştirilebilir.\n\nÖn kısmındaki geniş tepsi; takı, toka, anahtar ve küçük aksesuarlar için ek saklama bölümü sunar. Makyaj masası, çalışma masası, komodin ve banyo tezgâhında düzenli bir görünüm sağlar.",
+    "sale_price_value": null,
+    "gallery_images": [],
+    "main_image": "assets/images/products/cok-bolmeli-masaustu-organizer.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
