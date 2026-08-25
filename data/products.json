@@ -1280,31 +1280,11 @@
     "main_image_height": 760
   },
   {
-    "price_text": "200 TL",
-    "color_ids": [],
-    "seo_description": "Plaka ve ad soyad bilgisiyle hazırlanan kişiye özel plaka anahtarlık. Arka yüze isteğe bağlı telefon numarası eklenir. Kuşadası 3D baskı.",
-    "card_description": "Plakanız ve ad soyad bilginizle hazırlanan, arka yüzüne isteğe bağlı telefon numarası eklenebilen kişiye özel anahtarlık.",
-    "name": "Kişiye Özel Plaka Anahtarlık",
+    "price_value": "199",
     "pricing_tiers": [],
-    "featured": false,
-    "category": "anahtarlik-aksesuar",
-    "seo_title": "Kişiye Özel Plaka Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D",
-    "tags": [
-      "Kişiye Özel",
-      "Anahtarlık",
-      "Hediye",
-      "Plaka Anahtarlık",
-      "Araç Aksesuarı",
-      "İsimli Anahtarlık",
-      "Kişiselleştirilmiş",
-      "Otomobil"
-    ],
-    "price_value": "200",
-    "options": [
-      "Arka yüz telefon numarasız",
-      "Arka yüz telefon numaralı"
-    ],
-    "active": true,
+    "description": "Aracınızın plakasına özel hazırlanan plaka anahtarlık, ön yüzde plaka bilgisi ve ad soyad detayıyla kişiselleştirilir. Arka yüzüne isteğe bağlı olarak telefon numarası eklenebilir.\n\nPlaka görünümünü kompakt bir anahtarlık formuna taşıyan ürün, metal halka ve zincirle birlikte hazırlanır. Araç anahtarı, çanta veya günlük anahtarlık olarak kullanılabilir. Kendiniz için veya araç sahibi yakınlarınıza kişisel bir hediye seçeneğidir.",
+    "color_ids": [],
+    "sale_price_value": null,
     "slug": "kisiye-ozel-plaka-anahtarlik",
     "features": [
       "Kişiye özel plaka",
@@ -1315,10 +1295,30 @@
       "Araç sahipleri için hediye",
       "3D baskı üretim"
     ],
-    "sort_order": 28,
     "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Plaka ve ad soyad bilgileri sipariş öncesinde alınır. Arka yüz telefon numarası isteğe bağlıdır. Ürünün renk düzeni sabittir ve renk seçeneği sunulmaz. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
-    "description": "Aracınızın plakasına özel hazırlanan plaka anahtarlık, ön yüzde plaka bilgisi ve ad soyad detayıyla kişiselleştirilir. Arka yüzüne isteğe bağlı olarak telefon numarası eklenebilir.\n\nPlaka görünümünü kompakt bir anahtarlık formuna taşıyan ürün, metal halka ve zincirle birlikte hazırlanır. Araç anahtarı, çanta veya günlük anahtarlık olarak kullanılabilir. Kendiniz için veya araç sahibi yakınlarınıza kişisel bir hediye seçeneğidir.",
-    "sale_price_value": null,
+    "tags": [
+      "Kişiye Özel",
+      "Anahtarlık",
+      "Hediye",
+      "Plaka Anahtarlık",
+      "Araç Aksesuarı",
+      "İsimli Anahtarlık",
+      "Kişiselleştirilmiş",
+      "Otomobil"
+    ],
+    "price_text": "199 TL",
+    "seo_title": "Kişiye Özel Plaka Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D",
+    "card_description": "Plakanız ve ad soyad bilginizle hazırlanan, arka yüzüne isteğe bağlı telefon numarası eklenebilen kişiye özel anahtarlık.",
+    "options": [
+      "Arka yüz telefon numarasız",
+      "Arka yüz telefon numaralı"
+    ],
+    "category": "anahtarlik-aksesuar",
+    "active": true,
+    "seo_description": "Plaka ve ad soyad bilgisiyle hazırlanan kişiye özel plaka anahtarlık. Arka yüze isteğe bağlı telefon numarası eklenir. Kuşadası 3D baskı.",
+    "sort_order": 28,
+    "name": "Kişiye Özel Plaka Anahtarlık",
+    "featured": false,
     "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-plaka-anahtarlik.webp",
     "main_image_width": 1000,
