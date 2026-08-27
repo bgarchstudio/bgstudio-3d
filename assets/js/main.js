@@ -207,7 +207,7 @@ const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
   ]
 };
 
-const announcementSpeedSeconds = speed => ({ slow: 34, normal: 22, fast: 14 }[String(speed || '').toLowerCase()] || 22);
+const announcementPixelsPerSecond = speed => ({ slow: 55, normal: 85, fast: 130 }[String(speed || '').toLowerCase()] || 85);
 
 const safeAnnouncementHref = value => {
   const raw = String(value || '').trim();
@@ -272,7 +272,8 @@ const mountAnnouncementBar = async () => {
   bar.dataset.direction = direction;
   bar.setAttribute('role', 'region');
   bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
-  bar.style.setProperty('--announcement-duration', `${announcementSpeedSeconds(config?.speed)}s`);
+  const announcementSpeed = announcementPixelsPerSecond(config?.speed);
+  bar.dataset.speed = String(config?.speed || 'normal').toLowerCase();
   bar.innerHTML = `
     <div class="announcement-marquee-viewport">
       <div class="announcement-marquee-track">
@@ -302,6 +303,14 @@ const mountAnnouncementBar = async () => {
       const repeats = Math.max(1, Math.ceil((viewportWidth * 1.15) / baseWidth));
       primary.innerHTML = firstSequence + duplicateSequence.repeat(repeats - 1);
       clone.innerHTML = duplicateSequence.repeat(repeats);
+      // Keep the perceived movement speed identical on mobile and desktop.
+      // The old implementation used one fixed duration; shorter mobile content
+      // therefore travelled fewer pixels per second and looked much slower.
+      requestAnimationFrame(() => {
+        const segmentWidth = Math.max(1, primary.scrollWidth);
+        const duration = Math.max(4, segmentWidth / announcementSpeed);
+        bar.style.setProperty('--announcement-duration', `${duration.toFixed(3)}s`);
+      });
     });
   };
   fitSegments();

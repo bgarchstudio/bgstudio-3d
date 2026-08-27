@@ -5,7 +5,7 @@ const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className
 const splitLines=v=>(v||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function slugify(s){return (s||'').toLocaleLowerCase('tr-TR').replaceAll('ç','c').replaceAll('ğ','g').replaceAll('ı','i').replaceAll('ö','o').replaceAll('ş','s').replaceAll('ü','u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)}
-const PANEL_VERSION='3.1.31';
+const PANEL_VERSION='3.1.32';
 async function api(path,opts={}){
   let r;
   try{r=await fetch(path,{headers:{'Content-Type':'application/json'},cache:'no-store',...opts})}
@@ -207,7 +207,7 @@ document.addEventListener('click',e=>{if(e.target.matches('[data-close-colors]')
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('colorsModal').hidden){$('colorsModal').hidden=true;document.body.classList.remove('modal-open')}});
 
 // v3.1.30 — campaign manager performance pass: debounced preview + no layout-thrash
-const campaignPreviewSeconds=speed=>({slow:34,normal:22,fast:14}[String(speed||'').toLowerCase()]||22);
+const campaignPreviewPixelsPerSecond=speed=>({slow:55,normal:85,fast:130}[String(speed||'').toLowerCase()]||85);
 let campaignPreviewTimer=0;
 let campaignPreviewLastSignature='';
 let campaignPreviewResizeTimer=0;
@@ -247,14 +247,24 @@ function updateCampaignPreview(force=false){
   const speed=['slow','normal','fast'].includes($('campaignSpeed')?.value)?$('campaignSpeed').value:'normal';
   const speedLabel={slow:'Yavaş',normal:'Normal',fast:'Hızlı'}[speed];const directionLabel=direction==='rtl'?'Sağdan sola':'Soldan sağa';
   if(meta)meta.textContent=`${speedLabel} · ${directionLabel} · üzerine gelince durur`;
-  out.style.setProperty('--campaign-preview-duration',`${campaignPreviewSeconds(speed)}s`);out.dataset.direction=direction;out.style.animation='';out.style.animationPlayState='running';
+  out.dataset.direction=direction;out.style.animation='';out.style.animationPlayState='running';
   const viewportWidth=Math.round(viewport.getBoundingClientRect().width||viewport.clientWidth||900);
   const repeatCount=campaignPreviewRepeatCount(texts,viewportWidth);
   const signature=JSON.stringify([texts,direction,repeatCount]);
-  if(!force&&signature===campaignPreviewLastSignature)return;
+  if(!force&&signature===campaignPreviewLastSignature){
+    const group=out.querySelector('.campaign-preview-group');
+    if(group){const width=Math.max(1,group.scrollWidth||1);const duration=Math.max(4,width/campaignPreviewPixelsPerSecond(speed));out.style.setProperty('--campaign-preview-duration',`${duration.toFixed(3)}s`)}
+    return
+  }
   campaignPreviewLastSignature=signature;
   const sequence=campaignPreviewSequence(texts).repeat(repeatCount);
   out.innerHTML=`<div class="campaign-preview-group">${sequence}</div><div class="campaign-preview-group" aria-hidden="true">${sequence}</div>`;
+  requestAnimationFrame(()=>{
+    const group=out.querySelector('.campaign-preview-group');
+    const width=Math.max(1,group?.scrollWidth||1);
+    const duration=Math.max(4,width/campaignPreviewPixelsPerSecond(speed));
+    out.style.setProperty('--campaign-preview-duration',`${duration.toFixed(3)}s`);
+  });
 }
 async function openCampaignModal(){try{const d=await api('/api/site-settings');siteSettings=d.settings||{};const bar=siteSettings.announcement_bar||{};$('campaignEnabled').checked=bar.enabled!==false;$('campaignSpeed').value=['slow','normal','fast'].includes(bar.speed)?bar.speed:'normal';$('campaignDirection').value=['rtl','ltr'].includes(bar.direction)?bar.direction:'rtl';$('campaignModal').hidden=false;document.body.classList.add('modal-open');renderCampaignMessages(bar.messages||[]);$('campaignSaveState').textContent='Ayarlar yüklendi.';requestAnimationFrame(()=>updateCampaignPreview(true))}catch(err){toast(err.message,true)}}
 $('manageCampaign').onclick=openCampaignModal;
