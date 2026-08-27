@@ -292,33 +292,42 @@ const mountAnnouncementBar = async () => {
   primary.innerHTML = firstSequence;
   clone.innerHTML = duplicateSequence;
 
-  // A segment must be at least viewport-width so there is never empty space.
-  // Repeat the same message sequence inside each half, keeping both halves visually identical.
-  const fitSegments = () => {
+  // Build two pixel-identical segments and move by the EXACT measured width
+  // of one segment. This avoids the small percentage/sub-pixel jump that can
+  // appear on mobile when a -50% transform is rounded differently.
+  let lastViewportWidth = 0;
+  let resizeTimer = 0;
+  const fitSegments = (force = false) => {
+    const viewportWidth = Math.max(1, Math.round(viewport.getBoundingClientRect().width));
+    if (!force && Math.abs(viewportWidth - lastViewportWidth) < 4) return;
+    lastViewportWidth = viewportWidth;
+
     primary.innerHTML = firstSequence;
     clone.innerHTML = duplicateSequence;
+
     requestAnimationFrame(() => {
       const baseWidth = Math.max(1, primary.scrollWidth);
-      const viewportWidth = Math.max(1, viewport.clientWidth);
-      const repeats = Math.max(1, Math.ceil((viewportWidth * 1.15) / baseWidth));
+      // Keep each half comfortably wider than the viewport. The extra headroom
+      // prevents mobile browser chrome changes from exposing an empty edge.
+      const targetWidth = Math.max(viewportWidth * 1.35, viewportWidth + 120);
+      const repeats = Math.max(1, Math.ceil(targetWidth / baseWidth));
       primary.innerHTML = firstSequence + duplicateSequence.repeat(repeats - 1);
       clone.innerHTML = duplicateSequence.repeat(repeats);
-      // Keep the perceived movement speed identical on mobile and desktop.
-      // The old implementation used one fixed duration; shorter mobile content
-      // therefore travelled fewer pixels per second and looked much slower.
+
       requestAnimationFrame(() => {
         const segmentWidth = Math.max(1, primary.scrollWidth);
         const duration = Math.max(4, segmentWidth / announcementSpeed);
+        bar.style.setProperty('--announcement-distance', `${segmentWidth}px`);
         bar.style.setProperty('--announcement-duration', `${duration.toFixed(3)}s`);
       });
     });
   };
-  fitSegments();
+
+  fitSegments(true);
   if (typeof ResizeObserver === 'function') {
-    let resizeTimer = 0;
     const observer = new ResizeObserver(() => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(fitSegments, 80);
+      resizeTimer = window.setTimeout(() => fitSegments(false), 140);
     });
     observer.observe(viewport);
   }

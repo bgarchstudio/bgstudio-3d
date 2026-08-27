@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.32'
+PANEL_VERSION = '3.1.33'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
