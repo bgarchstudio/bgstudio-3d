@@ -1115,23 +1115,13 @@
     "main_image_height": 760
   },
   {
-    "sale_price_value": null,
-    "features": [
-      "İplerle asılı insan figürü görünümü",
-      "Heykelsi 3D kompozisyon",
-      "Havada süzülme etkisi",
-      "El ve insan figürü tasarımı",
-      "Siyah taşıyıcı stand",
-      "Modern masaüstü dekor",
-      "2 plaka 3D baskı üretim"
-    ],
-    "description": "İplerle asılı görünüm veren ince baskı bağlantılarıyla tasarlanan bu dekoratif figür, üstte yer alan el formu ve alttaki insan figürüyle güçlü bir görsel kompozisyon oluşturur. Havada süzülüyormuş etkisi veren yapısı sayesinde modern yaşam alanları, çalışma odaları ve dikkat çekici dekor objeleri kullanılan iç mekânlarda öne çıkar.\n\nSiyah stand ve açık renkli figür kontrastı ürünü daha heykelsi ve premium gösterir. Masaüstünde, raf üzerinde veya dekoratif sergileme alanlarında kullanılabilecek özgün bir 3D baskı tasarımıdır.",
-    "price_value": "1499",
     "card_description": "El formundan aşağı uzanan ince bağlantılarla havada asılı görünen insan figürünü bir araya getiren heykelsi masaüstü dekor.",
-    "color_ids": [
-      "bone-white",
-      "siyah",
-      "beyaz"
+    "pricing_tiers": [],
+    "price_value": "1499",
+    "options": [
+      "Beyaz figür + Siyah stand",
+      "Bone White figür + Siyah stand",
+      "Siyah figür + Siyah stand"
     ],
     "category": "dekoratif-duvar",
     "tags": [
@@ -1145,21 +1135,31 @@
       "Figür",
       "İpli Tasarım"
     ],
-    "seo_description": "El formundan aşağı uzanan ince baskı bağlantılarıyla asılı görünen insan figürü dekoru, modern masaüstü kullanım için 3D baskı ile üretilir.",
-    "slug": "iplerle-asili-insan-figuru-dekor",
-    "price_text": "1499 TL",
-    "sort_order": 25,
-    "options": [
-      "Beyaz figür + Siyah stand",
-      "Bone White figür + Siyah stand",
-      "Siyah figür + Siyah stand"
+    "features": [
+      "İplerle asılı insan figürü görünümü",
+      "Heykelsi 3D kompozisyon",
+      "Havada süzülme etkisi",
+      "El ve insan figürü tasarımı",
+      "Siyah taşıyıcı stand",
+      "Modern masaüstü dekor",
+      "2 plaka 3D baskı üretim"
     ],
+    "slug": "iplerle-asili-insan-figuru-dekor",
+    "seo_description": "El formundan aşağı uzanan ince baskı bağlantılarıyla asılı görünen insan figürü dekoru, modern masaüstü kullanım için 3D baskı ile üretilir.",
+    "description": "İplerle asılı görünüm veren ince baskı bağlantılarıyla tasarlanan bu dekoratif figür, üstte yer alan el formu ve alttaki insan figürüyle güçlü bir görsel kompozisyon oluşturur. Havada süzülüyormuş etkisi veren yapısı sayesinde modern yaşam alanları, çalışma odaları ve dikkat çekici dekor objeleri kullanılan iç mekânlarda öne çıkar.\n\nSiyah stand ve açık renkli figür kontrastı ürünü daha heykelsi ve premium gösterir. Masaüstünde, raf üzerinde veya dekoratif sergileme alanlarında kullanılabilecek özgün bir 3D baskı tasarımıdır.",
+    "color_ids": [
+      "bone-white",
+      "siyah",
+      "beyaz"
+    ],
+    "sale_price_value": null,
     "active": true,
-    "pricing_tiers": [],
-    "seo_title": "İplerle Asılı İnsan Figürü Dekor | Kuşadası 3D Baskı | BG Studio 3D",
     "featured": true,
     "production_note": "Ürün 2 plaka halinde 3D baskı yöntemiyle üretilir. Figürü taşıyan ince bağlantılar baskı sırasında ürünün parçası olarak basılır. Ek ip bağlama işlemi yoktur. 3D baskı yüzeylerinde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "sort_order": 25,
     "name": "İplerle Asılı İnsan Figürü Dekor",
+    "price_text": "1499 TL",
+    "seo_title": "İplerle Asılı İnsan Figürü Dekor | Kuşadası 3D Baskı | BG Studio 3D",
     "gallery_images": [],
     "main_image": "assets/images/products/iplerle-asili-insan-figuru-dekor.webp",
     "main_image_width": 1000,
@@ -1169,27 +1169,16 @@
     "poster_image_height": null
   },
   {
-    "price_value": "1499",
+    "card_description": "Kulaklık, akıllı saat ve takıları düzenleyen; alt tepsili, kaktüs formunda 3D baskı masaüstü stand.",
     "pricing_tiers": [],
-    "description": "Kaktüs formundaki masaüstü stand; kulaklık, akıllı saat ve günlük takıları tek noktada düzenlemek için tasarlanmıştır. Büyük yan kollar kulaklık askısı görevi görürken küçük kol akıllı saat veya bileklik için uygundur. Alt tabladaki tepsi; yüzük, kolye, küpe ve küçük masa aksesuarlarının düzenli tutulmasını sağlar.\n\nGaming masası, çalışma masası, yatak odası ve giyinme masasında dekoratif görünüm ile işlevi bir araya getirir. Dikey formu sayesinde masa yüzeyinde fazla yer kaplamadan birden fazla ürünü taşır.",
-    "color_ids": [
-      "bone-white",
-      "avocado-green",
-      "siyah",
-      "beyaz"
+    "price_value": "1499",
+    "options": [
+      "Bone White gövde + Siyah taban",
+      "Beyaz gövde + Siyah taban",
+      "Avocado Green gövde + Bone White taban",
+      "Tam Siyah"
     ],
-    "sale_price_value": null,
-    "slug": "kaktus-kulaklik-saat-standi",
-    "features": [
-      "Kulaklık askısı",
-      "Akıllı saat askısı",
-      "Alt takı tepsisi",
-      "Kaktüs formunda tasarım",
-      "Yüzük ve kolye bölümü",
-      "Gaming ve çalışma masasına uygun",
-      "3D baskı masaüstü stand"
-    ],
-    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Kulaklık, saat ve takıların düzenlenmesine yönelik farklı bölümler içerir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "category": "gaming-masaustu",
     "tags": [
       "Gaming",
       "Masaüstü",
@@ -1202,21 +1191,32 @@
       "Masa Aksesuarı",
       "Akıllı Saat Standı"
     ],
-    "price_text": "1499 TL",
-    "seo_title": "Kaktüs Kulaklık & Saat Standı | Kuşadası 3D Baskı | BG Studio 3D",
-    "card_description": "Kulaklık, akıllı saat ve takıları düzenleyen; alt tepsili, kaktüs formunda 3D baskı masaüstü stand.",
-    "options": [
-      "Bone White gövde + Siyah taban",
-      "Beyaz gövde + Siyah taban",
-      "Avocado Green gövde + Bone White taban",
-      "Tam Siyah"
+    "features": [
+      "Kulaklık askısı",
+      "Akıllı saat askısı",
+      "Alt takı tepsisi",
+      "Kaktüs formunda tasarım",
+      "Yüzük ve kolye bölümü",
+      "Gaming ve çalışma masasına uygun",
+      "3D baskı masaüstü stand"
     ],
-    "category": "gaming-masaustu",
-    "active": true,
+    "slug": "kaktus-kulaklik-saat-standi",
     "seo_description": "Kaktüs kulaklık ve saat standı; kulaklık, akıllı saat, yüzük ve takıları düzenleyen alt tepsili 3D baskı masaüstü standdır. Kuşadası.",
+    "description": "Kaktüs formundaki masaüstü stand; kulaklık, akıllı saat ve günlük takıları tek noktada düzenlemek için tasarlanmıştır. Büyük yan kollar kulaklık askısı görevi görürken küçük kol akıllı saat veya bileklik için uygundur. Alt tabladaki tepsi; yüzük, kolye, küpe ve küçük masa aksesuarlarının düzenli tutulmasını sağlar.\n\nGaming masası, çalışma masası, yatak odası ve giyinme masasında dekoratif görünüm ile işlevi bir araya getirir. Dikey formu sayesinde masa yüzeyinde fazla yer kaplamadan birden fazla ürünü taşır.",
+    "color_ids": [
+      "bone-white",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "sale_price_value": null,
+    "active": true,
+    "featured": true,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Kulaklık, saat ve takıların düzenlenmesine yönelik farklı bölümler içerir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
     "sort_order": 35,
     "name": "Kaktüs Kulaklık & Saat Standı",
-    "featured": true,
+    "price_text": "1499 TL",
+    "seo_title": "Kaktüs Kulaklık & Saat Standı | Kuşadası 3D Baskı | BG Studio 3D",
     "gallery_images": [],
     "main_image": "assets/images/products/kaktus-kulaklik-saat-standi.webp",
     "main_image_width": 1000,
@@ -1226,22 +1226,15 @@
     "poster_image_height": null
   },
   {
-    "price_text": "349 TL",
-    "color_ids": [
-      "sakura-pink",
-      "pastel-cloud-blue",
-      "bone-white",
-      "lavender",
-      "avocado-green",
-      "beyaz"
-    ],
-    "seo_description": "Kedi ve köpekler için kişiye özel mama küreği; sap kısmına evcil hayvanın adı yazılarak 3D baskı ile üretilir. Kuşadası 3D baskı.",
     "card_description": "Kedi veya köpek maması için kullanılan, üzerine evcil hayvanın adı yazılan kişiye özel mama küreği.",
-    "name": "Hayvanınızın İsmine Özel Mama Küreği",
     "pricing_tiers": [],
-    "featured": false,
+    "price_value": "349",
+    "options": [
+      "İsim kişiselleştirme dahil",
+      "Kedi için kullanım",
+      "Köpek için kullanım"
+    ],
     "category": "pet-urunleri",
-    "seo_title": "Hayvanıza Özel Mama Küreği | Kuşadası 3D Baskı | BG Studio 3D",
     "tags": [
       "Kişiye Özel",
       "Pet",
@@ -1256,14 +1249,6 @@
       "Köpek Maması",
       "Pet Aksesuarı"
     ],
-    "price_value": "349",
-    "options": [
-      "İsim kişiselleştirme dahil",
-      "Kedi için kullanım",
-      "Köpek için kullanım"
-    ],
-    "active": true,
-    "slug": "hayvaninizin-ismine-ozel-mama-kuregi",
     "features": [
       "İsme özel üretim",
       "Kedi ve köpek kullanımına uygun",
@@ -1273,14 +1258,32 @@
       "3D baskı üretim",
       "Farklı renk seçenekleri"
     ],
-    "sort_order": 27,
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "slug": "hayvaninizin-ismine-ozel-mama-kuregi",
+    "seo_description": "Kedi ve köpekler için kişiye özel mama küreği; sap kısmına evcil hayvanın adı yazılarak 3D baskı ile üretilir. Kuşadası 3D baskı.",
     "description": "Kedi ve köpek mamasını pratik şekilde servis etmek için tasarlanan kişiye özel mama küreği, tutma kısmındaki isim alanıyla evcil hayvanınıza özel hale getirilir. Sap bölümüne istenilen isim yazılarak hazırlanır ve günlük kullanımda mama kabına ölçülü aktarım sağlar.\n\nHem işlevsel hem de sevimli bir pet aksesuarı olan bu ürün; kedi ve köpek sahipleri için kişisel kullanımın yanında hediye olarak da tercih edilebilir. Mama küreği formu ve isim detayı sayesinde pet alanında düzenli ve özel bir kullanım sunar.",
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "avocado-green",
+      "beyaz"
+    ],
     "sale_price_value": null,
+    "active": true,
+    "featured": true,
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "sort_order": 27,
+    "name": "Hayvanınızın İsmine Özel Mama Küreği",
+    "price_text": "349 TL",
+    "seo_title": "Hayvanıza Özel Mama Küreği | Kuşadası 3D Baskı | BG Studio 3D",
     "gallery_images": [],
     "main_image": "assets/images/products/hayvaninizin-ismine-ozel-mama-kuregi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760
+    "main_image_height": 760,
+    "poster_image": null,
+    "poster_image_width": null,
+    "poster_image_height": null
   },
   {
     "price_value": "199",
