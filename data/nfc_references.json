@@ -23,21 +23,21 @@
   {
     "slug": "koala-petshop",
     "name": "Koala Petshop",
-    "headline": "Google, Instagram ve WhatsApp İçin NFC + QR Hızlı Bağlantı Standı",
-    "description": "Koala Petshop için BG Studio NFC altyapısına entegre, Google, Instagram ve WhatsApp erişimlerini tek noktada buluşturan özel NFC + QR hızlı bağlantı standı tasarlanıp üretilerek işletmeye teslim edildi. Müşteriler telefonlarını standa yaklaştırarak NFC üzerinden veya QR kodu okutarak işletmenin Google profiline, Instagram hesabına ve WhatsApp iletişim kanalına saniyeler içinde erişebiliyor. Fiziksel stand ile dijital iletişim kanalları tek bir kompakt sistemde bir araya getirildi.",
+    "headline": "Google, Instagram ve WhatsApp için BG Studio NFC Hızlı Bağlantı Standı",
+    "description": "Koala Petshop için BG Studio NFC ürün ailesine ait Hızlı Bağlantı Standı tasarlanıp üretildi. İşletmenin Google, Instagram ve WhatsApp kanalları tek bir fiziksel stand üzerinde bir araya getirildi. Müşteriler NFC erişimi veya stand üzerindeki ayrı QR kodlar üzerinden ilgili dijital kanala hızlıca geçebiliyor.\n\nİşletmeye özel tasarlanan stand sayesinde sosyal medya, iletişim ve Google erişimleri masa veya banko üzerinde düzenli, görünür ve tek noktadan ulaşılabilir hale getirildi.",
     "tags": [
       "BG Studio NFC",
+      "Hızlı Bağlantı Standı",
       "NFC + QR",
       "Google",
       "Instagram",
       "WhatsApp",
-      "Petshop",
-      "Hızlı Bağlantı Standı",
-      "Kuşadası"
+      "3 QR",
+      "Petshop"
     ],
     "active": true,
     "sort_order": 2,
-    "category": "Petshop · BG Studio NFC",
+    "category": "Petshop • Hızlı Bağlantı Standı",
     "image": "assets/images/references/koala-petshop.webp",
     "profile_image": "assets/images/references/koala-petshop-profile.webp"
   },
