@@ -2,21 +2,27 @@
   {
     "slug": "istavrit-restaurant",
     "name": "İstavrit Restaurant",
-    "headline": "Başlangıç Paketi · 10 Masada BG Studio NFC + QR Menü Sistemi",
-    "description": "İstavrit Restaurant için 10 masalık BG Studio NFC Başlangıç Paketi kuruldu. Her masa için özel üretilen toplam 10 adet NFC + QR stand tasarlanıp işletmeye teslim edildi.\nMisafirler telefonlarını standa yaklaştırarak veya QR kodu okutarak dijital menüye, Instagram hesabına ve değerlendirme akışına erişebiliyor. Değerlendirme sürecinde misafir önce BG Studio değerlendirme paneline yönlendiriliyor, ardından Google yorum adımına geçiyor.\nİşletme tarafında masa bazlı NFC + QR etkileşimleri, dijital menü ve sistem verileri BG Studio NFC işletme paneli üzerinden takip ediliyor.",
+    "headline": "Başlangıç Paketi · 10 Masada BG Studio NFC Sistemi",
+    "description": "İstavrit Restaurant için 10 masalık BG Studio NFC Başlangıç Paketi kuruldu. Her masa için özel hazırlanan toplam 10 adet NFC + QR stand, masa bazlı erişim altyapısıyla BG Studio NFC Sistemine bağlandı.\n\nMisafirler telefonlarını standa yaklaştırarak veya QR kodu okutarak dijital menüye, Instagram hesabına ve değerlendirme akışına erişebiliyor. Değerlendirme sürecinde misafir önce BG Studio değerlendirme paneline yönlendiriliyor, ardından Google yorum adımına geçebiliyor.\n\nİşletme tarafında masa bazlı NFC + QR etkileşimleri, dijital menü erişimleri ve sistem kullanımı BG Studio NFC işletme paneli üzerinden takip ediliyor. Böylece menü, sosyal medya erişimi, müşteri değerlendirmesi ve masa etkileşimleri tek sistem altında yönetiliyor.",
     "tags": [
       "BG Studio NFC",
       "Başlangıç Paketi",
       "10 Masa",
       "10 NFC + QR Stand",
+      "NFC + QR",
       "Dijital Menü",
       "Instagram",
       "Değerlendirme Paneli",
-      "Google Yorum"
+      "Google Yorum",
+      "İşletme Paneli",
+      "Masa Bazlı Analitik",
+      "Restoran",
+      "Kuşadası"
     ],
     "active": true,
     "sort_order": 1,
-    "category": "Restoran · BG Studio NFC",
+    "category": "Restoran • Başlangıç Paketi",
+    "theme": "light",
     "image": "assets/images/references/istavrit-restaurant.webp",
     "profile_image": "assets/images/references/istavrit-restaurant-profile.webp"
   },
