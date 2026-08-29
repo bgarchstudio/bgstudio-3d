@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.36'
+PANEL_VERSION = '3.1.37'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -702,6 +702,34 @@ def clean_content_item(kind, item):
     return out
 
 
+def save_content_theme(kind, slug, theme):
+    """Persist only a reference card tone, then rebuild and verify it.
+
+    This intentionally bypasses the general content form so a visual preference
+    cannot be lost because another field in the editor is stale.
+    """
+    kind = content_collection(kind)
+    slug = str(slug or '').strip()
+    theme = 'dark' if str(theme or '').strip().lower() == 'dark' else 'light'
+    items = read_content(kind)
+    row = next((x for x in items if str(x.get('slug') or '') == slug), None)
+    if not row:
+        raise ValueError('Kart tonu kaydedilecek referans bulunamadı.')
+    row['theme'] = theme
+    write_content(kind, items)
+
+    if kind == 'nfc':
+        write_content('corporate', sync_nfc_to_corporate(items, read_content('corporate')))
+    elif kind == 'corporate':
+        write_content('corporate', sync_nfc_to_corporate(read_content('nfc'), items))
+
+    result = build_site()
+    persisted = next((x for x in read_content(kind) if str(x.get('slug') or '') == slug), None) or {}
+    if str(persisted.get('theme') or '').lower() != theme:
+        raise RuntimeError('Kart tonu kalıcı veriye yazılamadı.')
+    return persisted, result
+
+
 def save_content_item(kind, payload):
     items = read_content(kind)
     original = str(payload.get('original_slug') or '')
@@ -1002,6 +1030,15 @@ class Handler(BaseHTTPRequestHandler):
                     shutil.rmtree(folder)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Ürün kalıcı olarak silindi.'})
+
+            if self.path == '/api/content/theme/save':
+                payload = self.read_json()
+                kind = payload.get('kind')
+                slug = str(payload.get('slug') or '')
+                theme = str(payload.get('theme') or '')
+                full_backup('before-content-theme-save')
+                item, result = save_content_theme(kind, slug, theme)
+                return self.send_json({'ok': True, 'message': f'Kart tonu {item.get("theme")} olarak kaydedildi ve build doğrulandı.', 'item': item, 'result': result})
 
             if self.path == '/api/content/save':
                 payload = self.read_json()

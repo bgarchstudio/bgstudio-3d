@@ -234,20 +234,45 @@ def home_case_link(item):
     return link.rstrip('/') + '/#referans-' + target_id
 
 
+def managed_case_theme(item, legacy_alternate=False):
+    """Return one explicit card theme for every managed reference.
+
+    New saves always persist light/dark. Legacy rows without a stored value keep
+    the old alternating appearance until the user makes a choice.
+    """
+    raw = str(item.get('theme') or '').strip().lower()
+    if raw in ('dark', 'light'):
+        return raw
+    if legacy_alternate and int(item.get('sort_order') or 0) % 2 == 1:
+        return 'dark'
+    return 'light'
+
+
+def managed_case_is_dark(item, legacy_alternate=False):
+    return managed_case_theme(item, legacy_alternate=legacy_alternate) == 'dark'
+
+
+def managed_case_class(theme, media_class=''):
+    theme = 'dark' if str(theme).lower() == 'dark' else 'light'
+    dark = ' dark' if theme == 'dark' else ''
+    return f'case-card{dark} theme-{theme}{media_class}'
+
+
 def render_managed_case(item, prefix='../'):
-    """Prototype/default managed card."""
+    """Prototype/default managed card with per-card light/dark tone."""
     name = esc(item.get('name'))
     headline = esc(item.get('headline') or item.get('name'))
     desc = esc(item.get('description'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     kicker = esc(item.get('category') or item.get('name'))
     media, media_class = case_media(item, prefix, name)
-    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 2 == 1 else 'case-card') + media_class
+    theme = managed_case_theme(item, legacy_alternate=True)
+    klass = managed_case_class(theme, media_class)
     body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 def render_nfc_case(item, prefix='../'):
-    """NFC field card: business identity is primary; shared content stays canonical."""
+    """NFC field card: business identity is primary and tone is managed per card."""
     name = esc(item.get('name'))
     raw_name = str(item.get('name') or '')
     desc = esc(item.get('description') or item.get('headline'))
@@ -255,10 +280,11 @@ def render_nfc_case(item, prefix='../'):
     kicker = esc(item.get('category') or 'NFC / QR saha uygulaması')
     media, media_class = case_media(item, prefix, name)
     profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
-    klass = ('case-card dark' if int(item.get('sort_order') or 0) % 2 == 1 else 'case-card') + media_class
+    theme = managed_case_theme(item, legacy_alternate=True)
+    klass = managed_case_class(theme, media_class)
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 def resolve_corporate_items():
     nfc_items = load_managed_content(NFC_DATA)
@@ -312,12 +338,12 @@ def render_corporate_case(item, prefix='../'):
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     media, media_class = case_media(item, prefix, name)
     profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
-    theme = str(item.get('theme') or '').lower()
-    klass = ('case-card dark' if theme == 'dark' else 'case-card') + media_class
+    theme = managed_case_theme(item, legacy_alternate=False)
+    klass = managed_case_class(theme, media_class)
     # Corporate layout deliberately uses business name as kicker and project headline as title.
     identity = f'<div class="case-identity">{profile}<span class="case-type">{name}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
-    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)}>{media}{body}</article>'
+    return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 
 def render_home_field_case(item, index, prefix=''):
@@ -327,12 +353,13 @@ def render_home_field_case(item, index, prefix=''):
     desc = esc(item.get('description'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or [])[:3])
     profile = case_profile(item, prefix, raw_name, 'profil görseli')
-    theme = ' dark' if str(item.get('theme') or '').lower() == 'dark' else ''
+    card_theme = managed_case_theme(item, legacy_alternate=False)
+    theme = ' dark theme-dark' if card_theme == 'dark' else ' theme-light'
     category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
     link = home_case_link(item)
     target_key = link.split('#', 1)[1] if '#' in link else 'referans-' + reference_identity(item)
     ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
-    return f'<article class="field-work-card{theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
+    return f'<article class="field-work-card{theme}" data-card-theme="{card_theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
 
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
@@ -646,7 +673,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.29'
+SITE_ASSET_VERSION = '3.1.37'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -661,6 +688,19 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
+
+def validate_reference_theme_output(html_text, items, label):
+    """Fail the build if a persisted card tone did not reach the generated HTML."""
+    for item in items:
+        ref_id = reference_identity(item)
+        expected = managed_case_theme(item, legacy_alternate=(label in ('NFC & QR', 'Prototip')))
+        match = re.search(rf'<article\b[^>]*\bid="referans-{re.escape(ref_id)}"[^>]*>', html_text, flags=re.I)
+        if not match:
+            raise RuntimeError(f'{label}: {ref_id} kartı build çıktısında bulunamadı.')
+        tag = match.group(0)
+        if f'data-card-theme="{expected}"' not in tag or f'theme-{expected}' not in tag:
+            raise RuntimeError(f'{label}: {ref_id} kart tonu build çıktısına uygulanamadı ({expected}).')
+
 
 def build_site():
     # Kalıcı AppData kasasını her build öncesinde repo çıktısına yansıt.
@@ -696,6 +736,7 @@ def build_site():
     nfc_html = nfc_path.read_text(encoding='utf-8')
     nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)
     nfc_html = replace_between(nfc_html, '<!-- CONTENT_MANAGER:NFC_START -->', '<!-- CONTENT_MANAGER:NFC_END -->', nfc_cards)
+    validate_reference_theme_output(nfc_html, nfc_items, 'NFC & QR')
     nfc_path.write_text(nfc_html, encoding='utf-8')
 
     corporate_items = [x for x in resolve_corporate_items() if x.get('active', True)]
@@ -703,6 +744,7 @@ def build_site():
     corporate_html = ensure_corporate_markers(corporate_path.read_text(encoding='utf-8'))
     corporate_cards = '\n'.join(render_corporate_case(x, '../') for x in corporate_items)
     corporate_html = replace_between(corporate_html, '<!-- CONTENT_MANAGER:CORPORATE_START -->', '<!-- CONTENT_MANAGER:CORPORATE_END -->', corporate_cards)
+    validate_reference_theme_output(corporate_html, corporate_items, 'Kurumsal')
     corporate_path.write_text(corporate_html, encoding='utf-8')
 
     # Keep the homepage real-work proof area synchronized with managed corporate references.
@@ -717,6 +759,7 @@ def build_site():
     prototype_html = prototype_path.read_text(encoding='utf-8')
     prototype_cards = '\n'.join(render_managed_case(x, '../') for x in prototype_items)
     prototype_html = replace_between(prototype_html, '<!-- CONTENT_MANAGER:PROTOTYPE_START -->', '<!-- CONTENT_MANAGER:PROTOTYPE_END -->', prototype_cards)
+    validate_reference_theme_output(prototype_html, prototype_items, 'Prototip')
     prototype_path.write_text(prototype_html, encoding='utf-8')
 
     for p in products:

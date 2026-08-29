@@ -742,3 +742,16 @@ button{font-family:inherit}
 
 /* v3.1.26 — WhatsApp fake notification badge removed */
 .floating-whatsapp::after{content:none!important;display:none!important}
+
+/* v3.1.37 — explicit reference-card tone contract.
+   data-card-theme + theme-* makes the saved panel choice authoritative. */
+.case-card.theme-light,.case-card[data-card-theme="light"]{background:#eadfd2!important;color:var(--ink)!important;border-color:var(--line)!important}
+.case-card.theme-dark,.case-card[data-card-theme="dark"]{background:#1b1713!important;color:#f7efe5!important;border-color:rgba(255,255,255,.08)!important}
+.case-card.theme-light p,.case-card[data-card-theme="light"] p{color:var(--ink-soft)!important}
+.case-card.theme-dark p,.case-card[data-card-theme="dark"] p{color:#b7a99d!important}
+.case-card.theme-light .case-type,.case-card[data-card-theme="light"] .case-type{color:var(--brown)!important}
+.case-card.theme-dark .case-type,.case-card[data-card-theme="dark"] .case-type{color:#d7a66e!important}
+.case-card.theme-light .case-meta span,.case-card[data-card-theme="light"] .case-meta span{border-color:var(--line)!important;color:inherit}
+.case-card.theme-dark .case-meta span,.case-card[data-card-theme="dark"] .case-meta span{border-color:rgba(255,255,255,.13)!important;color:#d4c8bd!important}
+.field-work-card.theme-light,.field-work-card[data-card-theme="light"]{background:#eadfd2!important;color:var(--ink)!important;border-color:var(--line)!important}
+.field-work-card.theme-dark,.field-work-card[data-card-theme="dark"]{background:#1a1612!important;color:#f7efe5!important;border-color:rgba(255,255,255,.08)!important}
