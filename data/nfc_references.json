@@ -61,5 +61,25 @@
     "sort_order": 3,
     "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp",
     "image": "assets/images/references/naz-balik-restaurant.webp"
+  },
+  {
+    "slug": "yusuf-sef",
+    "name": "Yusuf Şef",
+    "headline": "Profesyonel Paket · 15 Masada BG Studio NFC Sistemi",
+    "description": "Yusuf Şef için 15 masalık BG Studio NFC Profesyonel Paket kurulumu gerçekleştirildi. İşletmeye özel hazırlanan 15 adet NFC + QR stand, masa bazlı erişim altyapısıyla BG Studio NFC Sistemine bağlandı. Misafirler NFC veya QR üzerinden Akıllı Menü, Instagram ve değerlendirme akışına erişebiliyor.\n\nAkıllı Menü modülünde Türkçe ve İngilizce menü, ürün içerikleri, alerjen bilgileri ve yaklaşık kalori bilgileri sunuluyor. Değerlendirme akışında misafirler önce BG Studio değerlendirme paneline yönlendiriliyor, ardından Google yorum adımına geçebiliyor.\n\nİşletme; menü, değerlendirme, sosyal medya ve masa bazlı NFC + QR etkileşimlerini kendisine özel BG Studio NFC işletme paneli üzerinden yönetip takip edebiliyor. Böylece menü, müşteri geri bildirimi, sosyal medya erişimi ve kullanım verileri tek sistem altında toplanıyor.",
+    "tags": [
+      "BG Studio NFC",
+      "Profesyonel Paket",
+      "15 Masa",
+      "15 NFC + QR Stand",
+      "NFC + QR",
+      "Akıllı Menü",
+      "Türkçe + İngilizce",
+      "Alerjen Bilgisi"
+    ],
+    "active": true,
+    "sort_order": 4,
+    "category": "Restoran • Profesyonel Paket",
+    "image": "assets/images/references/yusuf-sef.webp"
   }
 ]

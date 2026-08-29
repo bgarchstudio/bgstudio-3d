@@ -42,5 +42,13 @@
     "image": "assets/images/references/kusadasi-asansor.webp",
     "profile_image": "assets/images/references/kusadasi-asansor-profile.webp",
     "category": "Kurumsal üretim"
+  },
+  {
+    "slug": "yusuf-sef",
+    "source_kind": "nfc",
+    "source_slug": "yusuf-sef",
+    "theme": "light",
+    "active": true,
+    "sort_order": 5
   }
 ]
