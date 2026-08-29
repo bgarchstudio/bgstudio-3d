@@ -75,11 +75,20 @@
       "NFC + QR",
       "Akıllı Menü",
       "Türkçe + İngilizce",
-      "Alerjen Bilgisi"
+      "Alerjen Bilgisi",
+      "Kalori Bilgisi",
+      "Instagram",
+      "Değerlendirme Paneli",
+      "Google Yorum",
+      "İşletme Paneli",
+      "Masa Bazlı Analitik",
+      "Restoran",
+      "Kuşadası"
     ],
     "active": true,
     "sort_order": 4,
     "category": "Restoran • Profesyonel Paket",
+    "theme": "light",
     "image": "assets/images/references/yusuf-sef.webp"
   }
 ]
