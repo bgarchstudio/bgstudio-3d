@@ -1169,16 +1169,29 @@
     "poster_image_height": null
   },
   {
-    "card_description": "Kulaklık, akıllı saat ve takıları düzenleyen; alt tepsili, kaktüs formunda 3D baskı masaüstü stand.",
-    "pricing_tiers": [],
-    "price_value": "1499",
+    "category": "gaming-masaustu",
     "options": [
       "Bone White gövde + Siyah taban",
       "Beyaz gövde + Siyah taban",
       "Avocado Green gövde + Bone White taban",
       "Tam Siyah"
     ],
-    "category": "gaming-masaustu",
+    "slug": "kaktus-kulaklik-saat-standi",
+    "card_description": "Kulaklık, akıllı saat ve takıları düzenleyen; alt tepsili, kaktüs formunda 3D baskı masaüstü stand.",
+    "pricing_tiers": [],
+    "description": "Kaktüs formundaki masaüstü stand; kulaklık, akıllı saat ve günlük takıları tek noktada düzenlemek için tasarlanmıştır. Büyük yan kollar kulaklık askısı görevi görürken küçük kol akıllı saat veya bileklik için uygundur. Alt tabladaki tepsi; yüzük, kolye, küpe ve küçük masa aksesuarlarının düzenli tutulmasını sağlar.\n\nGaming masası, çalışma masası, yatak odası ve makyaj masasında dekoratif görünüm ile işlevi bir araya getirir. Dikey formu sayesinde masa yüzeyinde fazla yer kaplamadan birden fazla ürünü taşır.",
+    "color_ids": [
+      "bone-white",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "active": true,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Kulaklık, saat ve takıların düzenlenmesine yönelik farklı bölümler içerir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "price_text": "1499 TL",
+    "sale_price_value": null,
+    "featured": true,
+    "seo_title": "Kaktüs Kulaklık & Saat Standı | Kuşadası 3D Baskı | BG Studio 3D",
     "tags": [
       "Gaming",
       "Masaüstü",
@@ -1191,6 +1204,10 @@
       "Masa Aksesuarı",
       "Akıllı Saat Standı"
     ],
+    "name": "Kaktüs Kulaklık & Saat Standı",
+    "sort_order": 35,
+    "seo_description": "Kaktüs kulaklık ve saat standı; kulaklık, akıllı saat, yüzük ve takıları düzenleyen alt tepsili 3D baskı masaüstü standdır. Kuşadası.",
+    "price_value": "1499",
     "features": [
       "Kulaklık askısı",
       "Akıllı saat askısı",
@@ -1200,23 +1217,6 @@
       "Gaming ve çalışma masasına uygun",
       "3D baskı masaüstü stand"
     ],
-    "slug": "kaktus-kulaklik-saat-standi",
-    "seo_description": "Kaktüs kulaklık ve saat standı; kulaklık, akıllı saat, yüzük ve takıları düzenleyen alt tepsili 3D baskı masaüstü standdır. Kuşadası.",
-    "description": "Kaktüs formundaki masaüstü stand; kulaklık, akıllı saat ve günlük takıları tek noktada düzenlemek için tasarlanmıştır. Büyük yan kollar kulaklık askısı görevi görürken küçük kol akıllı saat veya bileklik için uygundur. Alt tabladaki tepsi; yüzük, kolye, küpe ve küçük masa aksesuarlarının düzenli tutulmasını sağlar.\n\nGaming masası, çalışma masası, yatak odası ve giyinme masasında dekoratif görünüm ile işlevi bir araya getirir. Dikey formu sayesinde masa yüzeyinde fazla yer kaplamadan birden fazla ürünü taşır.",
-    "color_ids": [
-      "bone-white",
-      "avocado-green",
-      "siyah",
-      "beyaz"
-    ],
-    "sale_price_value": null,
-    "active": true,
-    "featured": true,
-    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Kulaklık, saat ve takıların düzenlenmesine yönelik farklı bölümler içerir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
-    "sort_order": 35,
-    "name": "Kaktüs Kulaklık & Saat Standı",
-    "price_text": "1499 TL",
-    "seo_title": "Kaktüs Kulaklık & Saat Standı | Kuşadası 3D Baskı | BG Studio 3D",
     "gallery_images": [],
     "main_image": "assets/images/products/kaktus-kulaklik-saat-standi.webp",
     "main_image_width": 1000,
