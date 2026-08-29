@@ -1589,5 +1589,85 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "category": "taki-makyaj",
+    "active": true,
+    "slug": "taki-aksesuar-tepsisi",
+    "sort_order": 36,
+    "featured": false,
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir. Tekli veya set halinde hazırlanabilir. Takı ve aksesuarlar görsel amaçlıdır, ürüne dahil değildir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "tags": [
+      "Organizer",
+      "Hediye",
+      "Masaüstü",
+      "Takı Tepsisi",
+      "Aksesuar Tepsisi",
+      "Yüzük Tepsisi",
+      "Küpe Organizeri",
+      "Kolye Düzenleyici",
+      "Makyaj Masası",
+      "Dekoratif Tepsi"
+    ],
+    "card_description": "Yüzük, küpe, kolye ve küçük aksesuarları düzenlemek için tasarlanan dekoratif takı tepsisi. Tekli veya set halinde kullanılabilir.",
+    "features": [
+      "Takı ve küçük aksesuarlar için uygun",
+      "Yuvarlak, kare ve kalp form seçenekleri",
+      "Tekli veya set halinde kullanım",
+      "Dekoratif çizgili yüzey tasarımı",
+      "Makyaj masası ve komodin için uygun",
+      "Kompakt ve düzenleyici kullanım",
+      "3D baskı üretim"
+    ],
+    "seo_description": "Yüzük, küpe, kolye ve küçük aksesuarlar için dekoratif takı tepsisi. Tekli veya set halinde sunulan 3D baskı düzenleyici tasarım.",
+    "color_ids": [
+      "silk-kings-gold",
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "lavender",
+      "siyah",
+      "beyaz"
+    ],
+    "description": "Takı ve küçük aksesuarları düzenli şekilde saklamak için tasarlanan dekoratif tepsi seti; yüzük, küpe, kolye, bileklik ve benzeri küçük eşyaların bir arada toplanmasına yardımcı olur. Yuvarlak, kare ve kalp formundaki seçenekleriyle makyaj masası, komodin ve şifonyer üzerinde hem düzenleyici hem dekoratif bir kullanım sunar.\n\nMinimal çizgili dış yüzeyi ve yumuşak hatlı formu sayesinde sade ve şık bir görünüm oluşturur. Tekli olarak tercih edilebildiği gibi, takım halinde kullanıldığında farklı aksesuarları ayrı ayrı düzenleme imkânı sağlar.",
+    "name": "Takı & Aksesuar Tepsisi",
+    "sale_price_value": null,
+    "price_value": null,
+    "pricing_tiers": [
+      {
+        "label": "Tekli",
+        "quantity": 1,
+        "price_value": "249",
+        "note": "Tekli Fiyat"
+      },
+      {
+        "label": "2’li alım",
+        "quantity": 2,
+        "price_value": "449",
+        "note": "Set Fiyatı"
+      },
+      {
+        "label": "3’lü alım",
+        "quantity": 3,
+        "price_value": "599",
+        "note": "Set Fiyatı"
+      }
+    ],
+    "options": [
+      "Yuvarlak Tepsi",
+      "Kare Tepsi",
+      "Kalp Tepsi",
+      "Karışık 2’li Set",
+      "3’lü Set"
+    ],
+    "seo_title": "Takı & Aksesuar Tepsisi | Kuşadası 3D Baskı | BG Studio 3D",
+    "price_text": "249 TL",
+    "gallery_images": [],
+    "main_image": "assets/images/products/taki-aksesuar-tepsisi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": "assets/images/posters/taki-aksesuar-tepsisi.webp",
+    "poster_image_width": 1254,
+    "poster_image_height": 1254
   }
 ]
