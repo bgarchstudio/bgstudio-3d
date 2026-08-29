@@ -77,8 +77,8 @@ function saveThemeImmediately(){
       const d=await api('/api/content/theme/save',{method:'POST',body:JSON.stringify({kind,slug,theme})});
       if(seq!==themeSaveSeq)return;
       const persisted=String(d.item?.theme||'').toLowerCase();
-      if(persisted!==theme)throw new Error('Kart tonu kaydedildi ancak doğrulama eşleşmedi.');
-      if(hint){hint.textContent=`✓ ${theme==='dark'?'Koyu':'Açık'} kart tonu kaydedildi ve build doğrulandı.`;hint.className='saved'}
+      if(persisted!==theme)throw new Error('Kart tonu kalıcı kayda yazıldı ancak doğrulama eşleşmedi.');
+      if(hint){hint.textContent=`✓ ${theme==='dark'?'Koyu':'Açık'} kart tonu kaydedildi ve ilgili sayfa doğrulandı.`;hint.className='saved'}
       toast(`✅ Kart tonu ${theme==='dark'?'Koyu':'Açık'} olarak uygulandı.`);
       await refreshCurrentContent(slug);
     }catch(err){

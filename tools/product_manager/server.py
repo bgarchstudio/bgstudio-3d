@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.37'
+PANEL_VERSION = '3.1.38'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -702,12 +702,25 @@ def clean_content_item(kind, item):
     return out
 
 
-def save_content_theme(kind, slug, theme):
-    """Persist only a reference card tone, then rebuild and verify it.
+def _public_theme_state(kind, slug):
+    page_rel = {
+        'nfc': 'nfc-qr/index.html',
+        'corporate': 'kurumsal/index.html',
+        'prototype': 'prototip-parca/index.html',
+    }[kind]
+    page = ROOT / page_rel
+    text = page.read_text(encoding='utf-8') if page.exists() else ''
+    ref = re.escape(slugify(slug))
+    match = re.search(rf'<article\b[^>]*\bid="referans-{ref}"[^>]*>', text, flags=re.I)
+    if not match:
+        raise RuntimeError(f'{kind}: referans kartı build çıktısında bulunamadı.')
+    tag = match.group(0)
+    found = re.search(r'data-card-theme="(light|dark)"', tag, flags=re.I)
+    return (found.group(1).lower() if found else '')
 
-    This intentionally bypasses the general content form so a visual preference
-    cannot be lost because another field in the editor is stale.
-    """
+
+def save_content_theme(kind, slug, theme):
+    """Persist a card tone and prove the exact public card received it."""
     kind = content_collection(kind)
     slug = str(slug or '').strip()
     theme = 'dark' if str(theme or '').strip().lower() == 'dark' else 'light'
@@ -719,6 +732,8 @@ def save_content_theme(kind, slug, theme):
     write_content(kind, items)
 
     if kind == 'nfc':
+        # NFC public card keeps its own tone. Corporate linked cards keep their
+        # independent corporate tone instead of overwriting the NFC choice.
         write_content('corporate', sync_nfc_to_corporate(items, read_content('corporate')))
     elif kind == 'corporate':
         write_content('corporate', sync_nfc_to_corporate(read_content('nfc'), items))
@@ -727,8 +742,10 @@ def save_content_theme(kind, slug, theme):
     persisted = next((x for x in read_content(kind) if str(x.get('slug') or '') == slug), None) or {}
     if str(persisted.get('theme') or '').lower() != theme:
         raise RuntimeError('Kart tonu kalıcı veriye yazılamadı.')
-    return persisted, result
-
+    public_theme = _public_theme_state(kind, slug)
+    if public_theme != theme:
+        raise RuntimeError(f'Kart tonu kaydedildi ancak canlı sayfa çıktısı {public_theme or "bulunamadı"} olarak üretildi.')
+    return persisted, {**result, 'verified_theme': public_theme, 'verified_kind': kind, 'verified_slug': slug}
 
 def save_content_item(kind, payload):
     items = read_content(kind)

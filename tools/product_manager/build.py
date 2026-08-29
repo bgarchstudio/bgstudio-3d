@@ -9,7 +9,7 @@ PROTOTYPE_DATA = ROOT / 'data' / 'prototypes.json'
 CORPORATE_DATA = ROOT / 'data' / 'corporate_references.json'
 COLORS_DATA = ROOT / 'data' / 'colors.json'
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from storage import ensure_initialized, get_collection, export_to_repo
+from storage import ensure_initialized, get_collection, set_collection, export_to_repo
 ensure_initialized()
 BASE_URL = 'https://3d.bgstudio.com.tr'
 CATEGORY_LABELS = {
@@ -157,6 +157,43 @@ def legacy_order_options(p):
     return [x for x in options if x.casefold() not in color_names]
 
 
+def ensure_explicit_reference_themes():
+    """Persist one explicit light/dark value for every managed reference.
+
+    Older NFC/prototype records could rely on odd/even fallback styling. Preserve
+    that current appearance once, then remove all runtime alternation so the
+    panel selection is the only source of truth for every public reference page.
+    """
+    changed = {}
+    for kind in ('nfc', 'corporate', 'prototype'):
+        rows = get_collection(kind, [])
+        if not isinstance(rows, list):
+            continue
+        next_rows = []
+        dirty = False
+        for idx, raw in enumerate(rows, 1):
+            if not isinstance(raw, dict):
+                continue
+            row = dict(raw)
+            theme = str(row.get('theme') or '').strip().lower()
+            if theme not in ('light', 'dark'):
+                if kind in ('nfc', 'prototype'):
+                    try:
+                        order = int(row.get('sort_order') or idx)
+                    except Exception:
+                        order = idx
+                    theme = 'dark' if order % 2 == 1 else 'light'
+                else:
+                    theme = 'light'
+                row['theme'] = theme
+                dirty = True
+            next_rows.append(row)
+        if dirty:
+            set_collection(kind, next_rows)
+            changed[kind] = True
+    return changed
+
+
 def load_managed_content(path):
     mapping = {
         NFC_DATA: 'nfc',
@@ -266,7 +303,7 @@ def render_managed_case(item, prefix='../'):
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     kicker = esc(item.get('category') or item.get('name'))
     media, media_class = case_media(item, prefix, name)
-    theme = managed_case_theme(item, legacy_alternate=True)
+    theme = managed_case_theme(item, legacy_alternate=False)
     klass = managed_case_class(theme, media_class)
     body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
     return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
@@ -280,7 +317,7 @@ def render_nfc_case(item, prefix='../'):
     kicker = esc(item.get('category') or 'NFC / QR saha uygulaması')
     media, media_class = case_media(item, prefix, name)
     profile = case_profile(item, prefix, raw_name, 'profil fotoğrafı')
-    theme = managed_case_theme(item, legacy_alternate=True)
+    theme = managed_case_theme(item, legacy_alternate=False)
     klass = managed_case_class(theme, media_class)
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
     body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
@@ -673,7 +710,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.37'
+SITE_ASSET_VERSION = '3.1.38'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -693,7 +730,7 @@ def validate_reference_theme_output(html_text, items, label):
     """Fail the build if a persisted card tone did not reach the generated HTML."""
     for item in items:
         ref_id = reference_identity(item)
-        expected = managed_case_theme(item, legacy_alternate=(label in ('NFC & QR', 'Prototip')))
+        expected = managed_case_theme(item, legacy_alternate=False)
         match = re.search(rf'<article\b[^>]*\bid="referans-{re.escape(ref_id)}"[^>]*>', html_text, flags=re.I)
         if not match:
             raise RuntimeError(f'{label}: {ref_id} kartı build çıktısında bulunamadı.')
@@ -703,6 +740,8 @@ def validate_reference_theme_output(html_text, items, label):
 
 
 def build_site():
+    # V3.1.38: every reference page uses the same explicit card-tone source.
+    ensure_explicit_reference_themes()
     # Kalıcı AppData kasasını her build öncesinde repo çıktısına yansıt.
     export_to_repo()
     products = load_products()
