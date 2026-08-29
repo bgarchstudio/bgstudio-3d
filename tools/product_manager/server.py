@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.33'
+PANEL_VERSION = '3.1.35'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -689,12 +689,13 @@ def clean_content_item(kind, item):
         'slug': slug, 'name': name,
         'headline': str(item.get('headline') or '').strip(),
         'description': str(item.get('description') or '').strip(),
-        'tags': [str(x).strip() for x in (item.get('tags') or []) if str(x).strip()][:8],
+        'tags': [str(x).strip() for x in (item.get('tags') or []) if str(x).strip()][:16],
         'active': bool(item.get('active', True)),
         'sort_order': int(item.get('sort_order') or 999),
     }
     if kind in ('prototype','nfc'): out['category'] = str(item.get('category') or ('Prototip / özel parça' if kind == 'prototype' else 'NFC / QR saha uygulaması')).strip()
-    if kind == 'corporate': out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
+    if kind in ('nfc','corporate','prototype'):
+        out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
     if item.get('image'): out['image'] = str(item.get('image'))
     if kind in ('nfc','corporate') and item.get('profile_image'):
         out['profile_image'] = str(item.get('profile_image'))
