@@ -12,7 +12,8 @@
     "active": true,
     "sort_order": 1,
     "category": "Prototip / bağlantı parçası",
-    "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp"
+    "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp",
+    "theme": "dark"
   },
   {
     "slug": "cikolata-selalesi-spiral-aksami",
@@ -27,6 +28,7 @@
     "active": true,
     "sort_order": 2,
     "category": "Yedek parça / makine aksamı",
-    "image": "assets/images/prototypes/cikolata-selalesi-spiral-aksami.webp"
+    "image": "assets/images/prototypes/cikolata-selalesi-spiral-aksami.webp",
+    "theme": "light"
   }
 ]
