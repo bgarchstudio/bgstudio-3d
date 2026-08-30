@@ -5,7 +5,8 @@
     "source_slug": "istavrit-restaurant",
     "theme": "dark",
     "active": true,
-    "sort_order": 1
+    "sort_order": 1,
+    "show_in_corporate": false
   },
   {
     "slug": "koala-petshop",
@@ -13,7 +14,8 @@
     "source_slug": "koala-petshop",
     "theme": "dark",
     "active": true,
-    "sort_order": 2
+    "sort_order": 2,
+    "show_in_corporate": false
   },
   {
     "slug": "naz-balik-restaurant",
@@ -21,7 +23,8 @@
     "source_slug": "naz-balik-restaurant",
     "theme": "light",
     "active": true,
-    "sort_order": 3
+    "sort_order": 3,
+    "show_in_corporate": false
   },
   {
     "slug": "kusadasi-asansor",
@@ -49,6 +52,7 @@
     "source_slug": "yusuf-sef",
     "theme": "light",
     "active": true,
-    "sort_order": 5
+    "sort_order": 5,
+    "show_in_corporate": false
   }
 ]

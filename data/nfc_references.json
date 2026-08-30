@@ -24,7 +24,8 @@
     "category": "Restoran • Başlangıç Paketi",
     "theme": "dark",
     "image": "assets/images/references/istavrit-restaurant.webp",
-    "profile_image": "assets/images/references/istavrit-restaurant-profile.webp"
+    "profile_image": "assets/images/references/istavrit-restaurant-profile.webp",
+    "show_in_corporate": false
   },
   {
     "slug": "koala-petshop",
@@ -46,7 +47,8 @@
     "category": "Petshop • Hızlı Bağlantı Standı",
     "theme": "dark",
     "image": "assets/images/references/koala-petshop.webp",
-    "profile_image": "assets/images/references/koala-petshop-profile.webp"
+    "profile_image": "assets/images/references/koala-petshop-profile.webp",
+    "show_in_corporate": false
   },
   {
     "slug": "naz-balik-restaurant",
@@ -68,7 +70,8 @@
     "category": "Restoran • QR Yorum Sistemi",
     "theme": "light",
     "image": "assets/images/references/naz-balik-restaurant.webp",
-    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
+    "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp",
+    "show_in_corporate": false
   },
   {
     "slug": "yusuf-sef",
@@ -97,6 +100,7 @@
     "sort_order": 4,
     "category": "Restoran • Profesyonel Paket",
     "theme": "light",
-    "image": "assets/images/references/yusuf-sef.webp"
+    "image": "assets/images/references/yusuf-sef.webp",
+    "show_in_corporate": false
   }
 ]
