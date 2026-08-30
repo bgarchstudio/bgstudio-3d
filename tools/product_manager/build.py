@@ -336,7 +336,8 @@ def resolve_corporate_items():
             if not src:
                 continue
             seen_nfc.add(source_slug)
-            item = {**src, **{k:v for k,v in raw.items() if k in ('slug','source_kind','source_slug','theme','active','sort_order','home_link')}}
+            item = {**src, **{k:v for k,v in raw.items() if k in ('slug','source_kind','source_slug','theme','sort_order','home_link')}}
+            item['active'] = bool(src.get('active', True))
         resolved.append(item)
 
     # Safety net: an NFC record can never disappear from Corporate even if an
@@ -778,7 +779,11 @@ def build_site():
     validate_reference_theme_output(nfc_html, nfc_items, 'NFC & QR')
     nfc_path.write_text(nfc_html, encoding='utf-8')
 
-    corporate_items = [x for x in resolve_corporate_items() if x.get('active', True)]
+    # Corporate-page visibility is independent from NFC publication. Linked NFC
+    # records may stay live on NFC & QR (and on the homepage proof area) while
+    # being temporarily hidden from the Corporate References page.
+    corporate_all_active = [x for x in resolve_corporate_items() if x.get('active', True)]
+    corporate_items = [x for x in corporate_all_active if not (x.get('source_kind') == 'nfc' and not bool(x.get('show_in_corporate', True)))]
     corporate_path = ROOT / 'kurumsal/index.html'
     corporate_html = ensure_corporate_markers(corporate_path.read_text(encoding='utf-8'))
     corporate_cards = '\n'.join(render_corporate_case(x, '../') for x in corporate_items)
@@ -786,10 +791,11 @@ def build_site():
     validate_reference_theme_output(corporate_html, corporate_items, 'Kurumsal')
     corporate_path.write_text(corporate_html, encoding='utf-8')
 
-    # Keep the homepage real-work proof area synchronized with managed corporate references.
+    # Homepage Sahadan İşler remains independent from the Corporate-page mirror
+    # switch, so hiding NFC cards from /kurumsal/ does not erase field proof.
     home_html = home_path.read_text(encoding='utf-8')
     if '<!-- CONTENT_MANAGER:HOME_FIELD_START -->' in home_html and '<!-- CONTENT_MANAGER:HOME_FIELD_END -->' in home_html:
-        home_field_cards = '\n'.join(render_home_field_case(x, i + 1, '') for i, x in enumerate(corporate_items[:4]))
+        home_field_cards = '\n'.join(render_home_field_case(x, i + 1, '') for i, x in enumerate(corporate_all_active[:4]))
         home_html = replace_between(home_html, '<!-- CONTENT_MANAGER:HOME_FIELD_START -->', '<!-- CONTENT_MANAGER:HOME_FIELD_END -->', home_field_cards)
         home_path.write_text(home_html, encoding='utf-8')
 

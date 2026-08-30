@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.38'
+PANEL_VERSION = '3.1.39'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -666,7 +666,17 @@ def sync_nfc_to_corporate(nfc_items=None, corporate_items=None):
             'slug': slug, 'source_kind': 'nfc', 'source_slug': slug,
             'theme': 'dark' if idx % 2 else 'light', 'active': bool(src.get('active', True)), 'sort_order': idx
         }
-        row.update({'slug': slug, 'source_kind': 'nfc', 'source_slug': slug})
+        row.update({
+            'slug': slug,
+            'source_kind': 'nfc',
+            'source_slug': slug,
+            # Corporate visibility belongs to the NFC source record. This keeps
+            # the NFC page independent while the corporate mirror can be hidden.
+            'show_in_corporate': bool(src.get('show_in_corporate', True)),
+            # Linked mirror publication follows the NFC source itself. Corporate-only
+            # hiding is handled by show_in_corporate, so homepage proof is unaffected.
+            'active': bool(src.get('active', True)),
+        })
         linked.append(row)
     return resequence_content(linked + independent)
 
@@ -694,6 +704,9 @@ def clean_content_item(kind, item):
         'sort_order': int(item.get('sort_order') or 999),
     }
     if kind in ('prototype','nfc'): out['category'] = str(item.get('category') or ('Prototip / özel parça' if kind == 'prototype' else 'NFC / QR saha uygulaması')).strip()
+    if kind == 'nfc':
+        # Independent toggle: NFC stays published while its corporate mirror may be hidden.
+        out['show_in_corporate'] = bool(item.get('show_in_corporate', True))
     if kind in ('nfc','corporate','prototype'):
         out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
     if item.get('image'): out['image'] = str(item.get('image'))
@@ -717,6 +730,55 @@ def _public_theme_state(kind, slug):
     tag = match.group(0)
     found = re.search(r'data-card-theme="(light|dark)"', tag, flags=re.I)
     return (found.group(1).lower() if found else '')
+
+
+def _public_reference_present(kind, slug):
+    page_rel = {
+        'nfc': 'nfc-qr/index.html',
+        'corporate': 'kurumsal/index.html',
+        'prototype': 'prototip-parca/index.html',
+    }[kind]
+    page = ROOT / page_rel
+    text = page.read_text(encoding='utf-8') if page.exists() else ''
+    ref = re.escape(slugify(slug))
+    return bool(re.search(rf'<article\b[^>]*\bid="referans-{ref}"[^>]*>', text, flags=re.I))
+
+
+def save_nfc_corporate_visibility(slug, visible):
+    """Toggle only the Corporate-page mirror of one NFC record."""
+    slug = str(slug or '').strip()
+    visible = bool(visible)
+    nfc_items = read_content('nfc')
+    row = next((x for x in nfc_items if str(x.get('slug') or '') == slug), None)
+    if not row:
+        raise ValueError('Kurumsal görünürlüğü değiştirilecek NFC kaydı bulunamadı.')
+    row['show_in_corporate'] = visible
+    write_content('nfc', nfc_items)
+    write_content('corporate', sync_nfc_to_corporate(nfc_items, read_content('corporate')))
+    result = build_site()
+    expected_present = bool(row.get('active', True)) and visible
+    public_present = _public_reference_present('corporate', slug)
+    if public_present != expected_present:
+        raise RuntimeError('Kurumsal görünürlük kaydedildi ancak sayfa çıktısı doğrulanamadı.')
+    return row, {**result, 'corporate_visible': visible, 'corporate_card_present': public_present}
+
+
+def save_all_nfc_corporate_visibility(visible):
+    """Bulk show/hide every NFC-backed Corporate mirror without touching NFC publication."""
+    visible = bool(visible)
+    nfc_items = read_content('nfc')
+    for row in nfc_items:
+        row['show_in_corporate'] = visible
+    write_content('nfc', nfc_items)
+    write_content('corporate', sync_nfc_to_corporate(nfc_items, read_content('corporate')))
+    result = build_site()
+    expected = sum(1 for row in nfc_items if row.get('active', True) and visible)
+    actual = sum(1 for row in nfc_items if _public_reference_present('corporate', row.get('slug'))) if visible else 0
+    if visible and actual != expected:
+        raise RuntimeError(f'NFC aynaları topluca açıldı ancak {expected} karttan {actual} tanesi doğrulandı.')
+    if not visible and any(_public_reference_present('corporate', row.get('slug')) for row in nfc_items):
+        raise RuntimeError('NFC aynaları topluca gizlendi ancak Kurumsal sayfada en az bir NFC kartı kaldı.')
+    return nfc_items, {**result, 'corporate_visible': visible, 'affected': len(nfc_items)}
 
 
 def save_content_theme(kind, slug, theme):
@@ -1047,6 +1109,23 @@ class Handler(BaseHTTPRequestHandler):
                     shutil.rmtree(folder)
                 build_site()
                 return self.send_json({'ok': True, 'message': 'Ürün kalıcı olarak silindi.'})
+
+            if self.path == '/api/content/corporate-visibility/save':
+                payload = self.read_json()
+                slug = str(payload.get('slug') or '')
+                visible = bool(payload.get('visible', True))
+                full_backup('before-corporate-visibility-save')
+                item, result = save_nfc_corporate_visibility(slug, visible)
+                label = 'gösteriliyor' if visible else 'gizlendi'
+                return self.send_json({'ok': True, 'message': f'NFC kaydı Kurumsal sayfada {label}.', 'item': item, 'result': result})
+
+            if self.path == '/api/content/corporate-visibility/bulk':
+                payload = self.read_json()
+                visible = bool(payload.get('visible', True))
+                full_backup('before-corporate-visibility-bulk')
+                items, result = save_all_nfc_corporate_visibility(visible)
+                label = 'gösteriliyor' if visible else 'gizlendi'
+                return self.send_json({'ok': True, 'message': f'Tüm NFC aynaları Kurumsal sayfada {label}.', 'items': items, 'result': result})
 
             if self.path == '/api/content/theme/save':
                 payload = self.read_json()
