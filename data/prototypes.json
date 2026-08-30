@@ -12,8 +12,8 @@
     "active": true,
     "sort_order": 1,
     "category": "Prototip / bağlantı parçası",
-    "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp",
-    "theme": "dark"
+    "theme": "light",
+    "image": "assets/images/prototypes/bot-sisirme-pompasi-ara-parcasi.webp"
   },
   {
     "slug": "cikolata-selalesi-spiral-aksami",
