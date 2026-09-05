@@ -755,3 +755,30 @@ button{font-family:inherit}
 .case-card.theme-dark .case-meta span,.case-card[data-card-theme="dark"] .case-meta span{border-color:rgba(255,255,255,.13)!important;color:#d4c8bd!important}
 .field-work-card.theme-light,.field-work-card[data-card-theme="light"]{background:#eadfd2!important;color:var(--ink)!important;border-color:var(--line)!important}
 .field-work-card.theme-dark,.field-work-card[data-card-theme="dark"]{background:#1a1612!important;color:#f7efe5!important;border-color:rgba(255,255,255,.08)!important}
+
+/* v3.1.40 — mobile nav geometry follows the real sticky header height, including announcement bar. */
+@media(max-width:1040px){
+  .site-header{overflow:visible}
+  .main-nav{
+    top:calc(100% + 8px)!important;
+    z-index:3;
+    max-height:calc(100dvh - var(--mobile-header-bottom,112px) - 16px)!important;
+    overscroll-behavior:contain;
+  }
+  .main-nav:before{display:none!important}
+  body.nav-open::before{
+    content:"";
+    position:fixed;
+    z-index:49;
+    left:0;right:0;
+    top:var(--mobile-header-bottom,112px);
+    bottom:0;
+    background:rgba(38,27,18,.16);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
+    pointer-events:none;
+  }
+}
+@media(max-width:680px){
+  .main-nav{left:14px!important;right:14px!important;top:calc(100% + 6px)!important;border-radius:20px}
+}

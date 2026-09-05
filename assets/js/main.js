@@ -403,8 +403,17 @@ document.addEventListener('click', (event) => {
 });
 
 // Mobile navigation
+const syncMobileNavGeometry = () => {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  const rect = header.getBoundingClientRect();
+  const bottom = Math.max(0, Math.min(window.innerHeight || rect.bottom, rect.bottom));
+  document.documentElement.style.setProperty('--mobile-header-bottom', `${Math.round(bottom)}px`);
+};
+
 const setMenuState = (open) => {
   if (!nav || !menuButton) return;
+  if (open) syncMobileNavGeometry();
   nav.classList.toggle('open', open);
   menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
   menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
@@ -425,7 +434,14 @@ document.addEventListener('keydown', (event) => {
   }
 });
 window.addEventListener('resize', () => {
-  if (window.innerWidth > 1040 && nav?.classList.contains('open')) setMenuState(false);
+  if (window.innerWidth > 1040 && nav?.classList.contains('open')) {
+    setMenuState(false);
+    return;
+  }
+  if (nav?.classList.contains('open')) syncMobileNavGeometry();
+}, { passive: true });
+window.visualViewport?.addEventListener('resize', () => {
+  if (nav?.classList.contains('open')) syncMobileNavGeometry();
 }, { passive: true });
 
 // Reveal animations with graceful fallback

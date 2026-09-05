@@ -711,7 +711,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.38'
+SITE_ASSET_VERSION = '3.1.40'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
