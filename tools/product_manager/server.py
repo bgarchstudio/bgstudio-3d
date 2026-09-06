@@ -157,6 +157,12 @@ NFC_MEDIA_FIXED_PATHS = {
     'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
 }
 
+NFC_MEDIA_DEFAULTS = {
+    'feedback_duo': {'image': '', 'theme': 'dark'},
+    'restaurant_packages': {'image': '', 'theme': 'light'},
+    'quick_stand': {'image': '', 'theme': 'light'},
+}
+
 
 def _repair_nfc_media_from_files(settings, persist=False):
     """Self-heal NFC showcase image pointers from their fixed repo files.
@@ -178,7 +184,11 @@ def _repair_nfc_media_from_files(settings, persist=False):
             image = ''
         if raw != image:
             changed = True
-        media[key] = {'image': image}
+        default_theme = str((NFC_MEDIA_DEFAULTS.get(key) or {}).get('theme') or 'light').lower()
+        theme = 'dark' if str(row.get('theme') or default_theme).strip().lower() == 'dark' else 'light'
+        if str((row or {}).get('theme') or '').strip().lower() != theme:
+            changed = True
+        media[key] = {'image': image, 'theme': theme}
     if media_in != media:
         changed = True
     settings['nfc_media'] = media
@@ -240,9 +250,9 @@ def default_site_settings():
             'catalog_intro': 'Dekoratif tasarımlardan gaming ve masaüstü ürünlerine, pet çözümlerinden takı & makyaj, oyun & oyuncak, aksesuar ve kişiye özel üretimlere uzanan atölye seçkimiz. Fiyatı belirtilmeyen ürünlerde ölçü, adet ve üretim detayına göre teklif hazırlanır.'
         },
         'nfc_media': {
-            'feedback_duo': {'image': ''},
-            'restaurant_packages': {'image': ''},
-            'quick_stand': {'image': ''},
+            'feedback_duo': {'image': '', 'theme': 'dark'},
+            'restaurant_packages': {'image': '', 'theme': 'light'},
+            'quick_stand': {'image': '', 'theme': 'light'},
         },
     }
 
@@ -356,8 +366,10 @@ def clean_nfc_media_settings(value, current=None):
         current_row = current.get(key) if isinstance(current.get(key), dict) else {}
         incoming_row = incoming.get(key) if isinstance(incoming.get(key), dict) else current_row
         image = str(incoming_row.get('image') or '').replace('\\', '/').lstrip('/')
+        theme_default = str((defaults.get(key) or {}).get('theme') or 'light').lower()
+        theme = 'dark' if str(incoming_row.get('theme') or current_row.get('theme') or theme_default).strip().lower() == 'dark' else 'light'
         # NFC showcase images always live at fixed, repo-safe paths.
-        out[key] = {'image': fixed if image == fixed else ''}
+        out[key] = {'image': fixed if image == fixed else '', 'theme': theme}
     return out
 
 
@@ -1131,17 +1143,24 @@ class Handler(BaseHTTPRequestHandler):
 
                 fixed_media = NFC_MEDIA_FIXED_PATHS
                 current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else default_site_settings()['nfc_media']
-                media = {key: dict(current_media.get(key) or {}) for key in fixed_media}
+                incoming_media = payload.get('nfc_media') if isinstance(payload.get('nfc_media'), dict) else {}
+                media = {}
                 uploads = payload.get('media_uploads') if isinstance(payload.get('media_uploads'), dict) else {}
                 clears = set(payload.get('media_clear') or []) if isinstance(payload.get('media_clear'), list) else set()
                 for key, rel in fixed_media.items():
+                    current_row = current_media.get(key) if isinstance(current_media.get(key), dict) else {}
+                    incoming_row = incoming_media.get(key) if isinstance(incoming_media.get(key), dict) else {}
+                    default_theme = str((NFC_MEDIA_DEFAULTS.get(key) or {}).get('theme') or 'light').lower()
+                    theme = 'dark' if str(incoming_row.get('theme') or current_row.get('theme') or default_theme).strip().lower() == 'dark' else 'light'
+                    image_value = str(current_row.get('image') or '').replace('\\', '/').lstrip('/')
                     if key in clears:
                         remove_file(rel)
-                        media[key] = {'image': ''}
+                        image_value = ''
                     image = uploads.get(key)
                     if isinstance(image, dict) and image.get('data'):
                         save_data_uri(image.get('data'), ROOT / rel)
-                        media[key] = {'image': rel}
+                        image_value = rel
+                    media[key] = {'image': image_value, 'theme': theme}
                 merged['nfc_media'] = media
 
                 settings = write_site_settings(merged)
