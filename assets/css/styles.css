@@ -859,3 +859,6 @@ button{font-family:inherit}
 .nfc-family-price strong{font-family:"Playfair Display",Georgia,serif;font-size:1.35rem;font-weight:500}
 .nfc-family-card-dark .nfc-family-price{border-color:rgba(255,255,255,.1)}
 .nfc-family-card-dark .nfc-family-price small{color:#a9998b}.nfc-family-card-dark .nfc-family-price strong{color:#f7efe5}
+
+.nfc-family-media.has-image{border-style:solid;background:#e9dccd;padding:0}
+.nfc-family-media.has-image img{width:100%;height:100%;display:block;object-fit:cover;object-position:center}

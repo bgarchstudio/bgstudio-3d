@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.46'
+PANEL_VERSION = '3.1.47'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -199,6 +199,11 @@ def default_site_settings():
         'website_copy': {
             'catalog_intro': 'Dekoratif tasarımlardan gaming ve masaüstü ürünlerine, pet çözümlerinden takı & makyaj, oyun & oyuncak, aksesuar ve kişiye özel üretimlere uzanan atölye seçkimiz. Fiyatı belirtilmeyen ürünlerde ölçü, adet ve üretim detayına göre teklif hazırlanır.'
         },
+        'nfc_media': {
+            'feedback_duo': {'image': ''},
+            'restaurant_packages': {'image': ''},
+            'quick_stand': {'image': ''},
+        },
     }
 
 
@@ -298,6 +303,25 @@ def clean_website_copy(value, current=None):
     return {'catalog_intro': intro[:520]}
 
 
+def clean_nfc_media_settings(value, current=None):
+    defaults = default_site_settings()['nfc_media']
+    current = current if isinstance(current, dict) else defaults
+    incoming = value if isinstance(value, dict) else {}
+    fixed_paths = {
+        'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
+        'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
+        'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
+    }
+    out = {}
+    for key, fixed in fixed_paths.items():
+        current_row = current.get(key) if isinstance(current.get(key), dict) else {}
+        incoming_row = incoming.get(key) if isinstance(incoming.get(key), dict) else current_row
+        image = str(incoming_row.get('image') or '').replace('\\', '/').lstrip('/')
+        # NFC showcase images always live at fixed, repo-safe paths.
+        out[key] = {'image': fixed if image == fixed else ''}
+    return out
+
+
 def clean_site_settings(value):
     payload = value if isinstance(value, dict) else {}
     current = read_site_settings()
@@ -339,6 +363,8 @@ def clean_site_settings(value):
     current_copy = current.get('website_copy') if isinstance(current.get('website_copy'), dict) else default_site_settings()['website_copy']
     incoming_nfc = payload.get('nfc_site') if isinstance(payload.get('nfc_site'), dict) else current_nfc
     incoming_copy = payload.get('website_copy') if isinstance(payload.get('website_copy'), dict) else current_copy
+    current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else default_site_settings()['nfc_media']
+    incoming_media = payload.get('nfc_media') if isinstance(payload.get('nfc_media'), dict) else current_media
     settings = {
         'announcement_bar': {
             'enabled': bool(incoming.get('enabled', True)),
@@ -355,6 +381,7 @@ def clean_site_settings(value):
         },
         'nfc_site': clean_nfc_site_settings(incoming_nfc, current_nfc),
         'website_copy': clean_website_copy(incoming_copy, current_copy),
+        'nfc_media': clean_nfc_media_settings(incoming_media, current_media),
     }
     # No active message means nothing can be displayed; keep data but hide the bar.
     if not any(x.get('enabled', True) and x.get('text') for x in messages):
@@ -1032,7 +1059,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
             settings = read_site_settings()
-            return self.send_json({'ok': True, 'nfc_site': settings.get('nfc_site') or default_site_settings()['nfc_site'], 'website_copy': settings.get('website_copy') or default_site_settings()['website_copy'], 'root': str(ROOT), 'storage': storage_status()})
+            return self.send_json({'ok': True, 'nfc_site': settings.get('nfc_site') or default_site_settings()['nfc_site'], 'website_copy': settings.get('website_copy') or default_site_settings()['website_copy'], 'nfc_media': settings.get('nfc_media') or default_site_settings()['nfc_media'], 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/backups':
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
@@ -1062,9 +1089,29 @@ class Handler(BaseHTTPRequestHandler):
                 merged = dict(current)
                 merged['nfc_site'] = payload.get('nfc_site') if isinstance(payload.get('nfc_site'), dict) else current.get('nfc_site')
                 merged['website_copy'] = payload.get('website_copy') if isinstance(payload.get('website_copy'), dict) else current.get('website_copy')
+
+                fixed_media = {
+                    'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
+                    'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
+                    'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
+                }
+                current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else default_site_settings()['nfc_media']
+                media = {key: dict(current_media.get(key) or {}) for key in fixed_media}
+                uploads = payload.get('media_uploads') if isinstance(payload.get('media_uploads'), dict) else {}
+                clears = set(payload.get('media_clear') or []) if isinstance(payload.get('media_clear'), list) else set()
+                for key, rel in fixed_media.items():
+                    if key in clears:
+                        remove_file(rel)
+                        media[key] = {'image': ''}
+                    image = uploads.get(key)
+                    if isinstance(image, dict) and image.get('data'):
+                        save_data_uri(image.get('data'), ROOT / rel)
+                        media[key] = {'image': rel}
+                merged['nfc_media'] = media
+
                 settings = write_site_settings(merged)
                 result = build_site()
-                return self.send_json({'ok': True, 'message': 'NFC website fiyatları ve site metinleri kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'result': result})
+                return self.send_json({'ok': True, 'message': 'NFC website fiyatları, metinleri ve ürün aile görselleri kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'nfc_media': settings.get('nfc_media'), 'result': result})
 
             if self.path == '/api/colors/save':
                 payload = self.read_json()
