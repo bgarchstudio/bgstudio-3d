@@ -711,7 +711,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.41'
+SITE_ASSET_VERSION = '3.1.42'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -726,6 +726,78 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
+
+def render_nfc_reference_section(cards_html):
+    """Return the entire NFC field-reference section from canonical panel data.
+
+    V3.1.42 intentionally does not trust the cards already present in
+    nfc-qr/index.html. A static page patch must never be able to erase newer
+    AppData references such as Naz Balık or Yusuf Şef again.
+    """
+    return (
+        '<section class="section-pad custom-band"><div class="shell reveal">'
+        '<div class="split-title"><h2>Sahada çalışan örnekler.</h2>'
+        '<p>Kurulan her sistem işletmenin masa sayısı, hedef kanalları ve kullanım senaryosuna göre farklılaşır. '
+        'Aşağıdaki örnekler sahada uygulanan kurulumlardan seçildi.</p></div>'
+        '<div class="case-grid case-grid-managed"><!-- CONTENT_MANAGER:NFC_START -->\n'
+        + cards_html +
+        '\n<!-- CONTENT_MANAGER:NFC_END --></div></div></section>'
+    )
+
+
+def rebuild_nfc_reference_section(html_text, cards_html):
+    """Replace the whole public NFC reference section, with marker recovery.
+
+    Older/stale page files may contain only a subset of cards or even lose the
+    content-manager markers. The heading is used as a recovery anchor so a
+    normal `Siteyi yeniden oluştur` always reconstructs the section.
+    """
+    section = render_nfc_reference_section(cards_html)
+    # Normal/current layout: replace the whole section containing our markers.
+    pattern = re.compile(
+        r'<section\b[^>]*class="[^"]*custom-band[^"]*"[^>]*>.*?'
+        r'<!--\s*CONTENT_MANAGER:NFC_START\s*-->.*?'
+        r'<!--\s*CONTENT_MANAGER:NFC_END\s*-->.*?</section>',
+        flags=re.I | re.S,
+    )
+    if pattern.search(html_text):
+        return pattern.sub(section, html_text, count=1)
+
+    # Recovery for stale legacy copies that have the correct heading but no markers.
+    heading_pattern = re.compile(
+        r'<section\b[^>]*>.*?<h2>\s*Sahada çalışan örnekler\.\s*</h2>.*?</section>',
+        flags=re.I | re.S,
+    )
+    if heading_pattern.search(html_text):
+        return heading_pattern.sub(section, html_text, count=1)
+
+    # Last-resort placement before the FAQ so build can self-heal a damaged page.
+    faq_anchor = re.search(r'<section\b[^>]*class="[^"]*nfc-faq[^"]*"', html_text, flags=re.I)
+    if faq_anchor:
+        return html_text[:faq_anchor.start()] + section + '\n' + html_text[faq_anchor.start():]
+    raise RuntimeError('NFC & QR referans bölümü sayfada bulunamadı ve güvenli biçimde yeniden kurulamadı.')
+
+
+def validate_nfc_reference_output(html_text, items):
+    """Prove that every active panel record appears once in the NFC section."""
+    start = html_text.find('<!-- CONTENT_MANAGER:NFC_START -->')
+    end = html_text.find('<!-- CONTENT_MANAGER:NFC_END -->')
+    if start < 0 or end < 0 or end <= start:
+        raise RuntimeError('NFC & QR: referans build işaretleri bulunamadı.')
+    section = html_text[start:end]
+    rendered_ids = re.findall(r'data-reference-id="([^"]+)"', section, flags=re.I)
+    expected_ids = [reference_identity(item) for item in items]
+    if len(rendered_ids) != len(expected_ids):
+        raise RuntimeError(
+            f'NFC & QR: panelde {len(expected_ids)} aktif kayıt var ancak sayfada {len(rendered_ids)} kart üretildi.'
+        )
+    if set(rendered_ids) != set(expected_ids):
+        missing = [x for x in expected_ids if x not in rendered_ids]
+        extra = [x for x in rendered_ids if x not in expected_ids]
+        raise RuntimeError(f'NFC & QR: referans eşleşmesi bozuk. Eksik={missing}, fazla={extra}')
+    if len(rendered_ids) != len(set(rendered_ids)):
+        raise RuntimeError('NFC & QR: aynı referans kartı birden fazla kez üretildi.')
+
 
 def validate_reference_theme_output(html_text, items, label):
     """Fail the build if a persisted card tone did not reach the generated HTML."""
@@ -775,7 +847,11 @@ def build_site():
     nfc_path = ROOT / 'nfc-qr/index.html'
     nfc_html = nfc_path.read_text(encoding='utf-8')
     nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)
-    nfc_html = replace_between(nfc_html, '<!-- CONTENT_MANAGER:NFC_START -->', '<!-- CONTENT_MANAGER:NFC_END -->', nfc_cards)
+    # V3.1.42: rebuild the *entire* reference section from persistent AppData.
+    # This prevents any future static nfc-qr/index.html patch from downgrading
+    # the live reference list to an older subset.
+    nfc_html = rebuild_nfc_reference_section(nfc_html, nfc_cards)
+    validate_nfc_reference_output(nfc_html, nfc_items)
     validate_reference_theme_output(nfc_html, nfc_items, 'NFC & QR')
     nfc_path.write_text(nfc_html, encoding='utf-8')
 
