@@ -843,7 +843,7 @@ button{font-family:inherit}
 .nfc-family-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .nfc-family-card{border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.26);padding:18px;display:grid;gap:16px;align-content:start}
 .nfc-family-card-dark{background:var(--dark);border-color:rgba(255,255,255,.08);color:#f7efe5}
-.nfc-family-media{min-height:170px;border-radius:22px;border:1px dashed rgba(138,78,14,.28);background:linear-gradient(135deg, rgba(255,255,255,.45), rgba(227,210,189,.32));display:grid;place-items:center;text-align:center;padding:16px}
+.nfc-family-media{min-height:170px;border-radius:22px;border:1px dashed rgba(138,78,14,.28);background:linear-gradient(135deg, rgba(255,255,255,.45), rgba(227,210,189,.32));display:grid;place-items:center;text-align:center;padding:16px;overflow:hidden;position:relative;isolation:isolate}
 .nfc-family-card-dark .nfc-family-media{border-color:rgba(215,166,110,.24);background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(215,166,110,.08))}
 .nfc-family-media span{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
 .nfc-family-card-dark .nfc-family-media span{color:#b7a99d}
@@ -860,5 +860,5 @@ button{font-family:inherit}
 .nfc-family-card-dark .nfc-family-price{border-color:rgba(255,255,255,.1)}
 .nfc-family-card-dark .nfc-family-price small{color:#a9998b}.nfc-family-card-dark .nfc-family-price strong{color:#f7efe5}
 
-.nfc-family-media.has-image{border-style:solid;background:#e9dccd;padding:0}
-.nfc-family-media.has-image img{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+.nfc-family-media.has-image{border-style:solid;background:#e9dccd;padding:0;overflow:hidden}.nfc-family-media.has-image::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(110,73,36,.08)}
+.nfc-family-media.has-image img{width:100%;height:100%;display:block;object-fit:cover;object-position:center;border-radius:inherit;transform:translateZ(0)}
