@@ -174,12 +174,21 @@ def default_nfc_media_settings():
 def nfc_media_settings():
     settings = load_site_settings()
     incoming = settings.get('nfc_media') if isinstance(settings.get('nfc_media'), dict) else {}
-    defaults = default_nfc_media_settings()
+    fixed_paths = {
+        'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
+        'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
+        'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
+    }
     out = {}
-    for key, base in defaults.items():
-        row = incoming.get(key) if isinstance(incoming.get(key), dict) else base
+    for key, fixed in fixed_paths.items():
+        row = incoming.get(key) if isinstance(incoming.get(key), dict) else {}
         image = str(row.get('image') or '').replace('\\', '/').lstrip('/')
-        out[key] = {'image': image if image and (ROOT / image).exists() else ''}
+        # V3.1.48 self-heal: fixed uploaded file wins if the DB pointer was lost.
+        if (ROOT / fixed).is_file():
+            image = fixed
+        elif not image or not (ROOT / image).is_file():
+            image = ''
+        out[key] = {'image': image}
     return out
 
 
@@ -814,7 +823,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.47'
+SITE_ASSET_VERSION = '3.1.48'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -834,7 +843,7 @@ def render_nfc_platform_sections():
     """Canonical NFC platform + package content for the public NFC page.
 
     V3.1.45 reframes the public NFC page around three real product families:
-    Feedback Duo, standard restaurant packages, and Hızlı Bağlantı Standı.
+    Premium Feedback Duo, standard restaurant packages, and Hızlı Bağlantı Standı.
     Restaurant packages stay capacity-based; QR, menu design and logo design
     remain optional. Hızlı Bağlantı Standı does not include menu design.
     """
@@ -863,13 +872,13 @@ def render_nfc_platform_sections():
     premium_qr_cost = qr_unit * 60
     quick_qr_cost = qr_unit * 3
     feedback_price = money(pack('feedback_duo').get('price'))
-    feedback_media = render_nfc_family_media('feedback_duo', 'Feedback Duo görseli', 'BG Studio NFC Feedback Duo adisyon ve değerlendirme standı')
+    feedback_media = render_nfc_family_media('feedback_duo', 'Premium Feedback Duo görseli', 'BG Studio NFC Premium Feedback Duo adisyon ve değerlendirme standı')
     restaurant_media = render_nfc_family_media('restaurant_packages', 'Restoran paket görseli', 'BG Studio NFC standart restoran paket standları')
     quick_media = render_nfc_family_media('quick_stand', 'Hızlı stand görseli', 'BG Studio NFC Hızlı Bağlantı Standı')
     return f'''<!-- NFC_PLATFORM_V145_START -->
 <section class="page-hero nfc-platform-hero"><div class="shell page-hero-grid reveal"><div><p class="eyebrow">BG STUDIO NFC İŞLETME PLATFORMU</p><h1>Bir etiketten fazlası. İşletmen için dijital altyapı.</h1><p class="lead">BG Studio NFC; yalnızca NFC etiketi veya QR kod üretmez. İşletmeye özel tasarlanan fiziksel standları, dijital menüyü, müşteri etkileşimlerini, değerlendirme akışını, analitikleri ve yönetim panelini tek sistemde birleştirir.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a><a class="secondary-cta" href="#urun-aileleri">Ürün ailelerini incele ↓</a></div></div><aside class="info-panel info-panel-dark nfc-platform-metrics"><p class="eyebrow">TEK SİSTEMDE</p><div class="metric-grid"><div class="metric"><strong>Stand</strong><span>İşletmeye özel 3D üretim</span></div><div class="metric"><strong>Uygulama</strong><span>Menü ve müşteri akışları</span></div><div class="metric"><strong>Panel</strong><span>İşletme yönetimi</span></div><div class="metric"><strong>Analitik</strong><span>Masa bazlı kullanım verisi</span></div></div></aside></div></section>
 <section class="tech-stage nfc-system-chain"><div class="shell reveal"><div class="split-title"><h2>Fiziksel standdan işletme otomasyonuna.</h2><p>Stand, NFC veya QR yalnızca giriş noktasıdır. Arkasında müşteri deneyimini ve işletme yönetimini birbirine bağlayan BG Studio NFC uygulaması çalışır.</p></div><div class="flow"><article class="flow-card"><span>01</span><h3>Özel 3D stand</h3><p>Logo, renk ve kullanım senaryosuna göre işletmeye özel fiziksel ürün.</p></article><article class="flow-card"><span>02</span><h3>NFC / QR erişimi</h3><p>Masa veya stand bazlı hedeflere hızlı, takip edilebilir erişim.</p></article><article class="flow-card"><span>03</span><h3>Uygulama <span class="plain-amp">&amp;</span> panel</h3><p>Akıllı menü, değerlendirme, bildirim ve müşteri etkileşim akışları.</p></article><article class="flow-card"><span>04</span><h3>Analitik <span class="plain-amp">&amp;</span> yönetim</h3><p>Kullanım verileri, sistem durumu ve bağlantılar uzaktan yönetilir.</p></article></div></div></section>
-<section class="section-pad-sm shell reveal nfc-product-families" id="urun-aileleri"><div class="split-title nfc-family-heading"><div><p class="eyebrow">3 ÜRÜN ÇEŞİDİ</p><h2>İhtiyaca göre üç ana ürün ailesi.</h2></div><p>BG Studio NFC altyapısı aynı çekirdeği kullanır; fiziksel ürün ve kullanım senaryosu işletmeye göre değişir. Görselleri daha sonra tek tek ekleyebileceğin alanları da bu yapıya göre hazırladık.</p></div><div class="nfc-family-grid"><article class="nfc-family-card nfc-family-card-dark">{feedback_media}<div class="nfc-family-copy"><p class="eyebrow">DEĞERLENDİRME + SOSYAL YÖNLENDİRME</p><h3>Feedback Duo</h3><p>Adisyon tutuculu fiziksel çözüm içinde hizmet değerlendirme akışı, Google veya TripAdvisor yönlendirmesi ve Instagram gibi sosyal medya hedefleri bir araya gelir.</p><div class="nfc-family-tags"><span>Adisyon tutuculu</span><span>İşletme içi feedback akışı</span><span>Google / TripAdvisor</span><span>Instagram ve sosyal medya</span></div><div class="nfc-family-price"><small>{year} fiyatı</small><strong>{feedback_price}</strong></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=feedback-duo">Feedback Duo için teklif al</a></div></article><article class="nfc-family-card">{restaurant_media}<div class="nfc-family-copy"><p class="eyebrow">RESTORAN KURULUMLARI</p><h3>Standart Restoran Paketleri</h3><p>Başlangıç, Profesyonel ve Premium restoran paketleri aynı BG Studio NFC altyapısını kullanır. Ana fark masa / stand ve NFC kapasitesidir; özel kapasite seçenekleri ayrıca ölçeklenebilir.</p><div class="nfc-family-tags"><span>Başlangıç</span><span>Profesyonel</span><span>Premium</span><span>Özel kapasite</span></div><a class="secondary-cta" href="#paketler">Paketleri incele</a></div></article><article class="nfc-family-card">{quick_media}<div class="nfc-family-copy"><p class="eyebrow">RESTORAN DIŞI İŞLETMELER</p><h3>Hızlı Bağlantı Standı</h3><p>Petshop, kuaför, klinik, mağaza, danışma noktası ve benzeri işletmeler için 3 NFC erişim noktalı fiziksel hızlı bağlantı çözümü. QR sistemi isteğe bağlıdır.</p><div class="nfc-family-tags"><span>3 NFC</span><span>3 QR opsiyonu</span><span>İşletme paneli</span><span>Kullanım analitiği</span></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=hizli-stand">Hızlı Stand için teklif al</a></div></article></div></section>
+<section class="section-pad-sm shell reveal nfc-product-families" id="urun-aileleri"><div class="split-title nfc-family-heading"><div><p class="eyebrow">3 ÜRÜN ÇEŞİDİ</p><h2>İhtiyaca göre üç ana ürün ailesi.</h2></div><p>BG Studio NFC altyapısı aynı çekirdeği kullanır; fiziksel ürün ve kullanım senaryosu işletmeye göre değişir. Görselleri daha sonra tek tek ekleyebileceğin alanları da bu yapıya göre hazırladık.</p></div><div class="nfc-family-grid"><article class="nfc-family-card nfc-family-card-dark">{feedback_media}<div class="nfc-family-copy"><p class="eyebrow">DEĞERLENDİRME + SOSYAL YÖNLENDİRME</p><h3>Premium Feedback Duo</h3><p>Adisyon tutuculu fiziksel çözüm içinde hizmet değerlendirme akışı, Google veya TripAdvisor yönlendirmesi ve Instagram gibi sosyal medya hedefleri bir araya gelir.</p><div class="nfc-family-tags"><span>Adisyon tutuculu</span><span>İşletme içi feedback akışı</span><span>Google / TripAdvisor</span><span>Instagram ve sosyal medya</span></div><div class="nfc-family-price"><small>{year} fiyatı</small><strong>{feedback_price}</strong></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=feedback-duo">Premium Feedback Duo için teklif al</a></div></article><article class="nfc-family-card">{restaurant_media}<div class="nfc-family-copy"><p class="eyebrow">RESTORAN KURULUMLARI</p><h3>Standart Restoran Paketleri</h3><p>Başlangıç, Profesyonel ve Premium restoran paketleri aynı BG Studio NFC altyapısını kullanır. Ana fark masa / stand ve NFC kapasitesidir; özel kapasite seçenekleri ayrıca ölçeklenebilir.</p><div class="nfc-family-tags"><span>Başlangıç</span><span>Profesyonel</span><span>Premium</span><span>Özel kapasite</span></div><a class="secondary-cta" href="#paketler">Paketleri incele</a></div></article><article class="nfc-family-card">{quick_media}<div class="nfc-family-copy"><p class="eyebrow">RESTORAN DIŞI İŞLETMELER</p><h3>Hızlı Bağlantı Standı</h3><p>Petshop, kuaför, klinik, mağaza, danışma noktası ve benzeri işletmeler için 3 NFC erişim noktalı fiziksel hızlı bağlantı çözümü. QR sistemi isteğe bağlıdır.</p><div class="nfc-family-tags"><span>3 NFC</span><span>3 QR opsiyonu</span><span>İşletme paneli</span><span>Kullanım analitiği</span></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=hizli-stand">Hızlı Stand için teklif al</a></div></article></div></section>
 <section class="section-pad-sm shell reveal nfc-packages" id="paketler">
 <div class="split-title nfc-package-heading"><div><p class="eyebrow">{year} STANDART RESTORAN PAKETLERİ</p><h2>Aynı altyapı. Farklı kapasite.</h2></div><p>Başlangıç, Profesyonel ve Premium aynı BG Studio NFC yazılım altyapısını kullanır. Ana fark masa / stand ve NFC kapasitesidir. QR sistemi, Menü Tasarımı ve Logo Tasarımı opsiyoneldir.</p></div>
 <div class="package-grid package-grid-detailed nfc-capacity-packages">
@@ -888,7 +897,7 @@ def render_nfc_platform_sections():
 <article class="nfc-infra-card"><span>07</span><h4>BG Studio Yönetim Altyapısı</h4><p>İşletmeler, masalar, NFC / QR hedefleri, paketler, bağlantılar, sistem durumu, kullanım hakları ve performans uzaktan yönetilir.</p></article>
 <article class="nfc-infra-card nfc-infra-card-accent"><span>08</span><h4>Özel Tasarım ve Üretim</h4><p>Hazır pleksiye etiket yapıştırmak yerine stand detaylarını biz tasarlıyor, kendi 3D üretim altyapımızla üretiyoruz. Logo, renk ve kullanım senaryosu işletmeye göre şekillenir.</p></article>
 </div></div>
-<div class="nfc-options nfc-options-v145"><div class="nfc-options-copy"><p class="eyebrow">OPSİYONEL HİZMETLER</p><h3>İhtiyacın kadar ekle.</h3><p>Mevcut menü ve logo kullanılabilir. QR sistemi de zorunlu değildir; seçilen kalemler proje kapsamına ayrıca eklenir. Hızlı Bağlantı Standı ve Feedback Duo tarafında menü tasarımı bulunmaz.</p></div><div class="nfc-option-list nfc-option-list-three"><div><span>QR sistemi</span><strong>{money(qr_unit)} / QR</strong><small>10 masa = 30 QR · 15 masa = 45 QR · 20 masa = 60 QR</small></div><div><span>Menü tasarımı</span><strong>{money(menu_design)}</strong><small>{year} liste bedeli · restoran paketlerinde opsiyonel</small></div><div><span>Logo tasarımı</span><strong>{money(logo_design)}</strong><small>{year} liste bedeli · mevcut logo kullanılabilir</small></div></div></div>
+<div class="nfc-options nfc-options-v145"><div class="nfc-options-copy"><p class="eyebrow">OPSİYONEL HİZMETLER</p><h3>İhtiyacın kadar ekle.</h3><p>Mevcut menü ve logo kullanılabilir. QR sistemi de zorunlu değildir; seçilen kalemler proje kapsamına ayrıca eklenir. Hızlı Bağlantı Standı ve Premium Feedback Duo tarafında menü tasarımı bulunmaz.</p></div><div class="nfc-option-list nfc-option-list-three"><div><span>QR sistemi</span><strong>{money(qr_unit)} / QR</strong><small>10 masa = 30 QR · 15 masa = 45 QR · 20 masa = 60 QR</small></div><div><span>Menü tasarımı</span><strong>{money(menu_design)}</strong><small>{year} liste bedeli · restoran paketlerinde opsiyonel</small></div><div><span>Logo tasarımı</span><strong>{money(logo_design)}</strong><small>{year} liste bedeli · mevcut logo kullanılabilir</small></div></div></div>
 <div class="nfc-scale-card"><div><p class="eyebrow">20 MASADAN BÜYÜK RESTORANLAR</p><h3>Daha büyük işletmeler için özel kapasite.</h3><p>20 masanın üzerindeki restoranlar için BG Studio NFC altyapısı işletmenin gerçek masa kapasitesine göre ölçeklenebilir.</p></div><div class="nfc-capacity-chips">{capacity_chips}</div><div class="nfc-scale-action"><span>Daha farklı kapasite mi gerekiyor? İşletmeye özel sistem hazırlanabilir.</span><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=ozel-kapasite">Özel teklif al</a></div></div>
 <div class="quick-stand-card quick-stand-card-v145"><div><p class="eyebrow">RESTORAN DIŞI İŞLETMELER İÇİN</p><h3>Hızlı Bağlantı Standı</h3><p>Mağaza, petshop, ofis, danışma noktası, güzellik salonu ve benzeri işletmeler için fiziksel NFC bağlantı çözümü. Google Yorum, Instagram, WhatsApp veya işletmeye özel farklı hedefler tek standda buluşabilir.</p><div class="quick-stand-tags"><span>Hedefler uzaktan değiştirilebilir</span><span>İşletme paneli</span><span>Kullanım analitiği</span><span>Logo tasarımı opsiyonel</span><span>Menü tasarımı yok</span></div><a class="text-cta" href="#referans-koala-petshop">Sahada: Koala Petshop ↓</a></div><div class="quick-stand-metrics"><span><b>1</b>Özel stand</span><span><b>3</b>NFC</span><span><b>3</b>QR opsiyonu</span></div><div class="quick-stand-price"><small>{year} TABAN FİYAT</small><strong>{money(pack('hizli_stand').get('price'))}</strong><span>QR seçilirse: 3 × {money(qr_unit)} = +{money(quick_qr_cost)}</span><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=hizli-stand">Teklif al</a></div></div>
 <p class="package-footnote">Fiyatlar {year} paket ve liste yapısını gösterir. Başlangıç, Profesyonel ve Premium aynı BG Studio NFC sistem altyapısını kullanır; ana fark kapasitedir. Proje kapsamı teklif öncesinde netleştirilir.</p>
@@ -1014,7 +1023,7 @@ def sync_nfc_offer_schema(html_text, pricing):
         'profesyonel': 'Profesyonel Paket',
         'premium': 'Premium Paket',
         'hizli_stand': 'Hızlı Bağlantı Standı',
-        'feedback_duo': 'Feedback Duo',
+        'feedback_duo': 'Premium Feedback Duo',
     }
     offers = []
     for key in ('baslangic', 'profesyonel', 'premium', 'hizli_stand', 'feedback_duo'):

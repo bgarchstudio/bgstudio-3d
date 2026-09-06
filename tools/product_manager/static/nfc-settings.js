@@ -4,9 +4,9 @@ const packageDefs=[
   ['profesyonel','Profesyonel','15 masa · 45 NFC'],
   ['premium','Premium','20 masa · 60 NFC'],
   ['hizli_stand','Hızlı Bağlantı Standı','1 stand · 3 NFC'],
-  ['feedback_duo','Feedback Duo','Fiyat boşsa sitede “Özel teklif” görünür']
+  ['feedback_duo','Premium Feedback Duo','Fiyat boşsa sitede “Özel teklif” görünür']
 ];
-const mediaDefs={feedback_duo:'Feedback Duo',restaurant_packages:'Standart Restoran Paketleri',quick_stand:'Hızlı Bağlantı Standı'};
+const mediaDefs={feedback_duo:'Premium Feedback Duo',restaurant_packages:'Standart Restoran Paketleri',quick_stand:'Hızlı Bağlantı Standı'};
 let data=null;
 const pendingMedia={};
 const clearMedia=new Set();

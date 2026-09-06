@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.47'
+PANEL_VERSION = '3.1.48'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -151,6 +151,46 @@ def write_colors(items):
     return clean
 
 
+NFC_MEDIA_FIXED_PATHS = {
+    'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
+    'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
+    'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
+}
+
+
+def _repair_nfc_media_from_files(settings, persist=False):
+    """Self-heal NFC showcase image pointers from their fixed repo files.
+
+    V3.1.48: if an older storage schema or restart loses only the nfc_media
+    pointer, the uploaded WebP itself remains authoritative and is reattached.
+    """
+    settings = dict(settings) if isinstance(settings, dict) else {}
+    media_in = settings.get('nfc_media') if isinstance(settings.get('nfc_media'), dict) else {}
+    media = {}
+    changed = False
+    for key, rel in NFC_MEDIA_FIXED_PATHS.items():
+        row = media_in.get(key) if isinstance(media_in.get(key), dict) else {}
+        raw = str(row.get('image') or '').replace('\\', '/').lstrip('/')
+        file_exists = (ROOT / rel).is_file()
+        if file_exists:
+            image = rel
+        else:
+            image = ''
+        if raw != image:
+            changed = True
+        media[key] = {'image': image}
+    if media_in != media:
+        changed = True
+    settings['nfc_media'] = media
+    if persist and changed:
+        set_collection('site_settings', settings)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
+    return settings
+
+
 def default_site_settings():
     return {
         'announcement_bar': {
@@ -209,7 +249,10 @@ def default_site_settings():
 
 def read_site_settings():
     data = get_collection('site_settings', default_site_settings())
-    return data if isinstance(data, dict) else default_site_settings()
+    if not isinstance(data, dict):
+        data = default_site_settings()
+    # V3.1.48: uploaded NFC showcase images survive old-schema/restart pointer loss.
+    return _repair_nfc_media_from_files(data, persist=True)
 
 
 def _safe_campaign_url(value):
@@ -307,11 +350,7 @@ def clean_nfc_media_settings(value, current=None):
     defaults = default_site_settings()['nfc_media']
     current = current if isinstance(current, dict) else defaults
     incoming = value if isinstance(value, dict) else {}
-    fixed_paths = {
-        'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
-        'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
-        'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
-    }
+    fixed_paths = NFC_MEDIA_FIXED_PATHS
     out = {}
     for key, fixed in fixed_paths.items():
         current_row = current.get(key) if isinstance(current.get(key), dict) else {}
@@ -1090,11 +1129,7 @@ class Handler(BaseHTTPRequestHandler):
                 merged['nfc_site'] = payload.get('nfc_site') if isinstance(payload.get('nfc_site'), dict) else current.get('nfc_site')
                 merged['website_copy'] = payload.get('website_copy') if isinstance(payload.get('website_copy'), dict) else current.get('website_copy')
 
-                fixed_media = {
-                    'feedback_duo': 'assets/images/nfc/products/feedback-duo.webp',
-                    'restaurant_packages': 'assets/images/nfc/products/restaurant-packages.webp',
-                    'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
-                }
+                fixed_media = NFC_MEDIA_FIXED_PATHS
                 current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else default_site_settings()['nfc_media']
                 media = {key: dict(current_media.get(key) or {}) for key in fixed_media}
                 uploads = payload.get('media_uploads') if isinstance(payload.get('media_uploads'), dict) else {}
@@ -1110,8 +1145,16 @@ class Handler(BaseHTTPRequestHandler):
                 merged['nfc_media'] = media
 
                 settings = write_site_settings(merged)
+                # V3.1.48: re-read actual fixed files and persist pointers before reporting success.
+                settings = _repair_nfc_media_from_files(settings, persist=True)
+                for key in uploads:
+                    if key not in fixed_media:
+                        continue
+                    rel = fixed_media[key]
+                    if not (ROOT / rel).is_file() or (settings.get('nfc_media') or {}).get(key, {}).get('image') != rel:
+                        raise ValueError(f'{key} vitrin görseli diske kaydedilemedi; işlem başarılı sayılmadı.')
                 result = build_site()
-                return self.send_json({'ok': True, 'message': 'NFC website fiyatları, metinleri ve ürün aile görselleri kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'nfc_media': settings.get('nfc_media'), 'result': result})
+                return self.send_json({'ok': True, 'message': 'NFC website fiyatları, metinleri ve ürün aile görselleri kalıcı kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'nfc_media': settings.get('nfc_media'), 'result': result})
 
             if self.path == '/api/colors/save':
                 payload = self.read_json()

@@ -620,7 +620,7 @@ if (quoteForm) {
     'baslangic': { name: 'Başlangıç', qty: 10, perUnitNfc: 3, perUnitQr: 3, price: 13900, renewal: 4900, qtyLabel: 'Masa / stand adedi' },
     'profesyonel': { name: 'Profesyonel', qty: 15, perUnitNfc: 3, perUnitQr: 3, price: 19900, renewal: 6900, qtyLabel: 'Masa / stand adedi' },
     'premium': { name: 'Premium', qty: 20, perUnitNfc: 3, perUnitQr: 3, price: 25900, renewal: 8900, qtyLabel: 'Masa / stand adedi' },
-    'feedback-duo': { name: 'Feedback Duo', qty: null, perUnitNfc: 2, perUnitQr: 2, price: null, renewal: null, qtyLabel: 'Adisyon / stand adedi', supportsMenu: false, summaryIntro: 'Adisyon tutuculu değerlendirme + sosyal medya çözümü' },
+    'feedback-duo': { name: 'Premium Feedback Duo', qty: null, perUnitNfc: 2, perUnitQr: 2, price: null, renewal: null, qtyLabel: 'Adisyon / stand adedi', supportsMenu: false, summaryIntro: 'Adisyon tutuculu değerlendirme + sosyal medya çözümü' },
     'hizli-stand': { name: 'Hızlı Bağlantı Standı', qty: 1, perUnitNfc: 3, perUnitQr: 3, price: 2000, renewal: null, quick: true, qtyLabel: 'Stand adedi', supportsMenu: false },
     'ozel-kapasite': { name: 'Özel kapasite', qty: null, perUnitNfc: 3, perUnitQr: 3, price: null, renewal: null, custom: true, qtyLabel: 'Masa / stand adedi' }
   };
@@ -674,7 +674,7 @@ if (quoteForm) {
     if (sizeField) sizeField.hidden = isNfc;
     if (colorLabel) colorLabel.textContent = isNfc ? 'Stand renk / tasarım tercihi' : 'Renk / malzeme tercihi';
     if (colorInput) colorInput.placeholder = isNfc ? 'Örn. Siyah, işletme renkleri, fark etmez' : 'Örn. Siyah PLA / fark etmez';
-    if (detailInput && isNfc && pkg?.name === 'Feedback Duo') detailInput.placeholder = 'İstenen yönlendirmeleri (Instagram, Google, TripAdvisor), adet bilgisini ve özel taleplerinizi yazın…';
+    if (detailInput && isNfc && pkg?.name === 'Premium Feedback Duo') detailInput.placeholder = 'İstenen yönlendirmeleri (Instagram, Google, TripAdvisor), adet bilgisini ve özel taleplerinizi yazın…';
     else if (detailInput && isNfc) detailInput.placeholder = 'İşletme yapısını, hedef kanalları, varsa QR / menü / logo taleplerini ve özel notları yazın…';
     else if (detailInput) detailInput.placeholder = 'Ürün, ölçü, kullanım amacı, adet ve varsa özel talepleri yazın…';
 
@@ -694,7 +694,7 @@ if (quoteForm) {
     if (packageSummary) packageSummary.hidden = false;
     if (packageTitle) packageTitle.textContent = ctx.pkg.name;
     if (packageCapacity) {
-      if (ctx.pkg.name === 'Feedback Duo') packageCapacity.textContent = ctx.qty ? `${ctx.qty} adisyon / stand · ${ctx.nfc || '-'} NFC${ctx.qrCount ? ` · ${ctx.qrCount} QR opsiyonu` : ''}` : 'Adisyon tutuculu değerlendirme + sosyal medya çözümü';
+      if (ctx.pkg.name === 'Premium Feedback Duo') packageCapacity.textContent = ctx.qty ? `${ctx.qty} adisyon / stand · ${ctx.nfc || '-'} NFC${ctx.qrCount ? ` · ${ctx.qrCount} QR opsiyonu` : ''}` : 'Adisyon tutuculu değerlendirme + sosyal medya çözümü';
       else if (ctx.pkg.custom) packageCapacity.textContent = ctx.qty ? `${ctx.qty} masa / stand · ${ctx.nfc} NFC` : '20+ masa · işletmeye özel kapasite';
       else if (ctx.pkg.quick) packageCapacity.textContent = '1 özel stand · 3 NFC erişim noktası';
       else packageCapacity.textContent = `${ctx.qty} masa / stand · ${ctx.nfc} NFC erişim noktası`;
@@ -705,7 +705,7 @@ if (quoteForm) {
     if (packagePrice) packagePrice.textContent = ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price);
     if (packageRenewal) packageRenewal.textContent = ctx.pkg.renewal ? `Yıllık yenileme: ${money(ctx.pkg.renewal)}` : (ctx.pkg.custom ? 'Kapasiteye göre hesaplanır' : 'Proje kapsamına göre');
     if (qrCopy) {
-      if (ctx.pkg.name === 'Feedback Duo') qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(ctx.qrCount * qrUnitPrice)}` : `Adisyon / stand başına 2 QR · ${money(qrUnitPrice)} / QR`;
+      if (ctx.pkg.name === 'Premium Feedback Duo') qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(ctx.qrCount * qrUnitPrice)}` : `Adisyon / stand başına 2 QR · ${money(qrUnitPrice)} / QR`;
       else if (ctx.pkg.quick) qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(ctx.qrCount * qrUnitPrice)}` : `Stand başına 3 QR · ${money(qrUnitPrice)} / QR`;
       else qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(ctx.qrCount * qrUnitPrice)}` : `Masa başına 3 QR · ${money(qrUnitPrice)} / QR`;
     }
