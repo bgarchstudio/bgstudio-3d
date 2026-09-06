@@ -711,7 +711,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.42'
+SITE_ASSET_VERSION = '3.1.43'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -726,6 +726,69 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
+
+def render_nfc_platform_sections():
+    """Canonical NFC platform + package content for the public NFC page.
+
+    V3.1.43 keeps packages capacity-based. Başlangıç, Profesyonel and Premium
+    share the same BG Studio NFC software platform; their main difference is
+    physical table/stand and NFC capacity. QR, menu design and logo design stay
+    optional services.
+    """
+    capacities = ['25','30','35','40','45','50','55','60','65','70','75','80','85','90','95','100','110','120']
+    capacity_chips = ''.join(f'<span>{x} masa</span>' for x in capacities)
+    return f'''<!-- NFC_PLATFORM_V143_START -->
+<section class="page-hero nfc-platform-hero"><div class="shell page-hero-grid reveal"><div><p class="eyebrow">BG STUDIO NFC İŞLETME PLATFORMU</p><h1>Bir etiketten fazlası. İşletmen için dijital altyapı.</h1><p class="lead">BG Studio NFC; yalnızca NFC etiketi veya QR kod üretmez. İşletmeye özel tasarlanan fiziksel standları, dijital menüyü, müşteri etkileşimlerini, değerlendirme akışını, analitikleri ve yönetim panelini tek sistemde birleştirir.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a><a class="secondary-cta" href="#paketler">Paketleri incele ↓</a></div></div><aside class="info-panel info-panel-dark nfc-platform-metrics"><p class="eyebrow">TEK SİSTEMDE</p><div class="metric-grid"><div class="metric"><strong>Stand</strong><span>İşletmeye özel 3D üretim</span></div><div class="metric"><strong>Uygulama</strong><span>Menü ve müşteri akışları</span></div><div class="metric"><strong>Panel</strong><span>İşletme yönetimi</span></div><div class="metric"><strong>Analitik</strong><span>Masa bazlı kullanım verisi</span></div></div></aside></div></section>
+<section class="tech-stage nfc-system-chain"><div class="shell reveal"><div class="split-title"><h2>Fiziksel standdan işletme otomasyonuna.</h2><p>Stand, NFC veya QR yalnızca giriş noktasıdır. Arkasında müşteri deneyimini ve işletme yönetimini birbirine bağlayan BG Studio NFC uygulaması çalışır.</p></div><div class="flow"><article class="flow-card"><span>01</span><h3>Özel 3D stand</h3><p>Logo, renk ve kullanım senaryosuna göre işletmeye özel fiziksel ürün.</p></article><article class="flow-card"><span>02</span><h3>NFC / QR erişimi</h3><p>Masa veya stand bazlı hedeflere hızlı, takip edilebilir erişim.</p></article><article class="flow-card"><span>03</span><h3>Uygulama <span class="plain-amp">&amp;</span> panel</h3><p>Akıllı menü, değerlendirme, bildirim ve müşteri etkileşim akışları.</p></article><article class="flow-card"><span>04</span><h3>Analitik <span class="plain-amp">&amp;</span> yönetim</h3><p>Kullanım verileri, sistem durumu ve bağlantılar uzaktan yönetilir.</p></article></div></div></section>
+<section class="section-pad-sm shell reveal nfc-packages" id="paketler">
+<div class="split-title nfc-package-heading"><div><p class="eyebrow">2026 STANDART RESTORAN PAKETLERİ</p><h2>Aynı altyapı. Farklı kapasite.</h2></div><p>Başlangıç, Profesyonel ve Premium aynı BG Studio NFC yazılım altyapısını kullanır. Ana fark masa / stand ve NFC kapasitesidir. QR sistemi, Menü Tasarımı ve Logo Tasarımı opsiyoneldir.</p></div>
+<div class="package-grid package-grid-detailed nfc-capacity-packages">
+<article class="package package-detailed"><div class="package-head"><span class="package-kicker">10 MASA / STAND · 30 NFC</span><span class="package-badge">Başlangıç</span></div><h3>Başlangıç</h3><p>10 masaya kadar restoranlar için BG Studio NFC işletme altyapısı. 10 stand ve toplam 30 NFC erişim noktası.</p><div class="package-price"><small>2026 lansman fiyatı</small><strong>13.900 TL</strong><span>Yıllık yenileme: 4.900 TL</span></div><div class="package-capacity"><span><b>10</b>Masa / Stand</span><span><b>30</b>NFC</span><span><b>30</b>QR opsiyonu</span></div><ul class="nfc-package-features"><li>10 özel tasarım stand, stand başına 3 NFC</li><li>Akıllı Menü + 10 dil altyapısı</li><li>İşletme müşteri paneli</li><li>Masa bazlı kullanım analitiği</li><li>Değerlendirme ve geri bildirim sistemi</li><li>Sosyal medya / iletişim yönlendirmeleri</li><li>Garson Çağır + Hesap İste seçeneği</li><li>Bildirim + uzaktan sistem yönetimi</li></ul><div class="package-extra"><span>QR seçilirse: 30 × 150 TL = +4.500 TL</span></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=baslangic">Teklif al</a></article>
+<article class="package package-detailed featured"><div class="package-head"><span class="package-kicker">15 MASA / STAND · 45 NFC</span><span class="package-badge">Öne çıkan</span></div><h3>Profesyonel</h3><p>15 masalık restoranlar için 45 NFC erişim noktası, dijital menü, müşteri paneli, analitik ve işletme otomasyonu.</p><div class="package-price"><small>2026 lansman fiyatı</small><strong>19.900 TL</strong><span>Yıllık yenileme: 6.900 TL</span></div><div class="package-capacity"><span><b>15</b>Masa / Stand</span><span><b>45</b>NFC</span><span><b>45</b>QR opsiyonu</span></div><ul class="nfc-package-features"><li>15 özel tasarım stand, stand başına 3 NFC</li><li>Akıllı Menü + 10 dil altyapısı</li><li>İşletme müşteri paneli</li><li>Masa bazlı kullanım analitiği</li><li>Değerlendirme ve geri bildirim sistemi</li><li>Sosyal medya / iletişim yönlendirmeleri</li><li>Garson Çağır + Hesap İste seçeneği</li><li>Push bildirim + uzaktan sistem yönetimi</li></ul><div class="package-extra"><span>QR seçilirse: 45 × 150 TL = +6.750 TL</span></div><a class="primary-cta" href="../teklif/?tur=nfc&amp;paket=profesyonel">Teklif al</a></article>
+<article class="package package-detailed"><div class="package-head"><span class="package-kicker">20 MASA / STAND · 60 NFC</span><span class="package-badge">Premium</span></div><h3>Premium</h3><p>20 masalık restoranlar için 60 NFC erişim noktası ve BG Studio NFC platformunun tam işletme altyapısı.</p><div class="package-price"><small>2026 lansman fiyatı</small><strong>25.900 TL</strong><span>Yıllık yenileme: 8.900 TL</span></div><div class="package-capacity"><span><b>20</b>Masa / Stand</span><span><b>60</b>NFC</span><span><b>60</b>QR opsiyonu</span></div><ul class="nfc-package-features"><li>20 özel tasarım stand, stand başına 3 NFC</li><li>Akıllı Menü + 10 dil altyapısı</li><li>İşletme müşteri paneli</li><li>Masa bazlı kullanım analitiği</li><li>Değerlendirme ve geri bildirim sistemi</li><li>Sosyal medya / iletişim yönlendirmeleri</li><li>Garson Çağır + Hesap İste seçeneği</li><li>Push bildirim + uzaktan sistem yönetimi</li></ul><div class="package-extra"><span>QR seçilirse: 60 × 150 TL = +9.000 TL</span></div><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=premium">Teklif al</a></article>
+</div>
+<div class="nfc-package-rule"><strong>QR sistemi paketlere zorunlu olarak dahil değildir.</strong><span>Standart restoran paketlerinde her stand 3 NFC erişim noktasıyla gelir. QR sistemi tercih edildiğinde masa başına 3 QR eklenir.</span></div>
+<div class="nfc-platform-block"><div class="nfc-platform-title"><div><p class="eyebrow">BG STUDIO NFC ALTYAPISI</p><h3>Standın arkasında gerçek bir uygulama çalışır.</h3></div><p>Paket kapasitesi değişir, sistemin çekirdeği değişmez. Fiziksel erişim noktaları, müşteri deneyimi, işletme paneli, analitik ve uzaktan yönetim birlikte çalışır.</p></div><div class="nfc-infra-grid">
+<article class="nfc-infra-card"><span>01</span><h4>Akıllı Dijital Menü</h4><p>NFC veya QR ile hızlı erişim. Ürün içerikleri, alerjen bilgileri, yaklaşık kalori değerleri ve işletmeye özel menü yapısı.</p></article>
+<article class="nfc-infra-card"><span>02</span><h4>10 Dil Desteği</h4><p>Türkçe ve İngilizce ana menülerin yanında Almanca, Rusça, Fransızca, İspanyolca, İtalyanca, Arapça, Japonca ve Çince.</p></article>
+<article class="nfc-infra-card"><span>03</span><h4>Değerlendirme Sistemi</h4><p>Müşteri önce BG Studio işletme içi değerlendirme akışına alınır. Geri bildirim panele düşer, uygun aşamada Google değerlendirme adımına devam edilebilir.</p></article>
+<article class="nfc-infra-card"><span>04</span><h4>Masa Bazlı Analitik</h4><p>NFC okutma, QR erişimi, menü etkileşimleri, değerlendirme tıklamaları ve sosyal medya hareketleri masa / stand bazında raporlanabilir.</p></article>
+<article class="nfc-infra-card"><span>05</span><h4>Garson Çağır + Hesap İste</h4><p>Menüsü bulunan Standart Restoran işletmelerinde yönetici tarafından açılıp kapatılabilir. Talep masa bilgisiyle Bildirim Merkezi'ne düşer; push açıksa anlık bildirim gider.</p></article>
+<article class="nfc-infra-card"><span>06</span><h4>İşletme Yönetim Paneli</h4><p>Kullanım verileri, müşteri geri bildirimleri, bildirimler, paket bilgileri, sistem durumu ve performans tek işletme panelinden takip edilir.</p></article>
+<article class="nfc-infra-card"><span>07</span><h4>BG Studio Yönetim Altyapısı</h4><p>İşletmeler, masalar, NFC / QR hedefleri, paketler, bağlantılar, sistem durumu, kullanım hakları ve performans uzaktan yönetilir.</p></article>
+<article class="nfc-infra-card nfc-infra-card-accent"><span>08</span><h4>Özel Tasarım ve Üretim</h4><p>Hazır pleksiye etiket yapıştırmak yerine stand detaylarını biz tasarlıyor, kendi 3D üretim altyapımızla üretiyoruz. Logo, renk ve kullanım senaryosu işletmeye göre şekillenir.</p></article>
+</div></div>
+<div class="nfc-options nfc-options-v143"><div class="nfc-options-copy"><p class="eyebrow">OPSİYONEL HİZMETLER</p><h3>İhtiyacın kadar ekle.</h3><p>Mevcut menü ve logo kullanılabilir. QR sistemi de zorunlu değildir; seçilen kalemler proje kapsamına ayrıca eklenir.</p></div><div class="nfc-option-list nfc-option-list-three"><div><span>QR sistemi</span><strong>150 TL / QR</strong><small>10 masa = 30 QR · 15 masa = 45 QR · 20 masa = 60 QR</small></div><div><span>Menü tasarımı</span><strong>2.500 TL</strong><small>2026 liste bedeli · mevcut menü kullanılabilir</small></div><div><span>Logo tasarımı</span><strong>2.500 TL</strong><small>2026 liste bedeli · mevcut logo kullanılabilir</small></div></div></div>
+<div class="nfc-scale-card"><div><p class="eyebrow">20 MASADAN BÜYÜK RESTORANLAR</p><h3>Daha büyük işletmeler için özel kapasite.</h3><p>20 masanın üzerindeki restoranlar için BG Studio NFC altyapısı işletmenin gerçek masa kapasitesine göre ölçeklenebilir.</p></div><div class="nfc-capacity-chips">{capacity_chips}</div><div class="nfc-scale-action"><span>Daha farklı kapasite mi gerekiyor? İşletmeye özel sistem hazırlanabilir.</span><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=ozel-kapasite">Özel teklif al</a></div></div>
+<div class="quick-stand-card quick-stand-card-v143"><div><p class="eyebrow">RESTORAN DIŞI İŞLETMELER İÇİN</p><h3>Hızlı Bağlantı Standı</h3><p>Mağaza, petshop, ofis, danışma noktası, güzellik salonu ve benzeri işletmeler için fiziksel NFC bağlantı çözümü. Google Yorum, Instagram, WhatsApp veya işletmeye özel farklı hedefler tek standda buluşabilir.</p><div class="quick-stand-tags"><span>Hedefler uzaktan değiştirilebilir</span><span>İşletme paneli</span><span>Kullanım analitiği</span><span>Logo tasarımı opsiyonel</span></div><a class="text-cta" href="#referans-koala-petshop">Sahada: Koala Petshop ↓</a></div><div class="quick-stand-metrics"><span><b>1</b>Özel stand</span><span><b>3</b>NFC</span><span><b>3</b>QR opsiyonu</span></div><div class="quick-stand-price"><small>2026 TABAN FİYAT</small><strong>2.000 TL</strong><span>QR seçilirse: 3 × 150 TL = +450 TL</span><a class="secondary-cta" href="../teklif/?tur=nfc&amp;paket=hizli-stand">Teklif al</a></div></div>
+<p class="package-footnote">Fiyatlar 2026 paket ve liste yapısını gösterir. Başlangıç, Profesyonel ve Premium aynı BG Studio NFC sistem altyapısını kullanır; ana fark kapasitedir. Proje kapsamı teklif öncesinde netleştirilir.</p>
+</section>
+<!-- NFC_PLATFORM_V143_END -->'''
+
+
+def rebuild_nfc_platform_sections(html_text):
+    """Replace public NFC platform/package copy without touching field references."""
+    rendered = render_nfc_platform_sections()
+    marker_pattern = re.compile(
+        r'<!--\s*NFC_PLATFORM_V143_START\s*-->.*?<!--\s*NFC_PLATFORM_V143_END\s*-->',
+        flags=re.I | re.S,
+    )
+    if marker_pattern.search(html_text):
+        html_text = marker_pattern.sub(rendered, html_text, count=1)
+    else:
+        start = re.search(r'<section\b[^>]*class="[^"]*page-hero[^"]*"[^>]*>', html_text, flags=re.I)
+        ref = re.search(r'<section\b[^>]*class="[^"]*custom-band[^"]*"[^>]*>.*?<h2>\s*Sahada çalışan örnekler\.\s*</h2>', html_text, flags=re.I | re.S)
+        if not start or not ref or ref.start() <= start.start():
+            raise RuntimeError('NFC platform bölümü güvenli biçimde bulunamadı; referans alanına dokunulmadı.')
+        html_text = html_text[:start.start()] + rendered + '\n' + html_text[ref.start():]
+
+    desc = ('BG Studio NFC işletme platformu; özel 3D stand, NFC ve opsiyonel QR erişimini Akıllı Menü, '
+            '10 dil, masa bazlı analitik, değerlendirme sistemi, bildirimler ve işletme paneliyle birleştirir.')
+    html_text = re.sub(r'(<meta\s+content=")[^"]*("\s+name="description"\s*/?>)', lambda m: m.group(1)+desc+m.group(2), html_text, count=1, flags=re.I)
+    html_text = re.sub(r'(<meta\s+content=")[^"]*("\s+property="og:description"\s*/?>)', lambda m: m.group(1)+desc+m.group(2), html_text, count=1, flags=re.I)
+    html_text = re.sub(r'(<meta\s+content=")[^"]*("\s+name="twitter:description"\s*/?>)', lambda m: m.group(1)+desc+m.group(2), html_text, count=1, flags=re.I)
+    return html_text
+
 
 def render_nfc_reference_section(cards_html):
     """Return the entire NFC field-reference section from canonical panel data.
@@ -846,6 +909,8 @@ def build_site():
     nfc_items = resolve_nfc_items()
     nfc_path = ROOT / 'nfc-qr/index.html'
     nfc_html = nfc_path.read_text(encoding='utf-8')
+    # V3.1.43: canonical platform/package content, independent from references.
+    nfc_html = rebuild_nfc_platform_sections(nfc_html)
     nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)
     # V3.1.42: rebuild the *entire* reference section from persistent AppData.
     # This prevents any future static nfc-qr/index.html patch from downgrading
