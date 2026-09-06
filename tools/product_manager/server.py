@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.44'
+PANEL_VERSION = '3.1.46'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -166,7 +166,39 @@ def default_site_settings():
                 {'id':'nfc-qr','text':'NFC + QR işletme çözümleri','url':'/nfc-qr/','enabled':True,'source_type':'manual','source_ref':''},
             ],
             'integration': {'discounts_enabled': False, 'mode': 'manual'},
-        }
+        },
+        'nfc_site': {
+            'active_year': '2026',
+            'years': {
+                '2026': {
+                    'qr_unit': 150,
+                    'menu_design': 2500,
+                    'logo_design': 2500,
+                    'packages': {
+                        'baslangic': {'price': 13900, 'list_price': 15900, 'renewal': 4900},
+                        'profesyonel': {'price': 19900, 'list_price': 21900, 'renewal': 6900},
+                        'premium': {'price': 25900, 'list_price': 28900, 'renewal': 8900},
+                        'hizli_stand': {'price': 2000, 'list_price': None, 'renewal': None},
+                        'feedback_duo': {'price': None, 'list_price': None, 'renewal': None},
+                    },
+                },
+                '2027': {
+                    'qr_unit': 200,
+                    'menu_design': 3000,
+                    'logo_design': 3000,
+                    'packages': {
+                        'baslangic': {'price': None, 'list_price': None, 'renewal': None},
+                        'profesyonel': {'price': None, 'list_price': None, 'renewal': None},
+                        'premium': {'price': None, 'list_price': None, 'renewal': None},
+                        'hizli_stand': {'price': None, 'list_price': None, 'renewal': None},
+                        'feedback_duo': {'price': None, 'list_price': None, 'renewal': None},
+                    },
+                },
+            },
+        },
+        'website_copy': {
+            'catalog_intro': 'Dekoratif tasarımlardan gaming ve masaüstü ürünlerine, pet çözümlerinden takı & makyaj, oyun & oyuncak, aksesuar ve kişiye özel üretimlere uzanan atölye seçkimiz. Fiyatı belirtilmeyen ürünlerde ölçü, adet ve üretim detayına göre teklif hazırlanır.'
+        },
     }
 
 
@@ -190,11 +222,87 @@ def _safe_campaign_url(value):
     raise ValueError('Kampanya bağlantısı http(s) adresi veya site içi / ile başlayan yol olmalı.')
 
 
+def _clean_money(value, *, allow_none=True, minimum=0, maximum=10000000):
+    if value in (None, '', 'null'):
+        return None if allow_none else minimum
+    raw = str(value).strip().replace('TL', '').replace('₺', '').replace(' ', '')
+    if '.' in raw and ',' in raw:
+        raw = raw.replace('.', '').replace(',', '.')
+    elif ',' in raw:
+        raw = raw.replace(',', '.')
+    elif re.fullmatch(r'\d{1,3}(?:\.\d{3})+', raw):
+        raw = raw.replace('.', '')
+    try:
+        n = float(raw)
+    except Exception:
+        raise ValueError(f'Geçersiz fiyat değeri: {value}')
+    if n < minimum or n > maximum:
+        raise ValueError(f'Fiyat {minimum} ile {maximum} arasında olmalı.')
+    return int(round(n))
+
+
+def clean_nfc_site_settings(value, current=None):
+    defaults = default_site_settings()['nfc_site']
+    current = current if isinstance(current, dict) else defaults
+    incoming = value if isinstance(value, dict) else {}
+    active_year = str(incoming.get('active_year') or current.get('active_year') or '2026')
+    if active_year not in ('2026', '2027'):
+        active_year = '2026'
+    out = {'active_year': active_year, 'years': {}}
+    incoming_years = incoming.get('years') if isinstance(incoming.get('years'), dict) else {}
+    current_years = current.get('years') if isinstance(current.get('years'), dict) else {}
+    package_keys = ('baslangic', 'profesyonel', 'premium', 'hizli_stand', 'feedback_duo')
+    for year in ('2026', '2027'):
+        dyear = defaults['years'][year]
+        cyear = current_years.get(year) if isinstance(current_years.get(year), dict) else dyear
+        iyear = incoming_years.get(year) if isinstance(incoming_years.get(year), dict) else {}
+        qr_unit = _clean_money(iyear.get('qr_unit', cyear.get('qr_unit', dyear['qr_unit'])), allow_none=False, minimum=0)
+        menu_design = _clean_money(iyear.get('menu_design', cyear.get('menu_design', dyear['menu_design'])), allow_none=False, minimum=0)
+        logo_design = _clean_money(iyear.get('logo_design', cyear.get('logo_design', dyear['logo_design'])), allow_none=False, minimum=0)
+        ipack = iyear.get('packages') if isinstance(iyear.get('packages'), dict) else {}
+        cpack = cyear.get('packages') if isinstance(cyear.get('packages'), dict) else {}
+        packages = {}
+        for key in package_keys:
+            dp = dyear['packages'].get(key, {})
+            cp = cpack.get(key) if isinstance(cpack.get(key), dict) else dp
+            pp = ipack.get(key) if isinstance(ipack.get(key), dict) else {}
+            packages[key] = {
+                'price': _clean_money(pp.get('price', cp.get('price', dp.get('price'))), allow_none=True),
+                'list_price': _clean_money(pp.get('list_price', cp.get('list_price', dp.get('list_price'))), allow_none=True),
+                'renewal': _clean_money(pp.get('renewal', cp.get('renewal', dp.get('renewal'))), allow_none=True),
+            }
+        out['years'][year] = {
+            'qr_unit': qr_unit,
+            'menu_design': menu_design,
+            'logo_design': logo_design,
+            'packages': packages,
+        }
+    # Do not allow a future year to become public with incomplete core pricing.
+    ay = out['years'][active_year]
+    required = [ay['qr_unit'], ay['menu_design'], ay['logo_design']]
+    for key in ('baslangic', 'profesyonel', 'premium'):
+        required.extend([ay['packages'][key]['price'], ay['packages'][key]['renewal']])
+    required.append(ay['packages']['hizli_stand']['price'])
+    if any(v is None for v in required):
+        raise ValueError(f'{active_year} aktif fiyat yılı yapılamaz; restoran paketleri, yenilemeler, Hızlı Stand, QR, menü ve logo fiyatlarını doldur.')
+    return out
+
+
+def clean_website_copy(value, current=None):
+    defaults = default_site_settings()['website_copy']
+    current = current if isinstance(current, dict) else defaults
+    incoming = value if isinstance(value, dict) else {}
+    intro = re.sub(r'\s+', ' ', str(incoming.get('catalog_intro', current.get('catalog_intro', defaults['catalog_intro'])) or '')).strip()
+    if not intro:
+        intro = defaults['catalog_intro']
+    return {'catalog_intro': intro[:520]}
+
+
 def clean_site_settings(value):
     payload = value if isinstance(value, dict) else {}
     current = read_site_settings()
     current_bar = current.get('announcement_bar') if isinstance(current.get('announcement_bar'), dict) else {}
-    incoming = payload.get('announcement_bar') if isinstance(payload.get('announcement_bar'), dict) else {}
+    incoming = payload.get('announcement_bar') if isinstance(payload.get('announcement_bar'), dict) else current_bar
     speed = str(incoming.get('speed') or current_bar.get('speed') or 'normal').strip().lower()
     if speed not in ('slow', 'normal', 'fast'):
         speed = 'normal'
@@ -227,6 +335,10 @@ def clean_site_settings(value):
             'source_type': source_type,
             'source_ref': str(row.get('source_ref') or '').strip()[:120],
         })
+    current_nfc = current.get('nfc_site') if isinstance(current.get('nfc_site'), dict) else default_site_settings()['nfc_site']
+    current_copy = current.get('website_copy') if isinstance(current.get('website_copy'), dict) else default_site_settings()['website_copy']
+    incoming_nfc = payload.get('nfc_site') if isinstance(payload.get('nfc_site'), dict) else current_nfc
+    incoming_copy = payload.get('website_copy') if isinstance(payload.get('website_copy'), dict) else current_copy
     settings = {
         'announcement_bar': {
             'enabled': bool(incoming.get('enabled', True)),
@@ -240,7 +352,9 @@ def clean_site_settings(value):
                 'discounts_enabled': bool((incoming.get('integration') or {}).get('discounts_enabled', False)) if isinstance(incoming.get('integration'), dict) else False,
                 'mode': str((incoming.get('integration') or {}).get('mode') or 'manual')[:40] if isinstance(incoming.get('integration'), dict) else 'manual',
             },
-        }
+        },
+        'nfc_site': clean_nfc_site_settings(incoming_nfc, current_nfc),
+        'website_copy': clean_website_copy(incoming_copy, current_copy),
     }
     # No active message means nothing can be displayed; keep data but hide the bar.
     if not any(x.get('enabled', True) and x.get('text') for x in messages):
@@ -916,6 +1030,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
+        if u.path == '/api/nfc-site-settings':
+            settings = read_site_settings()
+            return self.send_json({'ok': True, 'nfc_site': settings.get('nfc_site') or default_site_settings()['nfc_site'], 'website_copy': settings.get('website_copy') or default_site_settings()['website_copy'], 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/backups':
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
@@ -937,6 +1054,17 @@ class Handler(BaseHTTPRequestHandler):
                 settings = write_site_settings(payload.get('settings') or {})
                 result = build_site()
                 return self.send_json({'ok': True, 'message': 'Kampanya şeridi ayarları kaydedildi ve site güncellendi.', 'settings': settings, 'result': result})
+
+            if self.path == '/api/nfc-site-settings/save':
+                payload = self.read_json()
+                full_backup('before-nfc-site-settings-save')
+                current = read_site_settings()
+                merged = dict(current)
+                merged['nfc_site'] = payload.get('nfc_site') if isinstance(payload.get('nfc_site'), dict) else current.get('nfc_site')
+                merged['website_copy'] = payload.get('website_copy') if isinstance(payload.get('website_copy'), dict) else current.get('website_copy')
+                settings = write_site_settings(merged)
+                result = build_site()
+                return self.send_json({'ok': True, 'message': 'NFC website fiyatları ve site metinleri kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'result': result})
 
             if self.path == '/api/colors/save':
                 payload = self.read_json()

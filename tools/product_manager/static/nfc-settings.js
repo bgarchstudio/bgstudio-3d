@@ -1,0 +1,40 @@
+const $=id=>document.getElementById(id);
+const packageDefs=[
+  ['baslangic','Başlangıç','10 masa · 30 NFC'],
+  ['profesyonel','Profesyonel','15 masa · 45 NFC'],
+  ['premium','Premium','20 masa · 60 NFC'],
+  ['hizli_stand','Hızlı Bağlantı Standı','1 stand · 3 NFC'],
+  ['feedback_duo','Feedback Duo','Fiyat boşsa sitede “Özel teklif” görünür']
+];
+let data=null;
+const toast=(msg,error=false)=>{const t=$('toast');t.textContent=msg;t.className='toast'+(error?' error':'');t.hidden=false;clearTimeout(window.__nfcToast);window.__nfcToast=setTimeout(()=>t.hidden=true,4300)};
+const api=async(path,opts={})=>{const r=await fetch(path,{cache:'no-store',headers:{'Content-Type':'application/json'},...opts});const text=await r.text();let d={};try{d=text?JSON.parse(text):{}}catch{throw new Error(`Panel beklenmeyen yanıt verdi (${r.status}).`)}if(!r.ok||d.ok===false)throw new Error(d.error||`İşlem başarısız (${r.status})`);return d};
+const moneyInput=(year,key,field,value)=>`<label class="field"><span>${field==='price'?'Paket / taban fiyatı':field==='list_price'?'Normal / liste fiyatı':'Yenileme (varsa)'}</span><input inputmode="numeric" data-year="${year}" data-package="${key}" data-field="${field}" placeholder="Boş bırakılabilir" value="${value??''}"></label>`;
+function renderYear(year,yearData){
+  const card=document.createElement('section');card.className='year-card';card.dataset.yearCard=year;
+  const isLive=$('activeYear').value===year;
+  card.innerHTML=`<div class="year-head"><div><p class="eyebrow">FİYAT DÖNEMİ</p><h2>${year}</h2></div><span class="status ${isLive?'live':''}">${isLive?'Websitesinde aktif':'Hazır bekliyor'}</span></div><div class="common-grid"><label class="field"><span>QR adet fiyatı</span><input inputmode="numeric" data-year="${year}" data-common="qr_unit" value="${yearData.qr_unit??''}"></label><label class="field"><span>Menü tasarımı</span><input inputmode="numeric" data-year="${year}" data-common="menu_design" value="${yearData.menu_design??''}"></label><label class="field"><span>Logo tasarımı</span><input inputmode="numeric" data-year="${year}" data-common="logo_design" value="${yearData.logo_design??''}"></label></div><div class="packages"></div>`;
+  const wrap=card.querySelector('.packages');
+  packageDefs.forEach(([key,label,meta])=>{const row=yearData.packages?.[key]||{};const el=document.createElement('div');el.className='package-row';el.innerHTML=`<div class="package-title"><strong>${label}</strong><small>${meta}</small></div><div class="package-fields">${moneyInput(year,key,'price',row.price)}${moneyInput(year,key,'list_price',row.list_price)}${moneyInput(year,key,'renewal',row.renewal)}</div>`;wrap.append(el)});
+  return card;
+}
+function render(){
+  $('activeYear').value=data.nfc_site.active_year||'2026';
+  const years=$('years');years.innerHTML='';
+  ['2026','2027'].forEach(y=>years.append(renderYear(y,data.nfc_site.years[y])));
+  $('catalogIntro').value=data.website_copy?.catalog_intro||'';updateCount();
+}
+function updateLiveBadges(){document.querySelectorAll('[data-year-card]').forEach(card=>{const live=card.dataset.yearCard===$('activeYear').value;const s=card.querySelector('.status');s.classList.toggle('live',live);s.textContent=live?'Websitesinde aktif':'Hazır bekliyor'})}
+const parseMoney=v=>{const s=String(v??'').trim().replace(/\s+/g,'').replace(/TL|₺/gi,'');if(!s)return null;let x=s;if(x.includes('.')&&x.includes(','))x=x.replaceAll('.','').replace(',','.');else if(x.includes(','))x=x.replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(x))x=x.replaceAll('.','');const n=Number(x);return Number.isFinite(n)?Math.round(n):null};
+function collect(){
+  const nfc={active_year:$('activeYear').value,years:{}};
+  ['2026','2027'].forEach(year=>{const y={packages:{}};document.querySelectorAll(`[data-year="${year}"][data-common]`).forEach(i=>y[i.dataset.common]=parseMoney(i.value));packageDefs.forEach(([key])=>{const row={};document.querySelectorAll(`[data-year="${year}"][data-package="${key}"]`).forEach(i=>row[i.dataset.field]=parseMoney(i.value));y.packages[key]=row});nfc.years[year]=y});
+  return {nfc_site:nfc,website_copy:{catalog_intro:$('catalogIntro').value.trim()}};
+}
+async function load(){try{data=await api('/api/nfc-site-settings');render();$('saveState').textContent='Hazır · aktif yıl '+data.nfc_site.active_year}catch(e){toast(e.message,true);$('saveState').textContent='Yüklenemedi'}}
+$('activeYear').addEventListener('change',()=>{updateLiveBadges();$('saveState').textContent=$('activeYear').value+' aktif yıl olarak seçildi · henüz kaydedilmedi.'});
+$('catalogIntro').addEventListener('input',()=>{updateCount();$('saveState').textContent='Metin değişti · henüz kaydedilmedi.'});
+$('years').addEventListener('input',()=>{$('saveState').textContent='Fiyat değişti · henüz kaydedilmedi.'});
+function updateCount(){$('copyCount').textContent=$('catalogIntro').value.length}
+$('save').addEventListener('click',async()=>{const b=$('save');try{b.disabled=true;$('saveState').textContent='Kaydediliyor ve site hazırlanıyor…';const payload=collect();const d=await api('/api/nfc-site-settings/save',{method:'POST',body:JSON.stringify(payload)});data={nfc_site:d.nfc_site,website_copy:d.website_copy};render();$('saveState').textContent=`Kaydedildi · ${d.nfc_site.active_year} aktif · GitHub Desktop’ta Commit + Push`;toast('✅ '+d.message)}catch(e){$('saveState').textContent='Hata · değerleri kontrol et';toast(e.message,true)}finally{b.disabled=false}});
+load();

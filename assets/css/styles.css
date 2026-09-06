@@ -836,3 +836,26 @@ button{font-family:inherit}
 .nfc-capacity-chips a:hover{border-color:rgba(138,78,14,.42);background:rgba(255,255,255,.48)}
 
 .quote-form input.is-package-locked{background:#f2ebe2;color:#6f6257;cursor:not-allowed}
+
+
+.nfc-product-families{padding-top:6px}
+.nfc-family-heading{align-items:end}.nfc-family-heading>div .eyebrow{margin:0 0 10px}
+.nfc-family-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.nfc-family-card{border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.26);padding:18px;display:grid;gap:16px;align-content:start}
+.nfc-family-card-dark{background:var(--dark);border-color:rgba(255,255,255,.08);color:#f7efe5}
+.nfc-family-media{min-height:170px;border-radius:22px;border:1px dashed rgba(138,78,14,.28);background:linear-gradient(135deg, rgba(255,255,255,.45), rgba(227,210,189,.32));display:grid;place-items:center;text-align:center;padding:16px}
+.nfc-family-card-dark .nfc-family-media{border-color:rgba(215,166,110,.24);background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(215,166,110,.08))}
+.nfc-family-media span{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.nfc-family-card-dark .nfc-family-media span{color:#b7a99d}
+.nfc-family-copy .eyebrow{margin:0 0 8px}.nfc-family-copy h3{font-family:"Playfair Display",Georgia,serif;font-size:2.15rem;line-height:1.02;font-weight:500;margin:0 0 10px}.nfc-family-copy p:not(.eyebrow){margin:0;color:var(--ink-soft);font-size:.8rem;line-height:1.6}
+.nfc-family-card-dark .nfc-family-copy p:not(.eyebrow){color:#b7a99d}
+.nfc-family-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}.nfc-family-tags span{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#f5ede3;color:#72573b;font-size:.63rem;font-weight:700}
+.nfc-family-card-dark .nfc-family-tags span{border-color:rgba(255,255,255,.09);background:rgba(255,255,255,.045);color:#dfc29f}
+.nfc-family-card .secondary-cta{margin-top:14px}
+@media(max-width:1100px){.nfc-family-grid{grid-template-columns:1fr 1fr}.nfc-family-card:first-child{grid-column:1/-1}}
+@media(max-width:760px){.nfc-family-grid{grid-template-columns:1fr}.nfc-family-card,.nfc-family-media{border-radius:22px}.nfc-family-copy h3{font-size:1.95rem}}
+.nfc-family-price{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.nfc-family-price small{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft)}
+.nfc-family-price strong{font-family:"Playfair Display",Georgia,serif;font-size:1.35rem;font-weight:500}
+.nfc-family-card-dark .nfc-family-price{border-color:rgba(255,255,255,.1)}
+.nfc-family-card-dark .nfc-family-price small{color:#a9998b}.nfc-family-card-dark .nfc-family-price strong{color:#f7efe5}
