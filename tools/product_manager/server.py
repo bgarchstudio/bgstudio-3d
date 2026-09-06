@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.48'
+PANEL_VERSION = '3.1.51'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -445,6 +445,44 @@ def write_site_settings(value):
     set_collection('site_settings', clean)
     return clean
 
+
+
+def _public_nfc_family_theme(key):
+    path = ROOT / 'nfc-qr/index.html'
+    if not path.is_file():
+        return None
+    html_text = path.read_text(encoding='utf-8')
+    pattern = rf'<article[^>]*data-family-key="{re.escape(str(key))}"[^>]*>'
+    found = re.search(pattern, html_text, flags=re.I | re.S)
+    if not found:
+        return None
+    tag = found.group(0)
+    theme = re.search(r'data-family-theme="(light|dark)"', tag, flags=re.I)
+    return theme.group(1).lower() if theme else None
+
+
+def save_nfc_family_theme(key, theme):
+    key = str(key or '').strip()
+    if key not in NFC_MEDIA_FIXED_PATHS:
+        raise ValueError('Geçersiz NFC ürün ailesi.')
+    theme = 'dark' if str(theme or '').strip().lower() == 'dark' else 'light'
+    current = read_site_settings()
+    settings = dict(current)
+    current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else {}
+    media = {k: dict(current_media.get(k) or {}) for k in NFC_MEDIA_FIXED_PATHS}
+    row = media.get(key) or {}
+    rel = NFC_MEDIA_FIXED_PATHS[key]
+    image = rel if (ROOT / rel).is_file() else str(row.get('image') or '')
+    media[key] = {'image': image, 'theme': theme}
+    settings['nfc_media'] = media
+    set_collection('site_settings', settings)
+    export_to_repo()
+    result = build_site()
+    verified = _public_nfc_family_theme(key)
+    if verified != theme:
+        raise RuntimeError(f'Kart tonu kaydedildi ancak site çıktısı {verified or "bulunamadı"} olarak üretildi.')
+    repaired = read_site_settings()
+    return repaired, {**(result or {}), 'verified_theme': verified, 'verified_family': key}
 
 def backup():
     return create_db_backup('products-auto')
@@ -1132,6 +1170,20 @@ class Handler(BaseHTTPRequestHandler):
                 settings = write_site_settings(payload.get('settings') or {})
                 result = build_site()
                 return self.send_json({'ok': True, 'message': 'Kampanya şeridi ayarları kaydedildi ve site güncellendi.', 'settings': settings, 'result': result})
+
+
+            if self.path == '/api/nfc-family-theme/save':
+                payload = self.read_json()
+                full_backup('before-nfc-family-theme-save')
+                settings, result = save_nfc_family_theme(payload.get('key'), payload.get('theme'))
+                key = str(payload.get('key') or '')
+                labels = {
+                    'feedback_duo': 'Premium Feedback Duo',
+                    'restaurant_packages': 'Standart Restoran Paketleri',
+                    'quick_stand': 'Hızlı Bağlantı Standı',
+                }
+                tone = 'Koyu' if result.get('verified_theme') == 'dark' else 'Açık'
+                return self.send_json({'ok': True, 'message': f'{labels.get(key, key)} · {tone} kart tonu kaydedildi ve build doğrulandı.', 'nfc_media': settings.get('nfc_media'), 'result': result})
 
             if self.path == '/api/nfc-site-settings/save':
                 payload = self.read_json()

@@ -864,3 +864,18 @@ button{font-family:inherit}
 .nfc-family-media.has-image{border:0;background:transparent;padding:0;overflow:hidden;box-shadow:none}.nfc-family-media.has-image::after{display:none}
 .nfc-family-media.has-image img{width:100%;height:100%;display:block;object-fit:cover;object-position:center;border-radius:inherit;transform:translateZ(0)}
 .nfc-family-media.zoomable-media:focus-visible{outline:2px solid rgba(185,130,69,.55);outline-offset:4px}
+
+
+/* V3.1.51 — NFC family card tone: saved data attribute is authoritative */
+.nfc-family-card[data-family-theme="light"]{background:rgba(255,255,255,.26)!important;border-color:var(--line)!important;color:var(--ink)!important}
+.nfc-family-card[data-family-theme="light"] .nfc-family-copy p:not(.eyebrow){color:var(--ink-soft)!important}
+.nfc-family-card[data-family-theme="light"] .nfc-family-tags span{border-color:var(--line)!important;background:#f5ede3!important;color:#72573b!important}
+.nfc-family-card[data-family-theme="light"] .nfc-family-price{border-color:var(--line)!important}
+.nfc-family-card[data-family-theme="light"] .nfc-family-price small{color:var(--ink-soft)!important}
+.nfc-family-card[data-family-theme="light"] .nfc-family-price strong{color:var(--ink)!important}
+.nfc-family-card[data-family-theme="dark"]{background:var(--dark)!important;border-color:rgba(255,255,255,.08)!important;color:#f7efe5!important}
+.nfc-family-card[data-family-theme="dark"] .nfc-family-copy p:not(.eyebrow){color:#b7a99d!important}
+.nfc-family-card[data-family-theme="dark"] .nfc-family-tags span{border-color:rgba(255,255,255,.09)!important;background:rgba(255,255,255,.045)!important;color:#dfc29f!important}
+.nfc-family-card[data-family-theme="dark"] .nfc-family-price{border-color:rgba(255,255,255,.1)!important}
+.nfc-family-card[data-family-theme="dark"] .nfc-family-price small{color:#a9998b!important}
+.nfc-family-card[data-family-theme="dark"] .nfc-family-price strong{color:#f7efe5!important}
