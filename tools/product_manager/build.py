@@ -711,7 +711,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.43'
+SITE_ASSET_VERSION = '3.1.44'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -736,7 +736,7 @@ def render_nfc_platform_sections():
     optional services.
     """
     capacities = ['25','30','35','40','45','50','55','60','65','70','75','80','85','90','95','100','110','120']
-    capacity_chips = ''.join(f'<span>{x} masa</span>' for x in capacities)
+    capacity_chips = ''.join(f'<a href="../teklif/?tur=nfc&amp;paket=ozel-kapasite&amp;masa={x}">{x} masa</a>' for x in capacities)
     return f'''<!-- NFC_PLATFORM_V143_START -->
 <section class="page-hero nfc-platform-hero"><div class="shell page-hero-grid reveal"><div><p class="eyebrow">BG STUDIO NFC İŞLETME PLATFORMU</p><h1>Bir etiketten fazlası. İşletmen için dijital altyapı.</h1><p class="lead">BG Studio NFC; yalnızca NFC etiketi veya QR kod üretmez. İşletmeye özel tasarlanan fiziksel standları, dijital menüyü, müşteri etkileşimlerini, değerlendirme akışını, analitikleri ve yönetim panelini tek sistemde birleştirir.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a><a class="secondary-cta" href="#paketler">Paketleri incele ↓</a></div></div><aside class="info-panel info-panel-dark nfc-platform-metrics"><p class="eyebrow">TEK SİSTEMDE</p><div class="metric-grid"><div class="metric"><strong>Stand</strong><span>İşletmeye özel 3D üretim</span></div><div class="metric"><strong>Uygulama</strong><span>Menü ve müşteri akışları</span></div><div class="metric"><strong>Panel</strong><span>İşletme yönetimi</span></div><div class="metric"><strong>Analitik</strong><span>Masa bazlı kullanım verisi</span></div></div></aside></div></section>
 <section class="tech-stage nfc-system-chain"><div class="shell reveal"><div class="split-title"><h2>Fiziksel standdan işletme otomasyonuna.</h2><p>Stand, NFC veya QR yalnızca giriş noktasıdır. Arkasında müşteri deneyimini ve işletme yönetimini birbirine bağlayan BG Studio NFC uygulaması çalışır.</p></div><div class="flow"><article class="flow-card"><span>01</span><h3>Özel 3D stand</h3><p>Logo, renk ve kullanım senaryosuna göre işletmeye özel fiziksel ürün.</p></article><article class="flow-card"><span>02</span><h3>NFC / QR erişimi</h3><p>Masa veya stand bazlı hedeflere hızlı, takip edilebilir erişim.</p></article><article class="flow-card"><span>03</span><h3>Uygulama <span class="plain-amp">&amp;</span> panel</h3><p>Akıllı menü, değerlendirme, bildirim ve müşteri etkileşim akışları.</p></article><article class="flow-card"><span>04</span><h3>Analitik <span class="plain-amp">&amp;</span> yönetim</h3><p>Kullanım verileri, sistem durumu ve bağlantılar uzaktan yönetilir.</p></article></div></div></section>

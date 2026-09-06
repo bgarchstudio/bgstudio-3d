@@ -581,8 +581,112 @@ const quoteForm = document.querySelector('[data-quote-form]');
 if (quoteForm) {
   const params = new URLSearchParams(window.location.search);
   const requestedType = params.get('tur');
+  const requestedPackage = params.get('paket');
+  const requestedTableCount = Number.parseInt(params.get('masa') || '', 10);
   const typeSelect = quoteForm.querySelector('[name="talep_turu"]');
+  const packageConfig = quoteForm.querySelector('[data-nfc-quote-config]');
+  const packageSelect = quoteForm.querySelector('[name="nfc_paket"]');
+  const packageSummary = quoteForm.querySelector('[data-nfc-package-summary]');
+  const packageTitle = quoteForm.querySelector('[data-nfc-package-title]');
+  const packageCapacity = quoteForm.querySelector('[data-nfc-package-capacity]');
+  const packagePrice = quoteForm.querySelector('[data-nfc-package-price]');
+  const packageRenewal = quoteForm.querySelector('[data-nfc-package-renewal]');
+  const qrCopy = quoteForm.querySelector('[data-nfc-qr-copy]');
+  const totalBox = quoteForm.querySelector('[data-nfc-quote-total]');
+  const totalValue = quoteForm.querySelector('[data-nfc-total-value]');
+  const qtyInput = quoteForm.querySelector('[name="adet"]');
+  const qtyField = qtyInput?.closest('.field');
+  const qtyLabel = qtyField?.querySelector('label');
+  const sizeInput = quoteForm.querySelector('[name="olcu"]');
+  const sizeField = sizeInput?.closest('.field');
+  const colorInput = quoteForm.querySelector('[name="renk"]');
+  const colorLabel = colorInput?.closest('.field')?.querySelector('label');
+  const detailInput = quoteForm.querySelector('[name="detay"]');
+
+  const nfcPackages = {
+    'baslangic': { name: 'Başlangıç', tables: 10, nfc: 30, qr: 30, price: 13900, renewal: 4900 },
+    'profesyonel': { name: 'Profesyonel', tables: 15, nfc: 45, qr: 45, price: 19900, renewal: 6900 },
+    'premium': { name: 'Premium', tables: 20, nfc: 60, qr: 60, price: 25900, renewal: 8900 },
+    'hizli-stand': { name: 'Hızlı Bağlantı Standı', tables: 1, nfc: 3, qr: 3, price: 2000, renewal: null, quick: true },
+    'ozel-kapasite': { name: 'Özel kapasite', tables: null, nfc: null, qr: null, price: null, renewal: null, custom: true }
+  };
+  const money = value => Number(value || 0).toLocaleString('tr-TR') + ' TL';
+  const checked = name => !!quoteForm.querySelector(`[name="${name}"]`)?.checked;
+
   if (requestedType && typeSelect && [...typeSelect.options].some(option => option.value === requestedType)) typeSelect.value = requestedType;
+  if (requestedPackage && packageSelect && nfcPackages[requestedPackage]) packageSelect.value = requestedPackage;
+
+  const currentNfcPackage = () => nfcPackages[packageSelect?.value] || null;
+
+  const computeNfcContext = () => {
+    const pkg = currentNfcPackage();
+    if (!pkg) return null;
+    const enteredTables = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
+    const tables = pkg.custom ? enteredTables : pkg.tables;
+    const nfc = pkg.custom && tables ? tables * 3 : pkg.nfc;
+    const qrCount = pkg.custom && tables ? tables * 3 : pkg.qr;
+    const qrCost = checked('nfc_qr') && qrCount ? qrCount * 150 : 0;
+    const menuCost = checked('nfc_menu_design') ? 2500 : 0;
+    const logoCost = checked('nfc_logo_design') ? 2500 : 0;
+    const total = pkg.price == null ? null : pkg.price + qrCost + menuCost + logoCost;
+    return { pkg, tables, nfc, qrCount, qrCost, menuCost, logoCost, total };
+  };
+
+  const updateNfcSummary = ({ syncQty = false } = {}) => {
+    const pkg = currentNfcPackage();
+    const isNfc = typeSelect?.value === 'nfc';
+    if (packageConfig) packageConfig.hidden = !isNfc;
+    if (qtyLabel) qtyLabel.textContent = isNfc ? 'Masa / stand adedi' : 'Adet';
+    if (qtyInput) {
+      qtyInput.placeholder = isNfc ? 'Örn. 15' : 'Örn. 50';
+      qtyInput.readOnly = !!(isNfc && pkg && !pkg.custom);
+      qtyInput.classList.toggle('is-package-locked', !!(isNfc && pkg && !pkg.custom));
+      qtyInput.title = qtyInput.readOnly ? 'Bu paket sabit kapasitelidir. Farklı masa sayısı için Özel kapasite seçin.' : '';
+    }
+    if (sizeField) sizeField.hidden = isNfc;
+    if (colorLabel) colorLabel.textContent = isNfc ? 'Stand renk / tasarım tercihi' : 'Renk / malzeme tercihi';
+    if (colorInput) colorInput.placeholder = isNfc ? 'Örn. Siyah, işletme renkleri, fark etmez' : 'Örn. Siyah PLA / fark etmez';
+
+    if (!isNfc || !pkg) {
+      if (packageSummary) packageSummary.hidden = true;
+      if (totalBox) totalBox.hidden = true;
+      return;
+    }
+
+    if (syncQty && qtyInput) {
+      if (pkg.custom) {
+        if (Number.isFinite(requestedTableCount) && requestedTableCount > 20) qtyInput.value = String(requestedTableCount);
+      } else {
+        qtyInput.value = String(pkg.tables);
+      }
+    }
+
+    const ctx = computeNfcContext();
+    if (!ctx) return;
+    if (packageSummary) packageSummary.hidden = false;
+    if (packageTitle) packageTitle.textContent = ctx.pkg.name;
+    if (packageCapacity) {
+      if (ctx.pkg.custom) packageCapacity.textContent = ctx.tables ? `${ctx.tables} masa / stand · ${ctx.nfc} NFC` : '20+ masa · işletmeye özel kapasite';
+      else if (ctx.pkg.quick) packageCapacity.textContent = '1 özel stand · 3 NFC erişim noktası';
+      else packageCapacity.textContent = `${ctx.tables} masa / stand · ${ctx.nfc} NFC erişim noktası`;
+    }
+    if (packagePrice) packagePrice.textContent = ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price);
+    if (packageRenewal) packageRenewal.textContent = ctx.pkg.renewal ? `Yıllık yenileme: ${money(ctx.pkg.renewal)}` : (ctx.pkg.custom ? 'Kapasiteye göre hesaplanır' : 'Proje kapsamına göre');
+    if (qrCopy) qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(ctx.qrCount * 150)}` : 'Masa başına 3 QR · 150 TL / QR';
+    if (totalBox) totalBox.hidden = ctx.total == null;
+    if (totalValue && ctx.total != null) totalValue.textContent = money(ctx.total);
+  };
+
+  const initialNfc = typeSelect?.value === 'nfc';
+  updateNfcSummary({ syncQty: initialNfc && !!requestedPackage });
+
+  typeSelect?.addEventListener('change', () => updateNfcSummary());
+  packageSelect?.addEventListener('change', () => updateNfcSummary({ syncQty: true }));
+  quoteForm.querySelectorAll('[data-nfc-option]').forEach(input => input.addEventListener('change', () => updateNfcSummary()));
+  qtyInput?.addEventListener('input', () => {
+    if (typeSelect?.value === 'nfc' && packageSelect?.value === 'ozel-kapasite') updateNfcSummary();
+  });
+
   quoteForm.addEventListener('submit', event => {
     event.preventDefault();
     if (!quoteForm.reportValidity()) return;
@@ -595,22 +699,50 @@ if (quoteForm) {
       'urun': 'Mevcut ürün hakkında',
       'diger': 'Diğer'
     };
+    const isNfc = data.get('talep_turu') === 'nfc';
+    const ctx = isNfc ? computeNfcContext() : null;
     const lines = [
       'Merhaba BG Studio 3D, web sitesinden bir talep oluşturuyorum.',
       '',
       `Talep türü: ${labels[data.get('talep_turu')] || data.get('talep_turu')}`,
       `Ad / Soyad: ${data.get('ad') || '-'}`,
-      `İşletme / Marka: ${data.get('isletme') || '-'}`,
-      `Adet: ${data.get('adet') || '-'}`,
-      `Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,
-      `Renk / malzeme: ${data.get('renk') || '-'}`,
+      `İşletme / Marka: ${data.get('isletme') || '-'}`
+    ];
+
+    if (ctx) {
+      const options = [];
+      if (checked('nfc_qr')) options.push(`QR sistemi${ctx.qrCount ? ` (${ctx.qrCount} QR / +${money(ctx.qrCost)})` : ''}`);
+      if (checked('nfc_menu_design')) options.push('Menü tasarımı (+2.500 TL)');
+      if (checked('nfc_logo_design')) options.push('Logo tasarımı (+2.500 TL)');
+      lines.push(
+        '',
+        `Seçilen paket: ${ctx.pkg.name}`,
+        `Masa / stand: ${ctx.tables || data.get('adet') || '-'}`,
+        `NFC erişim noktası: ${ctx.nfc || '-'}`,
+        `Opsiyonlar: ${options.length ? options.join(', ') : 'Ek opsiyon seçilmedi'}`,
+        `Paket başlangıç bedeli: ${ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price)}`
+      );
+      if (ctx.total != null) lines.push(`Seçili opsiyonlarla tahmini başlangıç: ${money(ctx.total)}`);
+      if (ctx.pkg.renewal) lines.push(`Yıllık yenileme: ${money(ctx.pkg.renewal)}`);
+      lines.push(`Stand renk / tasarım: ${data.get('renk') || '-'}`);
+    } else {
+      lines.push(
+        `Adet: ${data.get('adet') || '-'}`,
+        `Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,
+        `Renk / malzeme: ${data.get('renk') || '-'}`
+      );
+    }
+
+    lines.push(
       `Şehir: ${data.get('sehir') || '-'}`,
       '',
       `Talep: ${data.get('detay') || '-'}`
-    ];
+    );
+
     const leadPayload = {
       method: 'quote_form_whatsapp',
       lead_type: data.get('talep_turu') || 'unknown',
+      nfc_package: ctx?.pkg?.name || undefined,
       page_location: canonicalUrl
     };
     trackEvent('quote_request', leadPayload);
