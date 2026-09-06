@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.51'
+PANEL_VERSION = '3.1.52'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -163,6 +163,56 @@ NFC_MEDIA_DEFAULTS = {
     'quick_stand': {'image': '', 'theme': 'light'},
 }
 
+NFC_FAMILY_THEME_DEFAULTS = {
+    'feedback_duo': 'dark',
+    'restaurant_packages': 'light',
+    'quick_stand': 'light',
+}
+
+
+def read_nfc_family_themes(seed_media=None, persist=True):
+    raw = get_collection('nfc_family_themes', {})
+    raw = raw if isinstance(raw, dict) else {}
+    seed_media = seed_media if isinstance(seed_media, dict) else {}
+    out = {}
+    for key, default in NFC_FAMILY_THEME_DEFAULTS.items():
+        seed_row = seed_media.get(key) if isinstance(seed_media.get(key), dict) else {}
+        value = str(raw.get(key) or seed_row.get('theme') or default).strip().lower()
+        out[key] = 'dark' if value == 'dark' else 'light'
+    if persist and raw != out:
+        set_collection('nfc_family_themes', out)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
+    return out
+
+
+def write_nfc_family_themes(value):
+    incoming = value if isinstance(value, dict) else {}
+    current = read_nfc_family_themes(persist=False)
+    out = {}
+    for key, default in NFC_FAMILY_THEME_DEFAULTS.items():
+        raw = str(incoming.get(key) or current.get(key) or default).strip().lower()
+        out[key] = 'dark' if raw == 'dark' else 'light'
+    set_collection('nfc_family_themes', out)
+    return out
+
+
+def overlay_nfc_family_themes(settings, persist=True):
+    settings = dict(settings) if isinstance(settings, dict) else {}
+    media = settings.get('nfc_media') if isinstance(settings.get('nfc_media'), dict) else {}
+    themes = read_nfc_family_themes(media, persist=persist)
+    merged = {}
+    for key, default_row in NFC_MEDIA_DEFAULTS.items():
+        row = media.get(key) if isinstance(media.get(key), dict) else {}
+        merged[key] = {
+            'image': str(row.get('image') or ''),
+            'theme': themes.get(key, default_row.get('theme', 'light')),
+        }
+    settings['nfc_media'] = merged
+    return settings
+
 
 def _repair_nfc_media_from_files(settings, persist=False):
     """Self-heal NFC showcase image pointers from their fixed repo files.
@@ -262,7 +312,9 @@ def read_site_settings():
     if not isinstance(data, dict):
         data = default_site_settings()
     # V3.1.48: uploaded NFC showcase images survive old-schema/restart pointer loss.
-    return _repair_nfc_media_from_files(data, persist=True)
+    data = _repair_nfc_media_from_files(data, persist=True)
+    # V3.1.52: tone is authoritative in a separate collection.
+    return overlay_nfc_family_themes(data, persist=True)
 
 
 def _safe_campaign_url(value):
@@ -443,7 +495,9 @@ def clean_site_settings(value):
 def write_site_settings(value):
     clean = clean_site_settings(value)
     set_collection('site_settings', clean)
-    return clean
+    media = clean.get('nfc_media') if isinstance(clean.get('nfc_media'), dict) else {}
+    write_nfc_family_themes({key: (media.get(key) or {}).get('theme') for key in NFC_FAMILY_THEME_DEFAULTS})
+    return overlay_nfc_family_themes(clean, persist=False)
 
 
 
@@ -466,6 +520,16 @@ def save_nfc_family_theme(key, theme):
     if key not in NFC_MEDIA_FIXED_PATHS:
         raise ValueError('Geçersiz NFC ürün ailesi.')
     theme = 'dark' if str(theme or '').strip().lower() == 'dark' else 'light'
+
+    # 1) Save into a dedicated tone store first.
+    themes = read_nfc_family_themes(persist=False)
+    themes[key] = theme
+    write_nfc_family_themes(themes)
+    persisted_theme = read_nfc_family_themes(persist=False).get(key)
+    if persisted_theme != theme:
+        raise RuntimeError(f'Kart tonu kalıcı kayda yazılamadı ({persisted_theme or "boş"}).')
+
+    # 2) Mirror into site_settings for backward compatibility.
     current = read_site_settings()
     settings = dict(current)
     current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else {}
@@ -477,12 +541,19 @@ def save_nfc_family_theme(key, theme):
     settings['nfc_media'] = media
     set_collection('site_settings', settings)
     export_to_repo()
-    result = build_site()
+
+    # 3) Force this build to use the just-saved tone; future rebuilds read the
+    # same value from nfc_family_themes.
+    result = build_site(nfc_family_theme_overrides={key: theme})
     verified = _public_nfc_family_theme(key)
     if verified != theme:
         raise RuntimeError(f'Kart tonu kaydedildi ancak site çıktısı {verified or "bulunamadı"} olarak üretildi.')
+
     repaired = read_site_settings()
+    if ((repaired.get('nfc_media') or {}).get(key) or {}).get('theme') != theme:
+        raise RuntimeError('Kart tonu build sonrası kalıcı ayarda doğrulanamadı.')
     return repaired, {**(result or {}), 'verified_theme': verified, 'verified_family': key}
+
 
 def backup():
     return create_db_backup('products-auto')

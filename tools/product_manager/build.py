@@ -171,6 +171,26 @@ def default_nfc_media_settings():
     }
 
 
+def default_nfc_family_themes():
+    return {
+        'feedback_duo': 'dark',
+        'restaurant_packages': 'light',
+        'quick_stand': 'light',
+    }
+
+
+def nfc_family_theme_settings():
+    # V3.1.52: tone is stored independently from media self-heal.
+    defaults = default_nfc_family_themes()
+    raw = get_collection('nfc_family_themes', {})
+    raw = raw if isinstance(raw, dict) else {}
+    out = {}
+    for key, default in defaults.items():
+        value = str(raw.get(key) or default).strip().lower()
+        out[key] = 'dark' if value == 'dark' else 'light'
+    return out
+
+
 def nfc_media_settings():
     settings = load_site_settings()
     incoming = settings.get('nfc_media') if isinstance(settings.get('nfc_media'), dict) else {}
@@ -809,7 +829,7 @@ def render_product_page(p, related):
 <meta content="{title}" property="og:title"/><meta content="{card_desc}" property="og:description"/><meta content="{canonical}" property="og:url"/><meta content="{main_abs}" property="og:image"/><meta content="{name} | BG Studio 3D" property="og:image:alt"/>
 <meta content="summary_large_image" name="twitter:card"/><meta content="{title}" name="twitter:title"/><meta content="{card_desc}" name="twitter:description"/><meta content="{main_abs}" name="twitter:image"/>
 <link href="../../favicon.ico" rel="icon" sizes="any"/><link href="../../assets/brand/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/><link href="../../assets/brand/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="../../apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="../../site.webmanifest" rel="manifest"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"/><link href="../../assets/css/styles.css?v=3.1.51" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"/><link href="../../assets/css/styles.css?v=3.1.52" rel="stylesheet"/>
 <script type="application/ld+json">{render_schema(p)}</script><script data-schema="breadcrumb" type="application/ld+json">{breadcrumb}</script><script data-schema="faq" type="application/ld+json">{faq}</script>
 <meta content="{robots}" name="robots"/><meta content="strict-origin-when-cross-origin" name="referrer"/><meta content="{w}" property="og:image:width"/><meta content="{h}" property="og:image:height"/><meta content="light" name="color-scheme"/>
 
@@ -826,7 +846,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.51'
+SITE_ASSET_VERSION = '3.1.52'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -842,7 +862,7 @@ def sync_site_asset_versions():
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
 
-def render_nfc_platform_sections():
+def render_nfc_platform_sections(theme_overrides=None):
     """Canonical NFC platform + package content for the public NFC page.
 
     V3.1.45 reframes the public NFC page around three real product families:
@@ -876,13 +896,21 @@ def render_nfc_platform_sections():
     quick_qr_cost = qr_unit * 3
     feedback_price = money(pack('feedback_duo').get('price'))
     media_settings = nfc_media_settings()
+    saved_themes = nfc_family_theme_settings()
+    theme_overrides = theme_overrides if isinstance(theme_overrides, dict) else {}
     def family_theme(key, fallback='light'):
-        row = media_settings.get(key) if isinstance(media_settings.get(key), dict) else {}
         base = 'dark' if str(fallback).lower() == 'dark' else 'light'
+        override = str(theme_overrides.get(key) or '').strip().lower()
+        if override in ('light', 'dark'):
+            return override
+        saved = str(saved_themes.get(key) or '').strip().lower()
+        if saved in ('light', 'dark'):
+            return saved
+        row = media_settings.get(key) if isinstance(media_settings.get(key), dict) else {}
         return 'dark' if str(row.get('theme') or base).strip().lower() == 'dark' else 'light'
     def family_card_attrs(key, fallback='light'):
         theme = family_theme(key, fallback)
-        # V3.1.51: data-family-theme is the single source of truth.
+        # V3.1.52: data-family-theme is the single source of truth.
         # Avoid legacy light/dark classes overriding a freshly saved choice.
         return 'nfc-family-card', theme
     feedback_media = render_nfc_family_media('feedback_duo', 'Premium Feedback Duo görseli', 'BG Studio NFC Premium Feedback Duo adisyon ve değerlendirme standı')
@@ -921,9 +949,9 @@ def render_nfc_platform_sections():
 <!-- NFC_PLATFORM_V145_END -->'''
 
 
-def rebuild_nfc_platform_sections(html_text):
+def rebuild_nfc_platform_sections(html_text, theme_overrides=None):
     """Replace public NFC platform/package copy without touching field references."""
-    rendered = render_nfc_platform_sections()
+    rendered = render_nfc_platform_sections(theme_overrides=theme_overrides)
     marker_pattern = re.compile(
         r'<!--\s*NFC_PLATFORM_V145_START\s*-->.*?<!--\s*NFC_PLATFORM_V145_END\s*-->',
         flags=re.I | re.S,
@@ -1062,7 +1090,7 @@ def sync_nfc_offer_schema(html_text, pricing):
         return pattern.sub(script, html_text, count=1)
     return html_text
 
-def build_site():
+def build_site(nfc_family_theme_overrides=None):
     # V3.1.38: every reference page uses the same explicit card-tone source.
     ensure_explicit_reference_themes()
     # Kalıcı AppData kasasını her build öncesinde repo çıktısına yansıt.
@@ -1101,7 +1129,7 @@ def build_site():
     nfc_html = nfc_path.read_text(encoding='utf-8')
     # V3.1.43+: canonical platform/package content, independent from references.
     nfc_pricing = active_nfc_pricing()
-    nfc_html = rebuild_nfc_platform_sections(nfc_html)
+    nfc_html = rebuild_nfc_platform_sections(nfc_html, theme_overrides=nfc_family_theme_overrides)
     nfc_html = sync_nfc_offer_schema(nfc_html, nfc_pricing)
     nfc_cards = '\n'.join(render_nfc_case(x, '../') for x in nfc_items)
     # V3.1.42: rebuild the *entire* reference section from persistent AppData.
