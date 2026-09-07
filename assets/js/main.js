@@ -576,9 +576,9 @@ if (backToTop) {
   backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// V3.1.55 — public NFC package calculators.
-// Restaurant package options and high-capacity ready packages now behave as
-// real selectors. Price totals and offer links stay in sync with the choice.
+// V3.1.56 — NFC references-first + public restaurant live calculators.
+// Runtime compatibility is intentional: copying this repo-safe patch is enough even
+// before Product Manager rebuilds the managed NFC page HTML.
 (() => {
   const money = value => Number(value || 0).toLocaleString('tr-TR') + ' TL';
   const numberOrNull = value => {
@@ -594,6 +594,74 @@ if (backToTop) {
     selected.has('menu') ? 'menu=1' : '',
     selected.has('logo') ? 'logo=1' : ''
   ].filter(Boolean);
+
+  // Force the matching V3.1.56 stylesheet when an older managed page still has an old query string.
+  document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
+    try {
+      const url = new URL(link.href, window.location.href);
+      if (url.searchParams.get('v') !== '3.1.56') { url.searchParams.set('v', '3.1.56'); link.href = url.toString(); }
+    } catch (_) {}
+  });
+
+  const restaurantReadyFallback = {
+    25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},
+    45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},
+    65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},
+    85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},
+    110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}
+  };
+
+  const moveFieldReferencesFirst = () => {
+    const main = document.querySelector('main');
+    if (!main) return;
+    const referenceSection = [...main.querySelectorAll('section')].find(section => {
+      const title = section.querySelector('h2');
+      return title && title.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.';
+    });
+    if (!referenceSection) return;
+    referenceSection.classList.add('nfc-reference-first');
+    if (main.firstElementChild !== referenceSection) main.insertBefore(referenceSection, main.firstElementChild);
+  };
+
+  const ensureReadyRestaurantCalculator = () => {
+    const card = document.querySelector('.special-ready-card');
+    if (!card || card.querySelector('[data-special-package-calculator]')) return;
+    const capacities = Object.keys(restaurantReadyFallback).map(Number);
+    const first = capacities[0];
+    const firstRow = restaurantReadyFallback[first];
+    const chips = capacities.map((tables, index) => {
+      const row = restaurantReadyFallback[tables];
+      return `<button class="nfc-capacity-choice${index === 0 ? ' is-selected' : ''}" type="button" data-special-capacity="${tables}" data-special-nfc="${tables * 3}" data-special-price="${row.price}" data-special-renewal="${row.renewal}" aria-pressed="${index === 0 ? 'true' : 'false'}"><span>${tables} masa</span><small>${money(row.price)}</small></button>`;
+    }).join('');
+    const qrCount = first * 3;
+    const qrUnit = 150;
+    const menuPrice = 2500;
+    const logoPrice = 2500;
+    card.innerHTML = `
+      <div class="special-ready-copy">
+        <p class="eyebrow">ÖZEL RESTORAN HAZIR PAKETLERİ</p>
+        <h3>Yüksek kapasitede restoran altyapısı.</h3>
+        <p>20 masanın üzerindeki restoranlarda aynı Standart Restoran altyapısı işletmenin kapasitesine göre ölçeklenir. Masa sayını seç; paket bedeli ve ek hizmet hesabı sağdaki kartta anında yenilensin.</p>
+        <div class="nfc-capacity-selector-head"><strong>Masa sayını seç</strong><span>Bir karta tıkla. Seçimin ve toplam hesabın sağ tarafta anında görünür.</span></div>
+        <div class="nfc-capacity-chips" role="group" aria-label="Özel Restoran hazır masa kapasitesi">${chips}</div>
+      </div>
+      <div class="special-ready-highlight" data-special-package-calculator data-qr-unit="${qrUnit}" data-menu-price="${menuPrice}" data-logo-price="${logoPrice}">
+        <span class="package-kicker" data-special-title>GÜNCEL ${first} MASA HAZIR PAKETİ</span>
+        <div class="special-ready-metrics"><span><b data-special-tables>${first}</b>Masa</span><span><b data-special-nfc>${qrCount}</b>NFC</span></div>
+        <div class="special-ready-price"><small data-special-price-year>2026 NFC hazır paket bedeli</small><strong data-special-base-price>${money(firstRow.price)}</strong><span data-special-renewal>Yıllık yenileme: ${money(firstRow.renewal)}</span></div>
+        <div class="special-ready-options">
+          <button type="button" data-special-option="qr" aria-pressed="false"><span>QR sistemi</span><b data-special-qr-cost>+${money(qrCount * qrUnit)}</b><small data-special-qr-copy>${qrCount} QR × ${money(qrUnit)} / QR</small></button>
+          <button type="button" data-special-option="menu" aria-pressed="false"><span>Menü Tasarımı</span><b data-special-menu-cost>+${money(menuPrice)}</b><small>Türkçe + İngilizce görsel menü · 8 ek dilde dijital metin menü · ürün içerikleri · 14 alerjen bilgi katmanı · yaklaşık kalori bilgileri</small></button>
+          <button type="button" data-special-option="logo" aria-pressed="false"><span>Logo Tasarımı</span><b data-special-logo-cost>+${money(logoPrice)}</b><small>İşletmeye özel logo · stand ve dijital menü kullanımına uyumlu</small></button>
+        </div>
+        <div class="special-ready-breakdown"><div><span>NFC hazır paket</span><b data-special-line-base>${money(firstRow.price)}</b></div><div><span>QR sistemi</span><b data-special-line-qr>Seçilmedi</b></div><div><span>Menü Tasarımı</span><b data-special-line-menu>Seçilmedi</b></div><div><span>Logo Tasarımı</span><b data-special-line-logo>Seçilmedi</b></div></div>
+        <div class="special-ready-total"><span>Seçili toplam</span><strong data-special-total>${money(firstRow.price)}</strong><small>NFC paket bedeli + seçtiğin ek hizmetler</small></div>
+        <a class="secondary-cta" data-special-offer href="../teklif/?tur=nfc&amp;paket=ozel-kapasite&amp;masa=${first}">${first} masa için teklifi al</a>
+      </div>`;
+  };
+
+  moveFieldReferencesFirst();
+  ensureReadyRestaurantCalculator();
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
     const base = numberOrNull(root.dataset.basePrice);
@@ -614,52 +682,47 @@ if (backToTop) {
       const logoCost = selected.has('logo') ? logoPrice : 0;
       const total = base == null ? null : base + qrCost + menuCost + logoCost;
       if (totalEl) totalEl.textContent = total == null ? 'Özel teklif' : money(total);
-
       const extras = [];
       if (selected.has('qr')) extras.push(`QR +${money(qrCost)}`);
       if (selected.has('menu')) extras.push(`Menü +${money(menuPrice)}`);
       if (selected.has('logo')) extras.push(`Logo +${money(logoPrice)}`);
-      if (breakdownEl) {
-        breakdownEl.textContent = extras.length
-          ? `NFC paket bedeli dahil · ${extras.join(' · ')}`
-          : 'NFC paket bedeli dahil · Ek hizmet seçilmedi';
-      }
+      if (breakdownEl) breakdownEl.textContent = extras.length ? `NFC paket bedeli dahil · ${extras.join(' · ')}` : 'NFC paket bedeli dahil · Ek hizmet seçilmedi';
       if (offerEl && code) {
         const flags = optionFlags(selected);
         offerEl.href = `../teklif/?tur=nfc&paket=${encodeURIComponent(code)}${flags.length ? '&' + flags.join('&') : ''}`;
       }
     };
-
-    buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        const key = button.dataset.packageOption;
-        if (!key) return;
-        if (selected.has(key)) selected.delete(key);
-        else selected.add(key);
-        setPressed(button, selected.has(key));
-        update();
-      });
-    });
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const key = button.dataset.packageOption;
+      if (!key) return;
+      selected.has(key) ? selected.delete(key) : selected.add(key);
+      setPressed(button, selected.has(key));
+      update();
+    }));
     update();
   });
 
   const special = document.querySelector('[data-special-package-calculator]');
   const capacityButtons = [...document.querySelectorAll('[data-special-capacity]')];
   if (special && capacityButtons.length) {
-    const qrUnit = Number(special.dataset.qrUnit || 0);
-    const menuPrice = Number(special.dataset.menuPrice || 0);
-    const logoPrice = Number(special.dataset.logoPrice || 0);
+    let qrUnit = Number(special.dataset.qrUnit || 150);
+    let menuPrice = Number(special.dataset.menuPrice || 2500);
+    let logoPrice = Number(special.dataset.logoPrice || 2500);
+    let priceYear = '2026';
     const optionButtons = [...special.querySelectorAll('[data-special-option]')];
     const selectedOptions = new Set();
-    let selectedCapacity = capacityButtons.find(btn => btn.getAttribute('aria-pressed') === 'true') || capacityButtons[capacityButtons.length - 1];
+    let selectedCapacity = capacityButtons.find(btn => btn.getAttribute('aria-pressed') === 'true') || capacityButtons[0];
 
     const titleEl = special.querySelector('[data-special-title]');
     const tablesEl = special.querySelector('[data-special-tables]');
     const nfcEl = special.querySelector('[data-special-nfc]');
+    const priceYearEl = special.querySelector('[data-special-price-year]');
     const basePriceEl = special.querySelector('[data-special-base-price]');
     const renewalEl = special.querySelector('[data-special-renewal]');
     const qrCostEl = special.querySelector('[data-special-qr-cost]');
     const qrCopyEl = special.querySelector('[data-special-qr-copy]');
+    const menuCostEl = special.querySelector('[data-special-menu-cost]');
+    const logoCostEl = special.querySelector('[data-special-logo-cost]');
     const baseLineEl = special.querySelector('[data-special-line-base]');
     const qrLineEl = special.querySelector('[data-special-line-qr]');
     const menuLineEl = special.querySelector('[data-special-line-menu]');
@@ -672,52 +735,73 @@ if (backToTop) {
       const nfc = Number(selectedCapacity?.dataset.specialNfc || tables * 3);
       const base = numberOrNull(selectedCapacity?.dataset.specialPrice);
       const renewal = numberOrNull(selectedCapacity?.dataset.specialRenewal);
-      const qrCost = selectedOptions.has('qr') ? nfc * qrUnit : 0;
+      const fullQrCost = nfc * qrUnit;
+      const qrCost = selectedOptions.has('qr') ? fullQrCost : 0;
       const menuCost = selectedOptions.has('menu') ? menuPrice : 0;
       const logoCost = selectedOptions.has('logo') ? logoPrice : 0;
       const total = base == null ? null : base + qrCost + menuCost + logoCost;
-
       if (titleEl) titleEl.textContent = `GÜNCEL ${tables} MASA HAZIR PAKETİ`;
       if (tablesEl) tablesEl.textContent = String(tables);
       if (nfcEl) nfcEl.textContent = String(nfc);
+      if (priceYearEl) priceYearEl.textContent = `${priceYear} NFC hazır paket bedeli`;
       if (basePriceEl) basePriceEl.textContent = base == null ? 'Özel teklif' : money(base);
       if (renewalEl) renewalEl.textContent = renewal == null ? 'Yıllık yenileme: Özel teklif' : `Yıllık yenileme: ${money(renewal)}`;
-      if (qrCostEl) qrCostEl.textContent = `+${money(nfc * qrUnit)}`;
+      if (qrCostEl) qrCostEl.textContent = `+${money(fullQrCost)}`;
       if (qrCopyEl) qrCopyEl.textContent = `${nfc} QR × ${money(qrUnit)} / QR`;
+      if (menuCostEl) menuCostEl.textContent = `+${money(menuPrice)}`;
+      if (logoCostEl) logoCostEl.textContent = `+${money(logoPrice)}`;
       if (baseLineEl) baseLineEl.textContent = base == null ? 'Özel teklif' : money(base);
       if (qrLineEl) qrLineEl.textContent = selectedOptions.has('qr') ? `+${money(qrCost)}` : 'Seçilmedi';
       if (menuLineEl) menuLineEl.textContent = selectedOptions.has('menu') ? `+${money(menuPrice)}` : 'Seçilmedi';
       if (logoLineEl) logoLineEl.textContent = selectedOptions.has('logo') ? `+${money(logoPrice)}` : 'Seçilmedi';
       if (totalEl) totalEl.textContent = total == null ? 'Özel teklif' : money(total);
-
       if (offerEl) {
         const flags = optionFlags(selectedOptions);
         offerEl.href = `../teklif/?tur=nfc&paket=ozel-kapasite&masa=${tables}${flags.length ? '&' + flags.join('&') : ''}`;
-        offerEl.textContent = `${tables} masa için teklifi al`;
+        offerEl.textContent = `${tables} masa için bu kapsamla teklif al`;
       }
     };
 
-    capacityButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        selectedCapacity = button;
-        capacityButtons.forEach(item => setPressed(item, item === button));
-        updateSpecial();
-      });
-    });
-
-    optionButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const key = button.dataset.specialOption;
-        if (!key) return;
-        if (selectedOptions.has(key)) selectedOptions.delete(key);
-        else selectedOptions.add(key);
-        setPressed(button, selectedOptions.has(key));
-        updateSpecial();
-      });
-    });
-
+    capacityButtons.forEach(button => button.addEventListener('click', () => {
+      selectedCapacity = button;
+      capacityButtons.forEach(item => setPressed(item, item === button));
+      updateSpecial();
+    }));
+    optionButtons.forEach(button => button.addEventListener('click', () => {
+      const key = button.dataset.specialOption;
+      if (!key) return;
+      selectedOptions.has(key) ? selectedOptions.delete(key) : selectedOptions.add(key);
+      setPressed(button, selectedOptions.has(key));
+      updateSpecial();
+    }));
     capacityButtons.forEach(item => setPressed(item, item === selectedCapacity));
     updateSpecial();
+
+    // Published site settings win over the built-in 2026 fallback when present.
+    fetch('/data/site_settings.json', { cache: 'no-store' }).then(response => response.ok ? response.json() : null).then(settings => {
+      const nfc = settings?.nfc_site;
+      const year = String(nfc?.active_year || '2026');
+      const yearData = nfc?.years?.[year];
+      if (!yearData || typeof yearData !== 'object') return;
+      priceYear = year;
+      qrUnit = Number(yearData.qr_unit ?? qrUnit) || qrUnit;
+      menuPrice = Number(yearData.menu_design ?? menuPrice) || menuPrice;
+      logoPrice = Number(yearData.logo_design ?? logoPrice) || logoPrice;
+      const rows = yearData.special_restaurant_packages || {};
+      capacityButtons.forEach(button => {
+        const tables = Number(button.dataset.specialCapacity || 0);
+        const row = rows[tables] || rows[String(tables)];
+        if (!row || typeof row !== 'object') return;
+        if (row.price != null) button.dataset.specialPrice = String(Number(row.price));
+        if (row.renewal != null) button.dataset.specialRenewal = String(Number(row.renewal));
+        const priceCopy = button.querySelector('small');
+        if (priceCopy && row.price != null) priceCopy.textContent = money(row.price);
+      });
+      special.dataset.qrUnit = String(qrUnit);
+      special.dataset.menuPrice = String(menuPrice);
+      special.dataset.logoPrice = String(logoPrice);
+      updateSpecial();
+    }).catch(() => {});
   }
 })();
 
@@ -742,8 +826,6 @@ if (quoteForm) {
   const priceYearLabel = quoteForm.querySelector('[data-nfc-price-year]');
   const feedbackCapacityWrap = quoteForm.querySelector('[data-feedback-capacity-wrap]');
   const feedbackCapacitySelect = quoteForm.querySelector('[name="feedback_duo_capacity"]');
-  const specialCapacityWrap = quoteForm.querySelector('[data-special-capacity-wrap]');
-  const specialCapacitySelect = quoteForm.querySelector('[name="special_restaurant_capacity"]');
   const qrCopy = quoteForm.querySelector('[data-nfc-qr-copy]');
   const menuPriceCopy = quoteForm.querySelector('[data-nfc-menu-price-copy]');
   const logoPriceCopy = quoteForm.querySelector('[data-nfc-logo-price-copy]');
@@ -774,28 +856,39 @@ if (quoteForm) {
   let specialRestaurantRows = {25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}};
 
   const nfcPackages = {
-    'baslangic': { name: 'Başlangıç', qty: 10, perUnitNfc: 3, perUnitQr: 3, price: 13900, renewal: 4900, qtyLabel: 'Masa / stand adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
-    'profesyonel': { name: 'Profesyonel', qty: 15, perUnitNfc: 3, perUnitQr: 3, price: 19900, renewal: 6900, qtyLabel: 'Masa / stand adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
-    'premium': { name: 'Premium', qty: 20, perUnitNfc: 3, perUnitQr: 3, price: 25900, renewal: 8900, qtyLabel: 'Masa / stand adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
-    'feedback-duo': { name: 'Premium Feedback Duo', qty: 10, perUnitNfc: 2, perUnitQr: 0, price: 14900, renewal: 4900, qtyLabel: 'Stand adedi', feedback:true, supportsQr:false, supportsMenu:false, supportsLogo:false },
-    'hizli-stand': { name: 'Hızlı Bağlantı Standı', qty: 1, perUnitNfc: 3, perUnitQr: 3, price: 2000, renewal: 990, quick:true, qtyLabel: 'Stand adedi', supportsQr:true, supportsMenu:false, supportsLogo:true },
-    'ozel-kapasite': { name: 'Özel Restoran Hazır Paketi / özel kapasite', qty: null, perUnitNfc: 3, perUnitQr: 3, price: null, renewal: null, custom:true, qtyLabel: 'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true }
+    'baslangic': { name:'Başlangıç', qty:10, perUnitNfc:3, perUnitQr:3, price:13900, renewal:4900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'profesyonel': { name:'Profesyonel', qty:15, perUnitNfc:3, perUnitQr:3, price:19900, renewal:6900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'premium': { name:'Premium', qty:20, perUnitNfc:3, perUnitQr:3, price:25900, renewal:8900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'feedback-duo': { name:'Premium Feedback Duo', qty:10, perUnitNfc:2, perUnitQr:0, price:14900, renewal:4900, qtyLabel:'Stand adedi', feedback:true, supportsQr:false, supportsMenu:false, supportsLogo:false },
+    'hizli-stand': { name:'Hızlı Bağlantı Standı', qty:1, perUnitNfc:3, perUnitQr:3, price:2000, renewal:990, quick:true, qtyLabel:'Stand adedi', supportsQr:true, supportsMenu:false, supportsLogo:true },
+    'ozel-kapasite-custom': { name:'Özel Restoran · farklı kapasite', qty:null, perUnitNfc:3, perUnitQr:3, price:null, renewal:null, custom:true, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true }
   };
   const money = value => Number(value || 0).toLocaleString('tr-TR') + ' TL';
   const checked = name => !!quoteForm.querySelector(`[name="${name}"]`)?.checked;
 
   if (requestedType && typeSelect && [...typeSelect.options].some(option => option.value === requestedType)) typeSelect.value = requestedType;
-  if (requestedPackage && packageSelect && nfcPackages[requestedPackage]) packageSelect.value = requestedPackage;
-  if (requestedPackage === 'feedback-duo' && Number.isFinite(requestedCapacity) && feedbackCapacitySelect && [...feedbackCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) feedbackCapacitySelect.value = String(requestedCapacity);
-  if (requestedPackage === 'ozel-kapasite' && specialCapacitySelect) {
-    if (Number.isFinite(requestedCapacity) && [...specialCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) specialCapacitySelect.value = String(requestedCapacity);
-    else if (Number.isFinite(requestedCapacity) && requestedCapacity > 0) specialCapacitySelect.value = 'custom';
+  if (packageSelect) {
+    let requestedValue = requestedPackage || '';
+    if (requestedPackage === 'ozel-kapasite') requestedValue = Number.isFinite(requestedCapacity) && specialRestaurantRows[requestedCapacity] ? `ozel-kapasite-${requestedCapacity}` : 'ozel-kapasite-custom';
+    if (requestedValue && [...packageSelect.options].some(option => option.value === requestedValue)) packageSelect.value = requestedValue;
   }
+  if (requestedPackage === 'feedback-duo' && Number.isFinite(requestedCapacity) && feedbackCapacitySelect && [...feedbackCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) feedbackCapacitySelect.value = String(requestedCapacity);
   if (requestedQr && qrOptionInput) qrOptionInput.checked = true;
   if (requestedMenu && menuOptionInput) menuOptionInput.checked = true;
+  if (requestedPackage === 'ozel-kapasite' && packageSelect?.value === 'ozel-kapasite-custom' && Number.isFinite(requestedCapacity) && requestedCapacity > 120 && qtyInput) qtyInput.value = String(requestedCapacity);
+  if (requestedPackage === 'ozel-kapasite-custom' && Number.isFinite(requestedCapacity) && requestedCapacity > 0 && qtyInput) qtyInput.value = String(requestedCapacity);
   if (requestedLogo && logoOptionInput) logoOptionInput.checked = true;
 
-  const currentNfcPackage = () => nfcPackages[packageSelect?.value] || null;
+  const currentNfcPackage = () => {
+    const value = String(packageSelect?.value || '');
+    const readyMatch = value.match(/^ozel-kapasite-(\d+)$/);
+    if (readyMatch) {
+      const qty = Number(readyMatch[1]);
+      const row = specialRestaurantRows[qty] || {};
+      return { name:`Özel Restoran Hazır Paketi · ${qty} Masa`, qty, perUnitNfc:3, perUnitQr:3, price:row.price ?? null, renewal:row.renewal ?? null, readySpecial:true, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true };
+    }
+    return nfcPackages[value] || null;
+  };
 
   const resolvePackageForContext = () => {
     const base = currentNfcPackage();
@@ -806,12 +899,8 @@ if (quoteForm) {
       return {...base, qty, price:row.price ?? null, renewal:row.renewal ?? null};
     }
     if (base.custom) {
-      const selectedValue = String(specialCapacitySelect?.value || '').trim();
-      const selectedReadyQty = selectedValue && selectedValue !== 'custom' ? Math.max(0, Number.parseInt(selectedValue, 10) || 0) : 0;
       const manualQty = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
-      const qty = selectedReadyQty || manualQty;
-      const row = selectedReadyQty ? (specialRestaurantRows[selectedReadyQty] || {}) : {};
-      return {...base, qty:qty || null, price:row.price ?? null, renewal:row.renewal ?? null, ready:selectedReadyQty > 0 && row.price != null};
+      return {...base, qty:manualQty || null};
     }
     return base;
   };
@@ -847,16 +936,16 @@ if (quoteForm) {
     const isNfc = typeSelect?.value === 'nfc';
     if (packageConfig) packageConfig.hidden = !isNfc;
     if (feedbackCapacityWrap) feedbackCapacityWrap.hidden = !(isNfc && pkg?.feedback);
-    if (specialCapacityWrap) specialCapacityWrap.hidden = !(isNfc && pkg?.custom);
     syncNfcOptionVisibility(isNfc, pkg);
     if (qtyLabel) qtyLabel.textContent = isNfc ? (pkg?.qtyLabel || 'Masa / stand adedi') : 'Adet';
     if (qtyInput) {
-      const specialReady = !!(isNfc && pkg?.custom && specialCapacitySelect?.value && specialCapacitySelect.value !== 'custom');
-      qtyInput.placeholder = isNfc ? (pkg?.quick ? '1' : (pkg?.feedback ? '10' : (pkg?.custom && specialCapacitySelect?.value === 'custom' ? 'Örn. 135' : 'Örn. 15'))) : 'Örn. 50';
-      const lock = !!(isNfc && pkg && ((pkg.custom && specialReady) || (!pkg.custom && Number.isFinite(pkg.qty) && pkg.qty > 0)));
+      const lock = !!(isNfc && pkg && !pkg.custom && Number.isFinite(pkg.qty) && pkg.qty > 0);
+      qtyInput.placeholder = isNfc ? (pkg?.quick ? '1' : pkg?.feedback ? '10' : pkg?.custom ? 'Örn. 135' : 'Örn. 15') : 'Örn. 50';
       qtyInput.readOnly = lock;
       qtyInput.classList.toggle('is-package-locked', lock);
       qtyInput.title = lock ? 'Bu hazır çözümde adet paket kapasitesinden gelir.' : '';
+      if (syncQty && lock) qtyInput.value = String(pkg.qty);
+      if (syncQty && pkg?.custom && Number.parseInt(qtyInput.value || '', 10) <= 120) qtyInput.value = '';
     }
     if (sizeField) sizeField.hidden = isNfc;
     if (colorLabel) colorLabel.textContent = isNfc ? 'Stand renk / tasarım tercihi' : 'Renk / malzeme tercihi';
@@ -871,25 +960,14 @@ if (quoteForm) {
       if (totalBox) totalBox.hidden = true;
       return;
     }
-
-    if (syncQty && qtyInput) {
-      if (pkg.feedback) qtyInput.value = String(pkg.qty || 10);
-      else if (pkg.custom && specialCapacitySelect?.value && specialCapacitySelect.value !== 'custom') qtyInput.value = String(Number.parseInt(specialCapacitySelect.value, 10) || '');
-      else if (Number.isFinite(pkg.qty) && pkg.qty > 0) qtyInput.value = String(pkg.qty);
-      else if (Number.isFinite(requestedCapacity) && requestedCapacity > 0) qtyInput.value = String(requestedCapacity);
-    } else if (pkg.feedback && qtyInput) {
-      qtyInput.value = String(pkg.qty || 10);
-    } else if (pkg.custom && specialCapacitySelect?.value && specialCapacitySelect.value !== 'custom' && qtyInput) {
-      qtyInput.value = String(Number.parseInt(specialCapacitySelect.value, 10) || '');
-    }
-
     const ctx = computeNfcContext();
     if (!ctx) return;
     if (packageSummary) packageSummary.hidden = false;
     if (packageTitle) packageTitle.textContent = ctx.pkg.name;
     if (packageCapacity) {
       if (ctx.pkg.feedback) packageCapacity.textContent = `${ctx.qty} stand · ${ctx.nfc} NFC · 2 NFC / stand`;
-      else if (ctx.pkg.custom) packageCapacity.textContent = ctx.qty ? `${ctx.qty} masa · ${ctx.nfc} NFC${ctx.pkg.ready ? ' · hazır paket fiyatı bulundu' : ' · özel teklif'}` : '20+ masa · yüksek kapasiteli restoran altyapısı';
+      else if (ctx.pkg.readySpecial) packageCapacity.textContent = `${ctx.qty} masa · ${ctx.nfc} NFC · hazır kapasite`;
+      else if (ctx.pkg.custom) packageCapacity.textContent = ctx.qty ? `${ctx.qty} masa · ${ctx.nfc} NFC · özel teklif` : '120 masa üzeri / farklı kapasite · özel teklif';
       else if (ctx.pkg.quick) packageCapacity.textContent = '1 özel stand · 3 bağımsız NFC erişim noktası';
       else packageCapacity.textContent = `${ctx.qty} masa · ${ctx.nfc} NFC erişim noktası`;
     }
@@ -899,8 +977,8 @@ if (quoteForm) {
     if (packagePrice) packagePrice.textContent = ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price);
     if (packageRenewal) packageRenewal.textContent = ctx.pkg.renewal ? `Yıllık yenileme: ${money(ctx.pkg.renewal)}` : (ctx.pkg.custom ? 'Kapasiteye göre hesaplanır' : 'Proje kapsamına göre');
     if (qrCopy && ctx.pkg.supportsQr !== false) {
-      if (ctx.pkg.quick) qrCopy.textContent = `3 QR · ${money(qrUnitPrice)} / QR · +${money(qrUnitPrice*3)}`;
-      else qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(qrUnitPrice)} / QR` : `Masa başına 3 QR · ${money(qrUnitPrice)} / QR`;
+      if (ctx.pkg.quick) qrCopy.textContent = `3 QR · ${money(qrUnitPrice)} / QR · +${money(qrUnitPrice * 3)}`;
+      else qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(qrUnitPrice)} / QR · +${money(ctx.qrCount * qrUnitPrice)}` : `Masa başına 3 QR · ${money(qrUnitPrice)} / QR`;
     }
     if (totalBox) totalBox.hidden = ctx.total == null;
     if (totalValue && ctx.total != null) totalValue.textContent = money(ctx.total);
@@ -908,7 +986,7 @@ if (quoteForm) {
 
   const applyPublishedNfcPricing = async () => {
     try {
-      const response = await fetch('/data/site_settings.json', { cache: 'no-store' });
+      const response = await fetch('/data/site_settings.json', { cache:'no-store' });
       if (!response.ok) return;
       const settings = await response.json();
       const nfc = settings?.nfc_site;
@@ -920,89 +998,51 @@ if (quoteForm) {
       menuDesignPrice = Number(yearData.menu_design ?? menuDesignPrice) || menuDesignPrice;
       logoDesignPrice = Number(yearData.logo_design ?? logoDesignPrice) || logoDesignPrice;
       const packs = yearData.packages || {};
-      const map = { baslangic: 'baslangic', profesyonel: 'profesyonel', premium: 'premium', hizli_stand: 'hizli-stand' };
-      Object.entries(map).forEach(([sourceKey, targetKey]) => {
+      const map = { baslangic:'baslangic', profesyonel:'profesyonel', premium:'premium', hizli_stand:'hizli-stand' };
+      Object.entries(map).forEach(([sourceKey,targetKey]) => {
         const row = packs[sourceKey];
         if (!row || !nfcPackages[targetKey]) return;
         nfcPackages[targetKey].price = row.price == null ? null : Number(row.price);
         nfcPackages[targetKey].renewal = row.renewal == null ? null : Number(row.renewal);
       });
       const duo = yearData.feedback_duo_packages || {};
-      feedbackRows = {};
       Object.entries(duo).forEach(([key,row]) => { if (row && typeof row === 'object') feedbackRows[Number(key)] = {price:row.price==null?null:Number(row.price),renewal:row.renewal==null?null:Number(row.renewal)}; });
       const special = yearData.special_restaurant_packages || {};
-      specialRestaurantRows = {};
       Object.entries(special).forEach(([key,row]) => { if (row && typeof row === 'object') specialRestaurantRows[Number(key)] = {price:row.price==null?null:Number(row.price),renewal:row.renewal==null?null:Number(row.renewal)}; });
-      updateNfcSummary({ syncQty: packageSelect?.value === 'feedback-duo' });
+      updateNfcSummary({ syncQty:false });
     } catch (_) {}
   };
 
   const initialNfc = typeSelect?.value === 'nfc';
   updateNfcSummary({ syncQty: initialNfc && !!requestedPackage });
   applyPublishedNfcPricing();
-
   typeSelect?.addEventListener('change', () => updateNfcSummary());
-  packageSelect?.addEventListener('change', () => updateNfcSummary({ syncQty: true }));
-  feedbackCapacitySelect?.addEventListener('change', () => updateNfcSummary({ syncQty: true }));
-  specialCapacitySelect?.addEventListener('change', () => {
-    if (specialCapacitySelect.value === 'custom' && qtyInput) {
-      qtyInput.readOnly = false;
-      if (Number.parseInt(qtyInput.value || '', 10) <= 120) qtyInput.value = '';
-    }
-    updateNfcSummary({ syncQty: specialCapacitySelect.value !== 'custom' });
-  });
+  packageSelect?.addEventListener('change', () => updateNfcSummary({ syncQty:true }));
+  feedbackCapacitySelect?.addEventListener('change', () => updateNfcSummary({ syncQty:true }));
   quoteForm.querySelectorAll('[data-nfc-option]').forEach(input => input.addEventListener('change', () => updateNfcSummary()));
-  qtyInput?.addEventListener('input', () => {
-    if (typeSelect?.value === 'nfc' && packageSelect?.value) updateNfcSummary();
-  });
+  qtyInput?.addEventListener('input', () => { if (typeSelect?.value === 'nfc' && packageSelect?.value) updateNfcSummary(); });
 
   quoteForm.addEventListener('submit', event => {
     event.preventDefault();
     if (!quoteForm.reportValidity()) return;
     const data = new FormData(quoteForm);
-    const labels = {
-      'kisiye-ozel': 'Kişiye özel üretim',
-      'kurumsal': 'Kurumsal / toplu üretim',
-      'nfc': 'NFC & QR sistemi',
-      'prototip': 'Prototip / parça üretimi',
-      'urun': 'Mevcut ürün hakkında',
-      'diger': 'Diğer'
-    };
+    const labels = {'kisiye-ozel':'Kişiye özel üretim','kurumsal':'Kurumsal / toplu üretim','nfc':'NFC & QR sistemi','prototip':'Prototip / parça üretimi','urun':'Mevcut ürün hakkında','diger':'Diğer'};
     const isNfc = data.get('talep_turu') === 'nfc';
     const ctx = isNfc ? computeNfcContext() : null;
-    const lines = [
-      'Merhaba BG Studio 3D, web sitesinden bir talep oluşturuyorum.',
-      '',
-      `Talep türü: ${labels[data.get('talep_turu')] || data.get('talep_turu')}`,
-      `Ad / Soyad: ${data.get('ad') || '-'}`,
-      `İşletme / Marka: ${data.get('isletme') || '-'}`
-    ];
-
+    const lines = ['Merhaba BG Studio 3D, web sitesinden bir talep oluşturuyorum.','',`Talep türü: ${labels[data.get('talep_turu')] || data.get('talep_turu')}`,`Ad / Soyad: ${data.get('ad') || '-'}`,`İşletme / Marka: ${data.get('isletme') || '-'}`];
     if (ctx) {
       const options = [];
       if (ctx.pkg.supportsQr !== false && checked('nfc_qr')) options.push(`QR sistemi${ctx.qrCount ? ` (${ctx.qrCount} QR / +${money(ctx.qrCost)})` : ''}`);
       if (ctx.pkg.supportsMenu !== false && checked('nfc_menu_design')) options.push(`Menü Tasarımı (+${money(menuDesignPrice)})`);
       if (ctx.pkg.supportsLogo !== false && checked('nfc_logo_design')) options.push(`Logo Tasarımı (+${money(logoDesignPrice)})`);
-      lines.push(
-        '',
-        `Seçilen çözüm: ${ctx.pkg.name}`,
-        `${ctx.pkg.feedback ? 'Stand' : ctx.pkg.quick ? 'Stand' : 'Masa / stand'}: ${ctx.qty || data.get('adet') || '-'}`,
-        `NFC erişim noktası: ${ctx.nfc || '-'}`,
-        `Opsiyonlar: ${options.length ? options.join(', ') : 'Ek opsiyon seçilmedi'}`,
-        `Kurulum / başlangıç bedeli: ${ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price)}`
-      );
+      lines.push('',`Seçilen çözüm: ${ctx.pkg.name}`,`${ctx.pkg.feedback || ctx.pkg.quick ? 'Stand' : 'Masa'}: ${ctx.qty || data.get('adet') || '-'}`,`NFC erişim noktası: ${ctx.nfc || '-'}`,`Opsiyonlar: ${options.length ? options.join(', ') : 'Ek opsiyon seçilmedi'}`,`Kurulum / başlangıç bedeli: ${ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price)}`);
       if (ctx.total != null && ctx.total !== ctx.pkg.price) lines.push(`Seçili opsiyonlarla tahmini başlangıç: ${money(ctx.total)}`);
       if (ctx.pkg.renewal) lines.push(`Yıllık yenileme: ${money(ctx.pkg.renewal)}`);
       lines.push(`Stand renk / tasarım: ${data.get('renk') || '-'}`);
     } else {
-      lines.push(
-        `Adet: ${data.get('adet') || '-'}`,
-        `Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,
-        `Renk / malzeme: ${data.get('renk') || '-'}`
-      );
+      lines.push(`Adet: ${data.get('adet') || '-'}`,`Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,`Renk / malzeme: ${data.get('renk') || '-'}`);
     }
-
-    lines.push(`Şehir: ${data.get('sehir') || '-'}`, '', `Talep: ${data.get('detay') || '-'}`);
+    lines.push(`Şehir: ${data.get('sehir') || '-'}`,'',`Talep: ${data.get('detay') || '-'}`);
     const leadPayload = { method:'quote_form_whatsapp', lead_type:data.get('talep_turu')||'unknown', nfc_package:ctx?.pkg?.name||undefined, page_location:canonicalUrl };
     trackEvent('quote_request', leadPayload);
     trackEvent('generate_lead', leadPayload);
