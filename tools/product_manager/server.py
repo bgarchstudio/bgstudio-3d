@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.52'
+PANEL_VERSION = '3.1.53'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -251,6 +251,43 @@ def _repair_nfc_media_from_files(settings, persist=False):
     return settings
 
 
+FEEDBACK_DUO_2026_PRICES = {
+    10: (14900, 4900), 15: (19900, 6900), 20: (24900, 8900),
+    25: (29900, 9900), 30: (34900, 10900), 35: (39900, 11900),
+    40: (44900, 12900), 45: (49900, 13900), 50: (54900, 14900),
+    55: (59900, 15900), 60: (64900, 16900), 65: (68900, 17900),
+    70: (72900, 18900), 75: (76900, 19900), 80: (80900, 20900),
+    85: (84900, 21900), 90: (88900, 22900), 95: (92900, 23900),
+    100: (96900, 24900), 110: (104900, 26900), 120: (112900, 28900),
+}
+FEEDBACK_DUO_CAPACITIES = tuple(FEEDBACK_DUO_2026_PRICES.keys())
+SPECIAL_RESTAURANT_CAPACITIES = (120,)
+
+
+def _feedback_duo_default_rows(year):
+    rows = {}
+    for stands in FEEDBACK_DUO_CAPACITIES:
+        price, renewal = FEEDBACK_DUO_2026_PRICES[stands]
+        rows[str(stands)] = {
+            'stands': stands,
+            'nfc': stands * 2,
+            'price': price if str(year) == '2026' else None,
+            'renewal': renewal if str(year) == '2026' else None,
+        }
+    return rows
+
+
+def _special_restaurant_default_rows(year):
+    return {
+        '120': {
+            'tables': 120,
+            'nfc': 360,
+            'price': 112900 if str(year) == '2026' else None,
+            'renewal': 28900 if str(year) == '2026' else None,
+        }
+    }
+
+
 def default_site_settings():
     return {
         'announcement_bar': {
@@ -278,9 +315,12 @@ def default_site_settings():
                         'baslangic': {'price': 13900, 'list_price': 15900, 'renewal': 4900},
                         'profesyonel': {'price': 19900, 'list_price': 21900, 'renewal': 6900},
                         'premium': {'price': 25900, 'list_price': 28900, 'renewal': 8900},
-                        'hizli_stand': {'price': 2000, 'list_price': None, 'renewal': None},
-                        'feedback_duo': {'price': None, 'list_price': None, 'renewal': None},
+                        'hizli_stand': {'price': 2000, 'list_price': None, 'renewal': 990},
+                        # Compatibility mirror of the 10-stand Feedback Duo tier.
+                        'feedback_duo': {'price': 14900, 'list_price': None, 'renewal': 4900},
                     },
+                    'feedback_duo_packages': _feedback_duo_default_rows('2026'),
+                    'special_restaurant_packages': _special_restaurant_default_rows('2026'),
                 },
                 '2027': {
                     'qr_unit': 200,
@@ -293,6 +333,8 @@ def default_site_settings():
                         'hizli_stand': {'price': None, 'list_price': None, 'renewal': None},
                         'feedback_duo': {'price': None, 'list_price': None, 'renewal': None},
                     },
+                    'feedback_duo_packages': _feedback_duo_default_rows('2027'),
+                    'special_restaurant_packages': _special_restaurant_default_rows('2027'),
                 },
             },
         },
@@ -306,11 +348,60 @@ def default_site_settings():
         },
     }
 
+def migrate_nfc_pricing_schema(settings, persist=False):
+    """V3.1.53: seed newly introduced public NFC price structures safely."""
+    settings = dict(settings) if isinstance(settings, dict) else default_site_settings()
+    nfc = settings.get('nfc_site') if isinstance(settings.get('nfc_site'), dict) else default_site_settings()['nfc_site']
+    nfc = dict(nfc)
+    years = nfc.get('years') if isinstance(nfc.get('years'), dict) else {}
+    years = dict(years)
+    changed = False
+    defaults = default_site_settings()['nfc_site']['years']
+    for year in ('2026','2027'):
+        row = years.get(year) if isinstance(years.get(year), dict) else {}
+        row = dict(row)
+        packages = row.get('packages') if isinstance(row.get('packages'), dict) else {}
+        packages = {k: dict(v) if isinstance(v, dict) else {} for k,v in packages.items()}
+        dyear = defaults[year]
+        # Newly published Hızlı Stand annual renewal has no legacy equivalent.
+        if year == '2026':
+            quick = packages.get('hizli_stand') if isinstance(packages.get('hizli_stand'), dict) else {}
+            quick = dict(quick)
+            if quick.get('price') is None:
+                quick['price'] = 2000; changed = True
+            if quick.get('renewal') is None:
+                quick['renewal'] = 990; changed = True
+            packages['hizli_stand'] = quick
+            duo_legacy = packages.get('feedback_duo') if isinstance(packages.get('feedback_duo'), dict) else {}
+            duo_legacy = dict(duo_legacy)
+            if duo_legacy.get('price') is None:
+                duo_legacy['price'] = 14900; changed = True
+            if duo_legacy.get('renewal') is None:
+                duo_legacy['renewal'] = 4900; changed = True
+            packages['feedback_duo'] = duo_legacy
+        row['packages'] = packages
+        if not isinstance(row.get('feedback_duo_packages'), dict) or not row.get('feedback_duo_packages'):
+            row['feedback_duo_packages'] = _feedback_duo_default_rows(year); changed = True
+        if not isinstance(row.get('special_restaurant_packages'), dict) or not row.get('special_restaurant_packages'):
+            row['special_restaurant_packages'] = _special_restaurant_default_rows(year); changed = True
+        years[year] = row
+    nfc['years'] = years
+    settings['nfc_site'] = nfc
+    if persist and changed:
+        set_collection('site_settings', settings)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
+    return settings
+
 
 def read_site_settings():
     data = get_collection('site_settings', default_site_settings())
     if not isinstance(data, dict):
         data = default_site_settings()
+    # V3.1.53: seed new Hızlı renewal, Feedback Duo ladder and 120-table ready package.
+    data = migrate_nfc_pricing_schema(data, persist=True)
     # V3.1.48: uploaded NFC showcase images survive old-schema/restart pointer loss.
     data = _repair_nfc_media_from_files(data, persist=True)
     # V3.1.52: tone is authoritative in a separate collection.
@@ -362,6 +453,7 @@ def clean_nfc_site_settings(value, current=None):
     incoming_years = incoming.get('years') if isinstance(incoming.get('years'), dict) else {}
     current_years = current.get('years') if isinstance(current.get('years'), dict) else {}
     package_keys = ('baslangic', 'profesyonel', 'premium', 'hizli_stand', 'feedback_duo')
+
     for year in ('2026', '2027'):
         dyear = defaults['years'][year]
         cyear = current_years.get(year) if isinstance(current_years.get(year), dict) else dyear
@@ -369,6 +461,7 @@ def clean_nfc_site_settings(value, current=None):
         qr_unit = _clean_money(iyear.get('qr_unit', cyear.get('qr_unit', dyear['qr_unit'])), allow_none=False, minimum=0)
         menu_design = _clean_money(iyear.get('menu_design', cyear.get('menu_design', dyear['menu_design'])), allow_none=False, minimum=0)
         logo_design = _clean_money(iyear.get('logo_design', cyear.get('logo_design', dyear['logo_design'])), allow_none=False, minimum=0)
+
         ipack = iyear.get('packages') if isinstance(iyear.get('packages'), dict) else {}
         cpack = cyear.get('packages') if isinstance(cyear.get('packages'), dict) else {}
         packages = {}
@@ -381,22 +474,66 @@ def clean_nfc_site_settings(value, current=None):
                 'list_price': _clean_money(pp.get('list_price', cp.get('list_price', dp.get('list_price'))), allow_none=True),
                 'renewal': _clean_money(pp.get('renewal', cp.get('renewal', dp.get('renewal'))), allow_none=True),
             }
+
+        # Premium Feedback Duo capacity ladder.
+        iduo = iyear.get('feedback_duo_packages') if isinstance(iyear.get('feedback_duo_packages'), dict) else {}
+        cduo = cyear.get('feedback_duo_packages') if isinstance(cyear.get('feedback_duo_packages'), dict) else {}
+        dduo = dyear.get('feedback_duo_packages') if isinstance(dyear.get('feedback_duo_packages'), dict) else _feedback_duo_default_rows(year)
+        duo_rows = {}
+        for stands in FEEDBACK_DUO_CAPACITIES:
+            key = str(stands)
+            dp = dduo.get(key) if isinstance(dduo.get(key), dict) else {'stands': stands, 'nfc': stands * 2, 'price': None, 'renewal': None}
+            cp = cduo.get(key) if isinstance(cduo.get(key), dict) else dp
+            pp = iduo.get(key) if isinstance(iduo.get(key), dict) else {}
+            duo_rows[key] = {
+                'stands': stands,
+                'nfc': stands * 2,
+                'price': _clean_money(pp.get('price', cp.get('price', dp.get('price'))), allow_none=True),
+                'renewal': _clean_money(pp.get('renewal', cp.get('renewal', dp.get('renewal'))), allow_none=True),
+            }
+
+        # High-capacity ready restaurant packages. Currently 120 tables has a published ready price.
+        ispecial = iyear.get('special_restaurant_packages') if isinstance(iyear.get('special_restaurant_packages'), dict) else {}
+        cspecial = cyear.get('special_restaurant_packages') if isinstance(cyear.get('special_restaurant_packages'), dict) else {}
+        dspecial = dyear.get('special_restaurant_packages') if isinstance(dyear.get('special_restaurant_packages'), dict) else _special_restaurant_default_rows(year)
+        special_rows = {}
+        for tables in SPECIAL_RESTAURANT_CAPACITIES:
+            key = str(tables)
+            dp = dspecial.get(key) if isinstance(dspecial.get(key), dict) else {'tables': tables, 'nfc': tables * 3, 'price': None, 'renewal': None}
+            cp = cspecial.get(key) if isinstance(cspecial.get(key), dict) else dp
+            pp = ispecial.get(key) if isinstance(ispecial.get(key), dict) else {}
+            special_rows[key] = {
+                'tables': tables,
+                'nfc': tables * 3,
+                'price': _clean_money(pp.get('price', cp.get('price', dp.get('price'))), allow_none=True),
+                'renewal': _clean_money(pp.get('renewal', cp.get('renewal', dp.get('renewal'))), allow_none=True),
+            }
+
+        # Keep legacy/quote summary fields in sync with the first Feedback Duo tier.
+        first_duo = duo_rows.get('10') or {}
+        if first_duo.get('price') is not None:
+            packages['feedback_duo']['price'] = first_duo.get('price')
+        if first_duo.get('renewal') is not None:
+            packages['feedback_duo']['renewal'] = first_duo.get('renewal')
+
         out['years'][year] = {
             'qr_unit': qr_unit,
             'menu_design': menu_design,
             'logo_design': logo_design,
             'packages': packages,
+            'feedback_duo_packages': duo_rows,
+            'special_restaurant_packages': special_rows,
         }
+
     # Do not allow a future year to become public with incomplete core pricing.
     ay = out['years'][active_year]
     required = [ay['qr_unit'], ay['menu_design'], ay['logo_design']]
     for key in ('baslangic', 'profesyonel', 'premium'):
         required.extend([ay['packages'][key]['price'], ay['packages'][key]['renewal']])
-    required.append(ay['packages']['hizli_stand']['price'])
+    required.extend([ay['packages']['hizli_stand']['price'], ay['packages']['hizli_stand']['renewal']])
     if any(v is None for v in required):
-        raise ValueError(f'{active_year} aktif fiyat yılı yapılamaz; restoran paketleri, yenilemeler, Hızlı Stand, QR, menü ve logo fiyatlarını doldur.')
+        raise ValueError(f'{active_year} aktif fiyat yılı yapılamaz; restoran paketleri, yenilemeler, Hızlı Stand fiyat/yenileme, QR, menü ve logo fiyatlarını doldur.')
     return out
-
 
 def clean_website_copy(value, current=None):
     defaults = default_site_settings()['website_copy']
