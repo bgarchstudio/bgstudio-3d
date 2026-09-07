@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.53'
+PANEL_VERSION = '3.1.54'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -261,7 +261,15 @@ FEEDBACK_DUO_2026_PRICES = {
     100: (96900, 24900), 110: (104900, 26900), 120: (112900, 28900),
 }
 FEEDBACK_DUO_CAPACITIES = tuple(FEEDBACK_DUO_2026_PRICES.keys())
-SPECIAL_RESTAURANT_CAPACITIES = (120,)
+SPECIAL_RESTAURANT_2026_PRICES = {
+    25: (29900, 9900), 30: (34900, 10900), 35: (39900, 11900),
+    40: (44900, 12900), 45: (49900, 13900), 50: (54900, 14900),
+    55: (59900, 15900), 60: (64900, 16900), 65: (68900, 17900),
+    70: (72900, 18900), 75: (76900, 19900), 80: (80900, 20900),
+    85: (84900, 21900), 90: (88900, 22900), 95: (92900, 23900),
+    100: (96900, 24900), 110: (104900, 26900), 120: (112900, 28900),
+}
+SPECIAL_RESTAURANT_CAPACITIES = tuple(SPECIAL_RESTAURANT_2026_PRICES.keys())
 
 
 def _feedback_duo_default_rows(year):
@@ -278,14 +286,16 @@ def _feedback_duo_default_rows(year):
 
 
 def _special_restaurant_default_rows(year):
-    return {
-        '120': {
-            'tables': 120,
-            'nfc': 360,
-            'price': 112900 if str(year) == '2026' else None,
-            'renewal': 28900 if str(year) == '2026' else None,
+    rows = {}
+    for tables in SPECIAL_RESTAURANT_CAPACITIES:
+        price, renewal = SPECIAL_RESTAURANT_2026_PRICES[tables]
+        rows[str(tables)] = {
+            'tables': tables,
+            'nfc': tables * 3,
+            'price': price if str(year) == '2026' else None,
+            'renewal': renewal if str(year) == '2026' else None,
         }
-    }
+    return rows
 
 
 def default_site_settings():
@@ -349,7 +359,7 @@ def default_site_settings():
     }
 
 def migrate_nfc_pricing_schema(settings, persist=False):
-    """V3.1.53: seed newly introduced public NFC price structures safely."""
+    """V3.1.54: seed full 25–120 ready restaurant pricing plus current NFC structures safely."""
     settings = dict(settings) if isinstance(settings, dict) else default_site_settings()
     nfc = settings.get('nfc_site') if isinstance(settings.get('nfc_site'), dict) else default_site_settings()['nfc_site']
     nfc = dict(nfc)
@@ -382,8 +392,22 @@ def migrate_nfc_pricing_schema(settings, persist=False):
         row['packages'] = packages
         if not isinstance(row.get('feedback_duo_packages'), dict) or not row.get('feedback_duo_packages'):
             row['feedback_duo_packages'] = _feedback_duo_default_rows(year); changed = True
-        if not isinstance(row.get('special_restaurant_packages'), dict) or not row.get('special_restaurant_packages'):
-            row['special_restaurant_packages'] = _special_restaurant_default_rows(year); changed = True
+        special_existing = row.get('special_restaurant_packages') if isinstance(row.get('special_restaurant_packages'), dict) else {}
+        special_existing = dict(special_existing)
+        special_defaults = _special_restaurant_default_rows(year)
+        for cap in SPECIAL_RESTAURANT_CAPACITIES:
+            key = str(cap)
+            if not isinstance(special_existing.get(key), dict):
+                special_existing[key] = dict(special_defaults[key]); changed = True
+            else:
+                existing = dict(special_existing[key])
+                expected_nfc = cap * 3
+                if existing.get('tables') != cap:
+                    existing['tables'] = cap; changed = True
+                if existing.get('nfc') != expected_nfc:
+                    existing['nfc'] = expected_nfc; changed = True
+                special_existing[key] = existing
+        row['special_restaurant_packages'] = special_existing
         years[year] = row
     nfc['years'] = years
     settings['nfc_site'] = nfc
@@ -400,7 +424,7 @@ def read_site_settings():
     data = get_collection('site_settings', default_site_settings())
     if not isinstance(data, dict):
         data = default_site_settings()
-    # V3.1.53: seed new Hızlı renewal, Feedback Duo ladder and 120-table ready package.
+    # V3.1.54: seed Hızlı renewal, Feedback Duo ladder and all 25–120 ready restaurant packages.
     data = migrate_nfc_pricing_schema(data, persist=True)
     # V3.1.48: uploaded NFC showcase images survive old-schema/restart pointer loss.
     data = _repair_nfc_media_from_files(data, persist=True)

@@ -594,6 +594,8 @@ if (quoteForm) {
   const priceYearLabel = quoteForm.querySelector('[data-nfc-price-year]');
   const feedbackCapacityWrap = quoteForm.querySelector('[data-feedback-capacity-wrap]');
   const feedbackCapacitySelect = quoteForm.querySelector('[name="feedback_duo_capacity"]');
+  const specialCapacityWrap = quoteForm.querySelector('[data-special-capacity-wrap]');
+  const specialCapacitySelect = quoteForm.querySelector('[name="special_restaurant_capacity"]');
   const qrCopy = quoteForm.querySelector('[data-nfc-qr-copy]');
   const menuPriceCopy = quoteForm.querySelector('[data-nfc-menu-price-copy]');
   const logoPriceCopy = quoteForm.querySelector('[data-nfc-logo-price-copy]');
@@ -621,7 +623,7 @@ if (quoteForm) {
   let feedbackRows = {
     10:{price:14900,renewal:4900},15:{price:19900,renewal:6900},20:{price:24900,renewal:8900},25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}
   };
-  let specialRestaurantRows = {120:{price:112900,renewal:28900}};
+  let specialRestaurantRows = {25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}};
 
   const nfcPackages = {
     'baslangic': { name: 'Başlangıç', qty: 10, perUnitNfc: 3, perUnitQr: 3, price: 13900, renewal: 4900, qtyLabel: 'Masa / stand adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
@@ -637,6 +639,7 @@ if (quoteForm) {
   if (requestedType && typeSelect && [...typeSelect.options].some(option => option.value === requestedType)) typeSelect.value = requestedType;
   if (requestedPackage && packageSelect && nfcPackages[requestedPackage]) packageSelect.value = requestedPackage;
   if (requestedPackage === 'feedback-duo' && Number.isFinite(requestedCapacity) && feedbackCapacitySelect && [...feedbackCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) feedbackCapacitySelect.value = String(requestedCapacity);
+  if (requestedPackage === 'ozel-kapasite' && Number.isFinite(requestedCapacity) && specialCapacitySelect && [...specialCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) specialCapacitySelect.value = String(requestedCapacity);
 
   const currentNfcPackage = () => nfcPackages[packageSelect?.value] || null;
 
@@ -649,9 +652,12 @@ if (quoteForm) {
       return {...base, qty, price:row.price ?? null, renewal:row.renewal ?? null};
     }
     if (base.custom) {
-      const qty = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
+      const selected = specialCapacitySelect?.value || '';
+      const selectedQty = /^\d+$/.test(selected) ? Number.parseInt(selected,10) : 0;
+      const typedQty = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
+      const qty = selectedQty || typedQty;
       const row = specialRestaurantRows[qty] || {};
-      return {...base, qty:qty || null, price:row.price ?? null, renewal:row.renewal ?? null, ready:!!row.price};
+      return {...base, qty:qty || null, price:row.price ?? null, renewal:row.renewal ?? null, ready:row.price != null, customManual:selected==='custom'};
     }
     return base;
   };
@@ -687,11 +693,13 @@ if (quoteForm) {
     const isNfc = typeSelect?.value === 'nfc';
     if (packageConfig) packageConfig.hidden = !isNfc;
     if (feedbackCapacityWrap) feedbackCapacityWrap.hidden = !(isNfc && pkg?.feedback);
+    if (specialCapacityWrap) specialCapacityWrap.hidden = !(isNfc && pkg?.custom);
     syncNfcOptionVisibility(isNfc, pkg);
     if (qtyLabel) qtyLabel.textContent = isNfc ? (pkg?.qtyLabel || 'Masa / stand adedi') : 'Adet';
     if (qtyInput) {
       qtyInput.placeholder = isNfc ? (pkg?.quick ? '1' : (pkg?.feedback ? '10' : 'Örn. 15')) : 'Örn. 50';
-      const lock = !!(isNfc && pkg && !pkg.custom && Number.isFinite(pkg.qty) && pkg.qty > 0);
+      const specialReadySelected = !!(isNfc && pkg?.custom && specialCapacitySelect && /^\d+$/.test(specialCapacitySelect.value || ''));
+      const lock = !!(isNfc && pkg && ((!pkg.custom && Number.isFinite(pkg.qty) && pkg.qty > 0) || specialReadySelected));
       qtyInput.readOnly = lock;
       qtyInput.classList.toggle('is-package-locked', lock);
       qtyInput.title = lock ? 'Bu hazır çözümde adet paket kapasitesinden gelir.' : '';
@@ -712,6 +720,7 @@ if (quoteForm) {
 
     if (syncQty && qtyInput) {
       if (pkg.feedback) qtyInput.value = String(pkg.qty || 10);
+      else if (pkg.custom && specialCapacitySelect && /^\d+$/.test(specialCapacitySelect.value || '')) qtyInput.value = specialCapacitySelect.value;
       else if (Number.isFinite(pkg.qty) && pkg.qty > 0) qtyInput.value = String(pkg.qty);
       else if (Number.isFinite(requestedCapacity) && requestedCapacity > 0) qtyInput.value = String(requestedCapacity);
     } else if (pkg.feedback && qtyInput) {
@@ -779,6 +788,7 @@ if (quoteForm) {
   typeSelect?.addEventListener('change', () => updateNfcSummary());
   packageSelect?.addEventListener('change', () => updateNfcSummary({ syncQty: true }));
   feedbackCapacitySelect?.addEventListener('change', () => updateNfcSummary({ syncQty: true }));
+  specialCapacitySelect?.addEventListener('change', () => { if (specialCapacitySelect.value === 'custom' && qtyInput) { qtyInput.readOnly=false; qtyInput.value=''; qtyInput.focus(); } updateNfcSummary({ syncQty: specialCapacitySelect.value !== 'custom' }); });
   quoteForm.querySelectorAll('[data-nfc-option]').forEach(input => input.addEventListener('change', () => updateNfcSummary()));
   qtyInput?.addEventListener('input', () => {
     if (typeSelect?.value === 'nfc' && packageSelect?.value) updateNfcSummary();

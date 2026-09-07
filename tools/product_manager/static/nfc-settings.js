@@ -5,6 +5,7 @@ const standardDefs=[
   ['premium','Premium','20 masa · 60 NFC'],
 ];
 const feedbackCaps=[10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120];
+const specialRestaurantCaps=[25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120];
 const mediaDefs={restaurant_packages:{label:'Standart Restoran Sistemleri',defaultTheme:'light'},quick_stand:{label:'Hızlı Bağlantı Standı',defaultTheme:'light'},feedback_duo:{label:'Premium Feedback Duo',defaultTheme:'dark'}};
 let data=null;
 const pendingMedia={};
@@ -25,14 +26,13 @@ function renderYear(year,yearData){
   const standardHtml=standardDefs.map(([key,label,meta])=>packageRow(year,key,label,meta,packs[key]||{})).join('');
   const quickHtml=packageRow(year,'hizli_stand','Hızlı Bağlantı Standı','1 stand · 3 NFC · Menü Tasarımı yok',packs.hizli_stand||{});
   const duoRows=feedbackCaps.map(count=>{const row=yearData.feedback_duo_packages?.[String(count)]||{};return {count,nfc:count*2,price:row.price,renewal:row.renewal}});
-  const specialRaw=yearData.special_restaurant_packages?.['120']||{};
-  const specialRows=[{count:120,nfc:360,price:specialRaw.price,renewal:specialRaw.renewal}];
+  const specialRows=specialRestaurantCaps.map(count=>{const row=yearData.special_restaurant_packages?.[String(count)]||{};return {count,nfc:count*3,price:row.price,renewal:row.renewal}});
   card.innerHTML=`<div class="year-head"><div><p class="eyebrow">FİYAT DÖNEMİ</p><h2>${year}</h2></div><span class="status ${isLive?'live':''}">${isLive?'Websitesinde aktif':'Hazır bekliyor'}</span></div>
   <div class="common-grid"><label class="field"><span>QR adet fiyatı</span><input inputmode="numeric" data-year="${year}" data-common="qr_unit" value="${yearData.qr_unit??''}"></label><label class="field"><span>Menü Tasarımı</span><input inputmode="numeric" data-year="${year}" data-common="menu_design" value="${yearData.menu_design??''}"></label><label class="field"><span>Logo Tasarımı</span><input inputmode="numeric" data-year="${year}" data-common="logo_design" value="${yearData.logo_design??''}"></label></div>
   <div class="section-label"><strong>Standart Restoran Sistemleri</strong><small>Başlangıç · Profesyonel · Premium</small></div><div class="packages">${standardHtml}</div>
   <div class="section-label"><strong>Hızlı Bağlantı Standı</strong><small>Taban fiyat + yıllık yenileme</small></div><div class="packages">${quickHtml}</div>
   ${capacityManager(year,'Premium Feedback Duo hazır paketleri','10–120 stand · 2 NFC / stand','duo',duoRows)}
-  ${capacityManager(year,'Özel Restoran Hazır Paketleri','Yüksek kapasiteli Standart Restoran altyapısı','special',specialRows)}`;
+  ${capacityManager(year,'Özel Restoran Hazır Paketleri','25–120 masa · 3 NFC / masa · fiyat ve yenilemeleri tek tek yönet','special',specialRows)}`;
   return card;
 }
 function mediaUrl(rel){return rel?'/'+String(rel).replace(/^\/+/, '')+'?v='+Date.now():''}
