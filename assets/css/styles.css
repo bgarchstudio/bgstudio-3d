@@ -899,10 +899,105 @@ button{font-family:inherit}
 }
 .nfc-feedback-capacity{display:grid;gap:6px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.4);padding:12px}.nfc-feedback-capacity[hidden]{display:none!important}.nfc-feedback-capacity label{font-size:.72rem;font-weight:700}.nfc-feedback-capacity select{width:100%;border:1px solid var(--line);background:#fffaf4;border-radius:10px;padding:10px 12px;color:var(--ink)}.nfc-feedback-capacity small{font-size:.61rem;color:var(--ink-soft)}
 
+/* V3.1.55 · RESTAURANT LIVE PACKAGE CALCULATORS */
+/* Restore the centered shell on the 2026 pricing footnote. */
+.package-footnote.shell{margin:16px auto 40px}
 
-/* V3.1.54 — full restaurant ready-package ladder + Premium Plus */
-.restaurant-common-platform{margin-top:18px;border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.18);padding:28px}.restaurant-common-head{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:end}.restaurant-common-head h3{font-family:"Playfair Display",Georgia,serif;font-size:clamp(2.2rem,3.4vw,3.7rem);font-weight:500;line-height:1;margin:0}.restaurant-common-head>p{margin:0;color:var(--ink-soft);font-size:.78rem;line-height:1.6}.restaurant-common-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}.restaurant-common-grid article{border:1px solid var(--line);border-radius:19px;padding:18px;background:rgba(255,255,255,.26)}.restaurant-common-grid h4{font-family:"Playfair Display",Georgia,serif;font-size:1.45rem;font-weight:500;margin:0 0 10px}.restaurant-common-grid ul{list-style:none;margin:0;padding:0}.restaurant-common-grid li{border-top:1px solid var(--line);padding:8px 0;font-size:.66rem;color:var(--ink-soft)}.restaurant-common-grid .restaurant-common-accent{background:var(--dark);color:#f7efe5;border-color:rgba(255,255,255,.08)}.restaurant-common-grid .restaurant-common-accent li{border-color:rgba(255,255,255,.09);color:#b7a99d}.restaurant-common-accent>p{margin:10px 0 0;color:#d0b89b;font-size:.64rem;line-height:1.55}
-.special-ready-card-v154{margin-bottom:12px}.special-ready-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:18px 0}.special-ready-summary span{border:1px solid var(--line);border-radius:14px;padding:11px;color:var(--ink-soft);font-size:.61rem;line-height:1.35}.special-ready-summary b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:1.16rem;color:var(--ink);font-weight:500;margin-bottom:2px}.special-ready-tags{display:flex;flex-wrap:wrap;gap:7px}.special-ready-tags span{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#f6eee4;color:#6c533c;font-size:.61rem}.special-pricing-details{margin-top:12px}.special-price-mobile{display:none}.special-price-mini{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbf6ef;display:grid;grid-template-columns:1fr 1fr;gap:10px}.special-price-mini>div:first-child{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px}.special-price-mini strong{font-family:"Playfair Display",Georgia,serif;font-size:1.25rem;font-weight:500}.special-price-mini span{font-size:.68rem;color:var(--ink-soft)}.special-price-mini small{display:block;color:var(--ink-soft);font-size:.57rem;margin-bottom:2px}.special-price-mini b{font-size:.72rem}
-.premium-plus-teaser{padding-top:72px}.premium-plus-head{border-radius:30px;background:var(--dark);color:#f7efe5;padding:32px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start}.premium-plus-head .eyebrow{color:#d7a66e}.premium-plus-head h2{font-family:"Playfair Display",Georgia,serif;font-size:clamp(3rem,6vw,6.5rem);font-weight:500;line-height:.9;margin:0 0 18px}.premium-plus-head p:not(.eyebrow){margin:0;max-width:850px;color:#b7a99d;font-size:.8rem;line-height:1.65}.premium-plus-badge{border:1px solid rgba(215,166,110,.35);border-radius:999px;padding:9px 12px;color:#e9c79f;font-size:.62rem;font-weight:800;letter-spacing:.1em}.premium-plus-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}.premium-plus-grid article{border:1px solid var(--line);border-radius:19px;padding:18px;background:rgba(255,255,255,.2)}.premium-plus-grid article>span{font-size:.62rem;color:var(--brown);font-weight:800}.premium-plus-grid h3{font-family:"Playfair Display",Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.08;margin:18px 0 9px}.premium-plus-grid p{font-size:.65rem;color:var(--ink-soft);line-height:1.55;margin:0}.premium-plus-note{margin:12px 0 0;border-left:3px solid #c68a48;padding:4px 0 4px 14px;color:var(--ink-soft);font-size:.68rem}
-@media(max-width:1100px){.restaurant-common-grid{grid-template-columns:1fr 1fr}.premium-plus-grid{grid-template-columns:repeat(2,1fr)}.premium-plus-grid article:last-child{grid-column:1/-1}.restaurant-common-head{grid-template-columns:1fr}.premium-plus-head{grid-template-columns:1fr}.premium-plus-badge{justify-self:start}}
-@media(max-width:760px){.restaurant-common-platform{padding:20px 17px;border-radius:22px}.restaurant-common-grid{grid-template-columns:1fr}.special-ready-summary{grid-template-columns:1fr 1fr}.special-price-mobile{display:grid;gap:8px}.special-pricing-details .feedback-price-table-wrap{display:none}.premium-plus-teaser{padding-top:52px}.premium-plus-head{padding:22px 18px;border-radius:22px}.premium-plus-grid{grid-template-columns:1fr}.premium-plus-grid article:last-child{grid-column:auto}.premium-plus-grid article{padding:17px}.premium-plus-head h2{font-size:3.6rem}}
+/* Real field work now follows the hero, before product and pricing detail. */
+.nfc-platform-hero + .custom-band{padding-top:88px;padding-bottom:88px}
+
+/* High-capacity ready package selector. */
+.nfc-capacity-selector-head{margin:22px 0 11px;display:flex;align-items:end;justify-content:space-between;gap:20px}
+.nfc-capacity-selector-head strong{font-size:.82rem;letter-spacing:.02em}
+.nfc-capacity-selector-head span{max-width:390px;text-align:right;color:var(--ink-soft);font-size:.66rem;line-height:1.45}
+.nfc-capacity-chips{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:0}
+.nfc-capacity-choice{appearance:none;-webkit-appearance:none;position:relative;min-width:0;border:1px solid rgba(88,55,28,.17);border-radius:14px;background:#f8f0e6;color:var(--ink);padding:11px 10px;text-align:left;font:inherit;cursor:pointer;box-shadow:0 1px 0 rgba(255,255,255,.55) inset;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease}
+.nfc-capacity-choice span{display:block!important;border:0!important;border-radius:0!important;background:transparent!important;padding:0!important;color:inherit!important;font-size:.72rem!important;font-weight:800!important;line-height:1.15}
+.nfc-capacity-choice small{display:block;margin-top:5px;color:#876e57;font-size:.57rem;line-height:1.15;white-space:nowrap}
+.nfc-capacity-choice::after{content:"SEÇ";position:absolute;top:8px;right:8px;border-radius:999px;background:rgba(138,78,14,.08);padding:3px 5px;color:#8a4e0e;font-size:.44rem;font-weight:900;letter-spacing:.08em;opacity:.78}
+.nfc-capacity-choice:hover{transform:translateY(-2px);border-color:rgba(138,78,14,.48);background:#fff8f0;box-shadow:0 8px 22px rgba(85,50,23,.08)}
+.nfc-capacity-choice:focus-visible{outline:2px solid rgba(138,78,14,.58);outline-offset:3px}
+.nfc-capacity-choice.is-selected{border-color:#1d1713;background:var(--dark);color:#fff8ee;box-shadow:0 10px 24px rgba(28,19,13,.16)}
+.nfc-capacity-choice.is-selected small{color:#ddb98e}
+.nfc-capacity-choice.is-selected::after{content:"SEÇİLDİ";background:#d7a66e;color:#1d1713;opacity:1}
+
+/* Standard restaurant package live add-ons. */
+.nfc-package-configurator{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:grid;gap:10px}
+.nfc-config-head{display:grid;gap:3px}
+.nfc-config-head strong{font-size:.74rem}
+.nfc-config-head small{color:var(--ink-soft);font-size:.59rem;line-height:1.4}
+.nfc-config-options{display:grid;gap:7px}
+.nfc-config-options button{appearance:none;-webkit-appearance:none;position:relative;display:grid;grid-template-columns:1fr auto;gap:3px 12px;width:100%;border:1px solid rgba(88,55,28,.16);border-radius:13px;background:#faf4ec;color:var(--ink);padding:11px 12px;text-align:left;font:inherit;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease}
+.nfc-config-options button:hover{transform:translateY(-1px);border-color:rgba(138,78,14,.45);background:#fff9f2;box-shadow:0 6px 18px rgba(85,50,23,.06)}
+.nfc-config-options button:focus-visible{outline:2px solid rgba(138,78,14,.55);outline-offset:2px}
+.nfc-config-options button span{font-size:.7rem;font-weight:800}
+.nfc-config-options button b{font-size:.68rem;color:#8a4e0e}
+.nfc-config-options button small{grid-column:1/-1;padding-right:56px;color:var(--ink-soft);font-size:.55rem;line-height:1.38}
+.nfc-config-options button::after{content:"EKLE";position:absolute;right:11px;bottom:10px;border-radius:999px;background:rgba(138,78,14,.09);padding:3px 6px;color:#8a4e0e;font-size:.45rem;font-weight:900;letter-spacing:.08em}
+.nfc-config-options button.is-selected{border-color:#b67b3e;background:#ead7bd;box-shadow:0 8px 20px rgba(85,50,23,.08)}
+.nfc-config-options button.is-selected::after{content:"SEÇİLDİ";background:#8a4e0e;color:#fff8ef}
+.nfc-config-total{border-radius:14px;background:#eee0ce;padding:12px 13px;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline}
+.nfc-config-total span{font-size:.61rem;text-transform:uppercase;letter-spacing:.08em;color:#7b624b;font-weight:800}
+.nfc-config-total strong{font-family:"Playfair Display",Georgia,serif;font-size:1.45rem;font-weight:500}
+.nfc-config-total small{grid-column:1/-1;color:#75614f;font-size:.55rem;line-height:1.35}
+.nfc-package-configurator .primary-cta,.nfc-package-configurator .secondary-cta{margin-top:1px;width:100%;text-align:center}
+
+/* The featured middle package keeps its dark visual language. */
+.package.featured .nfc-package-configurator{border-color:rgba(255,255,255,.1)}
+.package.featured .nfc-config-head small{color:#a99a8f}
+.package.featured .nfc-config-options button{border-color:rgba(255,255,255,.11);background:rgba(255,255,255,.045);color:#f7efe5}
+.package.featured .nfc-config-options button b{color:#e3b47e}
+.package.featured .nfc-config-options button small{color:#aa9b90}
+.package.featured .nfc-config-options button::after{background:rgba(215,166,110,.13);color:#e3b47e}
+.package.featured .nfc-config-options button:hover{border-color:rgba(215,166,110,.4);background:rgba(215,166,110,.08);box-shadow:none}
+.package.featured .nfc-config-options button.is-selected{border-color:#d7a66e;background:#39291d}
+.package.featured .nfc-config-options button.is-selected::after{background:#d7a66e;color:#1b1511}
+.package.featured .nfc-config-total{background:#2a2019}
+.package.featured .nfc-config-total span,.package.featured .nfc-config-total small{color:#b8a493}
+.package.featured .nfc-config-total strong{color:#fff8ef}
+
+/* High-capacity calculator controls and live invoice. */
+.special-ready-options{display:grid;gap:7px}
+.special-ready-options button{appearance:none;-webkit-appearance:none;position:relative;display:grid;grid-template-columns:1fr auto;gap:3px 12px;width:100%;border:1px solid rgba(255,255,255,.11);border-radius:13px;background:rgba(255,255,255,.04);color:#f7efe5;padding:11px 12px;text-align:left;font:inherit;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.special-ready-options button:hover{transform:translateY(-1px);border-color:rgba(215,166,110,.48);background:rgba(215,166,110,.08)}
+.special-ready-options button:focus-visible{outline:2px solid rgba(215,166,110,.65);outline-offset:2px}
+.special-ready-options button span{font-size:.69rem;font-weight:800}
+.special-ready-options button b{font-size:.67rem;color:#e3b47e}
+.special-ready-options button small{grid-column:1/-1;padding-right:62px;color:#a99a8f;font-size:.54rem;line-height:1.4}
+.special-ready-options button::after{content:"EKLE";position:absolute;right:11px;bottom:10px;border-radius:999px;background:rgba(215,166,110,.13);padding:3px 6px;color:#e3b47e;font-size:.44rem;font-weight:900;letter-spacing:.08em}
+.special-ready-options button.is-selected{border-color:#d7a66e;background:#39291d}
+.special-ready-options button.is-selected::after{content:"SEÇİLDİ";background:#d7a66e;color:#1c1510}
+.special-ready-breakdown{border-top:1px solid rgba(255,255,255,.1);padding-top:10px;display:grid;gap:7px}
+.special-ready-breakdown>div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;color:#aa9a8d;font-size:.62rem}
+.special-ready-breakdown b{color:#f3e5d5;font-size:.65rem}
+.special-ready-total{border:1px solid rgba(215,166,110,.24);border-radius:15px;background:rgba(215,166,110,.08);padding:13px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline}
+.special-ready-total span{color:#d9b487;font-size:.59rem;text-transform:uppercase;letter-spacing:.09em;font-weight:800}
+.special-ready-total strong{font-family:"Playfair Display",Georgia,serif;font-size:1.65rem;font-weight:500;color:#fff8ef}
+.special-ready-total small{grid-column:1/-1;color:#a99a8f;font-size:.54rem}
+.special-ready-highlight [data-special-offer]{width:100%;text-align:center}
+
+/* Global optional-service cards get enough space for the service scope. */
+.nfc-option-list-three article small{line-height:1.45}
+
+/* Quote form keeps the richer menu and logo descriptions readable. */
+.nfc-quote-options small{line-height:1.45}
+.nfc-quote-options label:has(input:checked){border-color:rgba(138,78,14,.5);background:#efe0cd;box-shadow:0 7px 18px rgba(85,50,23,.06)}
+
+@media(max-width:1100px){
+  .nfc-capacity-chips{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .nfc-platform-hero + .custom-band{padding-top:64px;padding-bottom:64px}
+  .nfc-capacity-selector-head{display:grid;gap:6px;align-items:start}
+  .nfc-capacity-selector-head span{text-align:left}
+  .nfc-capacity-chips{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .nfc-capacity-choice{padding:10px 8px;min-height:58px}
+  .nfc-capacity-choice::after{display:none}
+  .nfc-capacity-choice small{font-size:.54rem}
+  .nfc-config-options button small,.special-ready-options button small{padding-right:0}
+  .nfc-config-options button::after,.special-ready-options button::after{position:static;grid-column:2;grid-row:2;justify-self:end;align-self:end}
+  .nfc-config-total,.special-ready-total{grid-template-columns:1fr}
+  .nfc-config-total small,.special-ready-total small{grid-column:1}
+  .package-footnote.shell{margin:16px auto 34px;padding:0 18px}
+}
+
