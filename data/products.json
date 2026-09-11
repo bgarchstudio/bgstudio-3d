@@ -1669,5 +1669,61 @@
     "poster_image": "assets/images/posters/taki-aksesuar-tepsisi.webp",
     "poster_image_width": 1254,
     "poster_image_height": 1254
+  },
+  {
+    "price_text": "249 TL",
+    "tags": [
+      "Araç Aksesuarı",
+      "Gözlük Tutucu",
+      "Güneşlik Klipsi",
+      "Güneş Gözlüğü",
+      "Otomobil",
+      "Araç İçi Düzen",
+      "3D Baskı"
+    ],
+    "slug": "arac-guneslik-gozluk-tutucu",
+    "sale_price_value": null,
+    "active": true,
+    "color_ids": [
+      "silk-kings-gold",
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "bone-white",
+      "glitter-galaxy-black",
+      "lavender",
+      "avocado-green",
+      "sari",
+      "siyah",
+      "beyaz",
+      "kirmizi"
+    ],
+    "name": "Araç Güneşlik Gözlük Tutucu",
+    "production_note": "Ürün 3D baskı yöntemiyle üretilir ve araç güneşliğine klipslenerek takılır. Güneşlik kalınlığı ve gözlük formuna göre uyum farklılık gösterebilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "category": "pratik-fonksiyonel",
+    "seo_title": "Araç Güneşlik Gözlük Tutucu | Kuşadası 3D Baskı | BG Studio 3D",
+    "featured": false,
+    "options": [],
+    "sort_order": 37,
+    "features": [
+      "Araç güneşliğine klipsli montaj",
+      "Güneş ve numaralı gözlükler için uygun",
+      "Kompakt araç içi tasarım",
+      "Gözlüğü kolay erişilebilir konumda tutar",
+      "Ek montaj ekipmanı gerektirmez",
+      "Hafif yapı",
+      "3D baskı üretim"
+    ],
+    "description": "Araç içinde güneş gözlüğü veya numaralı gözlüğü düzenli biçimde saklamak için tasarlanan güneşlik tipi gözlük tutucu. Klipsli yapısı güneşliğe takılır ve gözlüğünüzü sürüş sırasında elinizin altında tutar.\n\nKompakt yapısı araç içinde ek yer kaplamaz. Gözlüğün torpidoda, kapı cebinde veya koltuk üzerinde dağılmasını önlemeye yardımcı olur.",
+    "seo_description": "Araç güneşliğine takılan 3D baskı gözlük tutucu; güneş ve numaralı gözlükleri araç içinde düzenli ve kolay erişilebilir konumda tutar.",
+    "price_value": "249",
+    "card_description": "Gözlüğünüzü araç güneşliğine sabitleyen, kolay erişim sağlayan kompakt 3D baskı gözlük tutucu.",
+    "pricing_tiers": [],
+    "gallery_images": [],
+    "main_image": "assets/images/products/arac-guneslik-gozluk-tutucu.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": null,
+    "poster_image_width": null,
+    "poster_image_height": null
   }
 ]
