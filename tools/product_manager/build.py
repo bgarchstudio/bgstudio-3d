@@ -172,9 +172,17 @@ def default_website_copy():
     }
 
 
+NFC_PRICING_COLLECTION = 'nfc_site_pricing'
+
+
 def load_site_settings():
     data = get_collection('site_settings', {})
-    return data if isinstance(data, dict) else {}
+    data = dict(data) if isinstance(data, dict) else {}
+    # V3.1.57: build always prefers the dedicated persistent pricing source.
+    pricing = get_collection(NFC_PRICING_COLLECTION, {})
+    if isinstance(pricing, dict) and isinstance(pricing.get('years'), dict):
+        data['nfc_site'] = pricing
+    return data
 
 
 def active_nfc_pricing():

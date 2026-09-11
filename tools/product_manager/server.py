@@ -17,7 +17,7 @@ from storage import (
 )
 from build import build_site
 
-PANEL_VERSION = '3.1.54'
+PANEL_VERSION = '3.1.57'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -420,12 +420,62 @@ def migrate_nfc_pricing_schema(settings, persist=False):
     return settings
 
 
+NFC_PRICING_COLLECTION = 'nfc_site_pricing'
+
+
+def _pricing_signature(value):
+    return json.dumps(value if isinstance(value, dict) else {}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+
+
+def read_nfc_site_pricing(seed=None, persist=True):
+    """Read the authoritative NFC website pricing collection.
+
+    V3.1.57: pricing no longer relies on the larger site_settings document as
+    its only persistence source.  The dedicated collection is authoritative,
+    while site_settings.nfc_site stays as the public/build compatibility mirror.
+    """
+    seed = seed if isinstance(seed, dict) else default_site_settings()['nfc_site']
+    raw = get_collection(NFC_PRICING_COLLECTION, {})
+    raw = raw if isinstance(raw, dict) else {}
+    source = raw if isinstance(raw.get('years'), dict) else seed
+    clean = clean_nfc_site_settings(source, seed)
+    if persist and _pricing_signature(raw) != _pricing_signature(clean):
+        set_collection(NFC_PRICING_COLLECTION, clean)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
+    return clean
+
+
+def write_nfc_site_pricing(value, current=None):
+    current = current if isinstance(current, dict) else default_site_settings()['nfc_site']
+    clean = clean_nfc_site_settings(value, current)
+    set_collection(NFC_PRICING_COLLECTION, clean)
+    raw = get_collection(NFC_PRICING_COLLECTION, {})
+    raw = raw if isinstance(raw, dict) else {}
+    verified = clean_nfc_site_settings(raw, clean) if isinstance(raw.get('years'), dict) else {}
+    if _pricing_signature(verified) != _pricing_signature(clean):
+        raise RuntimeError('NFC fiyatları kalıcı fiyat kasasına yazılamadı.')
+    return clean
+
+
 def read_site_settings():
     data = get_collection('site_settings', default_site_settings())
     if not isinstance(data, dict):
         data = default_site_settings()
     # V3.1.54: seed Hızlı renewal, Feedback Duo ladder and all 25–120 ready restaurant packages.
     data = migrate_nfc_pricing_schema(data, persist=True)
+    # V3.1.57: dedicated pricing collection is authoritative after restart/F5.
+    pricing = read_nfc_site_pricing(data.get('nfc_site'), persist=True)
+    if _pricing_signature(data.get('nfc_site')) != _pricing_signature(pricing):
+        data = dict(data)
+        data['nfc_site'] = pricing
+        set_collection('site_settings', data)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
     # V3.1.48: uploaded NFC showcase images survive old-schema/restart pointer loss.
     data = _repair_nfc_media_from_files(data, persist=True)
     # V3.1.52: tone is authoritative in a separate collection.
@@ -655,9 +705,29 @@ def clean_site_settings(value):
 
 def write_site_settings(value):
     clean = clean_site_settings(value)
+    # V3.1.57: write pricing to its own persistent collection first, then mirror it.
+    clean['nfc_site'] = write_nfc_site_pricing(clean.get('nfc_site'), clean.get('nfc_site'))
     set_collection('site_settings', clean)
     media = clean.get('nfc_media') if isinstance(clean.get('nfc_media'), dict) else {}
     write_nfc_family_themes({key: (media.get(key) or {}).get('theme') for key in NFC_FAMILY_THEME_DEFAULTS})
+    try:
+        export_to_repo()
+    except Exception:
+        pass
+    # Never report a successful write before the persistent store can read it back.
+    stored = get_collection('site_settings', {})
+    stored = stored if isinstance(stored, dict) else {}
+    stored_pricing = read_nfc_site_pricing(clean.get('nfc_site'), persist=False)
+    if _pricing_signature(stored_pricing) != _pricing_signature(clean.get('nfc_site')):
+        raise RuntimeError('NFC fiyat kaydı doğrulanamadı; eski fiyatlara dönmemesi için işlem durduruldu.')
+    if _pricing_signature((stored or {}).get('nfc_site')) != _pricing_signature(clean.get('nfc_site')):
+        repaired = dict(stored) if stored else dict(clean)
+        repaired['nfc_site'] = clean['nfc_site']
+        set_collection('site_settings', repaired)
+        try:
+            export_to_repo()
+        except Exception:
+            pass
     return overlay_nfc_family_themes(clean, persist=False)
 
 
@@ -1456,8 +1526,21 @@ class Handler(BaseHTTPRequestHandler):
                     rel = fixed_media[key]
                     if not (ROOT / rel).is_file() or (settings.get('nfc_media') or {}).get(key, {}).get('image') != rel:
                         raise ValueError(f'{key} vitrin görseli diske kaydedilemedi; işlem başarılı sayılmadı.')
+                expected_pricing = settings.get('nfc_site')
                 result = build_site()
-                return self.send_json({'ok': True, 'message': 'NFC website fiyatları, metinleri ve ürün aile görselleri kalıcı kaydedildi; site yeniden hazırlandı.', 'nfc_site': settings.get('nfc_site'), 'website_copy': settings.get('website_copy'), 'nfc_media': settings.get('nfc_media'), 'result': result})
+                # V3.1.57: build sonrası kalıcı kasayı yeniden oku. Eski fiyat geri geldiyse başarı dönme.
+                verified = read_site_settings()
+                if _pricing_signature(verified.get('nfc_site')) != _pricing_signature(expected_pricing):
+                    repair = dict(verified)
+                    repair['nfc_site'] = expected_pricing
+                    repair['website_copy'] = settings.get('website_copy')
+                    repair['nfc_media'] = settings.get('nfc_media')
+                    write_site_settings(repair)
+                    result = build_site()
+                    verified = read_site_settings()
+                if _pricing_signature(verified.get('nfc_site')) != _pricing_signature(expected_pricing):
+                    raise RuntimeError('Fiyatlar build sonrasında kalıcı olarak doğrulanamadı; işlem başarılı sayılmadı.')
+                return self.send_json({'ok': True, 'message': 'NFC website fiyatları kalıcı kasada doğrulandı ve site yeniden hazırlandı.', 'nfc_site': verified.get('nfc_site'), 'website_copy': verified.get('website_copy'), 'nfc_media': verified.get('nfc_media'), 'result': result, 'persistence_verified': True})
 
             if self.path == '/api/colors/save':
                 payload = self.read_json()
