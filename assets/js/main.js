@@ -576,7 +576,7 @@ if (backToTop) {
   backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// V3.1.60 — NFC references-first + stand schematic + restaurant calculators + Premium Plus roadmap.
+// V3.1.61 — NFC top-flow order + always-visible Stand Şeması + Premium Plus reveal fix.
 // Runtime compatibility is intentional: copying this repo-safe patch is enough even
 // before Product Manager rebuilds the managed NFC page HTML.
 (() => {
@@ -595,11 +595,11 @@ if (backToTop) {
     selected.has('logo') ? 'logo=1' : ''
   ].filter(Boolean);
 
-  // Force the matching V3.1.60 stylesheet when an older managed page still has an old query string.
+  // Force the matching V3.1.61 stylesheet when an older managed page still has an old query string.
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.60') { url.searchParams.set('v', '3.1.60'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.61') { url.searchParams.set('v', '3.1.61'); link.href = url.toString(); }
     } catch (_) {}
   });
 
@@ -611,25 +611,34 @@ if (backToTop) {
     110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}
   };
 
-  const moveFieldReferencesFirst = () => {
+  const arrangeNfcTopFlow = () => {
     const main = document.querySelector('main');
-    if (!main) return;
+    const hero = document.querySelector('.nfc-platform-hero');
+    if (!main || !hero) return;
     const referenceSection = [...main.querySelectorAll('section')].find(section => {
       const title = section.querySelector('h2');
       return title && title.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.';
     });
-    if (!referenceSection) return;
-    referenceSection.classList.add('nfc-reference-first');
-    if (main.firstElementChild !== referenceSection) main.insertBefore(referenceSection, main.firstElementChild);
+    const schema = document.querySelector('[data-nfc-stand-schema]');
+    if (main.firstElementChild !== hero) main.insertBefore(hero, main.firstElementChild);
+    if (referenceSection) {
+      referenceSection.classList.add('nfc-reference-first');
+      hero.insertAdjacentElement('afterend', referenceSection);
+      if (schema) referenceSection.insertAdjacentElement('afterend', schema);
+    } else if (schema) {
+      hero.insertAdjacentElement('afterend', schema);
+    }
   };
 
   const ensureNfcStandSchematic = () => {
-    if (!document.querySelector('.nfc-platform-hero') || document.querySelector('[data-nfc-stand-schema]')) return;
+    if (!document.querySelector('.nfc-platform-hero')) return;
+    const currentSchema = document.querySelector('[data-nfc-stand-schema]');
+    if (currentSchema) { currentSchema.dataset.nfcStandSchemaVersion = '3.1.61'; return; }
     const refs = document.querySelector('main > .nfc-reference-first') || [...document.querySelectorAll('main section')].find(section => section.querySelector('h2')?.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.');
     const hero = document.querySelector('.nfc-platform-hero');
     if (!hero) return;
     const wrap = document.createElement('div');
-    wrap.innerHTML = `<section class="section-pad-sm nfc-stand-schema" id="stand-semasi" data-nfc-stand-schema><div class="shell reveal"><div class="split-title nfc-stand-schema-heading"><div><p class="eyebrow">STAND YAPISI</p><h2>Tek stand üzerinde tüm erişim noktaları.</h2></div><p>Logo, QR alanları, uygulama ikonları ve NFC temas bölgeleri işletmenize özel tasarlanır. Restoran sistemlerinde arka yüz her masa için numaralandırılabilir.</p></div><figure class="nfc-stand-schema-figure zoomable-media" tabindex="0" role="button" aria-label="BG Studio NFC stand şemasını büyüt"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması; işletmeye özel logo, menü, Google ve sosyal medya QR alanları, NFC temas bölgeleri ve arka yüzde masa numarası gösterimi" width="1254" height="1254" loading="lazy" decoding="async"><figcaption><span>Büyütmek için görsele dokun veya tıkla</span></figcaption></figure><div class="nfc-stand-schema-points"><article><span>01</span><div><strong>İşletmeye özel kimlik</strong><p>Logo ve fiziksel stand görünümü işletmeye göre hazırlanır.</p></div></article><article><span>02</span><div><strong>QR erişim alanları</strong><p>Menü, Google ve sosyal medya hedefleri QR ile de erişilebilir.</p></div></article><article><span>03</span><div><strong>NFC temas noktaları</strong><p>Telefonu temas alanına yaklaştıran misafir ilgili dijital hedefe geçer.</p></div></article><article><span>04</span><div><strong>Masa numaralı arka yüz</strong><p>Restoran kurulumunda her standın arka yüzü masa numarasına göre ayrıştırılabilir.</p></div></article></div><div class="nfc-stand-schema-actions"><a class="secondary-cta" href="#restoran-sistemleri">Paketleri incele ↓</a><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a></div></div></section>`;
+    wrap.innerHTML = `<section class="section-pad-sm nfc-stand-schema" id="stand-semasi" data-nfc-stand-schema data-nfc-stand-schema-version="3.1.61"><div class="shell"><div class="split-title nfc-stand-schema-heading"><div><p class="eyebrow">STAND YAPISI</p><h2>Tek stand üzerinde tüm erişim noktaları.</h2></div><p>Logo, QR alanları, uygulama ikonları ve NFC temas bölgeleri işletmenize özel tasarlanır. Restoran sistemlerinde arka yüz her masa için numaralandırılabilir.</p></div><figure class="nfc-stand-schema-figure zoomable-media" tabindex="0" role="button" aria-label="BG Studio NFC stand şemasını büyüt"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması; işletmeye özel logo, menü, Google ve sosyal medya QR alanları, NFC temas bölgeleri ve arka yüzde masa numarası gösterimi" width="1254" height="1254" loading="lazy" decoding="async"><figcaption><span>Büyütmek için görsele dokun veya tıkla</span></figcaption></figure><div class="nfc-stand-schema-points"><article><span>01</span><div><strong>İşletmeye özel kimlik</strong><p>Logo ve fiziksel stand görünümü işletmeye göre hazırlanır.</p></div></article><article><span>02</span><div><strong>QR erişim alanları</strong><p>Menü, Google ve sosyal medya hedefleri QR ile de erişilebilir.</p></div></article><article><span>03</span><div><strong>NFC temas noktaları</strong><p>Telefonu temas alanına yaklaştıran misafir ilgili dijital hedefe geçer.</p></div></article><article><span>04</span><div><strong>Masa numaralı arka yüz</strong><p>Restoran kurulumunda her standın arka yüzü masa numarasına göre ayrıştırılabilir.</p></div></article></div><div class="nfc-stand-schema-actions"><a class="secondary-cta" href="#restoran-sistemleri">Paketleri incele ↓</a><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a></div></div></section>`;
     const schema = wrap.firstElementChild;
     if (!schema) return;
     if (refs && refs.parentNode) refs.insertAdjacentElement('afterend', schema); else hero.insertAdjacentElement('beforebegin', schema);
@@ -700,9 +709,11 @@ if (backToTop) {
     if (special) packages.insertBefore(block, special); else if (rule) rule.insertAdjacentElement('afterend', block); else packages.append(block);
   };
 
-  const ensurePremiumPlusRoadmapV160 = () => {
+  const ensurePremiumPlusRoadmapV161 = () => {
     if (!document.querySelector('.nfc-platform-hero')) return;
-    const html = `<section class="section-pad-sm shell reveal premium-plus-teaser" id="premium-plus" aria-labelledby="premium-plus-title"><div class="premium-plus-shell"><div class="premium-plus-head"><div class="premium-plus-copy"><p class="eyebrow">YAKINDA</p><h2 id="premium-plus-title">Premium Plus</h2><p>Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ile Garson Çağır + Hesap İste özellikleri tüm Standart Restoran paketlerinde devam eder.</p><p>Premium Plus bunların üzerine doğrudan masa siparişi, Akıllı Misafir Profili ve CRM, sadakat sistemi, rezervasyon / masa yönetimi ve AI destekli müşteri deneyimi araçlarını ekleyen gelişmiş üst katman olarak konumlandırılacaktır.</p></div><div class="premium-plus-state" aria-label="Premium Plus ürün durumu"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div></div><div class="premium-plus-roadmap-head"><div><p class="eyebrow">YAKINDA GELECEK ÖZELLİKLER</p><h3>Restoran deneyiminin bir sonraki katmanı.</h3></div><p>Özellik başlığına tıklayarak planlanan kapsamın ayrıntısını görebilirsin.</p></div><div class="premium-plus-grid">
+    const existing = document.querySelector('#premium-plus');
+    if (existing?.dataset.premiumPlusRoadmap === '3.1.61') return;
+    const html = `<section class="section-pad-sm shell premium-plus-teaser" id="premium-plus" data-premium-plus-roadmap="3.1.61" aria-labelledby="premium-plus-title"><div class="premium-plus-shell"><div class="premium-plus-head"><div class="premium-plus-copy"><p class="eyebrow">YAKINDA</p><h2 id="premium-plus-title">Premium Plus</h2><p>Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ile Garson Çağır + Hesap İste özellikleri tüm Standart Restoran paketlerinde devam eder.</p><p>Premium Plus bunların üzerine doğrudan masa siparişi, Akıllı Misafir Profili ve CRM, sadakat sistemi, rezervasyon / masa yönetimi ve AI destekli müşteri deneyimi araçlarını ekleyen gelişmiş üst katman olarak konumlandırılacaktır.</p></div><div class="premium-plus-state" aria-label="Premium Plus ürün durumu"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div></div><div class="premium-plus-roadmap-head"><div><p class="eyebrow">YAKINDA GELECEK ÖZELLİKLER</p><h3>Restoran deneyiminin bir sonraki katmanı.</h3></div><p>Özellik başlığına tıklayarak planlanan kapsamın ayrıntısını görebilirsin.</p></div><div class="premium-plus-grid">
 <details class="premium-plus-feature"><summary><span class="premium-plus-no">01</span><div><h4>NFC dijital menüden masaya doğrudan sipariş oluşturma</h4><p>Müşteri, Akıllı Menü üzerinden seçimini doğrudan bulunduğu masadan iletebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri Akıllı Menü içerisinden ürünlerini seçerek siparişi doğrudan bulunduğu masadan işletmeye iletebilecek.</p></div></details>
 <details class="premium-plus-feature"><summary><span class="premium-plus-no">02</span><div><h4>Soğansız gibi müşteri notlarını masa siparişine ekleme</h4><p>Siparişe ürün tercihi ve özel talepler eklenebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri siparişine:</p><ul><li>Soğansız</li><li>Acısız</li><li>Buzsuz</li><li>Ekstra sos</li><li>Pişirme tercihi</li><li>veya özel not</li></ul><p>gibi talepler ekleyebilecek.</p></div></details>
 <details class="premium-plus-feature"><summary><span class="premium-plus-no">03</span><div><h4>Akıllı Misafir Profili ve CRM</h4><p>İzinli müşteri ilişkileri tek misafir profili altyapısında yönetilebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletmenin izinli müşteri ilişkilerini tek noktada yönetebilmesini sağlayacak gelişmiş misafir profili altyapısı.</p><p>Sistem ileride ziyaret geçmişi, müşteri tercihleri ve işletmeyle olan etkileşimleri kullanarak daha kişiselleştirilmiş müşteri deneyimi sunabilecek.</p></div></details>
@@ -715,15 +726,14 @@ if (backToTop) {
 <details class="premium-plus-feature"><summary><span class="premium-plus-no">10</span><div><h4>Gelişmiş modüllerde öncelikli erişim</h4><p>Yeni CRM, sadakat, rezervasyon ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Premium Plus kullanıcıları gelecekte geliştirilecek ileri seviye CRM, sadakat, rezervasyon, müşteri deneyimi ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div></details>
 </div><div class="premium-plus-note-group"><p class="premium-plus-note"><strong>Premium Plus mevcut paket özelliklerini yeniden paketlemez.</strong> Garson Çağır + Hesap İste zaten tüm Standart Restoran paketlerinin mevcut kapsamındadır. Premium Plus; NFC menüden doğrudan sipariş, müşteri sipariş notları, Akıllı Misafir Profili ve CRM, sadakat ve ziyaret ödülleri, VIP / tekrar gelen misafir tanıma, otomatik müşteri segmentleri, geri kazanım kampanyaları, rezervasyon ve dijital bekleme listesi, AI ürün önerileri ve AI yönetici özetleri için geliştirilen ayrı bir üst katmandır.</p><p class="premium-plus-release-note">Çıkış tarihi, kesin özellik kapsamı ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="premium-plus-footer"><span class="premium-plus-follow">Premium Plus gelişmelerini takip et</span><span class="premium-plus-coming">YAKINDA</span></div></div></section>`;
     const wrap = document.createElement('div'); wrap.innerHTML = html; const next = wrap.firstElementChild; if (!next) return;
-    const existing = document.querySelector('#premium-plus');
     if (existing) existing.replaceWith(next); else document.querySelector('#hizli-stand')?.insertAdjacentElement('beforebegin', next);
   };
 
-  moveFieldReferencesFirst();
   ensureNfcStandSchematic();
   ensureReadyRestaurantCalculator();
   ensureRestaurantCommonPlatformV160();
-  ensurePremiumPlusRoadmapV160();
+  ensurePremiumPlusRoadmapV161();
+  arrangeNfcTopFlow();
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
     const base = numberOrNull(root.dataset.basePrice);

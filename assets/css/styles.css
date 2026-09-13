@@ -959,12 +959,14 @@ main>.nfc-reference-first+.nfc-platform-hero{padding-top:76px}
 .nfc-stand-schema-points strong{display:block;font-size:.78rem;margin:1px 0 5px}
 .nfc-stand-schema-points p{margin:0;color:var(--ink-soft);font-size:.67rem;line-height:1.45}
 .nfc-stand-schema-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
-main>.nfc-reference-first+.nfc-stand-schema{padding-top:0}
-main>.nfc-reference-first+.nfc-stand-schema+.nfc-platform-hero{padding-top:64px}
+main>.nfc-platform-hero+.nfc-reference-first{padding-top:72px}
+main>.nfc-platform-hero+.nfc-reference-first+.nfc-stand-schema{padding-top:0}
+.nfc-stand-schema .shell,.premium-plus-teaser{opacity:1;transform:none}
 @media(max-width:900px){.nfc-stand-schema-points{grid-template-columns:repeat(2,minmax(0,1fr))}.nfc-stand-schema-figure{border-radius:24px}}
 @media(max-width:620px){.nfc-stand-schema{padding-bottom:58px}.nfc-stand-schema .shell{gap:18px}.nfc-stand-schema-heading{gap:12px}.nfc-stand-schema-figure{border-radius:20px}.nfc-stand-schema-figure figcaption{left:10px;bottom:10px}.nfc-stand-schema-figure figcaption span{font-size:.58rem;padding:7px 9px}.nfc-stand-schema-figure:after{right:10px;bottom:10px;font-size:.56rem;padding:7px 9px}.nfc-stand-schema-points{grid-template-columns:1fr;gap:8px}.nfc-stand-schema-points article{padding:14px}.nfc-stand-schema-actions{display:grid;grid-template-columns:1fr}.nfc-stand-schema-actions a{width:100%;text-align:center}.nfc-stand-schema-actions .primary-cta{order:-1}}
 
 /* V3.1.60 — Premium Plus CRM / loyalty / reservation / AI roadmap */
+/* V3.1.61 — top-flow and reveal safety */
 .restaurant-common-platform{margin-top:18px;border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.18);padding:28px}
 .restaurant-common-head{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:end}
 .restaurant-common-head h3{font-family:"Playfair Display",Georgia,serif;font-size:clamp(2.2rem,3.4vw,3.7rem);font-weight:500;line-height:1;margin:0}
