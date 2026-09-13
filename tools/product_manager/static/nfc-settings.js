@@ -1,4 +1,4 @@
-/* BG Studio 3D Product Manager UI v3.1.59 */
+/* BG Studio 3D Product Manager UI v3.1.60 */
 const $=id=>document.getElementById(id);
 const standardDefs=[
   ['baslangic','Başlangıç','10 masa · 30 NFC'],

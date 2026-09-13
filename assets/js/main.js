@@ -576,7 +576,7 @@ if (backToTop) {
   backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// V3.1.59 — NFC references-first + stand schematic + public restaurant live calculators.
+// V3.1.60 — NFC references-first + stand schematic + restaurant calculators + Premium Plus roadmap.
 // Runtime compatibility is intentional: copying this repo-safe patch is enough even
 // before Product Manager rebuilds the managed NFC page HTML.
 (() => {
@@ -595,11 +595,11 @@ if (backToTop) {
     selected.has('logo') ? 'logo=1' : ''
   ].filter(Boolean);
 
-  // Force the matching V3.1.56 stylesheet when an older managed page still has an old query string.
+  // Force the matching V3.1.60 stylesheet when an older managed page still has an old query string.
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.59') { url.searchParams.set('v', '3.1.59'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.60') { url.searchParams.set('v', '3.1.60'); link.href = url.toString(); }
     } catch (_) {}
   });
 
@@ -668,7 +668,8 @@ if (backToTop) {
       <div class="special-ready-copy">
         <p class="eyebrow">ÖZEL RESTORAN HAZIR PAKETLERİ</p>
         <h3>Yüksek kapasitede restoran altyapısı.</h3>
-        <p>20 masanın üzerindeki restoranlarda aynı Standart Restoran altyapısı işletmenin kapasitesine göre ölçeklenir. Masa sayını seç; paket bedeli ve ek hizmet hesabı sağdaki kartta anında yenilensin.</p>
+        <p>20 masanın üzerindeki restoranlarda aynı Standart Restoran altyapısı işletmenin kapasitesine göre ölçeklenir. Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ve Garson Çağır + Hesap İste mevcut kapsamda devam eder. Masa sayını seç; paket bedeli ve ek hizmet hesabı sağdaki kartta anında yenilensin.</p>
+        <div class="special-ready-tags"><span>Akıllı Menü + çoklu dil</span><span>14 alerjen + yaklaşık kalori</span><span>Google performansı + değerlendirme</span><span>Garson Çağır + Hesap İste</span></div>
         <div class="nfc-capacity-selector-head"><strong>Masa sayını seç</strong><span>Bir karta tıkla. Seçimin ve toplam hesabın sağ tarafta anında görünür.</span></div>
         <div class="nfc-capacity-chips" role="group" aria-label="Özel Restoran hazır masa kapasitesi">${chips}</div>
       </div>
@@ -687,9 +688,42 @@ if (backToTop) {
       </div>`;
   };
 
+  const ensureRestaurantCommonPlatformV160 = () => {
+    const packages = document.querySelector('#restoran-sistemleri');
+    if (!packages || packages.querySelector('.restaurant-common-platform')) return;
+    const special = packages.querySelector('.special-ready-card');
+    const rule = packages.querySelector('.nfc-package-rule');
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div class="restaurant-common-platform"><div class="restaurant-common-head"><div><p class="eyebrow">TÜM STANDART RESTORAN PAKETLERİNDE MEVCUT</p><h3>Mevcut restoran altyapısı tüm kapasitelerde devam eder.</h3></div><p>Başlangıç, Profesyonel, Premium ve 25–120 masa Özel Restoran Hazır Paketleri aynı sistem çekirdeğini kullanır. Premium Plus bu kapsamın yerine geçmez.</p></div><div class="restaurant-common-grid"><article><h4>Akıllı Menü</h4><ul><li>Akıllı Menü ve çoklu dil altyapısı</li><li>Türkçe + İngilizce görsel menü</li><li>8 ek dilde dijital metin menü</li><li>Ürün içerikleri</li><li>14 alerjen bilgi katmanı</li><li>Yaklaşık kalori bilgileri</li></ul></article><article><h4>Değerlendirme & Google</h4><ul><li>Müşteri değerlendirme sistemi</li><li>Google değerlendirme devam akışı</li><li>Google puan ve yorum performansı</li><li>Sosyal medya / iletişim yönlendirmeleri</li></ul></article><article><h4>Panel & Analitik</h4><ul><li>İşletme müşteri paneli</li><li>Masa ve alan bazlı kullanım analitikleri</li><li>Bildirim / push altyapısı</li><li>Uzaktan sistem yönetimi</li></ul></article><article class="restaurant-common-accent"><h4>Servis Talepleri</h4><ul><li>Garson Çağır</li><li>Hesap İste</li><li>Talebin masa / alan bilgisiyle panele düşmesi</li><li>İşletme bazında aktif / pasif yönetim</li></ul><p>Garson Çağır + Hesap İste, Premium Plus avantajı değildir. Tüm Standart Restoran paketlerinin mevcut ortak özelliğidir.</p></article></div></div>`;
+    const block = wrap.firstElementChild;
+    if (!block) return;
+    if (special) packages.insertBefore(block, special); else if (rule) rule.insertAdjacentElement('afterend', block); else packages.append(block);
+  };
+
+  const ensurePremiumPlusRoadmapV160 = () => {
+    if (!document.querySelector('.nfc-platform-hero')) return;
+    const html = `<section class="section-pad-sm shell reveal premium-plus-teaser" id="premium-plus" aria-labelledby="premium-plus-title"><div class="premium-plus-shell"><div class="premium-plus-head"><div class="premium-plus-copy"><p class="eyebrow">YAKINDA</p><h2 id="premium-plus-title">Premium Plus</h2><p>Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ile Garson Çağır + Hesap İste özellikleri tüm Standart Restoran paketlerinde devam eder.</p><p>Premium Plus bunların üzerine doğrudan masa siparişi, Akıllı Misafir Profili ve CRM, sadakat sistemi, rezervasyon / masa yönetimi ve AI destekli müşteri deneyimi araçlarını ekleyen gelişmiş üst katman olarak konumlandırılacaktır.</p></div><div class="premium-plus-state" aria-label="Premium Plus ürün durumu"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div></div><div class="premium-plus-roadmap-head"><div><p class="eyebrow">YAKINDA GELECEK ÖZELLİKLER</p><h3>Restoran deneyiminin bir sonraki katmanı.</h3></div><p>Özellik başlığına tıklayarak planlanan kapsamın ayrıntısını görebilirsin.</p></div><div class="premium-plus-grid">
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">01</span><div><h4>NFC dijital menüden masaya doğrudan sipariş oluşturma</h4><p>Müşteri, Akıllı Menü üzerinden seçimini doğrudan bulunduğu masadan iletebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri Akıllı Menü içerisinden ürünlerini seçerek siparişi doğrudan bulunduğu masadan işletmeye iletebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">02</span><div><h4>Soğansız gibi müşteri notlarını masa siparişine ekleme</h4><p>Siparişe ürün tercihi ve özel talepler eklenebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri siparişine:</p><ul><li>Soğansız</li><li>Acısız</li><li>Buzsuz</li><li>Ekstra sos</li><li>Pişirme tercihi</li><li>veya özel not</li></ul><p>gibi talepler ekleyebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">03</span><div><h4>Akıllı Misafir Profili ve CRM</h4><p>İzinli müşteri ilişkileri tek misafir profili altyapısında yönetilebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletmenin izinli müşteri ilişkilerini tek noktada yönetebilmesini sağlayacak gelişmiş misafir profili altyapısı.</p><p>Sistem ileride ziyaret geçmişi, müşteri tercihleri ve işletmeyle olan etkileşimleri kullanarak daha kişiselleştirilmiş müşteri deneyimi sunabilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">04</span><div><h4>Sadakat, puan ve ziyaret ödülleri</h4><p>İşletme kendi sadakat ve ziyaret ödülü kurgusunu yönetebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletmeler kendi sadakat sistemlerini oluşturabilecek.</p><p>Örnek kullanım:</p><ul><li>5 ziyaret sonrası ödül</li><li>10 ziyaret sonrası özel avantaj</li><li>Puan biriktirme</li><li>Ziyaret bazlı ödül</li><li>İşletmeye özel kampanya veya ayrıcalık</li></ul></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">05</span><div><h4>VIP ve tekrar gelen misafir tanıma</h4><p>İzinli kullanıcılar üzerinden tekrar gelen misafirler ayrıştırılabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Sistem izinli kullanıcılar üzerinden tekrar gelen misafirleri tanıyabilecek.</p><p>Örnek segmentler:</p><ul><li>İlk kez gelen</li><li>Tekrar gelen</li><li>Sadık misafir</li><li>VIP misafir</li></ul></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">06</span><div><h4>Otomatik segmentler ve geri kazanım</h4><p>Davranışlara göre müşteri segmentleri ve geri kazanım grupları tanımlanabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletme müşterileri davranışlarına göre segmentleyebilecek.</p><p>Örnekler:</p><ul><li>30 gündür ziyaret etmeyen müşteriler</li><li>3 veya daha fazla kez gelen müşteriler</li><li>VIP müşteriler</li><li>Yüksek memnuniyet bırakan müşteriler</li><li>Geri kazanılması hedeflenen müşteriler</li></ul><p>Bu segmentler gelecekte işletmeye özel kampanya ve müşteri geri kazanım akışlarında kullanılabilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">07</span><div><h4>Rezervasyon, bekleme listesi ve masa yönetimi</h4><p>Ön salon ve masa operasyonları tek akışta yönetilebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Premium Plus kapsamında gelecekte:</p><ul><li>Online rezervasyon</li><li>Walk-in müşteri kaydı</li><li>Dijital bekleme listesi</li><li>Rezervasyon durumu</li><li>Masa hazır bilgisi</li><li>Müşterinin masaya alınması</li><li>Rezervasyon tamamlandı / gelmedi durumu</li></ul><p>gibi ön salon ve masa operasyon araçları geliştirilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">08</span><div><h4>AI ürün eşleştirme ve akıllı upsell</h4><p>Akıllı Menü seçilen ürüne göre tamamlayıcı öneriler sunabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Akıllı Menü müşterinin seçtiği ürüne göre tamamlayıcı ürünler önerebilecek.</p><p>Örnek:</p><ul><li>“Bu ürünle birlikte en çok tercih edilenler”</li><li>“Şefin önerisi”</li><li>“Menünü tamamla”</li><li>“Ana yemeğinin yanında bunu da deneyebilirsin”</li></ul><p>İşletme gerektiğinde öneri ilişkilerini manuel olarak da yönetebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">09</span><div><h4>AI günlük yönetici özeti</h4><p>İşletme verileri sade günlük özet ve kısa aksiyon önerilerine dönüşebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Sistem işletme verilerini sade bir günlük özet halinde yöneticinin önüne getirebilecek.</p><p>Örnek:</p><ul><li>Bugünkü NFC etkileşimleri</li><li>Yeni müşteri değerlendirmeleri</li><li>Google performansındaki değişimler</li><li>Memnuniyet kategorilerindeki yükseliş / düşüşler</li><li>Yoğun etkileşim alanları</li><li>Tekrar gelen misafirler</li><li>Dikkat edilmesi gereken müşteri deneyimi sinyalleri</li></ul><p>ve bunlara göre kısa aksiyon önerileri.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">10</span><div><h4>Gelişmiş modüllerde öncelikli erişim</h4><p>Yeni CRM, sadakat, rezervasyon ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Premium Plus kullanıcıları gelecekte geliştirilecek ileri seviye CRM, sadakat, rezervasyon, müşteri deneyimi ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div></details>
+</div><div class="premium-plus-note-group"><p class="premium-plus-note"><strong>Premium Plus mevcut paket özelliklerini yeniden paketlemez.</strong> Garson Çağır + Hesap İste zaten tüm Standart Restoran paketlerinin mevcut kapsamındadır. Premium Plus; NFC menüden doğrudan sipariş, müşteri sipariş notları, Akıllı Misafir Profili ve CRM, sadakat ve ziyaret ödülleri, VIP / tekrar gelen misafir tanıma, otomatik müşteri segmentleri, geri kazanım kampanyaları, rezervasyon ve dijital bekleme listesi, AI ürün önerileri ve AI yönetici özetleri için geliştirilen ayrı bir üst katmandır.</p><p class="premium-plus-release-note">Çıkış tarihi, kesin özellik kapsamı ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="premium-plus-footer"><span class="premium-plus-follow">Premium Plus gelişmelerini takip et</span><span class="premium-plus-coming">YAKINDA</span></div></div></section>`;
+    const wrap = document.createElement('div'); wrap.innerHTML = html; const next = wrap.firstElementChild; if (!next) return;
+    const existing = document.querySelector('#premium-plus');
+    if (existing) existing.replaceWith(next); else document.querySelector('#hizli-stand')?.insertAdjacentElement('beforebegin', next);
+  };
+
   moveFieldReferencesFirst();
   ensureNfcStandSchematic();
   ensureReadyRestaurantCalculator();
+  ensureRestaurantCommonPlatformV160();
+  ensurePremiumPlusRoadmapV160();
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
     const base = numberOrNull(root.dataset.basePrice);
