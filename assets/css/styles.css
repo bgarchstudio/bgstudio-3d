@@ -941,3 +941,25 @@ main>.nfc-reference-first+.nfc-platform-hero{padding-top:76px}
   .nfc-capacity-selector-head{display:grid;gap:6px;align-items:start}.nfc-capacity-selector-head span{text-align:left}.nfc-capacity-chips{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.nfc-capacity-choice{padding:13px 10px;min-height:70px}.nfc-capacity-choice::after{top:8px;right:7px;font-size:.39rem}.nfc-capacity-choice span{font-size:.78rem!important}.nfc-capacity-choice small{font-size:.54rem}
   .nfc-config-options button small,.special-ready-options button small{padding-right:0}.nfc-config-options button::after,.special-ready-options button::after{position:static;grid-column:2;grid-row:2;justify-self:end;align-self:end}.nfc-config-total,.special-ready-total{grid-template-columns:1fr}.nfc-config-total small,.special-ready-total small{grid-column:1}.package-footnote.shell{margin:16px auto 34px;padding:0 18px}
 }
+
+
+/* V3.1.59 — NFC stand schematic sales block */
+.nfc-stand-schema{padding-top:12px;padding-bottom:92px}
+.nfc-stand-schema .shell{display:grid;gap:26px}
+.nfc-stand-schema-heading{align-items:end;margin-bottom:2px}
+.nfc-stand-schema-heading h2{max-width:780px}
+.nfc-stand-schema-figure{margin:0;position:relative;overflow:hidden;border:1px solid rgba(81,54,34,.18);border-radius:30px;background:#17120f;box-shadow:0 24px 70px rgba(54,34,20,.12);isolation:isolate}
+.nfc-stand-schema-figure img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}
+.nfc-stand-schema-figure:after{content:"Büyüt ve incele";right:18px;bottom:18px;background:rgba(20,15,12,.86);border:1px solid rgba(255,220,158,.3);color:#fff6e9;padding:9px 13px;font-size:.7rem;font-weight:800;letter-spacing:.035em}
+.nfc-stand-schema-figure figcaption{position:absolute;left:18px;bottom:18px;z-index:2;pointer-events:none}
+.nfc-stand-schema-figure figcaption span{display:inline-flex;padding:9px 12px;border-radius:999px;background:rgba(20,15,12,.82);border:1px solid rgba(255,255,255,.14);color:#fff6e9;font-size:.68rem;font-weight:750;backdrop-filter:blur(10px)}
+.nfc-stand-schema-points{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.nfc-stand-schema-points article{min-width:0;display:flex;gap:12px;align-items:flex-start;padding:17px 16px;border:1px solid var(--line);border-radius:18px;background:#fbf6ef}
+.nfc-stand-schema-points article>span{flex:0 0 auto;display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:var(--dark);color:#f3c77e;font-size:.61rem;font-weight:900}
+.nfc-stand-schema-points strong{display:block;font-size:.78rem;margin:1px 0 5px}
+.nfc-stand-schema-points p{margin:0;color:var(--ink-soft);font-size:.67rem;line-height:1.45}
+.nfc-stand-schema-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+main>.nfc-reference-first+.nfc-stand-schema{padding-top:0}
+main>.nfc-reference-first+.nfc-stand-schema+.nfc-platform-hero{padding-top:64px}
+@media(max-width:900px){.nfc-stand-schema-points{grid-template-columns:repeat(2,minmax(0,1fr))}.nfc-stand-schema-figure{border-radius:24px}}
+@media(max-width:620px){.nfc-stand-schema{padding-bottom:58px}.nfc-stand-schema .shell{gap:18px}.nfc-stand-schema-heading{gap:12px}.nfc-stand-schema-figure{border-radius:20px}.nfc-stand-schema-figure figcaption{left:10px;bottom:10px}.nfc-stand-schema-figure figcaption span{font-size:.58rem;padding:7px 9px}.nfc-stand-schema-figure:after{right:10px;bottom:10px;font-size:.56rem;padding:7px 9px}.nfc-stand-schema-points{grid-template-columns:1fr;gap:8px}.nfc-stand-schema-points article{padding:14px}.nfc-stand-schema-actions{display:grid;grid-template-columns:1fr}.nfc-stand-schema-actions a{width:100%;text-align:center}.nfc-stand-schema-actions .primary-cta{order:-1}}

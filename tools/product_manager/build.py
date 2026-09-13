@@ -934,7 +934,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.56'
+SITE_ASSET_VERSION = '3.1.59'
 
 def sync_site_asset_versions():
     """Bump shared site CSS/JS query strings in-place without replacing page content."""
@@ -1108,8 +1108,9 @@ def render_nfc_platform_sections(theme_overrides=None):
     ])
     feedback_topics = ''.join(f'<span>{x}</span>' for x in ['Yemek','Servis','Ekip','İçecek / Bar','Tavsiye'])
 
-    return f'''<!-- NFC_PLATFORM_V156_START -->
+    return f'''<!-- NFC_PLATFORM_V159_START -->
 <!-- NFC_REFERENCE_SLOT -->
+<section class="section-pad-sm nfc-stand-schema" id="stand-semasi" data-nfc-stand-schema><div class="shell reveal"><div class="split-title nfc-stand-schema-heading"><div><p class="eyebrow">STAND YAPISI</p><h2>Tek stand üzerinde tüm erişim noktaları.</h2></div><p>Logo, QR alanları, uygulama ikonları ve NFC temas bölgeleri işletmenize özel tasarlanır. Restoran sistemlerinde arka yüz her masa için numaralandırılabilir.</p></div><figure class="nfc-stand-schema-figure zoomable-media" tabindex="0" role="button" aria-label="BG Studio NFC stand şemasını büyüt"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması; işletmeye özel logo, menü, Google ve sosyal medya QR alanları, NFC temas bölgeleri ve arka yüzde masa numarası gösterimi" width="1254" height="1254" loading="lazy" decoding="async"><figcaption><span>Büyütmek için görsele dokun veya tıkla</span></figcaption></figure><div class="nfc-stand-schema-points"><article><span>01</span><div><strong>İşletmeye özel kimlik</strong><p>Logo ve fiziksel stand görünümü işletmeye göre hazırlanır.</p></div></article><article><span>02</span><div><strong>QR erişim alanları</strong><p>Menü, Google ve sosyal medya hedefleri QR ile de erişilebilir.</p></div></article><article><span>03</span><div><strong>NFC temas noktaları</strong><p>Telefonu temas alanına yaklaştıran misafir ilgili dijital hedefe geçer.</p></div></article><article><span>04</span><div><strong>Masa numaralı arka yüz</strong><p>Restoran kurulumunda her standın arka yüzü masa numarasına göre ayrıştırılabilir.</p></div></article></div><div class="nfc-stand-schema-actions"><a class="secondary-cta" href="#restoran-sistemleri">Paketleri incele ↓</a><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a></div></div></section>
 <section class="page-hero nfc-platform-hero"><div class="shell page-hero-grid reveal"><div><p class="eyebrow">BG STUDIO NFC İŞLETME PLATFORMU</p><h1>Bir etiketten fazlası. İşletmen için dijital altyapı.</h1><p class="lead">BG Studio NFC; işletmeye özel fiziksel standları, NFC ve isteğe bağlı QR erişimini, müşteri etkileşimlerini, dijital menüyü, değerlendirme akışını, analitikleri ve yönetim panelini tek altyapıda birleştirir.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a><a class="secondary-cta" href="#urun-aileleri">Çözümleri incele ↓</a></div></div><aside class="info-panel info-panel-dark nfc-platform-metrics"><p class="eyebrow">TEK SİSTEMDE</p><div class="metric-grid"><div class="metric"><strong>Fiziksel</strong><span>İşletmeye özel 3D stand</span></div><div class="metric"><strong>Dijital</strong><span>Menü, feedback ve bağlantılar</span></div><div class="metric"><strong>Panel</strong><span>İşletme müşteri paneli</span></div><div class="metric"><strong>Analitik</strong><span>Stand / masa bazlı performans</span></div></div></aside></div></section>
 <section class="tech-stage nfc-system-chain"><div class="shell reveal"><div class="split-title"><h2>Fiziksel temas noktasından işletme verisine.</h2><p>NFC veya QR yalnızca erişim katmanıdır. Hedef yönetimi, müşteri akışları, geri bildirim, analitik ve raporlama BG Studio NFC altyapısında devam eder.</p></div><div class="flow"><article class="flow-card"><span>01</span><h3>Özel 3D stand</h3><p>Logo, renk ve kullanım senaryosuna göre tasarlanır ve üretilir.</p></article><article class="flow-card"><span>02</span><h3>NFC / QR erişimi</h3><p>Bağımsız hedeflere veya işletme uygulamasına hızlı erişim sağlar.</p></article><article class="flow-card"><span>03</span><h3>Panel <span class="plain-amp">&amp;</span> otomasyon</h3><p>Menü, feedback, bildirim, bağlantı ve müşteri akışları yönetilir.</p></article><article class="flow-card"><span>04</span><h3>Analitik <span class="plain-amp">&amp;</span> rapor</h3><p>Kullanım ve performans verileri işletme bazında izlenir.</p></article></div></div></section>
 <section class="section-pad-sm shell reveal nfc-product-families" id="urun-aileleri"><div class="split-title nfc-family-heading"><div><p class="eyebrow">3 ANA İŞLETME ÇÖZÜMÜ</p><h2>İhtiyaca göre ayrı ürün sistemleri.</h2></div><p>Standart Restoran Sistemleri, Hızlı Bağlantı Standı ve Premium Feedback Duo birbirinin alt paketi değildir. Her biri farklı işletme ihtiyacına göre konumlanır.</p></div><div class="nfc-family-grid">
@@ -1145,13 +1146,13 @@ def render_nfc_platform_sections(theme_overrides=None):
 <section class="section-pad-sm shell reveal nfc-platform-block-wrap"><div class="nfc-platform-block"><div class="nfc-platform-title"><div><p class="eyebrow">BG STUDIO NFC YÖNETİM ALTYAPISI</p><h3>Fiziksel ürünün arkasında çalışan sistem.</h3></div><p>Çözüme göre özellik seti değişse de işletme paneli, uzaktan hedef yönetimi, analitik ve BG Studio yönetim altyapısı fiziksel standları dijital sisteme bağlar.</p></div><div class="nfc-infra-grid"><article class="nfc-infra-card"><span>01</span><h4>İşletme paneli</h4><p>Kullanım verileri, bildirimler, paket ve sistem durumları tek merkezde takip edilir.</p></article><article class="nfc-infra-card"><span>02</span><h4>Analitik</h4><p>Masa veya stand bazlı NFC / QR etkileşimleri çözüm tipine göre raporlanır.</p></article><article class="nfc-infra-card"><span>03</span><h4>Uzaktan hedef yönetimi</h4><p>Bağlantılar ve dijital hedefler fiziksel ürünü yeniden üretmeden yönetilebilir.</p></article><article class="nfc-infra-card"><span>04</span><h4>Özel tasarım ve üretim</h4><p>Standlar hazır pleksi üstüne etiket yapıştırılan ürünler değildir; tasarım ve 3D üretim işletmeye göre hazırlanır.</p></article></div></div>
 <div class="nfc-options"><div class="nfc-options-copy"><p class="eyebrow">OPSİYONEL HİZMETLER</p><h3>Çözümüne göre ekle.</h3><p>QR, Menü Tasarımı ve Logo Tasarımı paket hesabına ayrı eklenir. Restoran kartlarında seçimini yapıp toplamı anında görebilirsin.</p></div><div class="nfc-option-list nfc-option-list-three"><div><span>QR sistemi</span><strong>{money(qr_unit)} / QR</strong><small>Restoranlarda masa başına 3 QR · Hızlı Standda 3 QR</small></div><div><span>Menü Tasarımı</span><strong>{money(menu_design)}</strong><small>Türkçe + İngilizce görsel menü · 8 ek dilde dijital metin menü · ürün içerikleri · 14 alerjen bilgi katmanı · yaklaşık kalori</small></div><div><span>Logo Tasarımı</span><strong>{money(logo_design)}</strong><small>İşletmeye özel logo · fiziksel stand ve dijital menü kullanımına uyumlu</small></div></div></div></section>
 <p class="package-footnote shell">Fiyatlar {year} dönemindeki güncel website fiyat yapısını gösterir. İşletme kapsamı, adet ve özel anlaşmalara göre teklif ayrıca netleştirilebilir.</p>
-<!-- NFC_PLATFORM_V156_END -->'''
+<!-- NFC_PLATFORM_V159_END -->'''
 
 def rebuild_nfc_platform_sections(html_text, theme_overrides=None):
     """Replace public NFC platform/package copy without touching field references."""
     rendered = render_nfc_platform_sections(theme_overrides=theme_overrides)
     marker_pattern = re.compile(
-        r'<!--\s*NFC_PLATFORM_V(?:145|153|154|155|156)_START\s*-->.*?<!--\s*NFC_PLATFORM_V(?:145|153|154|155|156)_END\s*-->',
+        r'<!--\s*NFC_PLATFORM_V(?:145|153|154|155|156|159)_START\s*-->.*?<!--\s*NFC_PLATFORM_V(?:145|153|154|155|156|159)_END\s*-->',
         flags=re.I | re.S,
     )
     if marker_pattern.search(html_text):
@@ -1192,7 +1193,7 @@ def render_nfc_reference_section(cards_html):
 def rebuild_nfc_reference_section(html_text, cards_html):
     """Rebuild public NFC field references as the first content block of the NFC page.
 
-    V3.1.56 keeps proof-of-work as the first content block of the NFC page. The platform renderer
+    V3.1.59 keeps proof-of-work as the first content block of the NFC page. The platform renderer
     recreates a dedicated slot on every build, so stale pages cannot push the
     managed reference cards back to the bottom.
     """

@@ -576,7 +576,7 @@ if (backToTop) {
   backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// V3.1.56 — NFC references-first + public restaurant live calculators.
+// V3.1.59 — NFC references-first + stand schematic + public restaurant live calculators.
 // Runtime compatibility is intentional: copying this repo-safe patch is enough even
 // before Product Manager rebuilds the managed NFC page HTML.
 (() => {
@@ -599,7 +599,7 @@ if (backToTop) {
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.56') { url.searchParams.set('v', '3.1.56'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.59') { url.searchParams.set('v', '3.1.59'); link.href = url.toString(); }
     } catch (_) {}
   });
 
@@ -621,6 +621,33 @@ if (backToTop) {
     if (!referenceSection) return;
     referenceSection.classList.add('nfc-reference-first');
     if (main.firstElementChild !== referenceSection) main.insertBefore(referenceSection, main.firstElementChild);
+  };
+
+  const ensureNfcStandSchematic = () => {
+    if (!document.querySelector('.nfc-platform-hero') || document.querySelector('[data-nfc-stand-schema]')) return;
+    const refs = document.querySelector('main > .nfc-reference-first') || [...document.querySelectorAll('main section')].find(section => section.querySelector('h2')?.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.');
+    const hero = document.querySelector('.nfc-platform-hero');
+    if (!hero) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<section class="section-pad-sm nfc-stand-schema" id="stand-semasi" data-nfc-stand-schema><div class="shell reveal"><div class="split-title nfc-stand-schema-heading"><div><p class="eyebrow">STAND YAPISI</p><h2>Tek stand üzerinde tüm erişim noktaları.</h2></div><p>Logo, QR alanları, uygulama ikonları ve NFC temas bölgeleri işletmenize özel tasarlanır. Restoran sistemlerinde arka yüz her masa için numaralandırılabilir.</p></div><figure class="nfc-stand-schema-figure zoomable-media" tabindex="0" role="button" aria-label="BG Studio NFC stand şemasını büyüt"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması; işletmeye özel logo, menü, Google ve sosyal medya QR alanları, NFC temas bölgeleri ve arka yüzde masa numarası gösterimi" width="1254" height="1254" loading="lazy" decoding="async"><figcaption><span>Büyütmek için görsele dokun veya tıkla</span></figcaption></figure><div class="nfc-stand-schema-points"><article><span>01</span><div><strong>İşletmeye özel kimlik</strong><p>Logo ve fiziksel stand görünümü işletmeye göre hazırlanır.</p></div></article><article><span>02</span><div><strong>QR erişim alanları</strong><p>Menü, Google ve sosyal medya hedefleri QR ile de erişilebilir.</p></div></article><article><span>03</span><div><strong>NFC temas noktaları</strong><p>Telefonu temas alanına yaklaştıran misafir ilgili dijital hedefe geçer.</p></div></article><article><span>04</span><div><strong>Masa numaralı arka yüz</strong><p>Restoran kurulumunda her standın arka yüzü masa numarasına göre ayrıştırılabilir.</p></div></article></div><div class="nfc-stand-schema-actions"><a class="secondary-cta" href="#restoran-sistemleri">Paketleri incele ↓</a><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a></div></div></section>`;
+    const schema = wrap.firstElementChild;
+    if (!schema) return;
+    if (refs && refs.parentNode) refs.insertAdjacentElement('afterend', schema); else hero.insertAdjacentElement('beforebegin', schema);
+    const media = schema.querySelector('.zoomable-media');
+    if (media) {
+      const openRuntimeLightbox = () => {
+        const source = media.querySelector('img'); if (!source) return;
+        let box = document.querySelector('.image-lightbox');
+        if (!box) {
+          box = document.createElement('div'); box.className='image-lightbox'; box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('aria-label','Stand şeması görseli'); box.hidden=true;
+          const image=document.createElement('img'); image.alt=''; const close=document.createElement('button'); close.type='button'; close.setAttribute('aria-label','Görseli kapat'); close.textContent='×'; box.append(image,close); document.body.append(box);
+          const closeBox=()=>{box.classList.remove('open');box.hidden=true;document.body.style.overflow='';}; close.addEventListener('click',closeBox); box.addEventListener('click',e=>{if(e.target===box)closeBox();}); document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!box.hidden)closeBox();});
+        }
+        const image=box.querySelector('img'); if(!image)return; image.src=source.currentSrc||source.src; image.alt=source.alt||'BG Studio NFC stand şeması'; box.hidden=false; requestAnimationFrame(()=>box.classList.add('open')); document.body.style.overflow='hidden'; box.querySelector('button')?.focus();
+      };
+      media.addEventListener('click', openRuntimeLightbox);
+      media.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();openRuntimeLightbox();} });
+    }
   };
 
   const ensureReadyRestaurantCalculator = () => {
@@ -661,6 +688,7 @@ if (backToTop) {
   };
 
   moveFieldReferencesFirst();
+  ensureNfcStandSchematic();
   ensureReadyRestaurantCalculator();
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
