@@ -1725,5 +1725,50 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "seo_title": "Diş Fırçası & Diş Macunu Standı | Kuşadası 3D Baskı | BG Studio 3D",
+    "active": true,
+    "sort_order": 38,
+    "sale_price_value": null,
+    "description": "Diş fırçaları ve diş macununu lavabo çevresinde düzenli tutmak için tasarlanan banyo standı. Üst bölümde 3 ayrı diş fırçası yuvası, yan bölümde ise diş macunu için özel hazne bulunur.\n\nSuya dayanıklı PETG malzemeden üretilen gövdesi, banyo ve lavabo çevresindeki neme karşı daha uygun bir yapı sunar. Tek parçada günlük bakım ürünlerini bir araya getirerek tezgâhtaki dağınıklığı azaltır.\n\nDiş fırçaları ve diş macunu ürüne dahil değildir.",
+    "featured": false,
+    "price_value": "349",
+    "pricing_tiers": [],
+    "seo_description": "3 diş fırçası ve 1 diş macununu düzenleyen suya dayanıklı PETG banyo standı. Lavabo çevresi için kompakt 3D baskı tasarım.",
+    "price_text": "349 TL",
+    "slug": "3-lu-dis-fircasi-dis-macunu-standi",
+    "card_description": "3 diş fırçası ve 1 diş macununu tek noktada düzenleyen, suya dayanıklı PETG malzemeden üretilen banyo standı.",
+    "features": [
+      "3 diş fırçası kapasitesi",
+      "Diş macunu için ayrı hazne",
+      "Suya dayanıklı PETG malzeme",
+      "Banyo ve lavabo tezgahına uygun",
+      "Kompakt düzenleyici tasarım",
+      "Tek noktada düzen",
+      "3D baskı üretim"
+    ],
+    "name": "3'lü Diş Fırçası & Diş Macunu Standı",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "production_note": "Ürün suya dayanıklı PETG filament ile 3D baskı yöntemiyle üretilir. 3 diş fırçası ve 1 diş macunu için tasarlanmıştır. Diş fırçası ve diş macunu pakete dahil değildir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "category": "ev-duzen",
+    "tags": [
+      "Banyo",
+      "Diş Fırçası Standı",
+      "Diş Macunu Standı",
+      "Banyo Organizeri",
+      "PETG",
+      "Suya Dayanıklı",
+      "3'lü Diş Fırçası",
+      "Lavabo Düzeni"
+    ],
+    "options": [],
+    "gallery_images": [],
+    "main_image": "assets/images/products/3-lu-dis-fircasi-dis-macunu-standi.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
