@@ -1,4 +1,4 @@
-/* BG Studio 3D Product Manager UI v3.1.69 */
+/* BG Studio 3D Product Manager UI v3.1.69-R2 */
 const $=id=>document.getElementById(id);
 const standardDefs=[
   ['baslangic','Başlangıç','10 masa · 30 NFC'],
@@ -7,7 +7,7 @@ const standardDefs=[
 ];
 const feedbackCaps=[10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120];
 const specialRestaurantCaps=[25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120];
-const mediaDefs={restaurant_packages:{label:'Standart Restoran Sistemleri',defaultTheme:'light'},quick_stand:{label:'Hızlı Bağlantı Standı',defaultTheme:'light'},feedback_duo:{label:'Premium Feedback Duo',defaultTheme:'dark'}};
+const mediaDefs={restaurant_packages:{label:'Standart Restoran Sistemleri',defaultTheme:'light'},quick_stand:{label:'Hızlı Bağlantı Standı',defaultTheme:'light'},feedback_duo:{label:'Premium Feedback Duo',defaultTheme:'dark'},premium_plus:{label:'Premium Plus',defaultTheme:'dark',themeOnly:true}};
 let data=null;
 const pendingMedia={};
 const clearMedia=new Set();
@@ -37,7 +37,7 @@ function renderYear(year,yearData){
   return card;
 }
 function mediaUrl(rel){return rel?'/'+String(rel).replace(/^\/+/, '')+'?v='+Date.now():''}
-function renderMedia(){document.querySelectorAll('[data-media-key]').forEach(card=>{const key=card.dataset.mediaKey;const preview=card.querySelector('[data-media-preview]');const state=card.querySelector('[data-media-state]');const themeSelect=card.querySelector('[data-media-theme]');if(!data.nfc_media[key])data.nfc_media[key]={image:'',theme:mediaDefs[key].defaultTheme};const pending=pendingMedia[key];const currentRow=data?.nfc_media?.[key]||{};const current=currentRow.image||'';const theme=currentRow.theme||mediaDefs[key].defaultTheme;if(themeSelect)themeSelect.value=theme==='dark'?'dark':'light';preview.innerHTML='';if(pending?.data){const img=new Image();img.src=pending.data;img.alt=mediaDefs[key].label;preview.append(img);state.textContent='Yeni görsel hazır · kaydedilmeyi bekliyor.'}else if(!clearMedia.has(key)&&current){const img=new Image();img.src=mediaUrl(current);img.alt=mediaDefs[key].label;preview.append(img);state.textContent='Kayıtlı görsel yayında.'}else{const span=document.createElement('span');span.textContent=mediaDefs[key].label+' görseli yok';preview.append(span);state.textContent=clearMedia.has(key)?'Görsel kaldırılacak · kaydetmeyi bekliyor.':'Henüz görsel yüklenmedi.'}})}
+function renderMedia(){document.querySelectorAll('[data-media-key]').forEach(card=>{const key=card.dataset.mediaKey;const def=mediaDefs[key]||{label:key,defaultTheme:'light'};const preview=card.querySelector('[data-media-preview]');const state=card.querySelector('[data-media-state]');const themeSelect=card.querySelector('[data-media-theme]');if(!data.nfc_media[key])data.nfc_media[key]={image:'',theme:def.defaultTheme};const pending=pendingMedia[key];const currentRow=data?.nfc_media?.[key]||{};const current=currentRow.image||'';const theme=currentRow.theme||def.defaultTheme;card.dataset.tone=theme==='dark'?'dark':'light';if(themeSelect)themeSelect.value=theme==='dark'?'dark':'light';if(def.themeOnly){state.textContent='Kart ve yol haritası tonu kayıtlı.';return}preview.innerHTML='';if(pending?.data){const img=new Image();img.src=pending.data;img.alt=def.label;preview.append(img);state.textContent='Yeni görsel hazır · kaydedilmeyi bekliyor.'}else if(!clearMedia.has(key)&&current){const img=new Image();img.src=mediaUrl(current);img.alt=def.label;preview.append(img);state.textContent='Kayıtlı görsel yayında.'}else{const span=document.createElement('span');span.textContent=def.label+' görseli yok';preview.append(span);state.textContent=clearMedia.has(key)?'Görsel kaldırılacak · kaydetmeyi bekliyor.':'Henüz görsel yüklenmedi.'}})}
 function render(){$('activeYear').value=data.nfc_site.active_year||'2026';const years=$('years');years.innerHTML='';['2026','2027'].forEach(y=>years.append(renderYear(y,data.nfc_site.years[y])));$('catalogIntro').value=data.website_copy?.catalog_intro||'';updateCount();renderMedia()}
 function updateLiveBadges(){document.querySelectorAll('[data-year-card]').forEach(card=>{const live=card.dataset.yearCard===$('activeYear').value;const s=card.querySelector('.status');s.classList.toggle('live',live);s.textContent=live?'Websitesinde aktif':'Hazır bekliyor'})}
 function collect(){

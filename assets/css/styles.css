@@ -1747,3 +1747,37 @@ html.home-motion-ready .home-motion.is-in-view{opacity:1;transform:none}
 .list-filters .catalog-personalizable-list-filter.active .catalog-admin-filter-count{background:rgba(255,255,255,.17);color:inherit}
 @media(max-width:900px){.project-index-grid{grid-template-columns:1fr!important}.project-index-card,.project-index-card:nth-child(3n+1),.project-index-card:nth-child(3n+2){grid-column:auto!important}.project-detail-grid{grid-template-columns:1fr!important}.project-detail-media{max-width:none!important;width:100%}}
 @media(max-width:700px){.project-index-stat{min-height:170px}.project-detail-copy h1{font-size:clamp(3rem,15vw,4.25rem)!important}}
+
+
+/* V3.1.69-R2 · NFC family tone manager + Premium Plus contrast */
+.nfc-solution-card[data-family-theme="light"]{background:#fbf4eb;color:#2c1c12;border-color:rgba(91,61,39,.14)}
+.nfc-solution-card[data-family-theme="light"] .nfc-solution-meta b,.nfc-solution-card[data-family-theme="light"] p,.nfc-solution-card[data-family-theme="light"] li{color:#725d4a}
+.nfc-solution-card[data-family-theme="dark"]{background:#18130f;color:#fff7ee;border-color:rgba(215,166,110,.28)}
+.nfc-solution-card[data-family-theme="dark"] h3{color:#fff8ef}
+.nfc-solution-card[data-family-theme="dark"] p,.nfc-solution-card[data-family-theme="dark"] li,.nfc-solution-card[data-family-theme="dark"] .nfc-solution-meta b{color:#d6c7ba}
+.nfc-solution-card[data-family-theme="dark"] .secondary-cta,.nfc-solution-card[data-family-theme="dark"] .ghost-cta{color:#fff7ee;border-color:rgba(255,255,255,.22)}
+.nfc-solution-premium-plus[data-family-theme="dark"]{background:linear-gradient(145deg,#2b1d14,#120f0c)}
+.nfc-solution-premium-plus[data-family-theme="dark"] .nfc-premium-plus-visual{background:linear-gradient(145deg,#3a2719,#17110d);color:#fff7ed}
+.nfc-solution-premium-plus[data-family-theme="dark"] .nfc-solution-card-body{background:rgba(12,9,7,.22)}
+.nfc-solution-premium-plus[data-family-theme="dark"] h3{color:#fff9f1}
+.nfc-solution-premium-plus[data-family-theme="dark"] p,.nfc-solution-premium-plus[data-family-theme="dark"] li,.nfc-solution-premium-plus[data-family-theme="dark"] .nfc-solution-meta b{color:#dfd0c1!important}
+.nfc-solution-premium-plus[data-family-theme="dark"] .ghost-cta{color:#f5c78c!important;border-color:rgba(229,177,111,.38)!important;background:rgba(229,177,111,.08)}
+.nfc-solution-premium-plus[data-family-theme="light"]{background:#fbf4eb;color:#2c1c12;border-color:rgba(91,61,39,.15)}
+.nfc-solution-premium-plus[data-family-theme="light"] .nfc-premium-plus-visual{background:linear-gradient(145deg,#efe0cf,#dfc6ab);color:#2c1c12}
+.nfc-solution-premium-plus[data-family-theme="light"] .nfc-premium-plus-visual span{color:#7b4e1e;border-color:rgba(123,78,30,.3)}
+.nfc-solution-premium-plus[data-family-theme="light"] .nfc-solution-card-body{border-top-color:rgba(91,61,39,.12)}
+.nfc-solution-premium-plus[data-family-theme="light"] p,.nfc-solution-premium-plus[data-family-theme="light"] li,.nfc-solution-premium-plus[data-family-theme="light"] .nfc-solution-meta b{color:#715b48!important}
+.nfc-solution-premium-plus[data-family-theme="light"] .ghost-cta{color:#2c1c12!important;border-color:rgba(91,61,39,.18)!important;background:#f4e7d8}
+.nfc-premium-plus-page-hero.theme-dark{background:linear-gradient(145deg,#241810,#100d0a);color:#fff8ef}
+.nfc-premium-plus-page-hero.theme-dark .lead,.nfc-premium-plus-page-hero.theme-dark .premium-plus-state small{color:#dac9bb}
+.nfc-premium-plus-roadmap.theme-dark{background:#17110d;border-radius:28px;padding:clamp(26px,4vw,50px);color:#fff8ef}
+.nfc-premium-plus-roadmap.theme-dark .split-title>p{color:#d7c8ba}
+.nfc-premium-plus-roadmap.theme-dark .nfc-premium-roadmap-grid article{background:#211812;border-color:rgba(215,166,110,.22)}
+.nfc-premium-plus-roadmap.theme-dark .nfc-premium-roadmap-grid h3{color:#fff8ef}
+.nfc-premium-plus-roadmap.theme-dark .nfc-premium-roadmap-grid p{color:#d4c5b8}
+.nfc-premium-plus-roadmap.theme-dark .premium-plus-note{color:#d7c8bc;background:rgba(215,166,110,.09);border-color:rgba(215,166,110,.24)}
+.nfc-premium-plus-roadmap.theme-dark .premium-plus-note strong{color:#f1c78f}
+.nfc-premium-plus-roadmap.theme-dark .premium-plus-release-note{color:#d9cbbb;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}
+.nfc-premium-plus-roadmap.theme-dark .nfc-page-cta{border-color:rgba(215,166,110,.2);background:#211812}
+.nfc-premium-plus-roadmap.theme-dark .nfc-page-cta h3{color:#fff8ef}
+.nfc-premium-plus-roadmap.theme-light{background:transparent;color:inherit}

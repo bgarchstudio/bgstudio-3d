@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.69'
-CATALOG_ADMIN_REVISION = '3.1.69-r1'
+PANEL_VERSION = '3.1.69-R2'
+CATALOG_ADMIN_REVISION = '3.1.69-r2'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -367,12 +367,15 @@ NFC_MEDIA_DEFAULTS = {
     'feedback_duo': {'image': '', 'theme': 'dark'},
     'restaurant_packages': {'image': '', 'theme': 'light'},
     'quick_stand': {'image': '', 'theme': 'light'},
+    # Theme-only family. Premium Plus keeps its typographic visual instead of a product image.
+    'premium_plus': {'image': '', 'theme': 'dark'},
 }
 
 NFC_FAMILY_THEME_DEFAULTS = {
     'feedback_duo': 'dark',
     'restaurant_packages': 'light',
     'quick_stand': 'light',
+    'premium_plus': 'dark',
 }
 
 
@@ -421,26 +424,21 @@ def overlay_nfc_family_themes(settings, persist=True):
 
 
 def _repair_nfc_media_from_files(settings, persist=False):
-    """Self-heal NFC showcase image pointers from their fixed repo files.
-
-    V3.1.48: if an older storage schema or restart loses only the nfc_media
-    pointer, the uploaded WebP itself remains authoritative and is reattached.
-    """
+    """Self-heal NFC showcase image pointers and keep theme-only families intact."""
     settings = dict(settings) if isinstance(settings, dict) else {}
     media_in = settings.get('nfc_media') if isinstance(settings.get('nfc_media'), dict) else {}
     media = {}
     changed = False
-    for key, rel in NFC_MEDIA_FIXED_PATHS.items():
+    for key, default_row in NFC_MEDIA_DEFAULTS.items():
         row = media_in.get(key) if isinstance(media_in.get(key), dict) else {}
+        rel = NFC_MEDIA_FIXED_PATHS.get(key)
         raw = str(row.get('image') or '').replace('\\', '/').lstrip('/')
-        file_exists = (ROOT / rel).is_file()
-        if file_exists:
-            image = rel
-        else:
-            image = ''
-        if raw != image:
-            changed = True
-        default_theme = str((NFC_MEDIA_DEFAULTS.get(key) or {}).get('theme') or 'light').lower()
+        image = ''
+        if rel:
+            image = rel if (ROOT / rel).is_file() else ''
+            if raw != image:
+                changed = True
+        default_theme = str(default_row.get('theme') or 'light').lower()
         theme = 'dark' if str(row.get('theme') or default_theme).strip().lower() == 'dark' else 'light'
         if str((row or {}).get('theme') or '').strip().lower() != theme:
             changed = True
@@ -561,6 +559,7 @@ def default_site_settings():
             'feedback_duo': {'image': '', 'theme': 'dark'},
             'restaurant_packages': {'image': '', 'theme': 'light'},
             'quick_stand': {'image': '', 'theme': 'light'},
+            'premium_plus': {'image': '', 'theme': 'dark'},
         },
     }
 
@@ -829,16 +828,18 @@ def clean_nfc_media_settings(value, current=None):
     defaults = default_site_settings()['nfc_media']
     current = current if isinstance(current, dict) else defaults
     incoming = value if isinstance(value, dict) else {}
-    fixed_paths = NFC_MEDIA_FIXED_PATHS
     out = {}
-    for key, fixed in fixed_paths.items():
+    for key, default_row in defaults.items():
         current_row = current.get(key) if isinstance(current.get(key), dict) else {}
         incoming_row = incoming.get(key) if isinstance(incoming.get(key), dict) else current_row
-        image = str(incoming_row.get('image') or '').replace('\\', '/').lstrip('/')
-        theme_default = str((defaults.get(key) or {}).get('theme') or 'light').lower()
+        theme_default = str(default_row.get('theme') or 'light').lower()
         theme = 'dark' if str(incoming_row.get('theme') or current_row.get('theme') or theme_default).strip().lower() == 'dark' else 'light'
-        # NFC showcase images always live at fixed, repo-safe paths.
-        out[key] = {'image': fixed if image == fixed else '', 'theme': theme}
+        fixed = NFC_MEDIA_FIXED_PATHS.get(key)
+        image = ''
+        if fixed:
+            raw = str(incoming_row.get('image') or '').replace('\\', '/').lstrip('/')
+            image = fixed if raw == fixed else ''
+        out[key] = {'image': image, 'theme': theme}
     return out
 
 
@@ -954,7 +955,7 @@ def _public_nfc_family_theme(key):
 
 def save_nfc_family_theme(key, theme):
     key = str(key or '').strip()
-    if key not in NFC_MEDIA_FIXED_PATHS:
+    if key not in NFC_FAMILY_THEME_DEFAULTS:
         raise ValueError('Geçersiz NFC ürün ailesi.')
     theme = 'dark' if str(theme or '').strip().lower() == 'dark' else 'light'
 
@@ -970,10 +971,10 @@ def save_nfc_family_theme(key, theme):
     current = read_site_settings()
     settings = dict(current)
     current_media = current.get('nfc_media') if isinstance(current.get('nfc_media'), dict) else {}
-    media = {k: dict(current_media.get(k) or {}) for k in NFC_MEDIA_FIXED_PATHS}
+    media = {k: dict(current_media.get(k) or {}) for k in NFC_FAMILY_THEME_DEFAULTS}
     row = media.get(key) or {}
-    rel = NFC_MEDIA_FIXED_PATHS[key]
-    image = rel if (ROOT / rel).is_file() else str(row.get('image') or '')
+    rel = NFC_MEDIA_FIXED_PATHS.get(key)
+    image = (rel if rel and (ROOT / rel).is_file() else str(row.get('image') or '')) if rel else ''
     media[key] = {'image': image, 'theme': theme}
     settings['nfc_media'] = media
     set_collection('site_settings', settings)
@@ -1707,6 +1708,7 @@ class Handler(BaseHTTPRequestHandler):
                     'feedback_duo': 'Premium Feedback Duo',
                     'restaurant_packages': 'Standart Restoran Paketleri',
                     'quick_stand': 'Hızlı Bağlantı Standı',
+                    'premium_plus': 'Premium Plus',
                 }
                 tone = 'Koyu' if result.get('verified_theme') == 'dark' else 'Açık'
                 return self.send_json({'ok': True, 'message': f'{labels.get(key, key)} · {tone} kart tonu kaydedildi ve build doğrulandı.', 'nfc_media': settings.get('nfc_media'), 'result': result})
@@ -1739,6 +1741,14 @@ class Handler(BaseHTTPRequestHandler):
                         save_data_uri(image.get('data'), ROOT / rel)
                         image_value = rel
                     media[key] = {'image': image_value, 'theme': theme}
+                # Preserve theme-only NFC families such as Premium Plus.
+                for key, default_theme_value in NFC_FAMILY_THEME_DEFAULTS.items():
+                    if key in media:
+                        continue
+                    current_row = current_media.get(key) if isinstance(current_media.get(key), dict) else {}
+                    incoming_row = incoming_media.get(key) if isinstance(incoming_media.get(key), dict) else {}
+                    theme = 'dark' if str(incoming_row.get('theme') or current_row.get('theme') or default_theme_value).strip().lower() == 'dark' else 'light'
+                    media[key] = {'image': '', 'theme': theme}
                 merged['nfc_media'] = media
 
                 settings = write_site_settings(merged)

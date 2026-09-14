@@ -256,6 +256,7 @@ def default_nfc_media_settings():
         'feedback_duo': {'image': '', 'theme': 'dark'},
         'restaurant_packages': {'image': '', 'theme': 'light'},
         'quick_stand': {'image': '', 'theme': 'light'},
+        'premium_plus': {'image': '', 'theme': 'dark'},
     }
 
 
@@ -264,6 +265,7 @@ def default_nfc_family_themes():
         'feedback_duo': 'dark',
         'restaurant_packages': 'light',
         'quick_stand': 'light',
+        'premium_plus': 'dark',
     }
 
 
@@ -288,15 +290,17 @@ def nfc_media_settings():
         'quick_stand': 'assets/images/nfc/products/quick-stand.webp',
     }
     out = {}
-    for key, fixed in fixed_paths.items():
+    for key, default_row in default_nfc_media_settings().items():
         row = incoming.get(key) if isinstance(incoming.get(key), dict) else {}
-        image = str(row.get('image') or '').replace('\\', '/').lstrip('/')
-        # V3.1.48 self-heal: fixed uploaded file wins if the DB pointer was lost.
-        if (ROOT / fixed).is_file():
-            image = fixed
-        elif not image or not (ROOT / image).is_file():
-            image = ''
-        default_theme = str((default_nfc_media_settings().get(key) or {}).get('theme') or 'light').lower()
+        image = ''
+        fixed = fixed_paths.get(key)
+        if fixed:
+            raw = str(row.get('image') or '').replace('\\', '/').lstrip('/')
+            if (ROOT / fixed).is_file():
+                image = fixed
+            elif raw and (ROOT / raw).is_file():
+                image = raw
+        default_theme = str(default_row.get('theme') or 'light').lower()
         theme = 'dark' if str(row.get('theme') or default_theme).strip().lower() == 'dark' else 'light'
         out[key] = {'image': image, 'theme': theme}
     return out
@@ -1252,7 +1256,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.69-r1'
+SITE_ASSET_VERSION = '3.1.69-r2'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1957,10 +1961,19 @@ def render_nfc_platform_sections(theme_overrides=None):
     restaurant_media = render_nfc_family_media('restaurant_packages', 'Restoran sistemleri', 'BG Studio NFC restoran sistemleri')
     quick_media = render_nfc_family_media('quick_stand', 'Hızlı Bağlantı Standı', 'BG Studio NFC Hızlı Bağlantı Standı')
     feedback_media = render_nfc_family_media('feedback_duo', 'Premium Feedback', 'BG Studio NFC Premium Feedback Duo ve Trio')
+    saved_themes = nfc_family_theme_settings()
+    theme_overrides = theme_overrides if isinstance(theme_overrides, dict) else {}
+    def family_theme(key, fallback='light'):
+        value = str(theme_overrides.get(key) or saved_themes.get(key) or fallback).strip().lower()
+        return 'dark' if value == 'dark' else 'light'
+    restaurant_theme = family_theme('restaurant_packages', 'light')
+    quick_theme = family_theme('quick_stand', 'light')
+    feedback_theme = family_theme('feedback_duo', 'dark')
+    premium_plus_theme = family_theme('premium_plus', 'dark')
     capacity_preview = _nfc_v3167_capacity_calculator(pricing, offer_prefix='../')
     return f'''<!-- NFC_PLATFORM_V167_START -->
 <section class="page-hero nfc-platform-hero nfc-hub-hero" data-nfc-hub-v3167="main"><div class="shell nfc-hub-hero-grid"><div class="nfc-hub-hero-copy"><p class="eyebrow">BG STUDIO NFC + QR</p><h1>Fiziksel temas. Dijital deneyim. Tek sistem.</h1><p class="lead">İşletmeler için fiziksel + dijital müşteri etkileşim sistemi. Özel tasarım 3D standları NFC, QR, Akıllı Menü, feedback, analitik ve yönetim altyapısıyla birleştiriyoruz.</p><div class="hero-actions"><a class="primary-cta" href="#sistemler">Sistemleri İncele ↓</a><a class="secondary-cta" href="../teklif/?tur=nfc">Teklif Al ↗</a></div><div class="nfc-hub-proof"><span>İşletmeye özel 3D üretim</span><span>NFC + QR</span><span>Panel + analitik</span><span>Kuşadası merkezli</span></div></div><div class="nfc-hub-hero-visual"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC ve QR restoran stand sistemi" width="1254" height="1254" fetchpriority="high" decoding="async"><div class="nfc-hub-hero-badge"><strong>Fiziksel + Dijital</strong><span>Stand → Telefon → Sistem</span></div></div></div></section>
-<section class="section-pad shell nfc-solution-hub" id="sistemler"><div class="split-title"><div><p class="eyebrow">ÇÖZÜM MERKEZİ</p><h2>İşletmene uygun sistemi seç.</h2></div><p>Ana sayfada kısa karşılaştır, ayrıntı için çözüm sayfasına geç. Fiyat ve paket motorları mevcut panel verilerinden beslenmeye devam eder.</p></div><div class="nfc-solution-grid"><article class="nfc-solution-card nfc-solution-card-large" id="restoran-sistemleri">{restaurant_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>RESTORAN SİSTEMLERİ</span><b>{year} · {_nfc_money(restaurant.get('price'))}'den</b></div><h3>Masadan dijital deneyime.</h3><p>Akıllı Menü, çoklu dil, 14 alerjen, yaklaşık kalori, feedback, analitik ve Garson Çağır + Hesap İste altyapısı.</p><ul><li>Stand başına 3 NFC</li><li>QR opsiyonel</li><li>10–120 masa ölçeklenebilir</li></ul><a class="primary-cta" href="restoran/">Restoran Sistemlerini İncele ↗</a></div></article><article class="nfc-solution-card">{quick_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>HIZLI BAĞLANTI</span><b>{_nfc_money(quick.get('price'))}</b></div><h3>Tek stand, üç bağlantı.</h3><p>Instagram, Google, WhatsApp, web veya işletmenin seçtiği farklı hedefleri tek fiziksel noktada birleştir.</p><ul><li>3 NFC / stand</li><li>QR opsiyonel</li><li>Uzaktan hedef yönetimi</li></ul><a class="secondary-cta" href="hizli-baglanti/">Hızlı Standı İncele ↗</a></div></article><article class="nfc-solution-card dark">{feedback_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>PREMIUM FEEDBACK</span><b>{_nfc_money(duo.get('price'))}'den</b></div><h3>Duo + Trio müşteri deneyimi.</h3><p>Feedback, Google devam akışı, sosyal / iletişim hedefleri ve raporlama odaklı gelişmiş işletme çözümü.</p><ul><li>Duo: 2 NFC / stand</li><li>Trio: 3 NFC / stand</li><li>QR paket dışında opsiyonel</li></ul><a class="secondary-cta" href="feedback/">Duo / Trio Detayları ↗</a></div></article><article class="nfc-solution-card nfc-solution-premium-plus"><div class="nfc-premium-plus-visual"><span>YAKINDA</span><strong>Premium<br>Plus</strong><small>Geliştiriliyor</small></div><div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>ÜST KATMAN</span><b>Henüz satışta değil</b></div><h3>CRM, sadakat, rezervasyon ve AI.</h3><p>Doğrudan masa siparişi, misafir profili, sadakat, segmentasyon, rezervasyon ve AI araçları için geliştirilen ayrı üst katman.</p><ul><li>Doğrudan masa siparişi</li><li>Misafir CRM + sadakat</li><li>Rezervasyon + AI araçları</li></ul><a class="ghost-cta" href="premium-plus/">Premium Plus Yol Haritası ↗</a></div></article></div></section>
+<section class="section-pad shell nfc-solution-hub" id="sistemler"><div class="split-title"><div><p class="eyebrow">ÇÖZÜM MERKEZİ</p><h2>İşletmene uygun sistemi seç.</h2></div><p>Ana sayfada kısa karşılaştır, ayrıntı için çözüm sayfasına geç. Fiyat ve paket motorları mevcut panel verilerinden beslenmeye devam eder.</p></div><div class="nfc-solution-grid"><article class="nfc-solution-card nfc-solution-card-large {'dark' if restaurant_theme=='dark' else ''}" id="restoran-sistemleri" data-family-key="restaurant_packages" data-family-theme="{restaurant_theme}">{restaurant_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>RESTORAN SİSTEMLERİ</span><b>{year} · {_nfc_money(restaurant.get('price'))}'den</b></div><h3>Masadan dijital deneyime.</h3><p>Akıllı Menü, çoklu dil, 14 alerjen, yaklaşık kalori, feedback, analitik ve Garson Çağır + Hesap İste altyapısı.</p><ul><li>Stand başına 3 NFC</li><li>QR opsiyonel</li><li>10–120 masa ölçeklenebilir</li></ul><a class="primary-cta" href="restoran/">Restoran Sistemlerini İncele ↗</a></div></article><article class="nfc-solution-card {'dark' if quick_theme=='dark' else ''}" data-family-key="quick_stand" data-family-theme="{quick_theme}">{quick_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>HIZLI BAĞLANTI</span><b>{_nfc_money(quick.get('price'))}</b></div><h3>Tek stand, üç bağlantı.</h3><p>Instagram, Google, WhatsApp, web veya işletmenin seçtiği farklı hedefleri tek fiziksel noktada birleştir.</p><ul><li>3 NFC / stand</li><li>QR opsiyonel</li><li>Uzaktan hedef yönetimi</li></ul><a class="secondary-cta" href="hizli-baglanti/">Hızlı Standı İncele ↗</a></div></article><article class="nfc-solution-card {'dark' if feedback_theme=='dark' else ''}" data-family-key="feedback_duo" data-family-theme="{feedback_theme}">{feedback_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>PREMIUM FEEDBACK</span><b>{_nfc_money(duo.get('price'))}'den</b></div><h3>Duo + Trio müşteri deneyimi.</h3><p>Feedback, Google devam akışı, sosyal / iletişim hedefleri ve raporlama odaklı gelişmiş işletme çözümü.</p><ul><li>Duo: 2 NFC / stand</li><li>Trio: 3 NFC / stand</li><li>QR paket dışında opsiyonel</li></ul><a class="secondary-cta" href="feedback/">Duo / Trio Detayları ↗</a></div></article><article class="nfc-solution-card nfc-solution-premium-plus {'dark' if premium_plus_theme=='dark' else 'light'}" data-family-key="premium_plus" data-family-theme="{premium_plus_theme}"><div class="nfc-premium-plus-visual"><span>YAKINDA</span><strong>Premium<br>Plus</strong><small>Geliştiriliyor</small></div><div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>ÜST KATMAN</span><b>Henüz satışta değil</b></div><h3>CRM, sadakat, rezervasyon ve AI.</h3><p>Doğrudan masa siparişi, misafir profili, sadakat, segmentasyon, rezervasyon ve AI araçları için geliştirilen ayrı üst katman.</p><ul><li>Doğrudan masa siparişi</li><li>Misafir CRM + sadakat</li><li>Rezervasyon + AI araçları</li></ul><a class="ghost-cta" href="premium-plus/">Premium Plus Yol Haritası ↗</a></div></article></div></section>
 {_nfc_v3167_software_showcase()}
 <section class="section-pad shell nfc-main-price-preview" id="fiyat-hesap"><div class="split-title"><div><p class="eyebrow">CANLI FİYAT HESABI</p><h2>25–120 masa için tek kontrol.</h2></div><p>Hazır kapasite listesini slider ve stepper ile sadeleştirdik. QR, Menü Tasarımı ve Logo Tasarımı seçimleri toplam satışa ayrı eklenir.</p></div>{capacity_preview}</section>
 <section class="section-pad shell nfc-hub-final"><div class="nfc-final-panel"><div><p class="eyebrow">BG STUDIO NFC + QR</p><h2>İşletmenin ihtiyacını seç, sistemi birlikte netleştirelim.</h2><p>Restoran, hızlı bağlantı, feedback veya özel kapsam için mevcut sistemi ve fiyat yapısını bozmadan teklif hazırlayalım.</p></div><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=nfc">Teklif Al ↗</a><a class="secondary-cta" href="#sistemler">Sistemlere dön ↑</a></div></div></section>
@@ -2025,6 +2038,8 @@ def _nfc_v3167_feedback_page():
 
 
 def _nfc_v3167_premium_plus_page():
+    premium_plus_theme = nfc_family_theme_settings().get('premium_plus', 'dark')
+    premium_plus_theme = 'dark' if str(premium_plus_theme).lower() == 'dark' else 'light'
     features=[
         ('01','Doğrudan masa siparişi','Müşteri Akıllı Menü üzerinden ürünlerini seçerek siparişi bulunduğu masadan işletmeye iletebilecek.'),
         ('02','Sipariş notları','Soğansız, acısız, buzsuz, ekstra sos, pişirme tercihi veya özel not gibi talepler siparişe eklenebilecek.'),
@@ -2038,7 +2053,7 @@ def _nfc_v3167_premium_plus_page():
         ('10','Gelişmiş modüllerde öncelik','Gelecekteki CRM, sadakat, rezervasyon ve AI modüllerinde Premium Plus kapsamına öncelik verilebilecek.'),
     ]
     cards=''.join(f'<article><span>{n}</span><h3>{esc(t)}</h3><p>{esc(d)}</p></article>' for n,t,d in features)
-    content=f'''<section class="nfc-sub-hero nfc-premium-plus-page-hero"><div class="shell"><div class="premium-plus-state"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div><p class="eyebrow">PREMIUM PLUS</p><h1>Restoran deneyiminin bir sonraki üst katmanı.</h1><p class="lead">Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ve Garson Çağır + Hesap İste Standart Restoran paketlerinde devam eder. Premium Plus bunların üzerine yeni CRM, sadakat, rezervasyon ve AI araçları eklemek için geliştiriliyor.</p><div class="hero-actions"><a class="secondary-cta" href="../../nfc-qr/restoran/">Mevcut Restoran Sistemleri ↗</a><span class="primary-cta is-disabled" aria-disabled="true">Premium Plus · Yakında</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">YOL HARİTASI</p><h2>Planlanan Premium Plus modülleri.</h2></div><p>Bu özellikler geliştirme yol haritasıdır. Çıkış tarihi, kesin kapsam ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="nfc-premium-roadmap-grid">{cards}</div><div class="premium-plus-note-group"><p class="premium-plus-note"><strong>Premium Plus mevcut paket özelliklerini yeniden paketlemez.</strong> Garson Çağır + Hesap İste tüm Standart Restoran paketlerinin mevcut kapsamındadır. Premium Plus'ın farkı doğrudan masa siparişi, sipariş notları, Misafir CRM, sadakat, VIP tanıma, segmentasyon, rezervasyon / bekleme listesi, AI upsell ve AI yönetici zekâsıdır.</p><p class="premium-plus-release-note">Çıkış tarihi, kesin özellik kapsamı ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="nfc-page-cta"><h3>Premium Plus gelişmelerini takip et.</h3><a class="secondary-cta" href="../../nfc-qr/">NFC + QR ana sayfasına dön ↗</a></div></section>'''
+    content=f'''<section class="nfc-sub-hero nfc-premium-plus-page-hero theme-{premium_plus_theme}" data-family-key="premium_plus" data-family-theme="{premium_plus_theme}"><div class="shell"><div class="premium-plus-state"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div><p class="eyebrow">PREMIUM PLUS</p><h1>Restoran deneyiminin bir sonraki üst katmanı.</h1><p class="lead">Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ve Garson Çağır + Hesap İste Standart Restoran paketlerinde devam eder. Premium Plus bunların üzerine yeni CRM, sadakat, rezervasyon ve AI araçları eklemek için geliştiriliyor.</p><div class="hero-actions"><a class="secondary-cta" href="../../nfc-qr/restoran/">Mevcut Restoran Sistemleri ↗</a><span class="primary-cta is-disabled" aria-disabled="true">Premium Plus · Yakında</span></div></div></section><section class="section-pad shell nfc-premium-plus-roadmap theme-{premium_plus_theme}"><div class="split-title"><div><p class="eyebrow">YOL HARİTASI</p><h2>Planlanan Premium Plus modülleri.</h2></div><p>Bu özellikler geliştirme yol haritasıdır. Çıkış tarihi, kesin kapsam ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="nfc-premium-roadmap-grid">{cards}</div><div class="premium-plus-note-group"><p class="premium-plus-note"><strong>Premium Plus mevcut paket özelliklerini yeniden paketlemez.</strong> Garson Çağır + Hesap İste tüm Standart Restoran paketlerinin mevcut kapsamındadır. Premium Plus'ın farkı doğrudan masa siparişi, sipariş notları, Misafir CRM, sadakat, VIP tanıma, segmentasyon, rezervasyon / bekleme listesi, AI upsell ve AI yönetici zekâsıdır.</p><p class="premium-plus-release-note">Çıkış tarihi, kesin özellik kapsamı ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="nfc-page-cta"><h3>Premium Plus gelişmelerini takip et.</h3><a class="secondary-cta" href="../../nfc-qr/">NFC + QR ana sayfasına dön ↗</a></div></section>'''
     return _nfc_v3167_page('Premium Plus · Yakında | BG Studio NFC', 'Premium Plus; doğrudan masa siparişi, Misafir CRM, sadakat, VIP tanıma, rezervasyon ve AI araçları için geliştirilen BG Studio NFC üst katmanıdır.', 'premium-plus', content)
 
 
