@@ -480,44 +480,47 @@
     "poster_image_height": 1254
   },
   {
-    "category": "hediye-kisiye-ozel",
-    "name": "Kişiye Özel Mıknatıslı Açacak",
     "card_description": "58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım.",
-    "pricing_tiers": [],
-    "sort_order": 12,
-    "price_text": "Özel üretim",
-    "price_value": null,
-    "active": true,
-    "options": [
-      "Projeye göre kişiselleştirilir"
-    ],
-    "description": "İsim, figür, tema ve renklerle kişiselleştirilebilen ön yüzü; arka yüzde metal açacak ve mıknatıs ile tamamlanan etkinlik ve hediyelik ürünü.",
-    "seo_description": "Kişiye Özel Mıknatıslı Açacak, 58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
-    "slug": "kisiye-ozel-miknatisli-acacak",
-    "seo_title": "Kişiye Özel Mıknatıslı Açacak | Kuşadası 3D Baskı | BG Studio 3D",
-    "features": [
-      "58 mm form",
-      "Mıknatıs + metal açacak",
-      "Çok renkli kişiselleştirme",
-      "Toplu üretime uygun"
-    ],
-    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
-    "featured": true,
+    "material_ids": [],
     "color_ids": [],
-    "gallery_images": [],
-    "main_image": "assets/images/products/kisiye-ozel-miknatisli-acacak.webp",
-    "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kisiye-ozel-miknatisli-acacak.webp",
-    "poster_image_width": 1400,
-    "poster_image_height": 1050,
+    "price_value": null,
+    "seo_description": "Kişiye Özel Mıknatıslı Açacak, 58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
+    "active": true,
+    "description": "İsim, figür, tema ve renklerle kişiselleştirilebilen ön yüzü; arka yüzde metal açacak ve mıknatıs ile tamamlanan etkinlik ve hediyelik ürünü.",
     "tags": [
       "Kişiye Özel",
       "Açacak",
       "Mıknatıslı",
       "Hediye",
       "Adetli Üretim"
-    ]
+    ],
+    "options": [
+      "Projeye göre kişiselleştirilir"
+    ],
+    "features": [
+      "58 mm form",
+      "Mıknatıs + metal açacak",
+      "Çok renkli kişiselleştirme",
+      "Toplu üretime uygun"
+    ],
+    "slug": "kisiye-ozel-miknatisli-acacak",
+    "price_text": "Özel üretim",
+    "pricing_tiers": [],
+    "sale_price_value": null,
+    "featured": true,
+    "category": "hediye-kisiye-ozel",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "name": "Kişiye Özel Mıknatıslı Açacak",
+    "sort_order": 12,
+    "seo_title": "Kişiye Özel Mıknatıslı Açacak | Kuşadası 3D Baskı | BG Studio 3D",
+    "personalizable": true,
+    "gallery_images": [],
+    "main_image": "assets/images/products/kisiye-ozel-miknatisli-acacak.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760,
+    "poster_image": "assets/images/posters/kisiye-ozel-miknatisli-acacak.webp",
+    "poster_image_width": 1400,
+    "poster_image_height": 1050
   },
   {
     "name": "Renkli Masa Lambası",
@@ -607,21 +610,16 @@
     ]
   },
   {
-    "slug": "kisiye-ozel-gaming-stand",
-    "sort_order": 15,
-    "features": [
-      "Kişiye özel isim veya kısa yazı",
-      "Xbox veya PlayStation logo seçeneği",
-      "Kulaklık için özel askı alanı",
-      "2 kontrolcü için stand alanı",
-      "Masaüstü kullanım",
-      "Siparişe özel 3D üretim"
+    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
+    "material_ids": [],
+    "color_ids": [
+      "siyah",
+      "beyaz"
     ],
-    "name": "Kişiye Özel Gaming Stand",
-    "price_text": "949 TL",
+    "price_value": "949",
+    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
     "active": true,
-    "pricing_tiers": [],
-    "category": "gaming-masaustu",
+    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
     "tags": [
       "Gaming",
       "Kişiye Özel",
@@ -633,17 +631,25 @@
       "Xbox logo",
       "PlayStation logo"
     ],
-    "color_ids": [
-      "siyah",
-      "beyaz"
+    "features": [
+      "Kişiye özel isim veya kısa yazı",
+      "Xbox veya PlayStation logo seçeneği",
+      "Kulaklık için özel askı alanı",
+      "2 kontrolcü için stand alanı",
+      "Masaüstü kullanım",
+      "Siparişe özel 3D üretim"
     ],
-    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "slug": "kisiye-ozel-gaming-stand",
+    "price_text": "949 TL",
+    "pricing_tiers": [],
+    "sale_price_value": null,
     "featured": true,
-    "price_value": "949",
-    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
-    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
+    "category": "gaming-masaustu",
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "name": "Kişiye Özel Gaming Stand",
+    "sort_order": 15,
     "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
-    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
+    "personalizable": true,
     "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
     "main_image_width": 1000,
@@ -1286,22 +1292,13 @@
     "poster_image_height": null
   },
   {
-    "price_value": "199",
-    "pricing_tiers": [],
-    "description": "Aracınızın plakasına özel hazırlanan plaka anahtarlık, ön yüzde plaka bilgisi ve ad soyad detayıyla kişiselleştirilir. Arka yüzüne isteğe bağlı olarak telefon numarası eklenebilir.\n\nPlaka görünümünü kompakt bir anahtarlık formuna taşıyan ürün, metal halka ve zincirle birlikte hazırlanır. Araç anahtarı, çanta veya günlük anahtarlık olarak kullanılabilir. Kendiniz için veya araç sahibi yakınlarınıza kişisel bir hediye seçeneğidir.",
+    "card_description": "Plakanız ve ad soyad bilginizle hazırlanan, arka yüzüne isteğe bağlı telefon numarası eklenebilen kişiye özel anahtarlık.",
+    "material_ids": [],
     "color_ids": [],
-    "sale_price_value": null,
-    "slug": "kisiye-ozel-plaka-anahtarlik",
-    "features": [
-      "Kişiye özel plaka",
-      "Ad soyad kişiselleştirme",
-      "Arka yüzde isteğe bağlı telefon numarası",
-      "Metal anahtarlık halkası",
-      "Sabit plaka renk tasarımı",
-      "Araç sahipleri için hediye",
-      "3D baskı üretim"
-    ],
-    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Plaka ve ad soyad bilgileri sipariş öncesinde alınır. Arka yüz telefon numarası isteğe bağlıdır. Ürünün renk düzeni sabittir ve renk seçeneği sunulmaz. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "price_value": "199",
+    "seo_description": "Plaka ve ad soyad bilgisiyle hazırlanan kişiye özel plaka anahtarlık. Arka yüze isteğe bağlı telefon numarası eklenir. Kuşadası 3D baskı.",
+    "active": true,
+    "description": "Aracınızın plakasına özel hazırlanan plaka anahtarlık, ön yüzde plaka bilgisi ve ad soyad detayıyla kişiselleştirilir. Arka yüzüne isteğe bağlı olarak telefon numarası eklenebilir.\n\nPlaka görünümünü kompakt bir anahtarlık formuna taşıyan ürün, metal halka ve zincirle birlikte hazırlanır. Araç anahtarı, çanta veya günlük anahtarlık olarak kullanılabilir. Kendiniz için veya araç sahibi yakınlarınıza kişisel bir hediye seçeneğidir.",
     "tags": [
       "Kişiye Özel",
       "Anahtarlık",
@@ -1312,19 +1309,30 @@
       "Kişiselleştirilmiş",
       "Otomobil"
     ],
-    "price_text": "199 TL",
-    "seo_title": "Kişiye Özel Plaka Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D",
-    "card_description": "Plakanız ve ad soyad bilginizle hazırlanan, arka yüzüne isteğe bağlı telefon numarası eklenebilen kişiye özel anahtarlık.",
     "options": [
       "Arka yüz telefon numarasız",
       "Arka yüz telefon numaralı"
     ],
-    "category": "anahtarlik-aksesuar",
-    "active": true,
-    "seo_description": "Plaka ve ad soyad bilgisiyle hazırlanan kişiye özel plaka anahtarlık. Arka yüze isteğe bağlı telefon numarası eklenir. Kuşadası 3D baskı.",
-    "sort_order": 28,
-    "name": "Kişiye Özel Plaka Anahtarlık",
+    "features": [
+      "Kişiye özel plaka",
+      "Ad soyad kişiselleştirme",
+      "Arka yüzde isteğe bağlı telefon numarası",
+      "Metal anahtarlık halkası",
+      "Sabit plaka renk tasarımı",
+      "Araç sahipleri için hediye",
+      "3D baskı üretim"
+    ],
+    "slug": "kisiye-ozel-plaka-anahtarlik",
+    "price_text": "199 TL",
+    "pricing_tiers": [],
+    "sale_price_value": null,
     "featured": false,
+    "category": "anahtarlik-aksesuar",
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Plaka ve ad soyad bilgileri sipariş öncesinde alınır. Arka yüz telefon numarası isteğe bağlıdır. Ürünün renk düzeni sabittir ve renk seçeneği sunulmaz. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "name": "Kişiye Özel Plaka Anahtarlık",
+    "sort_order": 28,
+    "seo_title": "Kişiye Özel Plaka Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D",
+    "personalizable": true,
     "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-plaka-anahtarlik.webp",
     "main_image_width": 1000,
