@@ -825,6 +825,50 @@ def rebuild_homepage_v3163(text, active, featured, field_items):
                 updated = updated.replace('</head>', preload + '</head>', 1)
     return updated
 
+
+CATALOG_MATERIAL_PATTERNS = (
+    ('pla-plus', 'PLA+', (r'\bpla\s*\+', r'\bpla\s*plus\b')),
+    ('pla-hd', 'PLA HD', (r'\bpla\s*hd\b',)),
+    ('petg', 'PETG', (r'\bpetg\b',)),
+    ('tpu', 'TPU', (r'\btpu\b',)),
+    ('asa', 'ASA', (r'\basa\b',)),
+    ('abs', 'ABS', (r'\babs\b',)),
+    ('pla', 'PLA', (r'\bpla\b',)),
+)
+
+def _catalog_product_text(p):
+    parts = [
+        p.get('name'), p.get('card_description'), p.get('description'),
+        p.get('production_note'), ' '.join(str(x) for x in (p.get('tags') or [])),
+        ' '.join(str(x) for x in (p.get('features') or [])),
+    ]
+    return re.sub(r'\s+', ' ', ' '.join(str(x or '') for x in parts)).strip()
+
+def catalog_materials(p):
+    """Derive catalog material filters only from product-owned text/tag data."""
+    source = _catalog_product_text(p).casefold()
+    found = []
+    matched_keys = set()
+    for key, label, patterns in CATALOG_MATERIAL_PATTERNS:
+        if key == 'pla' and ('pla-plus' in matched_keys or 'pla-hd' in matched_keys):
+            continue
+        if any(re.search(pattern, source, flags=re.I) for pattern in patterns):
+            found.append((key, label))
+            matched_keys.add(key)
+    return found
+
+def catalog_personalizable(p):
+    if str(p.get('category') or '') == 'hediye-kisiye-ozel':
+        return True
+    source = _catalog_product_text(p).casefold()
+    markers = (
+        'kişiye özel', 'kisiye ozel', 'isme özel', 'isme ozel',
+        'isminize özel', 'isminize ozel', 'ad soyad', 'plakanız',
+        'plakaniz', 'logolu', 'işletmenize özel', 'isletmenize ozel',
+    )
+    return any(marker in source for marker in markers)
+
+
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
 
@@ -859,19 +903,61 @@ def card_price_html(p):
     return f'<span class="sale-price"><del>{old}</del><strong>{sale}</strong><em>%{info["percent"]}</em></span>'
 
 
-def render_card(p, prefix=''):
-    name = esc(p['name'])
-    label = esc(category_label(p))
-    price = esc(active_price_text(p))
+def render_card(p, prefix='', catalog=False, catalog_index=0):
+    raw_name = str(p['name'])
+    raw_label = category_label(p)
+    raw_price = active_price_text(p)
+    raw_desc = p.get('card_description') or p.get('description') or ''
+    name = esc(raw_name)
+    label = esc(raw_label)
+    price = esc(raw_price)
     price_markup = card_price_html(p)
-    desc = esc(p.get('card_description') or p.get('description') or '')
+    desc = esc(raw_desc)
     img = esc(prefix + p['main_image'])
     href = esc(prefix + 'urunler/' + p['slug'] + '/')
     if prefix == '../':
         href = esc('../urunler/' + p['slug'] + '/')
-    search = ' '.join([label, price, name, desc, ' '.join(str(x) for x in (p.get('tags') or [])), 'Ürünü incele']).casefold()
+    search = ' '.join([
+        raw_label, raw_price, raw_name, str(raw_desc),
+        ' '.join(str(x) for x in (p.get('tags') or [])),
+        ' '.join(str(x) for x in (p.get('features') or [])),
+        'Ürünü incele'
+    ]).casefold()
     w = int(p.get('main_image_width') or 1000)
     h = int(p.get('main_image_height') or 760)
+
+    if catalog:
+        price_value = active_price_value(p) or ''
+        try:
+            order_value = int(p.get('sort_order') or 9999)
+        except Exception:
+            order_value = 9999
+        materials = catalog_materials(p)
+        material_keys = '|'.join(key for key, _label in materials)
+        personalizable = catalog_personalizable(p)
+        badges = []
+        if p.get('featured'):
+            badges.append('<span class="catalog-card-badge">Öne çıkan</span>')
+        if personalizable:
+            badges.append('<span class="catalog-card-badge catalog-card-badge-soft">Kişiye özel</span>')
+        if sale_price_info(p):
+            badges.append('<span class="catalog-card-badge catalog-card-badge-sale">İndirim</span>')
+        badge_markup = f'<span class="catalog-card-badges">{"".join(badges[:2])}</span>' if badges else ''
+        return (
+            f'<article class="product-card catalog-product-card" '
+            f'data-category="{esc(p.get("category"))}" data-search="{esc(search)}" '
+            f'data-price="{esc(price_value)}" data-order="{order_value}" data-added-rank="{int(catalog_index or 0)}" '
+            f'data-featured="{"1" if p.get("featured") else "0"}" '
+            f'data-personalizable="{"1" if personalizable else "0"}" '
+            f'data-materials="{esc(material_keys)}" aria-hidden="false">\n'
+            f'<a class="product-image" href="{href}">{badge_markup}<img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"/></a>\n'
+            f'<div class="product-card-body"><span class="catalog-card-category">{label}</span>'
+            f'<h3><a href="{href}">{name}</a></h3>'
+            f'<div class="catalog-card-footer"><span class="catalog-card-price">{price_markup}</span>'
+            f'<a class="product-link" href="{href}" aria-label="{name} ürününü incele">İncele ↗</a></div>'
+            f'</div>\n</article>'
+        )
+
     return (
         f'<article class="product-card" data-category="{esc(p.get("category"))}" data-search="{esc(search)}">\n'
         f'<a class="product-image" href="{href}"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"/></a>\n'
@@ -1137,7 +1223,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.63'
+SITE_ASSET_VERSION = '3.1.64'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1178,7 +1264,7 @@ def render_site_header(prefix='', active_key=''):
     # Keep route URLs relative so the static site works locally, on GitHub Pages
     # and on the production custom domain without a router dependency.
     return (
-        '<header class="site-header" id="top" data-bg-nav="v3.1.63"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.1.64"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
@@ -1193,7 +1279,7 @@ def render_site_header(prefix='', active_key=''):
 
 
 def sync_site_header_navigation():
-    """Give every public page one canonical V3.1.63 header without touching page data."""
+    """Give every public page one canonical V3.1.64 header without touching page data."""
     header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
     scanned = 0
     changed = 0
@@ -1239,6 +1325,7 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/homepage\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        updated = re.sub(r'((?:\.\./)*assets/js/catalog\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if 'assets/js/navigation.js' not in updated:
             nav_tag = f'<script defer="" src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script>'
             main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
@@ -1253,6 +1340,13 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.start()] + home_tag + updated[main_match.start():]
             else:
                 updated = updated.replace('</body>', home_tag + '</body>', 1)
+        if html_path == ROOT / 'urunler' / 'index.html' and 'assets/js/catalog.js' not in updated:
+            catalog_tag = f'<script defer="" src="../assets/js/catalog.js?v={SITE_ASSET_VERSION}"></script>'
+            main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
+            if main_match:
+                updated = updated[:main_match.start()] + catalog_tag + updated[main_match.start():]
+            else:
+                updated = updated.replace('</body>', catalog_tag + '</body>', 1)
         build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
         if 'name="bgstudio-build"' in updated:
             updated = re.sub(r'<meta\s+name="bgstudio-build"\s+content="[^"]*"\s*/?>', build_meta, updated, count=1, flags=re.I)
@@ -1639,8 +1733,8 @@ def sync_nfc_offer_schema(html_text, pricing):
     return html_text
 
 
-def verify_v3163_public_shell(include_home=True):
-    """Fail loudly if a public page still serves the pre-V3.1.63 navigation shell."""
+def verify_v3164_public_shell(include_home=True, include_catalog=True):
+    """Fail loudly if a public page still serves the pre-V3.1.64 navigation shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -1656,12 +1750,12 @@ def verify_v3163_public_shell(include_home=True):
         checked += 1
         rel = html_path.relative_to(ROOT).as_posix()
         required = (
-            'data-bg-nav="v3.1.63"',
+            'data-bg-nav="v3.1.64"',
             '>Üretim</button>',
             '>İşletmeler</button>',
             '>Projeler</a>',
             '>BG Studio</button>',
-            'assets/js/navigation.js?v=3.1.63',
+            'assets/js/navigation.js?v=3.1.64',
         )
         missing = [token for token in required if token not in text]
         if include_home and html_path == ROOT / 'index.html':
@@ -1669,15 +1763,27 @@ def verify_v3163_public_shell(include_home=True):
                 'class="home-v3163"',
                 'Fikirden fiziksel ürüne.',
                 'id="sahadan-isler"',
-                'assets/js/homepage.js?v=3.1.63',
+                'assets/js/homepage.js?v=3.1.64',
             )
             missing.extend(token for token in home_required if token not in text)
+        if include_catalog and html_path == ROOT / 'urunler' / 'index.html':
+            catalog_required = (
+                'data-catalog-v3164',
+                'id="catalog-sort"',
+                'data-catalog-flag="featured"',
+                'data-catalog-flag="personalizable"',
+                'assets/js/catalog.js?v=3.1.64',
+            )
+            missing.extend(token for token in catalog_required if token not in text)
         if missing:
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.1.63 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
+        raise RuntimeError('V3.1.64 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
+
+
+verify_v3163_public_shell = verify_v3164_public_shell
 
 
 def build_site(nfc_family_theme_overrides=None):
@@ -1693,18 +1799,83 @@ def build_site(nfc_family_theme_overrides=None):
     site_copy = website_copy_settings()
     catalog_intro = esc(site_copy.get('catalog_intro') or default_website_copy()['catalog_intro'])
     cat = re.sub(r'(<section\s+class="catalog-hero\s+shell">.*?<h1>Atölyeden çıkanlar\.</h1><p>).*?(</p>)', lambda m: m.group(1) + catalog_intro + m.group(2), cat, count=1, flags=re.S)
-    cards = '\n'.join(render_card(p, '../') for p in active)
+    cards = '\n'.join(render_card(p, '../', catalog=True, catalog_index=index) for index, p in enumerate(active, 1))
     cat = replace_between(cat, '<!-- PRODUCT_MANAGER:CATALOG_START -->', '<!-- PRODUCT_MANAGER:CATALOG_END -->', cards)
-    # V3.1.3: show the complete product taxonomy even before the first item is added to a category.
-    # This makes new shelves such as Pet Ürünleri visible immediately in the catalog UI.
+
+    # V3.1.64: premium catalog controls remain fully data-driven.
     present_categories = list(CATEGORY_ORDER)
-    # Include any future/custom valid category after the preferred order.
-    present_categories += sorted({p.get('category') for p in active if p.get('category') and p.get('category') not in present_categories}, key=lambda c: category_label({'category': c}))
-    filter_buttons = ['<button aria-pressed="true" class="filter-btn active" data-filter="all" type="button">Tümü</button>']
-    filter_buttons += [f'<button aria-pressed="false" class="filter-btn" data-filter="{esc(c)}" type="button">{esc(category_label({"category": c}))}</button>' for c in present_categories]
-    filter_html = '<div aria-label="Ürün kategorileri" class="filter-row" role="group">' + ''.join(filter_buttons) + '</div>'
-    cat = re.sub(r'<div aria-label="Ürün kategorileri" class="filter-row" role="group">.*?</div>', filter_html, cat, count=1, flags=re.S)
-    cat = re.sub(r'(<p[^>]*id="catalog-count"[^>]*>)[^<]*(</p>)', lambda m: m.group(1) + f'{len(active)} ürün' + m.group(2), cat, count=1)
+    present_categories += sorted(
+        {p.get('category') for p in active if p.get('category') and p.get('category') not in present_categories},
+        key=lambda c: category_label({'category': c})
+    )
+    category_counts = {category: 0 for category in present_categories}
+    for product in active:
+        category = product.get('category')
+        if category:
+            category_counts[category] = category_counts.get(category, 0) + 1
+
+    filter_buttons = [
+        f'<button aria-pressed="true" class="filter-btn active" data-filter="all" type="button">'
+        f'<span>Tümü</span><small>{len(active)}</small></button>'
+    ]
+    filter_buttons += [
+        f'<button aria-pressed="false" class="filter-btn" data-filter="{esc(category)}" type="button">'
+        f'<span>{esc(category_label({"category": category}))}</span><small>{int(category_counts.get(category, 0))}</small></button>'
+        for category in present_categories
+    ]
+    filter_html = '<div aria-label="Ürün kategorileri" class="filter-row catalog-category-row" role="group">' + ''.join(filter_buttons) + '</div>'
+
+    material_map = {}
+    for product in active:
+        for key, label in catalog_materials(product):
+            material_map[key] = label
+    material_order = [key for key, _label, _patterns in CATALOG_MATERIAL_PATTERNS if key in material_map]
+    material_options = ['<option value="">Tüm malzemeler</option>'] + [
+        f'<option value="{esc(key)}">{esc(material_map[key])}</option>' for key in material_order
+    ]
+    featured_count = sum(1 for product in active if product.get('featured'))
+    personalizable_count = sum(1 for product in active if catalog_personalizable(product))
+    controls_html = (
+        '<div class="catalog-tools catalog-tools-v3164" data-catalog-controls="">'
+        '<label class="catalog-search" for="product-search"><span>Ürün ara</span>'
+        '<input autocomplete="off" id="product-search" placeholder="Örn. lamba, anahtarlık, stand…" type="search"/></label>'
+        '<div class="catalog-secondary-controls">'
+        '<label class="catalog-select"><span>Sırala</span><select id="catalog-sort">'
+        '<option value="recommended">Önerilen sıralama</option>'
+        '<option value="newest">Yeni eklenenler</option>'
+        '<option value="price-asc">Fiyat: düşükten yükseğe</option>'
+        '<option value="price-desc">Fiyat: yüksekten düşüğe</option>'
+        '</select></label>'
+        + ('<label class="catalog-select"><span>Malzeme</span><select id="catalog-material">' + ''.join(material_options) + '</select></label>' if material_map else '') +
+        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="featured" type="button">Öne çıkanlar <small>{featured_count}</small></button>'
+        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="personalizable" type="button">Kişiselleştirilebilir <small>{personalizable_count}</small></button>'
+        '</div>'
+        f'<div class="catalog-result-line"><p aria-live="polite" class="catalog-count" id="catalog-count" role="status">{len(active)} ürün gösteriliyor</p>'
+        '<button class="catalog-reset" data-catalog-reset="" hidden type="button">Filtreleri temizle</button></div>'
+        '</div>'
+    )
+
+    catalog_controls = '<!-- BGSTUDIO:CATALOG_CONTROLS_START -->\n' + filter_html + controls_html + '\n<!-- BGSTUDIO:CATALOG_CONTROLS_END -->'
+    if '<!-- BGSTUDIO:CATALOG_CONTROLS_START -->' in cat:
+        cat = replace_between(cat, '<!-- BGSTUDIO:CATALOG_CONTROLS_START -->', '<!-- BGSTUDIO:CATALOG_CONTROLS_END -->', filter_html + controls_html)
+    else:
+        existing_filter = re.search(r'<div aria-label="Ürün kategorileri" class="filter-row" role="group">.*?</div>', cat, flags=re.S)
+        existing_tools = re.search(r'<div class="catalog-tools">.*?</div>', cat, flags=re.S)
+        if existing_filter and existing_tools and existing_filter.start() < existing_tools.end():
+            cat = cat[:existing_filter.start()] + catalog_controls + cat[existing_tools.end():]
+        elif existing_filter:
+            cat = cat[:existing_filter.start()] + catalog_controls + cat[existing_filter.end():]
+        else:
+            grid_marker = '<!-- PRODUCT_MANAGER:CATALOG_START -->'
+            cat = cat.replace(grid_marker, catalog_controls + '\n' + grid_marker, 1)
+
+    cat = re.sub(
+        r'<section(\s+class="[^"]*\bcatalog\b[^"]*"[^>]*)>',
+        lambda m: '<section' + (m.group(1) if 'data-catalog-v3164' in m.group(1) else m.group(1) + ' data-catalog-v3164=""') + '>',
+        cat,
+        count=1,
+        flags=re.I,
+    )
     cat_path.write_text(cat, encoding='utf-8')
 
     home_path = ROOT / 'index.html'
@@ -1768,7 +1939,7 @@ def build_site(nfc_family_theme_overrides=None):
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(render_product_page(p, choose_related(products, p)), encoding='utf-8')
 
-    # V3.1.63: canonical header migration remains mandatory and verified.
+    # V3.1.64: canonical header migration remains mandatory and verified.
     nav_sync = sync_site_header_navigation()
 
     today = date.today().isoformat()
@@ -1784,7 +1955,7 @@ def build_site(nfc_family_theme_overrides=None):
     lines.append('</urlset>')
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
-    shell_verify = verify_v3163_public_shell()
+    shell_verify = verify_v3164_public_shell()
     return {'navigation_sync': nav_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 

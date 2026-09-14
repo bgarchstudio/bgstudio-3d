@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.63';
-  const ASSET_VERSION = '3.1.63';
+  const HEADER_VERSION = 'v3.1.64';
+  const ASSET_VERSION = '3.1.64';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -530,7 +530,7 @@ const catalogCards = document.querySelectorAll('.catalog-grid .product-card');
 const productSearch = document.querySelector('#product-search');
 const catalogCount = document.querySelector('#catalog-count');
 const catalogEmpty = document.querySelector('#catalog-empty');
-if (catalogCards.length) {
+if (catalogCards.length && !window.BGStudioCatalogV3164) {
   let activeFilter = 'all';
   let searchTerm = '';
   const normalize = (value) => String(value || '').toLocaleLowerCase('tr-TR').trim();
@@ -663,7 +663,7 @@ if (backToTop) {
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.63') { url.searchParams.set('v', '3.1.63'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.64') { url.searchParams.set('v', '3.1.64'); link.href = url.toString(); }
     } catch (_) {}
   });
 
