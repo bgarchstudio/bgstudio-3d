@@ -922,7 +922,7 @@ def render_product_page(p, related):
 <meta content="{robots}" name="robots"/><meta content="strict-origin-when-cross-origin" name="referrer"/><meta content="{w}" property="og:image:width"/><meta content="{h}" property="og:image:height"/><meta content="light" name="color-scheme"/>
 
 </head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>
-<header class="site-header" id="top"><div class="shell nav-shell"><a aria-label="BG Studio 3D ana sayfa" class="brand" href="../../"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button><nav aria-label="Ana menü" class="main-nav" id="primary-navigation"><a aria-current="page" class="is-active" href="../../urunler/">Ürünler</a><a href="../../ozel-uretim/">Özel Üretim</a><a href="../../kurumsal/">Kurumsal</a><a href="../../nfc-qr/">NFC &amp; QR</a><a href="../../prototip-parca/">Prototip &amp; Parça Üretim</a><a href="../../hakkimizda/">Hakkımızda</a><a href="../../iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a class="nav-cta" href="https://wa.me/905302466903" rel="noopener" target="_blank">WhatsApp</a></nav></div></header>
+{render_site_header('../../', 'products')}
 {notice}
 <main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" fetchpriority="high" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
 <div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p><div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div><div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
@@ -934,7 +934,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.62'
+SITE_ASSET_VERSION = '3.1.62-r2'
 
 
 def _relative_prefix_for_html(html_path):
@@ -975,7 +975,7 @@ def render_site_header(prefix='', active_key=''):
     # Keep route URLs relative so the static site works locally, on GitHub Pages
     # and on the production custom domain without a router dependency.
     return (
-        '<header class="site-header" id="top"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.1.62-r2"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
@@ -992,15 +992,21 @@ def render_site_header(prefix='', active_key=''):
 def sync_site_header_navigation():
     """Give every public page one canonical V3.1.62 header without touching page data."""
     header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
+    scanned = 0
+    changed = 0
+    missing_header = []
     for html_path in ROOT.rglob('*.html'):
         rel_parts = html_path.relative_to(ROOT).parts
         if 'tools' in rel_parts:
             continue
+        scanned += 1
         try:
             text = html_path.read_text(encoding='utf-8')
         except Exception:
             continue
         if not header_pattern.search(text):
+            # Legal/special fragments may intentionally omit a site header; record only.
+            missing_header.append(html_path.relative_to(ROOT).as_posix())
             continue
         prefix = _relative_prefix_for_html(html_path)
         updated = header_pattern.sub(render_site_header(prefix, _nav_active_key(html_path)), text, count=1)
@@ -1009,13 +1015,18 @@ def sync_site_header_navigation():
             updated = re.sub(r'<section\b([^>]*class="[^"]*\bfield-work\b[^"]*"[^>]*)>', r'<section id="sahadan-isler"\1>', updated, count=1, flags=re.I)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
+            changed += 1
+    return {'scanned': scanned, 'changed': changed, 'missing_header': missing_header}
 
 
 def sync_site_asset_versions():
     """Bump shared assets and install the separate navigation module on every public page."""
+    changed = 0
+    scanned = 0
     for html_path in ROOT.rglob('*.html'):
         if 'tools' in html_path.relative_to(ROOT).parts:
             continue
+        scanned += 1
         try:
             text = html_path.read_text(encoding='utf-8')
         except Exception:
@@ -1031,8 +1042,15 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.start()] + nav_tag + updated[main_match.start():]
             else:
                 updated = updated.replace('</body>', nav_tag + '</body>', 1)
+        build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
+        if 'name="bgstudio-build"' in updated:
+            updated = re.sub(r'<meta\s+name="bgstudio-build"\s+content="[^"]*"\s*/?>', build_meta, updated, count=1, flags=re.I)
+        elif '</head>' in updated:
+            updated = updated.replace('</head>', build_meta + '</head>', 1)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
+            changed += 1
+    return {'scanned': scanned, 'changed': changed}
 
 def render_nfc_platform_sections(theme_overrides=None):
     """Canonical NFC + QR product, package and pricing presentation.
@@ -1409,6 +1427,40 @@ def sync_nfc_offer_schema(html_text, pricing):
         return pattern.sub(script, html_text, count=1)
     return html_text
 
+
+def verify_v3162_public_shell():
+    """Fail loudly if a public page still serves the pre-V3.1.62 navigation shell."""
+    failures = []
+    checked = 0
+    for html_path in ROOT.rglob('*.html'):
+        rel_parts = html_path.relative_to(ROOT).parts
+        if 'tools' in rel_parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        if 'site-header' not in text:
+            continue
+        checked += 1
+        rel = html_path.relative_to(ROOT).as_posix()
+        required = (
+            'data-bg-nav="v3.1.62-r2"',
+            '>Üretim</button>',
+            '>İşletmeler</button>',
+            '>Projeler</a>',
+            '>BG Studio</button>',
+            'assets/js/navigation.js?v=3.1.62-r2',
+        )
+        missing = [token for token in required if token not in text]
+        if missing:
+            failures.append({'page': rel, 'missing': missing})
+    if failures:
+        sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
+        raise RuntimeError('V3.1.62 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
+    return {'checked': checked, 'ok': True}
+
+
 def build_site(nfc_family_theme_overrides=None):
     # V3.1.38: every reference page uses the same explicit card-tone source.
     ensure_explicit_reference_themes()
@@ -1492,8 +1544,8 @@ def build_site(nfc_family_theme_overrides=None):
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(render_product_page(p, choose_related(products, p)), encoding='utf-8')
 
-    # V3.1.62: one header source for static pages and generated product pages.
-    sync_site_header_navigation()
+    # V3.1.62-R2: canonical header migration is mandatory and verified.
+    nav_sync = sync_site_header_navigation()
 
     today = date.today().isoformat()
     static = [
@@ -1507,8 +1559,9 @@ def build_site(nfc_family_theme_overrides=None):
         lines.append(f'  <url><loc>{url}</loc><lastmod>{today}</lastmod><changefreq>monthly</changefreq><priority>{prio}</priority></url>')
     lines.append('</urlset>')
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    sync_site_asset_versions()
-    return {'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    asset_sync = sync_site_asset_versions()
+    shell_verify = verify_v3162_public_shell()
+    return {'navigation_sync': nav_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':

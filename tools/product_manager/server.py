@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import urlparse, unquote
 from urllib.request import urlopen, Request
 from datetime import datetime
-import json, base64, re, webbrowser, threading, sys, shutil, traceback, time
+import json, base64, re, webbrowser, threading, sys, shutil, traceback, time, importlib
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / 'static'
@@ -15,7 +15,23 @@ from storage import (
     restore_backup as storage_restore_backup, status as storage_status,
     BACKUPS_ROOT
 )
-from build import build_site
+import build as build_module
+
+def _fresh_build_module():
+    global build_module
+    build_module = importlib.reload(build_module)
+    return build_module
+
+def build_site(*args, **kwargs):
+    # Product Manager uzun süre açık kalsa bile diskteki en güncel build.py kullanılır.
+    return _fresh_build_module().build_site(*args, **kwargs)
+
+def sync_public_shell_from_current_build():
+    module = _fresh_build_module()
+    nav = module.sync_site_header_navigation()
+    assets = module.sync_site_asset_versions()
+    verify = module.verify_v3162_public_shell()
+    return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
 PANEL_VERSION = '3.1.62'
 BACKUPS = BACKUPS_ROOT
@@ -50,6 +66,13 @@ TAG_PRESETS = [
 ]
 ensure_initialized()
 export_to_repo()
+# V3.1.62-R2: panel açılır açılmaz public shell güncel build dosyasına senkronlanır.
+# Böylece yalnız build.py değişmişken açık kalan eski Python süreci sessizce eski header üretmez.
+try:
+    STARTUP_SHELL_SYNC = sync_public_shell_from_current_build()
+except Exception as exc:
+    STARTUP_SHELL_SYNC = {'ok': False, 'error': str(exc)}
+    print('[V3.1.62-R2] Public shell startup sync warning:', exc, file=sys.stderr)
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -1445,7 +1468,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'r2', 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':

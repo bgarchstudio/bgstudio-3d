@@ -595,11 +595,11 @@ if (backToTop) {
     selected.has('logo') ? 'logo=1' : ''
   ].filter(Boolean);
 
-  // V3.1.62 keeps the proven V3.1.61 NFC runtime but points stale pages to the current shared stylesheet.
+  // V3.1.62-R2 keeps the proven V3.1.61 NFC runtime but points stale pages to the current shared stylesheet.
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.62') { url.searchParams.set('v', '3.1.62'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.62-r2') { url.searchParams.set('v', '3.1.62-r2'); link.href = url.toString(); }
     } catch (_) {}
   });
 
