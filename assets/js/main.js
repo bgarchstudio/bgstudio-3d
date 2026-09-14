@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.64';
-  const ASSET_VERSION = '3.1.64-r1';
+  const HEADER_VERSION = 'v3.1.67';
+  const ASSET_VERSION = '3.1.67';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -663,7 +663,7 @@ if (backToTop) {
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.64-r1') { url.searchParams.set('v', '3.1.64-r1'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.67') { url.searchParams.set('v', '3.1.67'); link.href = url.toString(); }
     } catch (_) {}
   });
 
@@ -749,14 +749,14 @@ if (backToTop) {
       <div class="special-ready-highlight" data-special-package-calculator data-qr-unit="${qrUnit}" data-menu-price="${menuPrice}" data-logo-price="${logoPrice}">
         <span class="package-kicker" data-special-title>GÜNCEL ${first} MASA HAZIR PAKETİ</span>
         <div class="special-ready-metrics"><span><b data-special-tables>${first}</b>Masa</span><span><b data-special-nfc>${qrCount}</b>NFC</span></div>
-        <div class="special-ready-price"><small data-special-price-year>2026 NFC hazır paket bedeli</small><strong data-special-base-price>${money(firstRow.price)}</strong><span data-special-renewal>Yıllık yenileme: ${money(firstRow.renewal)}</span></div>
+        <div class="special-ready-price"><small data-special-price-year>2026 paket plan bedeli</small><strong data-special-base-price>${money(firstRow.price)}</strong><span data-special-renewal>Yıllık yenileme: ${money(firstRow.renewal)}</span></div>
         <div class="special-ready-options">
           <button type="button" data-special-option="qr" aria-pressed="false"><span>QR sistemi</span><b data-special-qr-cost>+${money(qrCount * qrUnit)}</b><small data-special-qr-copy>${qrCount} QR × ${money(qrUnit)} / QR</small></button>
           <button type="button" data-special-option="menu" aria-pressed="false"><span>Menü Tasarımı</span><b data-special-menu-cost>+${money(menuPrice)}</b><small>Türkçe + İngilizce görsel menü · 8 ek dilde dijital metin menü · ürün içerikleri · 14 alerjen bilgi katmanı · yaklaşık kalori bilgileri</small></button>
           <button type="button" data-special-option="logo" aria-pressed="false"><span>Logo Tasarımı</span><b data-special-logo-cost>+${money(logoPrice)}</b><small>İşletmeye özel logo · stand ve dijital menü kullanımına uyumlu</small></button>
         </div>
         <div class="special-ready-breakdown"><div><span>NFC hazır paket</span><b data-special-line-base>${money(firstRow.price)}</b></div><div><span>QR sistemi</span><b data-special-line-qr>Seçilmedi</b></div><div><span>Menü Tasarımı</span><b data-special-line-menu>Seçilmedi</b></div><div><span>Logo Tasarımı</span><b data-special-line-logo>Seçilmedi</b></div></div>
-        <div class="special-ready-total"><span>Seçili toplam</span><strong data-special-total>${money(firstRow.price)}</strong><small>NFC paket bedeli + seçtiğin ek hizmetler</small></div>
+        <div class="special-ready-total"><span>Seçili toplam</span><strong data-special-total>${money(firstRow.price)}</strong><small>Paket plan bedeli + seçtiğin ek hizmetler</small></div>
         <a class="secondary-cta" data-special-offer href="../teklif/?tur=nfc&amp;paket=ozel-kapasite&amp;masa=${first}">${first} masa için teklifi al</a>
       </div>`;
   };
@@ -793,11 +793,16 @@ if (backToTop) {
     if (existing) existing.replaceWith(next); else document.querySelector('#hizli-stand')?.insertAdjacentElement('beforebegin', next);
   };
 
-  ensureNfcStandSchematic();
-  ensureReadyRestaurantCalculator();
-  ensureRestaurantCommonPlatformV160();
-  ensurePremiumPlusRoadmapV161();
-  arrangeNfcTopFlow();
+  const modernNfcExperience = !!document.querySelector('[data-nfc-hub-v3167]');
+  // V3.1.67 keeps legacy repair only for stale pages. The new hub/subpages must
+  // not receive the old long Premium Plus or capacity-card markup again.
+  if (!modernNfcExperience) {
+    ensureNfcStandSchematic();
+    ensureReadyRestaurantCalculator();
+    ensureRestaurantCommonPlatformV160();
+    ensurePremiumPlusRoadmapV161();
+  }
+  if (document.querySelector('.nfc-platform-hero')) arrangeNfcTopFlow();
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
     const base = numberOrNull(root.dataset.basePrice);
@@ -806,6 +811,7 @@ if (backToTop) {
     const menuPrice = Number(root.dataset.menuPrice || 0);
     const logoPrice = Number(root.dataset.logoPrice || 0);
     const code = root.dataset.packageCode || '';
+    const offerBase = root.dataset.offerBase || '../teklif/';
     const buttons = [...root.querySelectorAll('[data-package-option]')];
     const totalEl = root.querySelector('[data-package-total]');
     const breakdownEl = root.querySelector('[data-package-breakdown]');
@@ -822,10 +828,10 @@ if (backToTop) {
       if (selected.has('qr')) extras.push(`QR +${money(qrCost)}`);
       if (selected.has('menu')) extras.push(`Menü +${money(menuPrice)}`);
       if (selected.has('logo')) extras.push(`Logo +${money(logoPrice)}`);
-      if (breakdownEl) breakdownEl.textContent = extras.length ? `NFC paket bedeli dahil · ${extras.join(' · ')}` : 'NFC paket bedeli dahil · Ek hizmet seçilmedi';
+      if (breakdownEl) breakdownEl.textContent = extras.length ? `Paket plan bedeli dahil · ${extras.join(' · ')}` : 'Paket plan bedeli dahil · Ek hizmet seçilmedi';
       if (offerEl && code) {
         const flags = optionFlags(selected);
-        offerEl.href = `../teklif/?tur=nfc&paket=${encodeURIComponent(code)}${flags.length ? '&' + flags.join('&') : ''}`;
+        offerEl.href = `${offerBase}?tur=nfc&paket=${encodeURIComponent(code)}${flags.length ? '&' + flags.join('&') : ''}`;
       }
     };
     buttons.forEach(button => button.addEventListener('click', () => {
@@ -865,6 +871,7 @@ if (backToTop) {
     const logoLineEl = special.querySelector('[data-special-line-logo]');
     const totalEl = special.querySelector('[data-special-total]');
     const offerEl = special.querySelector('[data-special-offer]');
+    const specialOfferBase = special.dataset.offerBase || '../teklif/';
 
     const updateSpecial = () => {
       const tables = Number(selectedCapacity?.dataset.specialCapacity || 0);
@@ -879,7 +886,7 @@ if (backToTop) {
       if (titleEl) titleEl.textContent = `GÜNCEL ${tables} MASA HAZIR PAKETİ`;
       if (tablesEl) tablesEl.textContent = String(tables);
       if (nfcEl) nfcEl.textContent = String(nfc);
-      if (priceYearEl) priceYearEl.textContent = `${priceYear} NFC hazır paket bedeli`;
+      if (priceYearEl) priceYearEl.textContent = `${priceYear} paket plan bedeli`;
       if (basePriceEl) basePriceEl.textContent = base == null ? 'Özel teklif' : money(base);
       if (renewalEl) renewalEl.textContent = renewal == null ? 'Yıllık yenileme: Özel teklif' : `Yıllık yenileme: ${money(renewal)}`;
       if (qrCostEl) qrCostEl.textContent = `+${money(fullQrCost)}`;
@@ -893,7 +900,7 @@ if (backToTop) {
       if (totalEl) totalEl.textContent = total == null ? 'Özel teklif' : money(total);
       if (offerEl) {
         const flags = optionFlags(selectedOptions);
-        offerEl.href = `../teklif/?tur=nfc&paket=ozel-kapasite&masa=${tables}${flags.length ? '&' + flags.join('&') : ''}`;
+        offerEl.href = `${specialOfferBase}?tur=nfc&paket=ozel-kapasite&masa=${tables}${flags.length ? '&' + flags.join('&') : ''}`;
         offerEl.textContent = `${tables} masa için bu kapsamla teklif al`;
       }
     };

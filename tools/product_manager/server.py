@@ -33,7 +33,7 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.64'
+PANEL_VERSION = '3.1.67'
 CATALOG_ADMIN_REVISION = '3.1.64-r1'
 BACKUPS = BACKUPS_ROOT
 
@@ -75,6 +75,9 @@ def _panel_ui_version_text(text, filename):
                 value,
             )
         value = re.sub(r'(nfc-settings\.js\?v=)[^"\']+', lambda m: f'{m.group(1)}{version}', value)
+        # V3.1.67 pricing terminology: keep admin wording aligned with public calculators.
+        value = value.replace('Satış fiyatı', 'Paket plan bedeli')
+        value = value.replace('Toplam fiyat', 'Toplam satış')
 
     elif filename == 'nfc-settings.js':
         value = re.sub(
@@ -83,6 +86,8 @@ def _panel_ui_version_text(text, filename):
             value,
             count=1,
         )
+        value = value.replace('Satış fiyatı', 'Paket plan bedeli')
+        value = value.replace('Toplam fiyat', 'Toplam satış')
 
     return value
 
@@ -196,7 +201,7 @@ try:
     STARTUP_SHELL_SYNC = sync_public_shell_from_current_build()
 except Exception as exc:
     STARTUP_SHELL_SYNC = {'ok': False, 'error': str(exc)}
-    print('[V3.1.64] Public shell startup sync warning:', exc, file=sys.stderr)
+    print('[V3.1.67] Public shell startup sync warning:', exc, file=sys.stderr)
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -1652,7 +1657,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'catalog-v3164-r1', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'nfc-v3166-v3167-combined', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
