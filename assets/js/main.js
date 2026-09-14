@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.68';
-  const ASSET_VERSION = '3.1.68';
+  const HEADER_VERSION = 'v3.1.69';
+  const ASSET_VERSION = '3.1.69';
   const header = document.querySelector('.site-header');
   if (!header) return;
 

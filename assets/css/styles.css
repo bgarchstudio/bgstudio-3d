@@ -1656,3 +1656,66 @@ html.home-motion-ready .home-motion.is-in-view{opacity:1;transform:none}
 @media(max-width:1000px){.project-index-hero-grid,.project-detail-grid,.project-metrics{grid-template-columns:1fr}.project-index-card,.project-index-card:nth-child(3n+1),.project-index-card:nth-child(3n+2){grid-column:span 6}.project-detail-media{max-width:760px}.project-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.project-index-hero h1,.project-detail-copy h1{font-size:3.65rem}.project-index-grid{display:grid;grid-template-columns:1fr}.project-index-card,.project-index-card:nth-child(3n+1),.project-index-card:nth-child(3n+2){grid-column:auto}.project-filterbar{flex-wrap:nowrap;overflow:auto;padding-bottom:6px}.project-filter{flex:0 0 auto}.project-result-count{display:none}.project-index-cta .shell,.project-detail-cta .shell{display:grid;align-items:start}.project-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.project-facts article{border-bottom:1px solid var(--line)}.project-metric-grid,.project-related-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.projects-motion-enabled [data-project-motion]{opacity:1!important;transform:none!important;transition:none!important}.project-media img{transition:none!important}.project-index-card:hover .project-media img{transform:none!important}}
+
+/* ==============================================================
+   V3.1.69 · COUNT BADGE HOTFIX + NFC MEDIA FIT + EDITORIAL PAGES
+   ============================================================ */
+
+/* Catalog counts must always read as separate badges, even if an older catalog
+   wrapper misses data-catalog-v3164 during a transitional build. */
+.catalog-category-row .filter-btn{display:inline-flex!important;align-items:center!important;gap:10px!important}
+.catalog-category-row .filter-label{display:inline-block;white-space:nowrap}
+.catalog-category-row .filter-count{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto;min-width:24px;height:24px;padding:0 7px;margin-left:1px;border-radius:999px;background:rgba(73,50,34,.08);font-size:.62rem;font-weight:800;line-height:1;letter-spacing:0}
+.catalog-category-row .filter-btn.active .filter-count,.catalog-category-row .filter-btn[aria-pressed="true"] .filter-count{background:rgba(255,255,255,.16);color:#fff}
+
+/* NFC solution cards: preserve complete 16:9 source artwork instead of forcing
+   editorial posters into tall crop boxes. */
+.nfc-solution-card:not(.nfc-solution-premium-plus){grid-template-columns:1fr;grid-template-rows:auto 1fr;min-height:0}
+.nfc-solution-card-large:not(.nfc-solution-premium-plus){grid-column:1/-1;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);grid-template-rows:1fr;align-items:center}
+.nfc-solution-card:not(.nfc-solution-premium-plus) .nfc-family-media{width:100%;height:auto;min-height:0;aspect-ratio:16/9;border:0;border-radius:0;background:#1a1410;overflow:hidden;align-self:start}
+.nfc-solution-card:not(.nfc-solution-premium-plus) .nfc-family-media img{width:100%;height:100%;object-fit:contain!important;object-position:center!important;background:#1a1410}
+.nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-family-media{margin:18px 0 18px 18px;width:calc(100% - 18px);border-radius:22px;border:1px solid rgba(255,255,255,.06);box-shadow:0 16px 36px rgba(31,20,12,.08)}
+.nfc-solution-card:not(.nfc-solution-card-large):not(.nfc-solution-premium-plus) .nfc-family-media{border-bottom:1px solid rgba(82,55,34,.12)}
+
+/* Premium Plus was visually colliding in the old split card. Keep it clearly
+   informational and separate the poster from the roadmap copy. */
+.nfc-solution-premium-plus{grid-template-columns:1fr!important;grid-template-rows:auto 1fr;min-height:0}
+.nfc-premium-plus-visual{min-height:260px!important;padding:28px!important;justify-content:center!important;position:relative;overflow:hidden}
+.nfc-premium-plus-visual strong{font-size:clamp(3rem,5vw,5rem)!important;line-height:.86!important;max-width:100%;margin-top:20px!important}
+.nfc-premium-plus-visual small{position:relative;z-index:1}
+.nfc-solution-premium-plus .nfc-solution-card-body{border-top:1px solid rgba(255,255,255,.08)}
+
+/* V3.1.69 shared editorial pages */
+.v3169-page{background:var(--paper)}
+.v3169-hero{padding:clamp(72px,9vw,138px) 0 clamp(56px,7vw,96px);border-bottom:1px solid var(--line);background:radial-gradient(circle at 80% 15%,rgba(177,119,68,.13),transparent 30%),var(--paper)}
+.v3169-hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:clamp(34px,7vw,96px);align-items:end}
+.v3169-hero h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(4rem,7.7vw,8rem);font-weight:500;line-height:.88;letter-spacing:-.055em;margin:14px 0 24px;max-width:980px}
+.v3169-hero .lead{max-width:760px;color:var(--text-secondary,#756657);font-size:clamp(1rem,1.45vw,1.18rem);line-height:1.7}
+.v3169-sector-cloud,.v3169-brand-panel,.v3169-tech-flow{border:1px solid var(--line);border-radius:30px;padding:clamp(24px,4vw,38px);background:rgba(255,255,255,.46);display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.v3169-sector-cloud small{width:100%;font-size:.58rem;font-weight:900;letter-spacing:.12em;color:#9a6c43;margin-bottom:8px}
+.v3169-sector-cloud span,.v3169-brand-panel span{border:1px solid rgba(89,61,40,.14);border-radius:999px;padding:9px 12px;font-size:.65rem;font-weight:800;color:#654f3d;background:#fbf5ed}
+.v3169-brand-panel{display:grid;grid-template-columns:1fr 1fr}.v3169-brand-panel span{min-height:92px;border-radius:20px;display:flex;align-items:flex-end}
+.v3169-process{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#fbf5ed}
+.v3169-process article{padding:clamp(22px,3vw,34px);min-height:240px;border-right:1px solid var(--line)}
+.v3169-process article:last-child{border-right:0}.v3169-process article>span,.v3169-about-grid article>span,.v3169-contact-grid article>span{font-size:.56rem;letter-spacing:.1em;font-weight:900;color:#a36d3c}
+.v3169-process h3,.v3169-about-grid h3{font-family:"Playfair Display",Georgia,serif;font-size:clamp(1.7rem,2.6vw,2.6rem);font-weight:500;margin:30px 0 12px;line-height:1}
+.v3169-process p,.v3169-about-grid p,.v3169-contact-grid p{color:#745f4d;line-height:1.7;font-size:.76rem;margin:0}
+.v3169-reference-section .case-grid{margin-top:8px}
+.v3169-dark-cta{padding:clamp(58px,8vw,100px) 0;background:#19130f;color:#f8eee4}
+.v3169-dark-cta .shell{display:flex;align-items:end;justify-content:space-between;gap:34px}.v3169-dark-cta h2{font-family:"Playfair Display",Georgia,serif;font-size:clamp(3rem,5.5vw,5.8rem);font-weight:500;line-height:.93;margin:10px 0}.v3169-dark-cta p{color:#b9aa9b;max-width:720px;line-height:1.65}
+.v3169-tech-hero{background:radial-gradient(circle at 75% 20%,rgba(75,104,109,.11),transparent 30%),var(--paper)}
+.v3169-tech-flow{display:grid;grid-template-columns:1fr;gap:8px;background:#191511;color:#f5ebdf}.v3169-tech-flow span{border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 16px;font-weight:900;font-size:.68rem;letter-spacing:.08em}.v3169-tech-flow i{font-style:normal;text-align:center;color:#b78658}
+.v3169-about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v3169-about-grid article{border:1px solid var(--line);border-radius:26px;padding:clamp(24px,3vw,34px);background:#fbf5ed;min-height:260px}
+.v3169-architecture{padding:clamp(58px,8vw,92px) 0;background:#e8dac9;border-top:1px solid var(--line)}.v3169-architecture .shell{display:flex;align-items:end;justify-content:space-between;gap:32px}.v3169-architecture h2{font-family:"Playfair Display",Georgia,serif;font-size:clamp(3rem,5vw,5rem);font-weight:500;margin:10px 0}.v3169-architecture p{color:#6e5846;max-width:720px}
+.v3169-contact-primary{display:grid;grid-template-columns:1fr;gap:12px}.v3169-contact-primary a{display:grid;gap:8px;border:1px solid var(--line);border-radius:24px;padding:24px;background:#fbf5ed;text-decoration:none;color:inherit}.v3169-contact-primary small{font-size:.56rem;letter-spacing:.1em;color:#9a673b;font-weight:900}.v3169-contact-primary strong{font-family:"Playfair Display",Georgia,serif;font-size:2rem;font-weight:500}.v3169-contact-primary span{font-size:.68rem;font-weight:800;color:#8e5d33}
+.v3169-contact-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.v3169-contact-grid article{border:1px solid var(--line);border-radius:24px;background:#fbf5ed;padding:26px;min-height:230px}.v3169-contact-grid h2{font-family:"Playfair Display",Georgia,serif;font-size:2rem;font-weight:500;margin:28px 0 12px}
+
+@media(max-width:1050px){
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus){grid-template-columns:1fr;grid-template-rows:auto 1fr}.nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-family-media{margin:0;width:100%;border-radius:0;box-shadow:none}
+  .v3169-hero-grid{grid-template-columns:1fr}.v3169-process{grid-template-columns:repeat(2,minmax(0,1fr))}.v3169-process article:nth-child(2){border-right:0}.v3169-process article:nth-child(-n+2){border-bottom:1px solid var(--line)}.v3169-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .catalog-category-row .filter-btn{gap:8px!important}.catalog-category-row .filter-count{min-width:22px;height:22px;padding:0 6px;font-size:.58rem}
+  .nfc-premium-plus-visual{min-height:220px!important}.nfc-premium-plus-visual strong{font-size:3.7rem!important}
+  .v3169-hero{padding-top:52px}.v3169-hero h1{font-size:3.65rem}.v3169-sector-cloud,.v3169-brand-panel{border-radius:22px}.v3169-process{grid-template-columns:1fr}.v3169-process article,.v3169-process article:nth-child(2){border-right:0;border-bottom:1px solid var(--line)}.v3169-process article:last-child{border-bottom:0}.v3169-about-grid,.v3169-contact-grid{grid-template-columns:1fr}.v3169-dark-cta .shell,.v3169-architecture .shell{display:grid;align-items:start}.v3169-dark-cta .primary-cta,.v3169-architecture .secondary-cta{width:100%}.v3169-brand-panel{grid-template-columns:1fr 1fr}.v3169-brand-panel span{min-height:76px}
+}
