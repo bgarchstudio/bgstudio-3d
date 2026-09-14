@@ -33,7 +33,7 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.67'
+PANEL_VERSION = '3.1.68'
 CATALOG_ADMIN_REVISION = '3.1.64-r1'
 BACKUPS = BACKUPS_ROOT
 
@@ -1451,6 +1451,18 @@ def clean_content_item(kind, item):
         out['show_in_corporate'] = bool(item.get('show_in_corporate', True))
     if kind in ('nfc','corporate','prototype'):
         out['theme'] = 'dark' if str(item.get('theme') or '').lower() == 'dark' else 'light'
+        for key in ('sector','need','solution','quantity','system','delivery','result'):
+            value = item.get(key)
+            if value not in (None, ''):
+                out[key] = str(value).strip()
+        if isinstance(item.get('metrics'), dict):
+            clean_metrics = {}
+            for key in ('nfc_scans','menu_opens','feedback_count','google_redirects'):
+                value = item['metrics'].get(key)
+                if value not in (None, ''):
+                    clean_metrics[key] = value
+            if clean_metrics:
+                out['metrics'] = clean_metrics
     if item.get('image'): out['image'] = str(item.get('image'))
     if kind in ('nfc','corporate') and item.get('profile_image'):
         out['profile_image'] = str(item.get('profile_image'))
@@ -1657,7 +1669,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'nfc-v3166-v3167-combined', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'projects-v3168', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':

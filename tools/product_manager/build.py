@@ -543,7 +543,8 @@ def render_managed_case(item, prefix='../'):
     media, media_class = case_media(item, prefix, name)
     theme = managed_case_theme(item, legacy_alternate=False)
     klass = managed_case_class(theme, media_class)
-    body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    project_link = f'<a class="case-project-link" href="{esc(project_public_url(item, prefix))}">Proje detayını gör ↗</a>'
+    body = f'<div class="case-body"><span class="case-type">{kicker}</span><h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div>{project_link}</div>'
     return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 def render_nfc_case(item, prefix='../'):
@@ -558,7 +559,8 @@ def render_nfc_case(item, prefix='../'):
     theme = managed_case_theme(item, legacy_alternate=False)
     klass = managed_case_class(theme, media_class)
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
-    body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    project_link = f'<a class="case-project-link" href="{esc(project_public_url(item, prefix))}">Proje detayını gör ↗</a>'
+    body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div>{project_link}</div>'
     return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 def resolve_corporate_items():
@@ -618,7 +620,8 @@ def render_corporate_case(item, prefix='../'):
     klass = managed_case_class(theme, media_class)
     # Corporate layout deliberately uses business name as kicker and project headline as title.
     identity = f'<div class="case-identity">{profile}<span class="case-type">{name}</span></div>'
-    body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div></div>'
+    project_link = f'<a class="case-project-link" href="{esc(project_public_url(item, prefix))}">Proje detayını gör ↗</a>'
+    body = f'<div class="case-body">{identity}<h3>{headline}</h3><p>{desc}</p><div class="case-meta">{tags}</div>{project_link}</div>'
     return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 
@@ -632,7 +635,7 @@ def render_home_field_case(item, index, prefix=''):
     card_theme = managed_case_theme(item, legacy_alternate=False)
     theme = ' dark theme-dark' if card_theme == 'dark' else ' theme-light'
     category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
-    link = home_case_link(item)
+    link = project_public_url(item, '')
     target_key = link.split('#', 1)[1] if '#' in link else 'referans-' + reference_identity(item)
     ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
     return f'<article class="field-work-card{theme}" data-card-theme="{card_theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
@@ -708,7 +711,7 @@ def render_home_project_feature(item, index, prefix=''):
     desc = esc(item.get('description') or '')
     category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
     tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or [])[:3])
-    link = esc(home_case_link(item))
+    link = esc(project_public_url(item, ''))
     media_path = str(item.get('image') or item.get('profile_image') or '').strip()
     if media_path:
         media = f'<div class="home-project-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(prefix + media_path)}"/></div>'
@@ -1249,7 +1252,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.67'
+SITE_ASSET_VERSION = '3.1.68'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1270,6 +1273,8 @@ def _nav_active_key(html_path):
         return 'corporate'
     if rel.startswith('nfc-qr/'):
         return 'nfc'
+    if rel.startswith('projeler/'):
+        return 'projects'
     if rel.startswith('hakkimizda/'):
         return 'about'
     if rel.startswith('iletisim/'):
@@ -1290,14 +1295,14 @@ def render_site_header(prefix='', active_key=''):
     # Keep route URLs relative so the static site works locally, on GitHub Pages
     # and on the production custom domain without a router dependency.
     return (
-        '<header class="site-header" id="top" data-bg-nav="v3.1.67"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.1.68"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
         f'<a{direct_active("products")} href="{prefix}urunler/">Ürünler</a>'
         f'<div class="{group_class("custom-production", "prototype")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a{child_active("custom-production")} href="{prefix}ozel-uretim/">Özel Üretim</a><a{child_active("prototype")} href="{prefix}prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>'
         f'<div class="{group_class("corporate", "nfc")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a{child_active("corporate")} href="{prefix}kurumsal/">Kurumsal</a><a{child_active("nfc")} href="{prefix}nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>'
-        f'<a class="nav-link" href="{prefix}#sahadan-isler">Projeler</a>'
+        f'<a{direct_active("projects")} href="{prefix}projeler/">Projeler</a>'
         f'<div class="{group_class("about", "contact")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a{child_active("about")} href="{prefix}hakkimizda/">Hakkımızda</a><a{child_active("contact")} href="{prefix}iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>'
         '<div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>'
         '</nav></div></header>'
@@ -1305,7 +1310,7 @@ def render_site_header(prefix='', active_key=''):
 
 
 def sync_site_header_navigation():
-    """Give every public page one canonical V3.1.67 header without touching page data."""
+    """Give every public page one canonical V3.1.68 header without touching page data."""
     header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
     scanned = 0
     changed = 0
@@ -1353,6 +1358,7 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/homepage\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/catalog\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/nfc-hub\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        updated = re.sub(r'((?:\.\./)*assets/js/projects\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if 'assets/js/navigation.js' not in updated:
             nav_tag = f'<script defer="" src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script>'
             main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
@@ -1381,6 +1387,13 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + nfc_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', nfc_tag + '</body>', 1)
+        if html_path.relative_to(ROOT).as_posix().startswith('projeler/') and 'assets/js/projects.js' not in updated:
+            projects_tag = f'<script defer="" src="{prefix}assets/js/projects.js?v={SITE_ASSET_VERSION}"></script>'
+            main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
+            if main_match:
+                updated = updated[:main_match.end()] + projects_tag + updated[main_match.end():]
+            else:
+                updated = updated.replace('</body>', projects_tag + '</body>', 1)
         build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
         if 'name="bgstudio-build"' in updated:
             updated = re.sub(r'<meta\s+name="bgstudio-build"\s+content="[^"]*"\s*/?>', build_meta, updated, count=1, flags=re.I)
@@ -1768,7 +1781,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the V3.1.67 public shell."""
+    """Fail loudly if a public page misses the V3.1.68 public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -1784,7 +1797,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
         checked += 1
         rel = html_path.relative_to(ROOT).as_posix()
         required = (
-            'data-bg-nav="v3.1.67"',
+            'data-bg-nav="v3.1.68"',
             '>Üretim</button>',
             '>İşletmeler</button>',
             '>Projeler</a>',
@@ -1814,11 +1827,14 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             if rel in ('nfc-qr/restoran/index.html','nfc-qr/hizli-baglanti/index.html','nfc-qr/feedback/index.html','nfc-qr/premium-plus/index.html'):
                 nfc_required += ('data-nfc-hub-v3167="subpage"',)
             missing.extend(token for token in nfc_required if token not in text)
+        if rel.startswith('projeler/'):
+            project_required = (f'assets/js/projects.js?v={SITE_ASSET_VERSION}', 'data-projects-v3168')
+            missing.extend(token for token in project_required if token not in text)
         if missing:
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.1.67 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
+        raise RuntimeError('V3.1.68 public shell doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -2063,6 +2079,228 @@ def build_nfc_v3167_subpages(nfc_items):
         folder=ROOT/'nfc-qr'/slug; folder.mkdir(parents=True,exist_ok=True); path=folder/'index.html'; path.write_text(html_text,encoding='utf-8'); written.append(path.relative_to(ROOT).as_posix())
     return written
 
+# ==============================================================
+# V3.1.68 SAHADAN İŞLER + PROJELER
+# Data-driven project index and case-study pages. No fabricated metrics.
+# ==============================================================
+
+def _project_kind(item):
+    kind = str(item.get('_project_kind') or item.get('source_kind') or '').strip().lower()
+    if kind == 'nfc':
+        return 'nfc'
+    if kind == 'prototype':
+        return 'prototype'
+    return 'corporate'
+
+
+def _project_kind_label(item):
+    return {
+        'nfc': 'NFC + QR',
+        'prototype': 'Prototip + Parça',
+        'corporate': 'Kurumsal Üretim',
+    }.get(_project_kind(item), 'BG Studio Projesi')
+
+
+def _project_slug(item, force_kind_prefix=False):
+    raw = str(item.get('_project_slug') or item.get('source_slug') or item.get('slug') or item.get('name') or 'proje').strip().lower().replace('_','-')
+    safe = re.sub(r'[^a-z0-9-]+', '-', raw).strip('-')
+    safe = re.sub(r'-{2,}', '-', safe) or 'proje'
+    kind = _project_kind(item)
+    # Prototype records keep an explicit prefix so links rendered on the
+    # existing Prototip page can never collide with a corporate/NFC project.
+    if kind == 'prototype' and not safe.startswith('prototip-'):
+        safe = 'prototip-' + safe
+    if force_kind_prefix and not safe.startswith(kind + '-'):
+        return f'{kind}-{safe}'
+    return safe
+
+
+def collect_project_items(corporate_items, prototype_items):
+    """Create one canonical project stream from existing panel-managed content."""
+    rows = []
+    seen = set()
+    for raw in list(corporate_items or []) + [{**x, '_project_kind':'prototype'} for x in (prototype_items or [])]:
+        if not isinstance(raw, dict) or not raw.get('active', True):
+            continue
+        item = dict(raw)
+        kind = _project_kind(item)
+        item['_project_kind'] = kind
+        slug = _project_slug(item)
+        if slug in seen:
+            slug = _project_slug(item, True)
+        if slug in seen:
+            base = slug
+            i = 2
+            while f'{base}-{i}' in seen:
+                i += 1
+            slug = f'{base}-{i}'
+        item['_project_slug'] = slug
+        seen.add(slug)
+        rows.append(item)
+    return rows
+
+
+def project_public_url(item, prefix=''):
+    return f'{prefix}projeler/{_project_slug(item)}/'
+
+
+def _project_media(item, prefix='../', css_class=''):
+    image = str(item.get('image') or '').strip()
+    name = esc(item.get('name') or item.get('headline') or 'BG Studio projesi')
+    klass = f' {css_class}' if css_class else ''
+    if image:
+        return f'<div class="project-media{klass}"><img src="{esc(prefix + image)}" alt="{name}" loading="lazy" decoding="async"></div>'
+    return f'<div class="project-media project-media-fallback{klass}"><span>BG</span><strong>{name}</strong></div>'
+
+
+def _project_sector(item):
+    return str(item.get('sector') or item.get('category') or _project_kind_label(item)).strip()
+
+
+def _project_optional(item, *keys):
+    for key in keys:
+        value = item.get(key)
+        if value is None:
+            continue
+        if isinstance(value, (dict,list)):
+            continue
+        text = str(value).strip()
+        if text:
+            return text
+    return ''
+
+
+def _project_quantity(item):
+    return _project_optional(item, 'quantity', 'delivered_quantity', 'produced_quantity', 'stand_count')
+
+
+def _project_metrics(item):
+    raw = item.get('metrics') if isinstance(item.get('metrics'), dict) else {}
+    aliases = [
+        ('NFC taraması', ('nfc_scans','nfc_scan','scans')),
+        ('Menü açılışı', ('menu_opens','menu_views','menu_clicks')),
+        ('Feedback', ('feedback_count','feedbacks','reviews')),
+        ('Google yönlendirmesi', ('google_redirects','google_clicks','google_transfers')),
+    ]
+    out=[]
+    for label, keys in aliases:
+        value = None
+        for key in keys:
+            if key in raw and raw.get(key) not in (None,''):
+                value = raw.get(key); break
+            if key in item and item.get(key) not in (None,''):
+                value = item.get(key); break
+        if value in (None,''):
+            continue
+        try:
+            if float(value) < 0:
+                continue
+        except Exception:
+            pass
+        out.append((label, str(value)))
+    return out
+
+
+def _project_footer(prefix='../'):
+    return f'''<footer class="footer footer-dark"><div class="shell footer-inner"><div class="footer-topline"><a class="brand footer-brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p class="footer-tagline">Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı, özel üretim ve işletme sistemleri.</p></div><div aria-label="BG Studio 3D sosyal ve marka bağlantıları" class="footer-socials"><a class="footer-social icon-instagram" href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank"><span>bgstudio.3dtr</span></a><a class="footer-social icon-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20projeleriniz%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." rel="noopener" target="_blank"><span>WhatsApp</span></a><a class="footer-social icon-architecture" href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>bgstudio.com.tr</span></a></div><nav aria-label="Alt menü" class="footer-links"><a href="{prefix}urunler/">Ürünler</a><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}kurumsal/">Kurumsal</a><a href="{prefix}nfc-qr/">NFC &amp; QR</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}projeler/">Projeler</a><a href="{prefix}iletisim/">İletişim</a></nav><div class="footer-legal"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><p class="footer-credit">BG Studio tarafından tasarlanmış ve geliştirilmiştir.</p></div></div></footer>'''
+
+
+def _project_page_shell(title, description, canonical_path, body_html, prefix='../'):
+    canonical = BASE_URL + canonical_path
+    return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)}</title><meta name="description" content="{esc(clip_seo_text(description,160))}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(clip_seo_text(description,160))}"><meta property="og:url" content="{canonical}"><link rel="icon" href="{prefix}favicon.ico" sizes="any"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="{prefix}assets/css/styles.css?v={SITE_ASSET_VERSION}"><meta name="robots" content="index,follow"><meta name="color-scheme" content="light"></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header(prefix,'projects')}<main id="main-content" data-projects-v3168>{body_html}</main>{_project_footer(prefix)}<script defer src="{prefix}assets/js/consent.js"></script><script defer src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="{prefix}assets/js/main.js?v={SITE_ASSET_VERSION}"></script><script defer src="{prefix}assets/js/projects.js?v={SITE_ASSET_VERSION}"></script><div aria-label="Hızlı işlemler" class="floating-actions"><a class="floating-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20bir%20proje%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." rel="noopener" target="_blank">WhatsApp</a><button aria-label="Sayfanın başına dön" class="back-to-top" type="button">↑</button></div></body></html>'''
+
+
+def render_project_index(project_items):
+    cards=[]
+    counts={'all':len(project_items),'nfc':0,'corporate':0,'prototype':0}
+    for idx,item in enumerate(project_items,1):
+        kind=_project_kind(item); counts[kind]=counts.get(kind,0)+1
+        name=esc(item.get('name') or 'BG Studio')
+        headline=esc(item.get('headline') or item.get('name') or 'Proje')
+        desc=esc(item.get('description') or '')
+        sector=esc(_project_sector(item))
+        tags=''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or [])[:4])
+        media=_project_media(item,'../','project-index-media')
+        cards.append(f'''<article class="project-index-card" data-project-card data-project-kind="{kind}" data-project-motion><a class="project-index-media-link" href="{esc(_project_slug(item))}/" aria-label="{name} projesini incele">{media}</a><div class="project-index-body"><div class="project-index-meta"><span>{idx:02d}</span><small>{esc(_project_kind_label(item))} · {sector}</small></div><h2>{headline}</h2><p>{desc}</p><div class="project-index-tags">{tags}</div><a class="project-index-link" href="{esc(_project_slug(item))}/">Projeyi incele ↗</a></div></article>''')
+    filters=[]
+    labels=[('all','Tümü'),('nfc','NFC + QR'),('corporate','Kurumsal'),('prototype','Prototip + Parça')]
+    for key,label in labels:
+        if key!='all' and not counts.get(key): continue
+        active=' is-active' if key=='all' else ''
+        filters.append(f'<button class="project-filter{active}" type="button" data-project-filter="{key}" aria-pressed="{str(key=="all").lower()}">{label}<span>{counts.get(key,0)}</span></button>')
+    body=f'''<section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Panel ve veri tabanlı saha kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/">Teklif Al ↗</a></div></section>'''
+    return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
+
+
+def render_project_detail(item, project_items):
+    slug=_project_slug(item)
+    name=str(item.get('name') or 'BG Studio')
+    headline=str(item.get('headline') or name)
+    description=str(item.get('description') or headline)
+    sector=_project_sector(item)
+    kind_label=_project_kind_label(item)
+    quantity=_project_quantity(item)
+    need=_project_optional(item,'need','project_need','ihtiyac')
+    solution=_project_optional(item,'solution','project_solution','cozum')
+    system=_project_optional(item,'system','project_system','sistem')
+    delivery=_project_optional(item,'delivery','project_delivery','teslim')
+    result=_project_optional(item,'result','project_result','sonuc')
+    facts=[('Müşteri',name),('Sektör',sector)]
+    if quantity: facts.append(('Üretilen adet',quantity))
+    if system: facts.append(('Sistem',system))
+    if delivery: facts.append(('Teslim',delivery))
+    facts_html=''.join(f'<article><span>{esc(k)}</span><strong>{esc(v)}</strong></article>' for k,v in facts if v)
+    tags=''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
+    story=[]
+    if need: story.append(('01','İhtiyaç',need))
+    if solution: story.append(('02' if story else '01','BG Studio çözümü',solution))
+    if result: story.append((f'{len(story)+1:02d}','Sonuç',result))
+    if not story:
+        story.append(('01','Proje özeti',description))
+    story_html=''.join(f'<article class="project-story-card"><span>{num}</span><h2>{esc(title)}</h2><p>{esc(text)}</p></article>' for num,title,text in story)
+    metrics=_project_metrics(item)
+    metrics_html=''
+    if metrics:
+        metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">GERÇEK SİSTEM VERİSİ</p><h2>Kayıtlı proje metrikleri.</h2><p>Yalnızca veri kaydında bulunan değerler gösterilir.</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
+    media=_project_media(item,'../../','project-detail-media')
+    kind=_project_kind(item)
+    service={'nfc':'../../nfc-qr/','prototype':'../../prototip-parca/','corporate':'../../kurumsal/'}.get(kind,'../../kurumsal/')
+    offer={'nfc':'../../teklif/?tur=nfc','prototype':'../../teklif/?tur=prototip','corporate':'../../teklif/?tur=kurumsal'}.get(kind,'../../teklif/')
+    related=[x for x in project_items if _project_slug(x)!=slug][:3]
+    related_html=''.join(f'<a class="project-related-card" href="../{esc(_project_slug(x))}/">{_project_media(x,"../../","project-related-media")}<span>{esc(_project_kind_label(x))}</span><strong>{esc(x.get("name") or x.get("headline") or "Proje")}</strong></a>' for x in related)
+    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@type':'Organization','name':'BG Studio 3D','url':BASE_URL},'url':BASE_URL+'/projeler/'+slug+'/'}
+    if item.get('image'): schema['image']=BASE_URL+'/'+str(item.get('image')).lstrip('/')
+    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
+    body=f'''<script type="application/ld+json">{schema_json}</script><section class="project-detail-hero"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">DİĞER PROJELER</p><h2>Sahadan başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" href="{offer}">Teklif Al ↗</a></div></section>'''
+    return _project_page_shell(f'{headline} | BG Studio 3D Proje',description,f'/projeler/{slug}/',body,'../../')
+
+
+def build_project_pages(project_items):
+    root=ROOT/'projeler'
+    root.mkdir(parents=True,exist_ok=True)
+    (root/'index.html').write_text(render_project_index(project_items),encoding='utf-8')
+    keep={'index.html'}
+    for item in project_items:
+        slug=_project_slug(item)
+        folder=root/slug
+        folder.mkdir(parents=True,exist_ok=True)
+        (folder/'index.html').write_text(render_project_detail(item,project_items),encoding='utf-8')
+        keep.add(slug)
+    for child in root.iterdir():
+        if not child.is_dir() or child.name in keep:
+            continue
+        page=child/'index.html'
+        if page.exists():
+            try:
+                text=page.read_text(encoding='utf-8')
+            except Exception:
+                text=''
+            if 'data-projects-v3168' in text:
+                import shutil
+                shutil.rmtree(child,ignore_errors=True)
+    return {'projects':len(project_items),'detail_pages':len(project_items)}
+
+
 def build_site(nfc_family_theme_overrides=None):
     # V3.1.38: every reference page uses the same explicit card-tone source.
     ensure_explicit_reference_themes()
@@ -2216,6 +2454,9 @@ def build_site(nfc_family_theme_overrides=None):
     validate_reference_theme_output(prototype_html, prototype_items, 'Prototip')
     prototype_path.write_text(prototype_html, encoding='utf-8')
 
+    project_items = collect_project_items(corporate_all_active, prototype_items)
+    project_build = build_project_pages(project_items)
+
     for p in products:
         folder = ROOT / 'urunler' / p['slug']
         folder.mkdir(parents=True, exist_ok=True)
@@ -2227,10 +2468,10 @@ def build_site(nfc_family_theme_overrides=None):
     today = date.today().isoformat()
     static = [
         ('/', 1.0), ('/gizlilik/', .6), ('/hakkimizda/', .6), ('/iletisim/', .8),
-        ('/kurumsal/', .9), ('/kusadasi-3d-baski/', .95), ('/nfc-qr/', .95), ('/nfc-qr/restoran/', .92), ('/nfc-qr/hizli-baglanti/', .88), ('/nfc-qr/feedback/', .9), ('/nfc-qr/premium-plus/', .72), ('/prototip-parca/', .9), ('/ozel-uretim/', .9),
+        ('/kurumsal/', .9), ('/projeler/', .92), ('/kusadasi-3d-baski/', .95), ('/nfc-qr/', .95), ('/nfc-qr/restoran/', .92), ('/nfc-qr/hizli-baglanti/', .88), ('/nfc-qr/feedback/', .9), ('/nfc-qr/premium-plus/', .72), ('/prototip-parca/', .9), ('/ozel-uretim/', .9),
         ('/siparis-bilgilendirme/', .6), ('/teklif/', .8), ('/urunler/', .9),
     ]
-    urls = [(BASE_URL + path, prio) for path, prio in static] + [(f"{BASE_URL}/urunler/{p['slug']}/", .7) for p in active]
+    urls = [(BASE_URL + path, prio) for path, prio in static] + [(f"{BASE_URL}/urunler/{p['slug']}/", .7) for p in active] + [(f"{BASE_URL}/projeler/{_project_slug(item)}/", .72) for item in project_items]
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for url, prio in urls:
         lines.append(f'  <url><loc>{url}</loc><lastmod>{today}</lastmod><changefreq>monthly</changefreq><priority>{prio}</priority></url>')
@@ -2238,7 +2479,7 @@ def build_site(nfc_family_theme_overrides=None):
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
-    return {'navigation_sync': nav_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'navigation_sync': nav_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':

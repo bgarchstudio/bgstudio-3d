@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.67';
-  const ASSET_VERSION = '3.1.67';
+  const HEADER_VERSION = 'v3.1.68';
+  const ASSET_VERSION = '3.1.68';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -27,6 +27,7 @@
     : isRoute('/prototip-parca/') ? 'prototype'
     : isRoute('/kurumsal/') ? 'corporate'
     : isRoute('/nfc-qr/') ? 'nfc'
+    : isRoute('/projeler/') ? 'projects'
     : isRoute('/hakkimizda/') ? 'about'
     : isRoute('/iletisim/') ? 'contact'
     : '';
@@ -44,7 +45,7 @@
           <a${directActive('products')} href="/urunler/">Ürünler</a>
           <div class="${groupClass('custom-production','prototype')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a${childActive('custom-production')} href="/ozel-uretim/">Özel Üretim</a><a${childActive('prototype')} href="/prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>
           <div class="${groupClass('corporate','nfc')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a${childActive('corporate')} href="/kurumsal/">Kurumsal</a><a${childActive('nfc')} href="/nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>
-          <a class="nav-link" href="/#sahadan-isler">Projeler</a>
+          <a${directActive('projects')} href="/projeler/">Projeler</a>
           <div class="${groupClass('about','contact')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a${childActive('about')} href="/hakkimizda/">Hakkımızda</a><a${childActive('contact')} href="/iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>
           <div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>
         </nav>
