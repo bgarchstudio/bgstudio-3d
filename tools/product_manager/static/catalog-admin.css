@@ -1,0 +1,15 @@
+/* BG Studio 3D · V3.1.64-R1 material + personalization admin */
+.catalog-admin-materials{margin:18px 0;padding:16px;border:1px solid rgba(92,62,39,.15);border-radius:18px;background:rgba(255,255,255,.32)}
+.product-material-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:13px}
+.product-material-head>div{display:grid;gap:4px}.product-material-head strong{font-size:.82rem}.product-material-head small{color:#806c5b;line-height:1.45}
+.product-material-choices{display:flex;flex-wrap:wrap;gap:8px}
+.material-choice{position:relative;display:inline-flex;align-items:center;min-height:38px;padding:0 12px;border:1px solid rgba(92,62,39,.16);border-radius:999px;background:rgba(255,255,255,.5);cursor:pointer;transition:.18s ease}
+.material-choice:hover{transform:translateY(-1px);border-color:rgba(138,78,14,.34)}
+.material-choice input{position:absolute;opacity:0;pointer-events:none}.material-choice span{font-size:.72rem;font-weight:750;color:#6c5745}.material-choice.is-selected{background:#2d2017;border-color:#2d2017}.material-choice.is-selected span{color:#fff}
+.catalog-admin-empty{font-size:.72rem;color:#887564}
+.materials-card{width:min(760px,calc(100vw - 32px));max-height:min(84vh,820px);overflow:auto}
+.materials-toolbar,.materials-footer{display:flex;align-items:center;justify-content:space-between;gap:14px}.materials-toolbar{margin:18px 0 12px}.materials-toolbar span,.materials-footer span{font-size:.7rem;color:#806c5b}
+.material-inventory-list{display:grid;gap:8px}.material-inventory-row{display:grid;grid-template-columns:28px minmax(180px,1fr) minmax(170px,.7fr) auto;gap:10px;align-items:end;padding:10px;border:1px solid rgba(92,62,39,.13);border-radius:14px;background:rgba(255,255,255,.38)}
+.material-inventory-row label{display:grid;gap:5px}.material-inventory-row label span{font-size:.65rem;font-weight:800;color:#5a4738}.material-inventory-row input{min-height:42px}.material-order{align-self:center;color:#a28f7d;font-size:1rem}.material-id-preview{align-self:center;color:#8b7765;font-size:.64rem}.materials-footer{margin-top:16px;padding-top:14px;border-top:1px solid rgba(92,62,39,.12)}
+.checks label:has(#personalizable){padding:7px 10px;border-radius:12px;background:rgba(138,78,14,.055)}
+@media(max-width:760px){.product-material-head{display:grid}.material-inventory-row{grid-template-columns:20px 1fr auto}.material-id-preview{grid-column:2/4}.materials-toolbar,.materials-footer{align-items:flex-start;flex-direction:column}.materials-footer .primary{width:100%}}

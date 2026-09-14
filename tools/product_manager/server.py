@@ -34,6 +34,7 @@ def sync_public_shell_from_current_build():
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
 PANEL_VERSION = '3.1.64'
+CATALOG_ADMIN_REVISION = '3.1.64-r1'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -86,6 +87,50 @@ def _panel_ui_version_text(text, filename):
     return value
 
 
+
+def ensure_catalog_admin_extensions():
+    # Preserve the existing manager shell and attach only the new catalog admin layer.
+    path = STATIC / 'index.html'
+    if not path.exists() or not path.is_file():
+        return {'ok': False, 'reason': 'index.html missing'}
+    text = path.read_text(encoding='utf-8')
+    original = text
+    rev = CATALOG_ADMIN_REVISION
+
+    css_tag = f'<link rel="stylesheet" href="catalog-admin.css?v={rev}">'
+    if 'catalog-admin.css' not in text:
+        text = text.replace('</head>', css_tag + '</head>', 1)
+    else:
+        text = re.sub(r'(catalog-admin\.css\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    if 'id="personalizable"' not in text:
+        text = re.sub(
+            r'(<div class="checks">.*?<label><input id="featured" type="checkbox">\s*Ana sayfada öne çıkar</label>)',
+            r'\1<label><input id="personalizable" type="checkbox"> Kişiselleştirilebilir</label>',
+            text,
+            count=1,
+            flags=re.S,
+        )
+
+    if 'id="productMaterialChoices"' not in text:
+        material_manager = '<div class="product-material-manager catalog-admin-materials"><div class="product-material-head"><div><strong>Ürün malzemeleri</strong><small>Bu üründe kullanılan malzemeleri seç. Katalogdaki malzeme filtresi yalnızca buradaki seçime göre çalışır.</small></div><button class="tiny" id="manageMaterialsInline" type="button">Malzeme listesini düzenle</button></div><div class="product-material-choices" id="productMaterialChoices"></div></div>'
+        text = text.replace('<div class="product-tag-manager">', material_manager + '<div class="product-tag-manager">', 1)
+
+    if 'id="materialsModal"' not in text:
+        material_modal = '<div class="modal" id="materialsModal" hidden><div class="modal-backdrop" data-close-materials></div><div class="modal-card materials-card"><button class="modal-close" type="button" data-close-materials>×</button><p class="eyebrow-preview">MALZEME KÜTÜPHANESİ</p><h2>Tüm malzemeler.</h2><p class="publish-intro">PLA, PETG gibi mevcut üretim malzemelerini buradan yönet. Yeni malzeme eklediğinde ürün düzenleme ekranında seçim olarak görünür. Bir malzeme ancak ürüne seçildiğinde katalog filtresinde yer alır.</p><div class="materials-toolbar"><button id="addMaterial" class="tiny" type="button">+ Yeni malzeme ekle</button><span>Malzeme adını düzenleyebilir veya artık kullanılmayan satırı kaldırabilirsin.</span></div><div id="materialInventoryList" class="material-inventory-list"></div><div class="materials-footer"><span id="materialsSaveState">Değişiklik bekleniyor.</span><button id="saveMaterials" class="primary" type="button">Malzemeleri kaydet ve siteyi hazırla</button></div></div></div>'
+        text = text.replace('<div class="modal campaign-modal"', material_modal + '<div class="modal campaign-modal"', 1)
+
+    js_tag = f'<script src="catalog-admin.js?v={rev}"></script>'
+    if 'catalog-admin.js' not in text:
+        text = text.replace('</body>', js_tag + '</body>', 1)
+    else:
+        text = re.sub(r'(catalog-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    if text != original:
+        path.write_text(text, encoding='utf-8')
+    return {'ok': True, 'changed': text != original, 'revision': rev}
+
+
 def sync_panel_static_versions():
     """Synchronize panel shell version markers before the HTTP server opens."""
     changed = []
@@ -108,6 +153,12 @@ try:
 except Exception as exc:
     PANEL_STATIC_SYNC = {'ok': False, 'version': PANEL_VERSION, 'error': str(exc)}
     print(f'[V{PANEL_VERSION}] Panel static version sync warning:', exc, file=sys.stderr)
+
+try:
+    CATALOG_ADMIN_STATIC_SYNC = ensure_catalog_admin_extensions()
+except Exception as exc:
+    CATALOG_ADMIN_STATIC_SYNC = {'ok': False, 'revision': CATALOG_ADMIN_REVISION, 'error': str(exc)}
+    print(f'[V{PANEL_VERSION}] Catalog admin extension warning:', exc, file=sys.stderr)
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
 CATEGORY_OPTIONS = (
@@ -244,6 +295,60 @@ def clean_colors(items):
 def write_colors(items):
     clean = clean_colors(items)
     set_collection('colors', clean)
+    return clean
+
+
+DEFAULT_MATERIALS = (
+    ('pla', 'PLA'),
+    ('pla-plus', 'PLA+'),
+    ('pla-hd', 'PLA HD'),
+    ('petg', 'PETG'),
+    ('tpu', 'TPU'),
+    ('asa', 'ASA'),
+    ('abs', 'ABS'),
+)
+
+
+def default_materials():
+    return [
+        {'id': material_id, 'name': name, 'sort_order': (index + 1) * 10}
+        for index, (material_id, name) in enumerate(DEFAULT_MATERIALS)
+    ]
+
+
+def read_materials():
+    data = get_collection('materials', None)
+    if not isinstance(data, list) or not data:
+        return default_materials()
+    return sorted(data, key=lambda x: (int(x.get('sort_order') or 9999), str(x.get('name') or '').casefold()))
+
+
+def clean_materials(items):
+    out = []
+    seen = set()
+    for index, item in enumerate(items or []):
+        if not isinstance(item, dict):
+            continue
+        name = re.sub(r'\s+', ' ', str(item.get('name') or '')).strip()[:60]
+        if not name:
+            continue
+        material_id = slugify(item.get('id') or name)
+        if not material_id or material_id in seen:
+            continue
+        seen.add(material_id)
+        out.append({
+            'id': material_id,
+            'name': name,
+            'sort_order': int(item.get('sort_order') or ((index + 1) * 10)),
+        })
+    return sorted(out, key=lambda x: (x['sort_order'], x['name'].casefold()))[:120]
+
+
+def write_materials(items):
+    clean = clean_materials(items)
+    if not clean:
+        clean = default_materials()
+    set_collection('materials', clean)
     return clean
 
 
@@ -1153,7 +1258,7 @@ def clean_product(p):
         'slug', 'name', 'category', 'price_text', 'price_value', 'sale_price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'tags'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'material_ids', 'personalizable', 'tags'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
@@ -1188,6 +1293,10 @@ def clean_product(p):
     out['options'] = [str(x).strip() for x in (out.get('options') or []) if str(x).strip()]
     valid_color_ids = {c.get('id') for c in read_colors()}
     out['color_ids'] = [str(x).strip() for x in (out.get('color_ids') or []) if str(x).strip() in valid_color_ids]
+    valid_material_ids = {m.get('id') for m in read_materials()}
+    seen_materials = set()
+    out['material_ids'] = [mid for mid in (str(x).strip() for x in (out.get('material_ids') or [])) if mid in valid_material_ids and not (mid in seen_materials or seen_materials.add(mid))]
+    out['personalizable'] = bool(out.get('personalizable'))
     out['features'] = [str(x).strip() for x in (out.get('features') or []) if str(x).strip()]
     clean_tags = []
     seen_tags = set()
@@ -1537,11 +1646,13 @@ class Handler(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         if u.path == '/api/products':
             categories = [{'id': category_id, 'label': label} for category_id, label in CATEGORY_OPTIONS]
-            return self.send_json({'products': read_products(), 'colors': read_colors(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
+            return self.send_json({'products': read_products(), 'colors': read_colors(), 'materials': read_materials(), 'categories': categories, 'tag_presets': TAG_PRESETS, 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
+        if u.path == '/api/materials':
+            return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'catalog-v3164', 'panel_static_sync': PANEL_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'catalog-v3164-r1', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -1645,14 +1756,26 @@ class Handler(BaseHTTPRequestHandler):
                 result = build_site()
                 return self.send_json({'ok': True, 'message': 'Renk stoğu kaydedildi ve site güncellendi.', 'colors': colors, 'result': result})
 
+            if self.path == '/api/materials/save':
+                payload = self.read_json()
+                full_backup('before-materials-save')
+                materials = write_materials(payload.get('materials') or [])
+                result = build_site()
+                return self.send_json({'ok': True, 'message': 'Malzeme kütüphanesi kaydedildi ve site güncellendi.', 'materials': materials, 'result': result})
+
             if self.path == '/api/save':
                 payload = self.read_json()
                 original = payload.get('original_slug') or ''
-                p = clean_product(payload.get('product') or {})
-                if original and p['slug'] != original:
-                    raise ValueError('Mevcut ürünün URL slug alanını değiştirmeyin. SEO adresini koruyoruz.')
                 products = read_products()
                 idx = next((i for i, x in enumerate(products) if x['slug'] == original), None) if original else None
+                raw_product = dict(payload.get('product') or {})
+                old_for_meta = products[idx] if idx is not None else {}
+                for meta_key in ('material_ids', 'personalizable'):
+                    if meta_key not in raw_product and meta_key in old_for_meta:
+                        raw_product[meta_key] = old_for_meta.get(meta_key)
+                p = clean_product(raw_product)
+                if original and p['slug'] != original:
+                    raise ValueError('Mevcut ürünün URL slug alanını değiştirmeyin. SEO adresini koruyoruz.')
                 if idx is None and any(x['slug'] == p['slug'] for x in products):
                     raise ValueError('Bu URL slug zaten kullanılıyor.')
                 main = payload.get('main_image')

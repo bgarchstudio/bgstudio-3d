@@ -16,7 +16,7 @@
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
   const HEADER_VERSION = 'v3.1.64';
-  const ASSET_VERSION = '3.1.64';
+  const ASSET_VERSION = '3.1.64-r1';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -663,7 +663,7 @@ if (backToTop) {
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.64') { url.searchParams.set('v', '3.1.64'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.64-r1') { url.searchParams.set('v', '3.1.64-r1'); link.href = url.toString(); }
     } catch (_) {}
   });
 

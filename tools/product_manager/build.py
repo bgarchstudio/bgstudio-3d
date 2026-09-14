@@ -349,6 +349,21 @@ def load_colors():
     return sorted(data, key=lambda c: (int(c.get('sort_order') or 9999), str(c.get('name') or '').casefold()))
 
 
+def load_materials():
+    data = get_collection('materials', [])
+    if not isinstance(data, list) or not data:
+        data = [
+            {'id':'pla','name':'PLA','sort_order':10},
+            {'id':'pla-plus','name':'PLA+','sort_order':20},
+            {'id':'pla-hd','name':'PLA HD','sort_order':30},
+            {'id':'petg','name':'PETG','sort_order':40},
+            {'id':'tpu','name':'TPU','sort_order':50},
+            {'id':'asa','name':'ASA','sort_order':60},
+            {'id':'abs','name':'ABS','sort_order':70},
+        ]
+    return sorted(data, key=lambda m: (int(m.get('sort_order') or 9999), str(m.get('name') or '').casefold()))
+
+
 def color_is_available(color):
     qty = color.get('stock_qty')
     return bool(color.get('in_stock', True)) and (qty is None or int(qty or 0) > 0)
@@ -845,28 +860,38 @@ def _catalog_product_text(p):
     return re.sub(r'\s+', ' ', ' '.join(str(x or '') for x in parts)).strip()
 
 def catalog_materials(p):
-    """Derive catalog material filters only from product-owned text/tag data."""
+    """Use explicit panel material selection; legacy products keep text fallback until edited."""
+    material_rows = load_materials()
+    by_id = {str(item.get('id') or ''): str(item.get('name') or item.get('id') or '') for item in material_rows}
+    if 'material_ids' in p:
+        found = []
+        seen = set()
+        for material_id in (p.get('material_ids') or []):
+            key = str(material_id or '').strip()
+            if key and key in by_id and key not in seen:
+                seen.add(key)
+                found.append((key, by_id[key]))
+        return found
+
+    # Legacy compatibility only. Once a product is saved with material_ids,
+    # catalog filtering becomes fully panel-controlled.
     source = _catalog_product_text(p).casefold()
     found = []
     matched_keys = set()
     for key, label, patterns in CATALOG_MATERIAL_PATTERNS:
         if key == 'pla' and ('pla-plus' in matched_keys or 'pla-hd' in matched_keys):
             continue
+        if key not in by_id:
+            continue
         if any(re.search(pattern, source, flags=re.I) for pattern in patterns):
-            found.append((key, label))
+            found.append((key, by_id.get(key) or label))
             matched_keys.add(key)
     return found
 
+
 def catalog_personalizable(p):
-    if str(p.get('category') or '') == 'hediye-kisiye-ozel':
-        return True
-    source = _catalog_product_text(p).casefold()
-    markers = (
-        'kişiye özel', 'kisiye ozel', 'isme özel', 'isme ozel',
-        'isminize özel', 'isminize ozel', 'ad soyad', 'plakanız',
-        'plakaniz', 'logolu', 'işletmenize özel', 'isletmenize ozel',
-    )
-    return any(marker in source for marker in markers)
+    # Explicit admin switch only. Category/title/tag text never forces this flag.
+    return bool(p.get('personalizable'))
 
 
 def category_label(p):
@@ -921,6 +946,7 @@ def render_card(p, prefix='', catalog=False, catalog_index=0):
         raw_label, raw_price, raw_name, str(raw_desc),
         ' '.join(str(x) for x in (p.get('tags') or [])),
         ' '.join(str(x) for x in (p.get('features') or [])),
+        ' '.join(label for _key, label in catalog_materials(p)),
         'Ürünü incele'
     ]).casefold()
     w = int(p.get('main_image_width') or 1000)
@@ -1223,7 +1249,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.64'
+SITE_ASSET_VERSION = '3.1.64-r1'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1755,7 +1781,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             '>İşletmeler</button>',
             '>Projeler</a>',
             '>BG Studio</button>',
-            'assets/js/navigation.js?v=3.1.64',
+            'assets/js/navigation.js?v=3.1.64-r1',
         )
         missing = [token for token in required if token not in text]
         if include_home and html_path == ROOT / 'index.html':
@@ -1763,7 +1789,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
                 'class="home-v3163"',
                 'Fikirden fiziksel ürüne.',
                 'id="sahadan-isler"',
-                'assets/js/homepage.js?v=3.1.64',
+                'assets/js/homepage.js?v=3.1.64-r1',
             )
             missing.extend(token for token in home_required if token not in text)
         if include_catalog and html_path == ROOT / 'urunler' / 'index.html':
@@ -1772,7 +1798,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
                 'id="catalog-sort"',
                 'data-catalog-flag="featured"',
                 'data-catalog-flag="personalizable"',
-                'assets/js/catalog.js?v=3.1.64',
+                'assets/js/catalog.js?v=3.1.64-r1',
             )
             missing.extend(token for token in catalog_required if token not in text)
         if missing:
@@ -1816,11 +1842,11 @@ def build_site(nfc_family_theme_overrides=None):
 
     filter_buttons = [
         f'<button aria-pressed="true" class="filter-btn active" data-filter="all" type="button">'
-        f'<span>Tümü</span><small>{len(active)}</small></button>'
+        f'<span class="filter-label">Tümü</span><span class="filter-count" aria-label="{len(active)} ürün">{len(active)}</span></button>'
     ]
     filter_buttons += [
         f'<button aria-pressed="false" class="filter-btn" data-filter="{esc(category)}" type="button">'
-        f'<span>{esc(category_label({"category": category}))}</span><small>{int(category_counts.get(category, 0))}</small></button>'
+        f'<span class="filter-label">{esc(category_label({"category": category}))}</span><span class="filter-count" aria-label="{int(category_counts.get(category, 0))} ürün">{int(category_counts.get(category, 0))}</span></button>'
         for category in present_categories
     ]
     filter_html = '<div aria-label="Ürün kategorileri" class="filter-row catalog-category-row" role="group">' + ''.join(filter_buttons) + '</div>'
@@ -1829,7 +1855,9 @@ def build_site(nfc_family_theme_overrides=None):
     for product in active:
         for key, label in catalog_materials(product):
             material_map[key] = label
-    material_order = [key for key, _label, _patterns in CATALOG_MATERIAL_PATTERNS if key in material_map]
+    global_material_order = [str(item.get('id') or '') for item in load_materials()]
+    material_order = [key for key in global_material_order if key in material_map]
+    material_order += sorted(key for key in material_map if key not in material_order)
     material_options = ['<option value="">Tüm malzemeler</option>'] + [
         f'<option value="{esc(key)}">{esc(material_map[key])}</option>' for key in material_order
     ]
@@ -1847,8 +1875,8 @@ def build_site(nfc_family_theme_overrides=None):
         '<option value="price-desc">Fiyat: yüksekten düşüğe</option>'
         '</select></label>'
         + ('<label class="catalog-select"><span>Malzeme</span><select id="catalog-material">' + ''.join(material_options) + '</select></label>' if material_map else '') +
-        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="featured" type="button">Öne çıkanlar <small>{featured_count}</small></button>'
-        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="personalizable" type="button">Kişiselleştirilebilir <small>{personalizable_count}</small></button>'
+        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="featured" type="button">Öne çıkanlar <span class="filter-count">{featured_count}</span></button>'
+        f'<button aria-pressed="false" class="catalog-toggle" data-catalog-flag="personalizable" type="button">Kişiselleştirilebilir <span class="filter-count">{personalizable_count}</span></button>'
         '</div>'
         f'<div class="catalog-result-line"><p aria-live="polite" class="catalog-count" id="catalog-count" role="status">{len(active)} ürün gösteriliyor</p>'
         '<button class="catalog-reset" data-catalog-reset="" hidden type="button">Filtreleri temizle</button></div>'
