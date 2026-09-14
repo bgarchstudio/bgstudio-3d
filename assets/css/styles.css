@@ -9,6 +9,30 @@
   --dark:#16120f;
   --shadow:0 22px 60px rgba(77,51,28,.12);
   --radius:26px;
+
+  /* V3.1.62 global design system aliases. Legacy tokens stay authoritative for compatibility. */
+  --bg-primary:var(--paper);
+  --bg-secondary:var(--paper-2);
+  --text-primary:var(--ink);
+  --text-secondary:var(--ink-soft);
+  --accent:var(--brown);
+  --accent-strong:var(--brown-2);
+  --border:var(--line);
+  --radius-sm:14px;
+  --radius-md:22px;
+  --radius-lg:32px;
+  --shadow-soft:0 18px 52px rgba(77,51,28,.10);
+  --space-section:clamp(84px,10vw,156px);
+  --space-section-compact:clamp(58px,7vw,104px);
+  --content-readable:720px;
+  --transition-fast:180ms cubic-bezier(.2,.7,.2,1);
+  --transition-normal:280ms cubic-bezier(.2,.7,.2,1);
+  --text-display:clamp(4rem,6.4vw,5.5rem);
+  --text-h1:clamp(3.25rem,5.3vw,4.5rem);
+  --text-h2:clamp(2.5rem,4.2vw,3.5rem);
+  --text-h3:clamp(1.5rem,2.3vw,2rem);
+  --text-body:clamp(1.03rem,1.15vw,1.18rem);
+  --text-small:clamp(.81rem,.86vw,.88rem);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -1035,4 +1059,76 @@ main>.nfc-platform-hero+.nfc-reference-first+.nfc-stand-schema{padding-top:0}
 @media(max-width:760px){
   .restaurant-common-platform{padding:20px 17px;border-radius:22px}.restaurant-common-grid{grid-template-columns:1fr}.special-ready-tags{margin-bottom:15px}
   .premium-plus-teaser{padding-top:54px;padding-bottom:18px}.premium-plus-shell{padding:22px 17px;border-radius:23px}.premium-plus-head{gap:19px;padding-bottom:20px}.premium-plus-copy h2{font-size:3.65rem;margin-bottom:17px}.premium-plus-copy>p:not(.eyebrow){font-size:.72rem;line-height:1.62}.premium-plus-roadmap-head{padding:22px 0 13px}.premium-plus-roadmap-head h3{font-size:2.25rem}.premium-plus-grid{grid-template-columns:1fr;gap:8px}.premium-plus-feature summary{padding:15px 14px;gap:11px}.premium-plus-no{width:30px;height:30px}.premium-plus-feature h4{font-size:1.2rem}.premium-plus-feature summary p{font-size:.59rem}.premium-plus-feature-body{padding:14px}.premium-plus-feature-body ul{grid-template-columns:1fr}.premium-plus-footer{display:grid;grid-template-columns:1fr}.premium-plus-follow,.premium-plus-coming{width:100%;text-align:center;justify-content:center}
+}
+
+
+/* ==========================================================
+   V3.1.62 - GLOBAL DESIGN SYSTEM + HEADER / NAVIGATION
+   Keeps the V3.1.61 reveal contract untouched.
+   ========================================================== */
+
+/* Shared type, spacing and readable-width primitives */
+.bg-display{font-family:"Playfair Display",Georgia,serif;font-size:var(--text-display);font-weight:500;line-height:.92;letter-spacing:-.045em;text-wrap:balance}
+.bg-h1{font-family:"Playfair Display",Georgia,serif;font-size:var(--text-h1);font-weight:500;line-height:.94;letter-spacing:-.04em;text-wrap:balance}
+.bg-h2{font-family:"Playfair Display",Georgia,serif;font-size:var(--text-h2);font-weight:500;line-height:.98;letter-spacing:-.035em;text-wrap:balance}
+.bg-h3{font-family:"Playfair Display",Georgia,serif;font-size:var(--text-h3);font-weight:500;line-height:1.04;letter-spacing:-.025em;text-wrap:balance}
+.bg-lead{max-width:var(--content-readable);font-size:var(--text-body);line-height:1.68;color:var(--text-secondary)}
+.bg-copy{max-width:var(--content-readable)}
+.bg-section{padding-block:var(--space-section)}
+.bg-section-compact{padding-block:var(--space-section-compact)}
+
+/* Shared interactive primitives. Existing component classes remain valid. */
+.primary-cta,.secondary-cta,.ghost-cta,.bg-button{min-height:52px;padding-inline:20px;border-radius:999px;transition:transform var(--transition-fast),background var(--transition-fast),border-color var(--transition-fast),color var(--transition-fast),box-shadow var(--transition-fast)}
+.primary-cta:hover,.secondary-cta:hover,.ghost-cta:hover,.bg-button:hover{transform:translateY(-1px)}
+.primary-cta:active,.secondary-cta:active,.ghost-cta:active,.bg-button:active{transform:translateY(0)}
+.ghost-cta{display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;background:transparent;color:var(--text-primary);text-decoration:none;font-size:.85rem;font-weight:700}
+.bg-card{border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(255,255,255,.28);box-shadow:0 1px 0 rgba(255,255,255,.38) inset}
+.field input,.field select,.field textarea,.order-field input,.order-field select{transition:border-color var(--transition-fast),box-shadow var(--transition-fast),background var(--transition-fast)}
+
+/* Header shell */
+.site-header{transition:background var(--transition-normal),box-shadow var(--transition-normal),border-color var(--transition-normal);isolation:isolate}
+.site-header.is-scrolled{background:rgba(248,243,236,.94);border-bottom-color:rgba(72,46,25,.12);box-shadow:0 10px 30px rgba(52,35,22,.055)}
+.nav-shell{height:78px;gap:22px}
+.main-nav{gap:6px;min-width:0}
+.main-nav>a,.nav-link,.nav-group-toggle{min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:transparent;color:#514235;text-decoration:none;font:inherit;font-size:.8rem;font-weight:650;line-height:1;padding:0 13px;cursor:pointer;white-space:nowrap;transition:color var(--transition-fast),background var(--transition-fast),box-shadow var(--transition-fast)}
+.main-nav>a:hover,.nav-link:hover,.nav-group-toggle:hover,.nav-group.is-open>.nav-group-toggle,.nav-group:focus-within>.nav-group-toggle{color:var(--accent);background:rgba(255,255,255,.38)}
+.main-nav .nav-link.is-active,.main-nav .nav-link[aria-current="page"],.nav-group.is-active>.nav-group-toggle{color:var(--accent);background:rgba(138,78,14,.07)}
+.main-nav a[aria-current="page"]:not(.nav-cta):after{display:none}
+.nav-group{position:relative;display:flex;align-items:center}
+.nav-group-toggle:after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:8px;opacity:.7;transition:transform var(--transition-fast)}
+.nav-group.is-open>.nav-group-toggle:after,.nav-group:focus-within>.nav-group-toggle:after{transform:rotate(225deg) translate(-1px,-1px)}
+.nav-submenu{position:absolute;z-index:80;top:calc(100% + 10px);left:50%;min-width:238px;padding:8px;border:1px solid var(--border);border-radius:18px;background:rgba(251,247,241,.98);box-shadow:0 24px 56px rgba(55,36,22,.14);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:grid;gap:2px;opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,-6px);transition:opacity var(--transition-fast),transform var(--transition-fast),visibility var(--transition-fast)}
+.nav-submenu a{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:44px!important;padding:0 13px!important;border-radius:12px!important;color:#514235!important;text-decoration:none!important;font-size:.78rem!important;font-weight:650!important;white-space:nowrap}
+.nav-submenu a:hover,.nav-submenu a:focus-visible,.nav-submenu a.is-active,.nav-submenu a[aria-current="page"]{background:#efe3d4!important;color:var(--accent)!important}
+.nav-group.is-open>.nav-submenu,.nav-group:focus-within>.nav-submenu{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}
+@media(hover:hover) and (pointer:fine){.nav-group:hover>.nav-submenu{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:4px}
+.nav-whatsapp{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff!important;text-decoration:none;font-size:.78rem;font-weight:750;white-space:nowrap;transition:transform var(--transition-fast),background var(--transition-fast),box-shadow var(--transition-fast)}
+.nav-whatsapp:hover{transform:translateY(-1px);background:#0f0d0b;box-shadow:0 8px 24px rgba(31,22,16,.12)}
+.nav-whatsapp:focus-visible{outline-color:rgba(138,78,14,.55)}
+
+/* Tablet and mobile: drawer is still opened by the proven V3.1.61 main.js flow. */
+@media(max-width:1040px){
+  .nav-shell{height:72px}
+  .menu-toggle{display:block;flex:0 0 44px;width:44px;height:44px;background:rgba(255,255,255,.26)}
+  .main-nav{position:absolute;left:24px;right:24px;top:calc(100% + 8px)!important;display:none;flex-direction:column;align-items:stretch;gap:5px;padding:12px;border-radius:22px;background:rgba(251,247,241,.985);box-shadow:0 24px 60px rgba(55,36,22,.16);border:1px solid var(--border);max-height:calc(100dvh - var(--mobile-header-bottom,112px) - 16px)!important;overflow:auto;overscroll-behavior:contain}
+  .main-nav.open{display:flex}
+  .main-nav>a,.nav-link,.nav-group-toggle{width:100%;min-height:48px;justify-content:space-between;padding:0 14px;border-radius:14px;font-size:.88rem}
+  .nav-group{display:grid;width:100%}
+  .nav-group-toggle:after{margin-left:auto;margin-right:3px}
+  .nav-submenu{position:static;min-width:0;width:100%;padding:0 0 0 10px;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;display:grid;gap:3px;opacity:1;visibility:visible;pointer-events:auto;transform:none;max-height:0;overflow:hidden;transition:max-height var(--transition-normal),padding var(--transition-normal)}
+  .nav-group.is-open>.nav-submenu{max-height:260px;padding-top:4px;padding-bottom:4px;transform:none}
+  .nav-submenu a{min-height:44px!important;padding:0 14px!important;background:rgba(255,255,255,.26)!important;border-radius:12px!important;font-size:.82rem!important}
+  .nav-actions{margin:5px 0 0;display:grid;width:100%}
+  .nav-whatsapp{min-height:50px;width:100%}
+}
+@media(max-width:680px){
+  .shell{width:min(100% - 24px,1360px)}
+  .nav-shell{height:68px;gap:12px}
+  .brand-text strong{font-size:.88rem}.brand-text small{font-size:.58rem}
+  .main-nav{left:12px!important;right:12px!important;top:calc(100% + 6px)!important;padding:10px;border-radius:20px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .site-header,.nav-submenu,.nav-group-toggle:after,.primary-cta,.secondary-cta,.ghost-cta,.bg-button,.nav-whatsapp{transition:none!important}
 }

@@ -934,10 +934,85 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.61'
+SITE_ASSET_VERSION = '3.1.62'
+
+
+def _relative_prefix_for_html(html_path):
+    rel = html_path.relative_to(ROOT)
+    depth = max(0, len(rel.parts) - 1)
+    return '../' * depth
+
+
+def _nav_active_key(html_path):
+    rel = html_path.relative_to(ROOT).as_posix().lower()
+    if rel == 'urunler/index.html' or rel.startswith('urunler/'):
+        return 'products'
+    if rel.startswith('ozel-uretim/'):
+        return 'custom-production'
+    if rel.startswith('prototip-parca/'):
+        return 'prototype'
+    if rel.startswith('kurumsal/'):
+        return 'corporate'
+    if rel.startswith('nfc-qr/'):
+        return 'nfc'
+    if rel.startswith('hakkimizda/'):
+        return 'about'
+    if rel.startswith('iletisim/'):
+        return 'contact'
+    return ''
+
+
+def render_site_header(prefix='', active_key=''):
+    def direct_active(key):
+        return ' aria-current="page" class="nav-link is-active"' if active_key == key else ' class="nav-link"'
+
+    def group_class(*keys):
+        return 'nav-group is-active' if active_key in keys else 'nav-group'
+
+    def child_active(key):
+        return ' aria-current="page" class="is-active"' if active_key == key else ''
+
+    # Keep route URLs relative so the static site works locally, on GitHub Pages
+    # and on the production custom domain without a router dependency.
+    return (
+        '<header class="site-header" id="top"><div class="shell nav-shell">'
+        f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
+        '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
+        '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
+        f'<a{direct_active("products")} href="{prefix}urunler/">Ürünler</a>'
+        f'<div class="{group_class("custom-production", "prototype")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a{child_active("custom-production")} href="{prefix}ozel-uretim/">Özel Üretim</a><a{child_active("prototype")} href="{prefix}prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>'
+        f'<div class="{group_class("corporate", "nfc")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a{child_active("corporate")} href="{prefix}kurumsal/">Kurumsal</a><a{child_active("nfc")} href="{prefix}nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>'
+        f'<a class="nav-link" href="{prefix}#sahadan-isler">Projeler</a>'
+        f'<div class="{group_class("about", "contact")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a{child_active("about")} href="{prefix}hakkimizda/">Hakkımızda</a><a{child_active("contact")} href="{prefix}iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>'
+        '<div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>'
+        '</nav></div></header>'
+    )
+
+
+def sync_site_header_navigation():
+    """Give every public page one canonical V3.1.62 header without touching page data."""
+    header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
+    for html_path in ROOT.rglob('*.html'):
+        rel_parts = html_path.relative_to(ROOT).parts
+        if 'tools' in rel_parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        if not header_pattern.search(text):
+            continue
+        prefix = _relative_prefix_for_html(html_path)
+        updated = header_pattern.sub(render_site_header(prefix, _nav_active_key(html_path)), text, count=1)
+        # Make the existing homepage field-work section a stable project target.
+        if html_path == ROOT / 'index.html' and 'id="sahadan-isler"' not in updated:
+            updated = re.sub(r'<section\b([^>]*class="[^"]*\bfield-work\b[^"]*"[^>]*)>', r'<section id="sahadan-isler"\1>', updated, count=1, flags=re.I)
+        if updated != text:
+            html_path.write_text(updated, encoding='utf-8')
+
 
 def sync_site_asset_versions():
-    """Bump shared site CSS/JS query strings in-place without replacing page content."""
+    """Bump shared assets and install the separate navigation module on every public page."""
     for html_path in ROOT.rglob('*.html'):
         if 'tools' in html_path.relative_to(ROOT).parts:
             continue
@@ -945,8 +1020,17 @@ def sync_site_asset_versions():
             text = html_path.read_text(encoding='utf-8')
         except Exception:
             continue
+        prefix = _relative_prefix_for_html(html_path)
         updated = re.sub(r'((?:\.\./)*assets/css/styles\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        if 'assets/js/navigation.js' not in updated:
+            nav_tag = f'<script defer="" src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script>'
+            main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
+            if main_match:
+                updated = updated[:main_match.start()] + nav_tag + updated[main_match.start():]
+            else:
+                updated = updated.replace('</body>', nav_tag + '</body>', 1)
         if updated != text:
             html_path.write_text(updated, encoding='utf-8')
 
@@ -1407,6 +1491,9 @@ def build_site(nfc_family_theme_overrides=None):
         folder = ROOT / 'urunler' / p['slug']
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(render_product_page(p, choose_related(products, p)), encoding='utf-8')
+
+    # V3.1.62: one header source for static pages and generated product pages.
+    sync_site_header_navigation()
 
     today = date.today().isoformat()
     static = [
