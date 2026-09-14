@@ -22,6 +22,9 @@
     state.materials = Array.isArray(data.materials) ? data.materials : [];
     renderChoices();
     syncCurrentProduct(true);
+    ensurePersonalizableListFilter();
+    updatePersonalizableFilterUI();
+    if (personalizableListFilterActive) schedulePersonalizableFilter();
   }
 
   function currentProduct() {
@@ -95,6 +98,136 @@
     const response = await nativeFetch(input, init);
     return response;
   };
+
+
+
+  // V3.1.69-R1 · Product Manager sidebar: explicit personalizable filter.
+  let personalizableListFilterActive = false;
+  let productListObserver = null;
+
+  function personalizableProducts() {
+    return state.products.filter(product => Boolean(product?.personalizable));
+  }
+
+  function productForListNode(node) {
+    if (!(node instanceof Element)) return null;
+    const candidates = [
+      node.dataset?.slug,
+      node.dataset?.productSlug,
+      node.dataset?.product,
+      node.getAttribute?.('data-id'),
+      node.querySelector?.('[data-slug]')?.getAttribute('data-slug'),
+      node.querySelector?.('[data-product-slug]')?.getAttribute('data-product-slug'),
+    ].filter(Boolean).map(String);
+    for (const value of candidates) {
+      const match = state.products.find(product =>
+        String(product.slug || '') === value || String(product.id || '') === value
+      );
+      if (match) return match;
+    }
+
+    const text = String(node.textContent || '').replace(/\s+/g, ' ').trim().toLocaleLowerCase('tr-TR');
+    if (!text) return null;
+    const matches = state.products
+      .filter(product => {
+        const name = String(product.name || '').trim().toLocaleLowerCase('tr-TR');
+        return name && text.includes(name);
+      })
+      .sort((a, b) => String(b.name || '').length - String(a.name || '').length);
+    return matches[0] || null;
+  }
+
+  function applyPersonalizableListFilter() {
+    const list = $('#productList');
+    if (!list) return;
+    [...list.children].forEach(node => {
+      if (!(node instanceof HTMLElement)) return;
+      if (!personalizableListFilterActive) {
+        if (node.dataset.catalogPersonalizableHidden === '1') {
+          node.hidden = false;
+          node.style.removeProperty('display');
+          delete node.dataset.catalogPersonalizableHidden;
+        }
+        return;
+      }
+      const product = productForListNode(node);
+      const visible = Boolean(product?.personalizable);
+      if (!visible) {
+        node.dataset.catalogPersonalizableHidden = '1';
+        node.hidden = true;
+        node.style.setProperty('display', 'none', 'important');
+      } else if (node.dataset.catalogPersonalizableHidden === '1') {
+        node.hidden = false;
+        node.style.removeProperty('display');
+        delete node.dataset.catalogPersonalizableHidden;
+      }
+    });
+  }
+
+  function updatePersonalizableFilterUI() {
+    const button = $('#personalizableListFilter');
+    if (!button) return;
+    button.classList.toggle('active', personalizableListFilterActive);
+    button.setAttribute('aria-pressed', personalizableListFilterActive ? 'true' : 'false');
+    const count = button.querySelector('.catalog-admin-filter-count');
+    if (count) count.textContent = String(personalizableProducts().length);
+  }
+
+  function schedulePersonalizableFilter() {
+    requestAnimationFrame(() => {
+      applyPersonalizableListFilter();
+      setTimeout(applyPersonalizableListFilter, 40);
+      setTimeout(applyPersonalizableListFilter, 160);
+    });
+  }
+
+  function ensurePersonalizableListFilter() {
+    const host = $('#listFilters');
+    if (!host) return;
+    let button = $('#personalizableListFilter');
+    if (!button) {
+      button = document.createElement('button');
+      button.id = 'personalizableListFilter';
+      button.type = 'button';
+      button.className = 'catalog-personalizable-list-filter';
+      button.setAttribute('aria-pressed', 'false');
+      button.innerHTML = '<span>Kişiselleştirilebilir</span><span class="catalog-admin-filter-count">0</span>';
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const all = host.querySelector('[data-filter="all"]');
+        if (!personalizableListFilterActive) {
+          if (all && !all.classList.contains('active')) all.click();
+          personalizableListFilterActive = true;
+        } else {
+          personalizableListFilterActive = false;
+          if (all) all.click();
+        }
+        [...host.querySelectorAll('[data-filter]')].forEach(nativeButton => {
+          if (personalizableListFilterActive) nativeButton.classList.remove('active');
+        });
+        updatePersonalizableFilterUI();
+        schedulePersonalizableFilter();
+      });
+      host.appendChild(button);
+      host.querySelectorAll('[data-filter]').forEach(nativeButton => {
+        nativeButton.addEventListener('click', () => {
+          if (!personalizableListFilterActive) return;
+          personalizableListFilterActive = false;
+          updatePersonalizableFilterUI();
+          applyPersonalizableListFilter();
+        });
+      });
+    }
+    updatePersonalizableFilterUI();
+    const list = $('#productList');
+    if (list && !productListObserver) {
+      productListObserver = new MutationObserver(() => {
+        if (personalizableListFilterActive) schedulePersonalizableFilter();
+      });
+      productListObserver.observe(list, { childList: true, subtree: true });
+    }
+  }
 
   function openMaterials() {
     renderInventory();
@@ -213,5 +346,6 @@
     }, 1200);
   });
 
+  ensurePersonalizableListFilter();
   loadState().catch(error => console.warn('[BG Studio catalog admin]', error));
 })();

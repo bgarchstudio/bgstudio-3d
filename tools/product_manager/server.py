@@ -34,7 +34,7 @@ def sync_public_shell_from_current_build():
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
 PANEL_VERSION = '3.1.69'
-CATALOG_ADMIN_REVISION = '3.1.64-r1'
+CATALOG_ADMIN_REVISION = '3.1.69-r1'
 BACKUPS = BACKUPS_ROOT
 
 

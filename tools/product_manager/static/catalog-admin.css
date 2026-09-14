@@ -13,3 +13,5 @@
 .material-inventory-row label{display:grid;gap:5px}.material-inventory-row label span{font-size:.65rem;font-weight:800;color:#5a4738}.material-inventory-row input{min-height:42px}.material-order{align-self:center;color:#a28f7d;font-size:1rem}.material-id-preview{align-self:center;color:#8b7765;font-size:.64rem}.materials-footer{margin-top:16px;padding-top:14px;border-top:1px solid rgba(92,62,39,.12)}
 .checks label:has(#personalizable){padding:7px 10px;border-radius:12px;background:rgba(138,78,14,.055)}
 @media(max-width:760px){.product-material-head{display:grid}.material-inventory-row{grid-template-columns:20px 1fr auto}.material-id-preview{grid-column:2/4}.materials-toolbar,.materials-footer{align-items:flex-start;flex-direction:column}.materials-footer .primary{width:100%}}
+
+.list-filters .catalog-personalizable-list-filter{white-space:nowrap}
