@@ -36,6 +36,79 @@ def sync_public_shell_from_current_build():
 PANEL_VERSION = '3.1.63'
 BACKUPS = BACKUPS_ROOT
 
+
+def _panel_ui_version_text(text, filename):
+    """Keep the static Product Manager shell locked to PANEL_VERSION.
+
+    Patch overlays do not always need to ship unchanged static HTML files. In
+    earlier versions this allowed server.py to move forward while index.html
+    still announced the previous UI version, which triggered the panel's
+    mismatch guard. Update only the manager version markers and asset query
+    strings; page structure and user data are never touched.
+    """
+    version = str(PANEL_VERSION)
+    value = str(text or '')
+
+    if filename == 'index.html':
+        value = re.sub(r'(<em>v)[^<]+(</em>)', lambda m: f'{m.group(1)}{version}{m.group(2)}', value, count=1)
+        for key in ('BG_PANEL_VERSION', 'BG_PANEL_UI_VERSION', 'PANEL_UI_VERSION', 'BG_STUDIO_PANEL_VERSION'):
+            value = re.sub(
+                rf'(window\.{re.escape(key)}\s*=\s*["\'])[^"\']+(["\'])',
+                lambda m: f'{m.group(1)}{version}{m.group(2)}',
+                value,
+            )
+        value = re.sub(r'(manager\.css\?v=)[^"\']+', lambda m: f'{m.group(1)}{version}', value)
+        value = re.sub(r'(manager\.js\?v=)[^"\']+', lambda m: f'{m.group(1)}{version}', value)
+
+    elif filename == 'nfc-settings.html':
+        value = re.sub(
+            r'(NFC Website Bilgileri\s*·\s*v)[^<]+',
+            lambda m: f'{m.group(1)}{version}',
+            value,
+            count=1,
+        )
+        for key in ('BG_PANEL_VERSION', 'BG_PANEL_UI_VERSION', 'PANEL_UI_VERSION', 'BG_STUDIO_PANEL_VERSION'):
+            value = re.sub(
+                rf'(window\.{re.escape(key)}\s*=\s*["\'])[^"\']+(["\'])',
+                lambda m: f'{m.group(1)}{version}{m.group(2)}',
+                value,
+            )
+        value = re.sub(r'(nfc-settings\.js\?v=)[^"\']+', lambda m: f'{m.group(1)}{version}', value)
+
+    elif filename == 'nfc-settings.js':
+        value = re.sub(
+            r'(BG Studio 3D Product Manager UI v)[0-9A-Za-z._-]+',
+            lambda m: f'{m.group(1)}{version}',
+            value,
+            count=1,
+        )
+
+    return value
+
+
+def sync_panel_static_versions():
+    """Synchronize panel shell version markers before the HTTP server opens."""
+    changed = []
+    checked = []
+    for name in ('index.html', 'nfc-settings.html', 'nfc-settings.js'):
+        path = STATIC / name
+        if not path.exists() or not path.is_file():
+            continue
+        checked.append(name)
+        original = path.read_text(encoding='utf-8')
+        updated = _panel_ui_version_text(original, name)
+        if updated != original:
+            path.write_text(updated, encoding='utf-8')
+            changed.append(name)
+    return {'ok': True, 'version': PANEL_VERSION, 'checked': checked, 'changed': changed}
+
+
+try:
+    PANEL_STATIC_SYNC = sync_panel_static_versions()
+except Exception as exc:
+    PANEL_STATIC_SYNC = {'ok': False, 'version': PANEL_VERSION, 'error': str(exc)}
+    print(f'[V{PANEL_VERSION}] Panel static version sync warning:', exc, file=sys.stderr)
+
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
 CATEGORY_OPTIONS = (
     ('dekoratif-duvar', 'Dekoratif & Duvar'),
@@ -1468,7 +1541,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'homepage-v3163', 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'homepage-v3163-r1', 'panel_static_sync': PANEL_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
