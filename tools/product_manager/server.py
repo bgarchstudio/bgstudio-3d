@@ -30,10 +30,10 @@ def sync_public_shell_from_current_build():
     module = _fresh_build_module()
     nav = module.sync_site_header_navigation()
     assets = module.sync_site_asset_versions()
-    verify = module.verify_v3162_public_shell()
+    verify = module.verify_v3163_public_shell(include_home=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.62'
+PANEL_VERSION = '3.1.63'
 BACKUPS = BACKUPS_ROOT
 
 # Tek kaynak: panel dropdown'u, API ve kayıt doğrulaması aynı kategori listesini kullanır.
@@ -66,13 +66,13 @@ TAG_PRESETS = [
 ]
 ensure_initialized()
 export_to_repo()
-# V3.1.62-R3: panel açılır açılmaz public shell güncel build dosyasına senkronlanır.
+# V3.1.63: panel açılır açılmaz yalnız public shell ve asset sürümleri senkronlanır.
 # Böylece yalnız build.py değişmişken açık kalan eski Python süreci sessizce eski header üretmez.
 try:
     STARTUP_SHELL_SYNC = sync_public_shell_from_current_build()
 except Exception as exc:
     STARTUP_SHELL_SYNC = {'ok': False, 'error': str(exc)}
-    print('[V3.1.62-R3] Public shell startup sync warning:', exc, file=sys.stderr)
+    print('[V3.1.63] Public shell startup sync warning:', exc, file=sys.stderr)
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -1468,7 +1468,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/colors':
             return self.send_json({'colors': read_colors(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'r2', 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'homepage-v3163', 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':

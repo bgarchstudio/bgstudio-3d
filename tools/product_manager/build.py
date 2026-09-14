@@ -622,6 +622,209 @@ def render_home_field_case(item, index, prefix=''):
     ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
     return f'<article class="field-work-card{theme}" data-card-theme="{card_theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
 
+
+def _home_product_selection(active, featured, limit=6):
+    # Stable homepage product selection: featured first, then active without duplicates.
+    picked = []
+    seen = set()
+    for product in list(featured or []) + list(active or []):
+        slug = str(product.get('slug') or '').strip()
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        picked.append(product)
+        if len(picked) >= limit:
+            break
+    return picked
+
+
+def _picture_sources_for_product(product, prefix=''):
+    # Use AVIF/WebP only when the matching optimized file really exists.
+    raw = str(product.get('main_image') or '').strip()
+    if not raw:
+        return {'fallback': '', 'avif': '', 'webp': ''}
+    rel = Path(raw)
+    absolute = ROOT / rel
+    candidates = {'fallback': prefix + raw, 'avif': '', 'webp': ''}
+    for suffix, key in (('.avif', 'avif'), ('.webp', 'webp')):
+        candidate = absolute.with_suffix(suffix)
+        if candidate.exists():
+            candidates[key] = prefix + candidate.relative_to(ROOT).as_posix()
+    return candidates
+
+
+def render_home_product_picture(product, prefix='', eager=False, css_class=''):
+    name = esc(product.get('name') or 'BG Studio 3D ürünü')
+    sources = _picture_sources_for_product(product, prefix)
+    fallback = sources.get('fallback') or prefix + 'assets/brand/bgstudio3d-monogram.png'
+    width = int(product.get('main_image_width') or 1000)
+    height = int(product.get('main_image_height') or 760)
+    source_html = ''
+    if sources.get('avif'):
+        source_html += f'<source srcset="{esc(sources["avif"])}" type="image/avif"/>'
+    if sources.get('webp') and sources.get('webp') != fallback:
+        source_html += f'<source srcset="{esc(sources["webp"])}" type="image/webp"/>'
+    loading = 'eager' if eager else 'lazy'
+    priority = ' fetchpriority="high"' if eager else ''
+    klass = f' class="{esc(css_class)}"' if css_class else ''
+    return f'<picture{klass}>{source_html}<img alt="{name}" decoding="async" height="{height}" loading="{loading}" src="{esc(fallback)}" width="{width}"{priority}/></picture>'
+
+
+def render_home_showcase_product(product, index=0):
+    name = esc(product.get('name') or '')
+    href = esc('urunler/' + str(product.get('slug') or '').strip('/') + '/')
+    label = esc(category_label(product))
+    price_html = card_price_html(product)
+    picture = render_home_product_picture(product, '', eager=False, css_class='home-showcase-picture')
+    lead_class = ' is-lead' if index == 0 else ''
+    return (
+        f'<article class="home-showcase-card home-motion{lead_class}" data-home-motion>'
+        f'<a class="home-showcase-media" href="{href}">{picture}</a>'
+        f'<div class="home-showcase-body"><div class="home-showcase-top"><span>{label}</span>{price_html}</div>'
+        f'<h3><a href="{href}">{name}</a></h3>'
+        f'<a class="home-showcase-link" href="{href}">Ürünü incele ↗</a></div></article>'
+    )
+
+
+def render_home_project_feature(item, index, prefix=''):
+    raw_name = str(item.get('name') or '').strip()
+    name = esc(raw_name)
+    headline = esc(item.get('headline') or raw_name)
+    desc = esc(item.get('description') or '')
+    category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
+    tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or [])[:3])
+    link = esc(home_case_link(item))
+    media_path = str(item.get('image') or item.get('profile_image') or '').strip()
+    if media_path:
+        media = f'<div class="home-project-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(prefix + media_path)}"/></div>'
+    else:
+        media = f'<div class="home-project-media home-project-media-fallback"><span>{index:02d}</span><strong>{name or "BG Studio"}</strong></div>'
+    ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
+    return (
+        f'<article class="home-project-card home-motion" data-home-motion data-reference-id="{esc(ref_id)}" data-reference-name="{name}">'
+        f'{media}<div class="home-project-body"><div class="home-project-kicker"><span>{index:02d}</span><small>{category}</small></div>'
+        f'<h3>{headline}</h3><p>{desc}</p><div class="home-project-tags">{tags}</div>'
+        f'<a class="home-project-link" href="{link}">Projeyi incele ↗</a></div></article>'
+    )
+
+
+def _home_visual_product(product, position='main', eager=False):
+    if not product:
+        return f'<div class="home-hero-visual-fallback home-hero-visual-{esc(position)}"><span>BG</span><small>STUDIO 3D</small></div>'
+    picture = render_home_product_picture(product, '', eager=eager, css_class='home-hero-picture')
+    name = esc(product.get('name') or 'BG Studio 3D')
+    price = esc(active_price_text(product))
+    return (
+        f'<figure class="home-hero-visual home-hero-visual-{esc(position)}">{picture}'
+        f'<figcaption><span>{name}</span><small>{price}</small></figcaption></figure>'
+    )
+
+
+def render_homepage_v3163(active, featured, field_items):
+    # V3.1.63 editorial homepage. Product/reference data always stays data-driven.
+    products = _home_product_selection(active, featured, limit=6)
+    hero_products = products[:3]
+    hero_main = hero_products[0] if hero_products else None
+    hero_side_1 = hero_products[1] if len(hero_products) > 1 else hero_main
+    hero_side_2 = hero_products[2] if len(hero_products) > 2 else hero_side_1
+    product_cards = '\n'.join(render_home_showcase_product(p, i) for i, p in enumerate(products))
+    project_cards = '\n'.join(render_home_project_feature(x, i + 1, '') for i, x in enumerate((field_items or [])[:4]))
+    production_product = products[1] if len(products) > 1 else hero_main
+    production_visual = _home_visual_product(production_product, 'production', eager=False)
+
+    return f'''<main class="home-v3163" id="main-content">
+<section class="home-hero-v3163 bg-section-compact" aria-labelledby="home-hero-title">
+  <div class="shell home-hero-grid-v3163">
+    <div class="home-hero-copy-v3163 home-motion" data-home-motion>
+      <p class="eyebrow">BG STUDIO 3D</p>
+      <h1 id="home-hero-title">Fikirden fiziksel ürüne.</h1>
+      <p class="home-hero-lead">3D baskı ürünleri, özel üretim, prototip ve işletmelere özel fiziksel + dijital sistemler.</p>
+      <div class="hero-actions home-hero-actions-v3163"><a class="primary-cta" href="urunler/">Ürünleri İncele</a><a class="secondary-cta" href="ozel-uretim/">Özel Üretim</a></div>
+      <div class="home-hero-proof"><span>Kuşadası merkezli üretim</span><span>Tek adet + toplu üretim</span><span>Türkiye geneli kargo</span></div>
+    </div>
+    <div class="home-hero-stage-v3163" data-home-parallax="0.16" aria-label="BG Studio 3D ürün seçkisi">
+      {_home_visual_product(hero_main, 'main', eager=True)}
+      {_home_visual_product(hero_side_1, 'side-one', eager=False)}
+      {_home_visual_product(hero_side_2, 'side-two', eager=False)}
+      <div class="home-hero-stage-label"><span>BG STUDIO 3D</span><strong>Tasarım → Üretim</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="home-products-v3163 bg-section" aria-labelledby="home-products-title">
+  <div class="shell">
+    <div class="home-section-head home-motion" data-home-motion><div><p class="eyebrow">ÜRÜNLER</p><h2 id="home-products-title">Tasarlandı. Basıldı. Kullanıma hazır.</h2></div><a class="text-cta" href="urunler/">Ürünleri Gör ↗</a></div>
+    <div class="home-showcase-grid">
+<!-- PRODUCT_MANAGER:FEATURED_START -->
+{product_cards}
+<!-- PRODUCT_MANAGER:FEATURED_END -->
+    </div>
+  </div>
+</section>
+
+<section class="home-production-v3163 bg-section" aria-labelledby="home-production-title">
+  <div class="shell home-split-panel home-split-production">
+    <div class="home-split-copy home-motion" data-home-motion><p class="eyebrow">ÖZEL ÜRETİM</p><h2 id="home-production-title">Aklındaki parçayı üretelim.</h2><p>Fotoğraf, eskiz, ölçü veya fikirle başlayabiliriz. Tasarımı üretilebilir hale getirip baskı sürecine taşıyoruz.</p><a class="primary-cta" href="teklif/?tur=ozel-uretim">Teklif Al ↗</a></div>
+    <div class="home-production-stage home-motion" data-home-motion>{production_visual}<div class="home-production-steps"><span><b>01</b>Fikir</span><span><b>02</b>Model</span><span><b>03</b>Baskı</span></div></div>
+  </div>
+</section>
+
+<section class="home-business-v3163 bg-section" aria-labelledby="home-business-title">
+  <div class="shell home-split-panel home-split-business">
+    <figure class="home-business-visual home-motion zoomable-media" data-home-motion tabindex="0" role="button" aria-label="BG Studio NFC stand sistemini büyüt"><img alt="BG Studio NFC restoran stand şeması" decoding="async" height="1254" loading="lazy" src="assets/images/nfc-stand-semasi.webp" width="1254"/></figure>
+    <div class="home-split-copy home-motion" data-home-motion><p class="eyebrow">İŞLETME ÇÖZÜMLERİ</p><h2 id="home-business-title">Fiziksel ürünün ötesinde.</h2><p>İşletmeye özel 3D standı NFC, QR, dijital menü, değerlendirme ve yönetim altyapısıyla tek deneyimde birleştiriyoruz.</p><div class="home-business-points"><span>İşletmeye özel fiziksel stand</span><span>NFC + QR erişimi</span><span>Dijital işletme altyapısı</span></div><a class="secondary-cta" href="nfc-qr/">NFC Sistemlerini İncele ↗</a></div>
+  </div>
+</section>
+
+<section class="home-projects-v3163 bg-section" id="sahadan-isler" aria-labelledby="home-projects-title">
+  <div class="shell">
+    <div class="home-section-head home-motion" data-home-motion><div><p class="eyebrow">SAHADAN İŞLER</p><h2 id="home-projects-title">Gerçek ihtiyaçlar. Gerçek teslimler.</h2></div><p>Tamamlanan işletme ve üretim projelerinden seçilen uygulamalar.</p></div>
+    <div class="home-project-grid">
+<!-- CONTENT_MANAGER:HOME_FIELD_START -->
+{project_cards}
+<!-- CONTENT_MANAGER:HOME_FIELD_END -->
+    </div>
+    <div class="home-project-actions"><a class="secondary-cta" href="kurumsal/">Kurumsal işleri gör ↗</a><a class="ghost-cta" href="nfc-qr/">NFC saha çözümleri ↗</a></div>
+  </div>
+</section>
+
+<section class="home-why-v3163 bg-section" aria-labelledby="home-why-title">
+  <div class="shell home-why-shell">
+    <div class="home-why-heading home-motion" data-home-motion><p class="eyebrow">NEDEN BG STUDIO</p><h2 id="home-why-title">Tasarım ile üretim aynı masada.</h2></div>
+    <div class="home-why-grid">
+      <article class="home-motion" data-home-motion><span>01</span><h3>Üretilebilir fikirler</h3><p>Görsel fikri baskı süresi, malzeme ve kullanım senaryosuyla birlikte değerlendiriyoruz.</p></article>
+      <article class="home-motion" data-home-motion><span>02</span><h3>Gerçek kullanım</h3><p>Dekoratif ürün kadar fonksiyonel parça, stand, aparat ve işletme ihtiyaçlarına odaklanıyoruz.</p></article>
+      <article class="home-motion" data-home-motion><span>03</span><h3>Tek üretim altyapısı</h3><p>Tek üründen toplu üretime ve NFC + QR sistemlerine uzanan aynı tasarım yaklaşımı.</p></article>
+    </div>
+    <a class="home-architecture-branch home-motion" data-home-motion href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>BG Studio'nun diğer iş kolu</span><strong>Architecture ↗</strong></a>
+  </div>
+</section>
+
+<section class="home-final-v3163 bg-section-compact" aria-labelledby="home-final-title">
+  <div class="shell home-final-shell home-motion" data-home-motion><div><p class="eyebrow">BİR FİKRİN Mİ VAR?</p><h2 id="home-final-title">Birlikte üretelim.</h2><p>Ürün, prototip, işletme çözümü veya özel üretim talebini gönder. Uygun üretim yolunu birlikte netleştirelim.</p></div><div class="home-final-actions"><a class="primary-cta" href="teklif/">Teklif Al ↗</a><a class="secondary-cta" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp'tan Yaz ↗</a></div></div>
+</section>
+</main>'''
+
+
+def rebuild_homepage_v3163(text, active, featured, field_items):
+    # Replace only <main>; head, announcement, canonical header and footer stay intact.
+    main_html = render_homepage_v3163(active, featured, field_items)
+    pattern = re.compile(r'<main\b[^>]*>.*?</main>', flags=re.I | re.S)
+    if not pattern.search(text):
+        raise RuntimeError('V3.1.63 ana sayfa <main> alanı bulunamadı.')
+    updated = pattern.sub(lambda _m: main_html, text, count=1)
+
+    selected = _home_product_selection(active, featured, limit=1)
+    if selected:
+        hero_src = str(selected[0].get('main_image') or '').strip()
+        if hero_src:
+            preload = f'<!-- BGSTUDIO:HOME_HERO_PRELOAD --><link rel="preload" as="image" href="{esc(hero_src)}" fetchpriority="high"/>'
+            if '<!-- BGSTUDIO:HOME_HERO_PRELOAD -->' in updated:
+                updated = re.sub(r'<!-- BGSTUDIO:HOME_HERO_PRELOAD -->\s*<link\b[^>]*>', preload, updated, count=1, flags=re.I)
+            elif '</head>' in updated:
+                updated = updated.replace('</head>', preload + '</head>', 1)
+    return updated
+
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
 
@@ -934,7 +1137,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.62-r3'
+SITE_ASSET_VERSION = '3.1.63'
 
 
 def _relative_prefix_for_html(html_path):
@@ -975,7 +1178,7 @@ def render_site_header(prefix='', active_key=''):
     # Keep route URLs relative so the static site works locally, on GitHub Pages
     # and on the production custom domain without a router dependency.
     return (
-        '<header class="site-header" id="top" data-bg-nav="v3.1.62-r3"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.1.63"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
@@ -990,7 +1193,7 @@ def render_site_header(prefix='', active_key=''):
 
 
 def sync_site_header_navigation():
-    """Give every public page one canonical V3.1.62 header without touching page data."""
+    """Give every public page one canonical V3.1.63 header without touching page data."""
     header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
     scanned = 0
     changed = 0
@@ -1035,6 +1238,7 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/css/styles\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        updated = re.sub(r'((?:\.\./)*assets/js/homepage\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         if 'assets/js/navigation.js' not in updated:
             nav_tag = f'<script defer="" src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script>'
             main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
@@ -1042,6 +1246,13 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.start()] + nav_tag + updated[main_match.start():]
             else:
                 updated = updated.replace('</body>', nav_tag + '</body>', 1)
+        if html_path == ROOT / 'index.html' and 'assets/js/homepage.js' not in updated:
+            home_tag = f'<script defer="" src="assets/js/homepage.js?v={SITE_ASSET_VERSION}"></script>'
+            main_match = re.search(r'<script\b[^>]*src="assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
+            if main_match:
+                updated = updated[:main_match.start()] + home_tag + updated[main_match.start():]
+            else:
+                updated = updated.replace('</body>', home_tag + '</body>', 1)
         build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
         if 'name="bgstudio-build"' in updated:
             updated = re.sub(r'<meta\s+name="bgstudio-build"\s+content="[^"]*"\s*/?>', build_meta, updated, count=1, flags=re.I)
@@ -1428,8 +1639,8 @@ def sync_nfc_offer_schema(html_text, pricing):
     return html_text
 
 
-def verify_v3162_public_shell():
-    """Fail loudly if a public page still serves the pre-V3.1.62 navigation shell."""
+def verify_v3163_public_shell(include_home=True):
+    """Fail loudly if a public page still serves the pre-V3.1.63 navigation shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -1445,19 +1656,27 @@ def verify_v3162_public_shell():
         checked += 1
         rel = html_path.relative_to(ROOT).as_posix()
         required = (
-            'data-bg-nav="v3.1.62-r3"',
+            'data-bg-nav="v3.1.63"',
             '>Üretim</button>',
             '>İşletmeler</button>',
             '>Projeler</a>',
             '>BG Studio</button>',
-            'assets/js/navigation.js?v=3.1.62-r3',
+            'assets/js/navigation.js?v=3.1.63',
         )
         missing = [token for token in required if token not in text]
+        if include_home and html_path == ROOT / 'index.html':
+            home_required = (
+                'class="home-v3163"',
+                'Fikirden fiziksel ürüne.',
+                'id="sahadan-isler"',
+                'assets/js/homepage.js?v=3.1.63',
+            )
+            missing.extend(token for token in home_required if token not in text)
         if missing:
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.1.62 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
+        raise RuntimeError('V3.1.63 header doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -1523,11 +1742,16 @@ def build_site(nfc_family_theme_overrides=None):
     validate_reference_theme_output(corporate_html, corporate_items, 'Kurumsal')
     corporate_path.write_text(corporate_html, encoding='utf-8')
 
+    # V3.1.63: the homepage is now a focused editorial product experience.
+    # Data-driven product/reference content remains sourced from Product Manager/AppData.
+    home_html = rebuild_homepage_v3163(home_path.read_text(encoding='utf-8'), active, featured, corporate_all_active)
+    home_path.write_text(home_html, encoding='utf-8')
+
     # Homepage Sahadan İşler remains independent from the Corporate-page mirror
     # switch, so hiding NFC cards from /kurumsal/ does not erase field proof.
     home_html = home_path.read_text(encoding='utf-8')
     if '<!-- CONTENT_MANAGER:HOME_FIELD_START -->' in home_html and '<!-- CONTENT_MANAGER:HOME_FIELD_END -->' in home_html:
-        home_field_cards = '\n'.join(render_home_field_case(x, i + 1, '') for i, x in enumerate(corporate_all_active[:4]))
+        home_field_cards = '\n'.join(render_home_project_feature(x, i + 1, '') for i, x in enumerate(corporate_all_active[:4]))
         home_html = replace_between(home_html, '<!-- CONTENT_MANAGER:HOME_FIELD_START -->', '<!-- CONTENT_MANAGER:HOME_FIELD_END -->', home_field_cards)
         home_path.write_text(home_html, encoding='utf-8')
 
@@ -1544,7 +1768,7 @@ def build_site(nfc_family_theme_overrides=None):
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(render_product_page(p, choose_related(products, p)), encoding='utf-8')
 
-    # V3.1.62-R3: canonical header migration is mandatory and verified.
+    # V3.1.63: canonical header migration remains mandatory and verified.
     nav_sync = sync_site_header_navigation()
 
     today = date.today().isoformat()
@@ -1560,7 +1784,7 @@ def build_site(nfc_family_theme_overrides=None):
     lines.append('</urlset>')
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
-    shell_verify = verify_v3162_public_shell()
+    shell_verify = verify_v3163_public_shell()
     return {'navigation_sync': nav_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 

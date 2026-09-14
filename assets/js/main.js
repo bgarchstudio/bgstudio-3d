@@ -10,13 +10,13 @@
   window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
 })();
 
-// V3.1.62-R3 — public header runtime root fix.
-// Some already-published static pages may still carry the pre-V3.1.62 header until
+// V3.1.63 - public header runtime compatibility layer.
+// Some already-published static pages may still carry the pre-V3.1.63 header until
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.62-r3';
-  const ASSET_VERSION = '3.1.62-r3';
+  const HEADER_VERSION = 'v3.1.63';
+  const ASSET_VERSION = '3.1.63';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -659,11 +659,11 @@ if (backToTop) {
     selected.has('logo') ? 'logo=1' : ''
   ].filter(Boolean);
 
-  // V3.1.62-R3 keeps the proven V3.1.61 NFC runtime but points stale pages to the current shared stylesheet.
+  // V3.1.63 keeps the proven V3.1.61 NFC runtime but points stale pages to the current shared stylesheet.
   document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
     try {
       const url = new URL(link.href, window.location.href);
-      if (url.searchParams.get('v') !== '3.1.62-r3') { url.searchParams.set('v', '3.1.62-r3'); link.href = url.toString(); }
+      if (url.searchParams.get('v') !== '3.1.63') { url.searchParams.set('v', '3.1.63'); link.href = url.toString(); }
     } catch (_) {}
   });
 

@@ -1,6 +1,6 @@
-/* BG Studio 3D navigation v3.1.62-r3 */
+/* BG Studio 3D navigation v3.1.63 */
 (() => {
-  const INIT_VERSION = '3.1.62-r3';
+  const INIT_VERSION = '3.1.63';
   const init = () => {
     const header = document.querySelector('.site-header');
     const nav = document.querySelector('.main-nav');
