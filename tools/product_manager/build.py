@@ -934,7 +934,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.62-r2'
+SITE_ASSET_VERSION = '3.1.62-r3'
 
 
 def _relative_prefix_for_html(html_path):
@@ -975,7 +975,7 @@ def render_site_header(prefix='', active_key=''):
     # Keep route URLs relative so the static site works locally, on GitHub Pages
     # and on the production custom domain without a router dependency.
     return (
-        '<header class="site-header" id="top" data-bg-nav="v3.1.62-r2"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.1.62-r3"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
@@ -1445,12 +1445,12 @@ def verify_v3162_public_shell():
         checked += 1
         rel = html_path.relative_to(ROOT).as_posix()
         required = (
-            'data-bg-nav="v3.1.62-r2"',
+            'data-bg-nav="v3.1.62-r3"',
             '>Üretim</button>',
             '>İşletmeler</button>',
             '>Projeler</a>',
             '>BG Studio</button>',
-            'assets/js/navigation.js?v=3.1.62-r2',
+            'assets/js/navigation.js?v=3.1.62-r3',
         )
         missing = [token for token in required if token not in text]
         if missing:
@@ -1544,7 +1544,7 @@ def build_site(nfc_family_theme_overrides=None):
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(render_product_page(p, choose_related(products, p)), encoding='utf-8')
 
-    # V3.1.62-R2: canonical header migration is mandatory and verified.
+    # V3.1.62-R3: canonical header migration is mandatory and verified.
     nav_sync = sync_site_header_navigation()
 
     today = date.today().isoformat()

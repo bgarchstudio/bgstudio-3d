@@ -66,13 +66,13 @@ TAG_PRESETS = [
 ]
 ensure_initialized()
 export_to_repo()
-# V3.1.62-R2: panel açılır açılmaz public shell güncel build dosyasına senkronlanır.
+# V3.1.62-R3: panel açılır açılmaz public shell güncel build dosyasına senkronlanır.
 # Böylece yalnız build.py değişmişken açık kalan eski Python süreci sessizce eski header üretmez.
 try:
     STARTUP_SHELL_SYNC = sync_public_shell_from_current_build()
 except Exception as exc:
     STARTUP_SHELL_SYNC = {'ok': False, 'error': str(exc)}
-    print('[V3.1.62-R2] Public shell startup sync warning:', exc, file=sys.stderr)
+    print('[V3.1.62-R3] Public shell startup sync warning:', exc, file=sys.stderr)
 
 MIME = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
