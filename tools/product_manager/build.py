@@ -1324,7 +1324,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.73-r1'
+SITE_ASSET_VERSION = '3.1.74'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2658,6 +2658,202 @@ def audit_v3171_public_pages():
         if '<main' not in text: result['missing_main'].append(rel)
         if re.search(r'<img\b(?![^>]*\balt=)[^>]*>',text,re.I): result['missing_alt'].append(rel)
     return result
+
+
+# ============================================================
+# V3.1.74 · PROJECT / CASE STUDY MANAGEMENT LAYER
+# Project metadata lives in persistent AppData `projects` collection.
+# Source NFC / Corporate / Prototype records remain untouched.
+# ============================================================
+
+def load_project_overrides():
+    data = get_collection('projects', [])
+    if not isinstance(data, list):
+        return []
+    return [dict(x) for x in data if isinstance(x, dict) and str(x.get('id') or '').strip()]
+
+
+def _project_source_id(item):
+    kind = _project_kind(item)
+    slug = str(item.get('source_slug') or item.get('slug') or item.get('name') or 'proje').strip()
+    return f'{kind}:{slug}'
+
+
+def collect_project_items(corporate_items, prototype_items):
+    """Merge persistent project-only overrides without mutating source records."""
+    overrides = {str(x.get('id')): x for x in load_project_overrides()}
+    rows = []
+    seen_slugs = set()
+    sources = list(corporate_items or []) + [{**x, '_project_kind':'prototype'} for x in (prototype_items or [])]
+    for source_index, raw in enumerate(sources, 1):
+        if not isinstance(raw, dict) or not raw.get('active', True):
+            continue
+        item = dict(raw)
+        kind = _project_kind(item)
+        item['_project_kind'] = kind
+        project_id = _project_source_id(item)
+        override = dict(overrides.get(project_id) or {})
+        if override and not bool(override.get('project_active', True)):
+            continue
+        item['_project_id'] = project_id
+        item['_project_managed'] = bool(override)
+        for key in ('client','title','summary','sector','need','solution','quantity','system','delivery','result','tags','metrics','seo_title','seo_description','cover_image','gallery_images'):
+            if key in override:
+                item['project_' + key] = override.get(key)
+        try:
+            item['_project_sort_order'] = int(override.get('sort_order') or 999999) if override else 999999
+        except Exception:
+            item['_project_sort_order'] = 999999
+        item['_project_source_index'] = source_index
+        slug = _project_slug(item)
+        if slug in seen_slugs:
+            slug = _project_slug(item, True)
+        if slug in seen_slugs:
+            base = slug
+            i = 2
+            while f'{base}-{i}' in seen_slugs:
+                i += 1
+            slug = f'{base}-{i}'
+        item['_project_slug'] = slug
+        seen_slugs.add(slug)
+        rows.append(item)
+    rows.sort(key=lambda x: (int(x.get('_project_sort_order') or 999999), int(x.get('_project_source_index') or 999999), str(x.get('project_title') or x.get('headline') or x.get('name') or '').casefold()))
+    return rows
+
+
+def _project_media(item, prefix='../', css_class=''):
+    image = str(item.get('project_cover_image') or item.get('image') or '').strip()
+    name = esc(item.get('project_client') or item.get('name') or item.get('project_title') or item.get('headline') or 'BG Studio projesi')
+    klass = f' {css_class}' if css_class else ''
+    if image:
+        return f'<div class="project-media{klass}"><img src="{esc(prefix + image)}" alt="{name}" loading="lazy" decoding="async"></div>'
+    return f'<div class="project-media project-media-fallback{klass}"><span>BG</span><strong>{name}</strong></div>'
+
+
+def _project_sector(item):
+    if 'project_sector' in item:
+        return str(item.get('project_sector') or '').strip()
+    return str(item.get('sector') or item.get('category') or _project_kind_label(item)).strip()
+
+
+def _project_quantity(item):
+    if 'project_quantity' in item:
+        return str(item.get('project_quantity') or '').strip()
+    return _project_optional(item, 'quantity', 'delivered_quantity', 'produced_quantity', 'stand_count')
+
+
+def _project_metrics(item):
+    has_override = 'project_metrics' in item
+    raw = item.get('project_metrics') if has_override and isinstance(item.get('project_metrics'), dict) else (item.get('metrics') if isinstance(item.get('metrics'), dict) else {})
+    aliases = [
+        ('NFC taraması', ('nfc_scans','nfc_scan','scans')),
+        ('Menü açılışı', ('menu_opens','menu_views','menu_clicks')),
+        ('Feedback', ('feedback_count','feedbacks','reviews')),
+        ('Google yönlendirmesi', ('google_redirects','google_clicks','google_transfers')),
+    ]
+    out=[]
+    for label, keys in aliases:
+        value = None
+        for key in keys:
+            if key in raw and raw.get(key) not in (None,''):
+                value = raw.get(key); break
+            if not has_override and key in item and item.get(key) not in (None,''):
+                value = item.get(key); break
+        if value in (None,''):
+            continue
+        try:
+            if float(value) < 0:
+                continue
+        except Exception:
+            pass
+        out.append((label, str(value)))
+    return out
+
+
+def _project_tags(item):
+    values = item.get('project_tags') if 'project_tags' in item else item.get('tags')
+    return [str(x).strip() for x in (values or []) if str(x).strip()]
+
+
+def _project_gallery(item):
+    values = item.get('project_gallery_images') if 'project_gallery_images' in item else []
+    return [str(x).strip() for x in (values or []) if str(x).strip()][:6]
+
+
+def render_project_index(project_items):
+    cards=[]
+    counts={'all':len(project_items),'nfc':0,'corporate':0,'prototype':0}
+    for idx,item in enumerate(project_items,1):
+        kind=_project_kind(item)
+        counts[kind]=counts.get(kind,0)+1
+        name=esc(item.get('project_client') or item.get('name') or 'BG Studio')
+        headline=esc(item.get('project_title') or item.get('headline') or item.get('name') or 'Proje')
+        desc=esc(item.get('project_summary') if 'project_summary' in item else (item.get('description') or ''))
+        sector=esc(_project_sector(item))
+        tags=''.join(f'<span>{esc(t)}</span>' for t in _project_tags(item)[:4])
+        media=_project_media(item,'../','project-index-media')
+        cards.append(f'''<article class="project-index-card" data-project-card data-project-kind="{kind}" data-project-motion><a class="project-index-media-link" href="{esc(_project_slug(item))}/" aria-label="{name} projesini incele">{media}</a><div class="project-index-body"><div class="project-index-meta"><span>{idx:02d}</span><small>{esc(_project_kind_label(item))} · {sector}</small></div><h2>{headline}</h2><p>{desc}</p><div class="project-index-tags">{tags}</div><a class="project-index-link" href="{esc(_project_slug(item))}/">Projeyi incele ↗</a></div></article>''')
+    filters=[]
+    labels=[('all','Tümü'),('nfc','NFC + QR'),('corporate','Kurumsal'),('prototype','Prototip + Parça')]
+    for key,label in labels:
+        if key!='all' and not counts.get(key):
+            continue
+        active=' is-active' if key=='all' else ''
+        filters.append(f'<button class="project-filter{active}" type="button" data-project-filter="{key}" aria-pressed="{str(key=="all").lower()}">{label}<span>{counts.get(key,0)}</span></button>')
+    body=f'''<section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Ürün Yöneticisindeki proje kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/">Teklif Al ↗</a></div></section>'''
+    return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
+
+
+def render_project_detail(item, project_items):
+    slug=_project_slug(item)
+    name=str(item.get('project_client') or item.get('name') or 'BG Studio')
+    headline=str(item.get('project_title') or item.get('headline') or name)
+    description=str(item.get('project_summary') if 'project_summary' in item else (item.get('description') or headline))
+    sector=_project_sector(item)
+    kind_label=_project_kind_label(item)
+    quantity=_project_quantity(item)
+    need=str(item.get('project_need') if 'project_need' in item else _project_optional(item,'need','project_need','ihtiyac')).strip()
+    solution=str(item.get('project_solution') if 'project_solution' in item else _project_optional(item,'solution','project_solution','cozum')).strip()
+    system=str(item.get('project_system') if 'project_system' in item else _project_optional(item,'system','project_system','sistem')).strip()
+    delivery=str(item.get('project_delivery') if 'project_delivery' in item else _project_optional(item,'delivery','project_delivery','teslim')).strip()
+    result=str(item.get('project_result') if 'project_result' in item else _project_optional(item,'result','project_result','sonuc')).strip()
+    facts=[('Müşteri',name),('Sektör',sector)]
+    if quantity: facts.append(('Üretilen adet',quantity))
+    if system: facts.append(('Sistem',system))
+    if delivery: facts.append(('Teslim',delivery))
+    facts_html=''.join(f'<article><span>{esc(k)}</span><strong>{esc(v)}</strong></article>' for k,v in facts if v)
+    tags=''.join(f'<span>{esc(t)}</span>' for t in _project_tags(item))
+    story=[]
+    if need: story.append(('01','İhtiyaç',need))
+    if solution: story.append((f'{len(story)+1:02d}','BG Studio çözümü',solution))
+    if result: story.append((f'{len(story)+1:02d}','Sonuç',result))
+    if not story:
+        story.append(('01','Proje özeti',description))
+    story_html=''.join(f'<article class="project-story-card"><span>{num}</span><h2>{esc(title)}</h2><p>{esc(value)}</p></article>' for num,title,value in story)
+    metrics=_project_metrics(item)
+    metrics_html=''
+    if metrics:
+        metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">GERÇEK SİSTEM VERİSİ</p><h2>Kayıtlı proje metrikleri.</h2><p>Yalnızca Ürün Yöneticisinde girilen değerler gösterilir.</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
+    media=_project_media(item,'../../','project-detail-media')
+    gallery=_project_gallery(item)
+    gallery_html=''
+    if gallery:
+        gallery_cards=''.join(f'<button class="project-gallery-item zoomable-media" type="button" aria-label="{esc(name)} proje görselini büyüt"><img src="../../{esc(src)}" alt="{esc(name)} proje görseli {idx}" loading="lazy" decoding="async"></button>' for idx,src in enumerate(gallery,1))
+        gallery_html=f'<section class="section-pad-sm shell project-gallery-section"><div class="split-title"><div><p class="eyebrow">PROJE GÖRSELLERİ</p><h2>Uygulamadan detaylar.</h2></div></div><div class="project-gallery-grid">{gallery_cards}</div></section>'
+    kind=_project_kind(item)
+    service={'nfc':'../../nfc-qr/','prototype':'../../prototip-parca/','corporate':'../../kurumsal/'}.get(kind,'../../kurumsal/')
+    offer={'nfc':'../../teklif/?tur=nfc','prototype':'../../teklif/?tur=prototip','corporate':'../../teklif/?tur=kurumsal'}.get(kind,'../../teklif/')
+    related=[x for x in project_items if _project_slug(x)!=slug][:3]
+    related_html=''.join(f'<a class="project-related-card" href="../{esc(_project_slug(x))}/">{_project_media(x,"../../","project-related-media")}<span>{esc(_project_kind_label(x))}</span><strong>{esc(x.get("project_client") or x.get("name") or x.get("project_title") or x.get("headline") or "Proje")}</strong></a>' for x in related)
+    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@type':'Organization','name':'BG Studio 3D','url':BASE_URL},'url':BASE_URL+'/projeler/'+slug+'/'}
+    cover=str(item.get('project_cover_image') or item.get('image') or '').strip()
+    if cover:
+        schema['image']=BASE_URL+'/'+cover.lstrip('/')
+    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
+    body=f'''<script type="application/ld+json">{schema_json}</script><section class="project-detail-hero"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{gallery_html}{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">DİĞER PROJELER</p><h2>Sahadan başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" href="{offer}">Teklif Al ↗</a></div></section>'''
+    seo_title=str(item.get('project_seo_title') or f'{headline} | BG Studio 3D Proje').strip()
+    seo_description=clip_seo_text(item.get('project_seo_description') or description,160)
+    return _project_page_shell(seo_title,seo_description,f'/projeler/{slug}/',body,'../../')
 
 
 def build_site(nfc_family_theme_overrides=None):

@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.73-R1'
-CATALOG_ADMIN_REVISION = '3.1.73-R1'
+PANEL_VERSION = '3.1.74'
+CATALOG_ADMIN_REVISION = '3.1.74'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -152,6 +152,18 @@ def ensure_catalog_admin_extensions():
         text = text.replace('</body>', tech_js + '</body>', 1)
     else:
         text = re.sub(r'(product-tech-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    project_css = f'<link rel="stylesheet" href="project-admin.css?v={rev}">'
+    if 'project-admin.css' not in text:
+        text = text.replace('</head>', project_css + '</head>', 1)
+    else:
+        text = re.sub(r'(project-admin\.css\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    project_js = f'<script src="project-admin.js?v={rev}"></script>'
+    if 'project-admin.js' not in text:
+        text = text.replace('</body>', project_js + '</body>', 1)
+    else:
+        text = re.sub(r'(project-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
 
     if text != original:
         path.write_text(text, encoding='utf-8')
@@ -1662,6 +1674,224 @@ def save_content_item(kind, payload):
 
     return item, build_site()
 
+# ============================================================
+# V3.1.74 · PROJECT / CASE STUDY ADMIN
+# Project-only metadata is stored independently from source reference records.
+# ============================================================
+
+def _project_admin_id(kind, slug):
+    return f'{kind}:{str(slug or "").strip()}'
+
+
+def _project_admin_slug(kind, slug):
+    safe = slugify(slug or 'proje') or 'proje'
+    if kind == 'prototype' and not safe.startswith('prototip-'):
+        safe = 'prototip-' + safe
+    return safe
+
+
+def read_project_overrides():
+    data = get_collection('projects', [])
+    return [dict(x) for x in data if isinstance(x, dict) and str(x.get('id') or '').strip()] if isinstance(data, list) else []
+
+
+def write_project_overrides(items):
+    cleaned = [dict(x) for x in (items or []) if isinstance(x, dict) and str(x.get('id') or '').strip()]
+    cleaned.sort(key=lambda x: (int(x.get('sort_order') or 999999), str(x.get('id') or '').casefold()))
+    set_collection('projects', cleaned)
+    return cleaned
+
+
+def project_admin_sources():
+    nfc = {str(x.get('slug') or ''): dict(x) for x in read_content('nfc') if isinstance(x, dict)}
+    out=[]
+    seen=set()
+    for raw in read_content('corporate'):
+        if not isinstance(raw, dict):
+            continue
+        row=dict(raw)
+        if row.get('source_kind') == 'nfc' and row.get('source_slug'):
+            slug=str(row.get('source_slug') or '')
+            source=nfc.get(slug)
+            if not source:
+                continue
+            merged={**source, **{k:v for k,v in row.items() if k in ('slug','source_kind','source_slug','sort_order')}}
+            kind='nfc'
+            source_slug=slug
+        else:
+            merged=row
+            kind='corporate'
+            source_slug=str(row.get('slug') or '')
+        pid=_project_admin_id(kind,source_slug)
+        if not source_slug or pid in seen:
+            continue
+        seen.add(pid)
+        merged['_project_kind']=kind
+        merged['_project_id']=pid
+        merged['_project_source_slug']=source_slug
+        out.append(merged)
+    for row in read_content('prototype'):
+        if not isinstance(row, dict):
+            continue
+        source_slug=str(row.get('slug') or '')
+        pid=_project_admin_id('prototype',source_slug)
+        if not source_slug or pid in seen:
+            continue
+        seen.add(pid)
+        merged=dict(row)
+        merged['_project_kind']='prototype'
+        merged['_project_id']=pid
+        merged['_project_source_slug']=source_slug
+        out.append(merged)
+    return out
+
+
+def _project_admin_defaults(source):
+    kind=source.get('_project_kind') or 'corporate'
+    source_slug=str(source.get('_project_source_slug') or source.get('slug') or '')
+    return {
+        'id': source.get('_project_id') or _project_admin_id(kind,source_slug),
+        'source_kind': kind,
+        'source_slug': source_slug,
+        'project_slug': _project_admin_slug(kind,source_slug),
+        'source_active': bool(source.get('active', True)),
+        'project_active': True,
+        'sort_order': int(source.get('sort_order') or 999),
+        'client': str(source.get('name') or '').strip(),
+        'title': str(source.get('headline') or source.get('name') or '').strip(),
+        'summary': str(source.get('description') or '').strip(),
+        'sector': str(source.get('sector') or source.get('category') or '').strip(),
+        'need': str(source.get('need') or '').strip(),
+        'solution': str(source.get('solution') or '').strip(),
+        'quantity': str(source.get('quantity') or source.get('stand_count') or '').strip(),
+        'system': str(source.get('system') or '').strip(),
+        'delivery': str(source.get('delivery') or '').strip(),
+        'result': str(source.get('result') or '').strip(),
+        'tags': [str(x).strip() for x in (source.get('tags') or []) if str(x).strip()],
+        'metrics': dict(source.get('metrics') or {}) if isinstance(source.get('metrics'),dict) else {},
+        'seo_title': '',
+        'seo_description': '',
+        'cover_image': str(source.get('image') or '').strip(),
+        'gallery_images': [],
+        'managed': False,
+    }
+
+
+def project_admin_items():
+    overrides={str(x.get('id')):dict(x) for x in read_project_overrides()}
+    items=[]
+    for source in project_admin_sources():
+        base=_project_admin_defaults(source)
+        override=overrides.get(base['id'])
+        if override:
+            for key in ('project_active','sort_order','client','title','summary','sector','need','solution','quantity','system','delivery','result','tags','metrics','seo_title','seo_description','cover_image','gallery_images'):
+                if key in override:
+                    base[key]=override.get(key)
+            base['managed']=True
+        base['source_label']={'nfc':'NFC + QR','corporate':'Kurumsal','prototype':'Prototip + Parça'}.get(base['source_kind'],'Proje')
+        items.append(base)
+    return sorted(items,key=lambda x:(int(x.get('sort_order') or 999999),str(x.get('client') or x.get('title') or '').casefold()))
+
+
+def _project_safe_text(value, limit):
+    return re.sub(r'\s+',' ',str(value or '').strip())[:limit]
+
+
+def _project_multiline(value, limit):
+    return str(value or '').replace('\r\n','\n').strip()[:limit]
+
+
+def _project_save_image(data_obj, rel):
+    if not isinstance(data_obj,dict) or not data_obj.get('data'):
+        return None
+    save_data_uri(data_obj.get('data'), ROOT / rel)
+    return rel
+
+
+def save_project_admin(payload):
+    project_id=str(payload.get('id') or '').strip()
+    source=next((x for x in project_admin_sources() if x.get('_project_id')==project_id),None)
+    if not source:
+        raise ValueError('Proje kaynağı bulunamadı.')
+    defaults=_project_admin_defaults(source)
+    incoming=payload.get('project') if isinstance(payload.get('project'),dict) else {}
+    row={
+        'id':project_id,
+        'source_kind':defaults['source_kind'],
+        'source_slug':defaults['source_slug'],
+        'project_active':bool(incoming.get('project_active',True)),
+        'sort_order':max(1,int(incoming.get('sort_order') or defaults['sort_order'] or 999)),
+        'client':_project_safe_text(incoming.get('client'),120),
+        'title':_project_safe_text(incoming.get('title'),180),
+        'summary':_project_multiline(incoming.get('summary'),800),
+        'sector':_project_safe_text(incoming.get('sector'),120),
+        'need':_project_multiline(incoming.get('need'),1800),
+        'solution':_project_multiline(incoming.get('solution'),1800),
+        'quantity':_project_safe_text(incoming.get('quantity'),120),
+        'system':_project_safe_text(incoming.get('system'),240),
+        'delivery':_project_safe_text(incoming.get('delivery'),180),
+        'result':_project_multiline(incoming.get('result'),1800),
+        'tags':[re.sub(r'\s+',' ',str(x or '').strip())[:50] for x in (incoming.get('tags') or []) if str(x or '').strip()][:16],
+        'metrics':{},
+        'seo_title':_project_safe_text(incoming.get('seo_title'),180),
+        'seo_description':_project_safe_text(incoming.get('seo_description'),220),
+    }
+    metrics=incoming.get('metrics') if isinstance(incoming.get('metrics'),dict) else {}
+    for key in ('nfc_scans','menu_opens','feedback_count','google_redirects'):
+        value=str(metrics.get(key) or '').strip()
+        if value:
+            try:
+                num=int(float(value))
+                if num >= 0:
+                    row['metrics'][key]=num
+            except Exception:
+                pass
+    old=next((x for x in read_project_overrides() if str(x.get('id'))==project_id),{})
+    safe_id=slugify(project_id.replace(':','-')) or 'proje'
+    if payload.get('cover_clear'):
+        old_cover=str(old.get('cover_image') or '')
+        if old_cover.startswith('assets/images/projects/'):
+            remove_file(old_cover)
+        row['cover_image']=''
+    else:
+        cover=_project_save_image(payload.get('cover_file'),f'assets/images/projects/{safe_id}-cover.webp')
+        row['cover_image']=cover if cover else str(incoming.get('cover_image') or old.get('cover_image') or defaults.get('cover_image') or '')
+    keep=[str(x).strip() for x in (payload.get('gallery_keep') or []) if str(x).startswith('assets/images/projects/')][:6]
+    old_gallery=[str(x) for x in (old.get('gallery_images') or [])]
+    for rel in old_gallery:
+        if rel.startswith('assets/images/projects/') and rel not in keep:
+            remove_file(rel)
+    gallery=list(keep)
+    for idx,obj in enumerate((payload.get('gallery_new') or [])[:max(0,6-len(gallery))],1):
+        rel=f'assets/images/projects/{safe_id}-gallery-{int(time.time()*1000)}-{idx}.webp'
+        saved=_project_save_image(obj,rel)
+        if saved:
+            gallery.append(saved)
+    row['gallery_images']=gallery[:6]
+    rows=[dict(x) for x in read_project_overrides() if str(x.get('id'))!=project_id]
+    rows.append(row)
+    write_project_overrides(rows)
+    result=build_site()
+    saved=next((x for x in project_admin_items() if x.get('id')==project_id),row)
+    return saved,result
+
+
+def reset_project_admin(project_id):
+    project_id=str(project_id or '').strip()
+    rows=read_project_overrides()
+    old=next((x for x in rows if str(x.get('id'))==project_id),None)
+    if not old:
+        return build_site()
+    cover=str(old.get('cover_image') or '')
+    if cover.startswith('assets/images/projects/'):
+        remove_file(cover)
+    for rel in (old.get('gallery_images') or []):
+        if str(rel).startswith('assets/images/projects/'):
+            remove_file(rel)
+    write_project_overrides([x for x in rows if str(x.get('id'))!=project_id])
+    return build_site()
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print('[Panel]', fmt % args)
@@ -1708,7 +1938,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3173-r1', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3174-project-admin', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -1718,6 +1948,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
             return self.send_json(preflight())
+        if u.path == '/api/projects-admin':
+            return self.send_json({'ok': True, 'items': project_admin_items(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/content':
             from urllib.parse import parse_qs
             kind = (parse_qs(u.query).get('kind') or [''])[0]
@@ -2014,6 +2246,18 @@ class Handler(BaseHTTPRequestHandler):
                 items, result = save_all_nfc_corporate_visibility(visible)
                 label = 'gösteriliyor' if visible else 'gizlendi'
                 return self.send_json({'ok': True, 'message': f'Tüm NFC aynaları Kurumsal sayfada {label}.', 'items': items, 'result': result})
+
+            if self.path == '/api/projects-admin/save':
+                payload = self.read_json()
+                full_backup('before-project-admin-save')
+                item, result = save_project_admin(payload)
+                return self.send_json({'ok': True, 'message': 'Proje bilgileri kaydedildi ve proje sayfaları güncellendi.', 'item': item, 'result': result})
+
+            if self.path == '/api/projects-admin/reset':
+                payload = self.read_json()
+                full_backup('before-project-admin-reset')
+                result = reset_project_admin(payload.get('id'))
+                return self.send_json({'ok': True, 'message': 'Proje özel ayarları sıfırlandı ve kaynak veriye dönüldü.', 'result': result})
 
             if self.path == '/api/content/theme/save':
                 payload = self.read_json()
