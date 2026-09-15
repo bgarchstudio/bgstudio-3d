@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.75'
-CATALOG_ADMIN_REVISION = '3.1.75'
+PANEL_VERSION = '3.1.76'
+CATALOG_ADMIN_REVISION = '3.1.76'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -1950,7 +1950,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3175-site-content-consent-hero', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3176-home-placement-manager', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -1964,7 +1964,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'items': project_admin_items(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/site-content-v3175':
             module = _fresh_build_module()
-            return self.send_json({'ok': True, 'content': module.read_site_content_v3175(), 'products': [{'slug': p.get('slug'), 'name': p.get('name')} for p in read_products() if p.get('active', True)], 'root': str(ROOT), 'storage': storage_status()})
+            return self.send_json({'ok': True, 'content': module.read_site_content_v3175(), 'products': [{'slug': p.get('slug'), 'name': p.get('name'), 'image': p.get('main_image') or '', 'price': p.get('price') or '', 'category': p.get('category') or ''} for p in read_products() if p.get('active', True)], 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/content':
             from urllib.parse import parse_qs
             kind = (parse_qs(u.query).get('kind') or [''])[0]

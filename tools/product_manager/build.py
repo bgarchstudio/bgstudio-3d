@@ -655,6 +655,8 @@ SITE_CONTENT_V3175_DEFAULTS = {
         'hero_primary_label': 'Ürünleri İncele', 'hero_primary_url': 'urunler/',
         'hero_secondary_label': 'Özel Üretim', 'hero_secondary_url': 'ozel-uretim/',
         'hero_product_slugs': [],
+        'showcase_product_slugs': [],
+        'production_product_slug': '',
         'production_eyebrow': 'ÖZEL ÜRETİM', 'production_title': 'Aklındaki parçayı üretelim.',
         'production_lead': 'Fotoğraf, eskiz, ölçü veya fikirle başlayabiliriz. Tasarımı üretilebilir hale getirip baskı sürecine taşıyoruz.',
         'production_cta_label': 'Teklif Al ↗', 'production_cta_url': 'teklif/?tur=ozel-uretim',
@@ -710,10 +712,23 @@ def clean_site_content_v3175(value):
         supplied = raw.get(section) if isinstance(raw.get(section), dict) else {}
         row = {}
         for key, default in defaults.items():
-            if key == 'hero_product_slugs':
+            if key in ('hero_product_slugs', 'showcase_product_slugs'):
                 items = supplied.get(key, default)
                 if not isinstance(items, list): items = []
-                row[key] = [re.sub(r'[^a-z0-9-]', '', str(x or '').casefold())[:100] for x in items if str(x or '').strip()][:3]
+                slot_count = 3 if key == 'hero_product_slugs' else 6
+                cleaned = []
+                for item in items[:slot_count]:
+                    token = str(item or '').strip().casefold()
+                    if key == 'showcase_product_slugs' and token == '__hide__':
+                        cleaned.append('__hide__')
+                    else:
+                        cleaned.append(re.sub(r'[^a-z0-9-]', '', token)[:100])
+                cleaned.extend([''] * max(0, slot_count - len(cleaned)))
+                row[key] = cleaned[:slot_count]
+                continue
+            if key == 'production_product_slug':
+                token = str(supplied.get(key, default) or '').strip().casefold()
+                row[key] = re.sub(r'[^a-z0-9-]', '', token)[:100]
                 continue
             text = str(supplied.get(key, default) or '').strip()
             if not text:
@@ -747,22 +762,63 @@ def _site_why_title_html(value):
     return ''.join(f'<span>{esc(part)}</span>' for part in parts)
 
 
-def _home_product_selection(active, featured, limit=6):
-    # Stable homepage product selection: panel-picked hero products first, then featured/active.
+def _homepage_product_pool(active, featured):
+    """Deterministic fallback pool. Manual placements are handled separately."""
     picked = []
     seen = set()
-    by_slug = {str(product.get('slug') or '').strip(): product for product in (active or [])}
-    preferred = read_site_content_v3175().get('home', {}).get('hero_product_slugs') or []
-    ordered = [by_slug[slug] for slug in preferred if slug in by_slug] + list(featured or []) + list(active or [])
-    for product in ordered:
+    for product in list(featured or []) + list(active or []):
         slug = str(product.get('slug') or '').strip()
         if not slug or slug in seen:
             continue
         seen.add(slug)
         picked.append(product)
-        if len(picked) >= limit:
-            break
     return picked
+
+
+def _homepage_slot_products(active, featured, configured, slot_count, allow_hide=False):
+    """Resolve exact panel slots while keeping an automatic fallback for empty slots."""
+    by_slug = {str(product.get('slug') or '').strip(): product for product in (active or [])}
+    pool = _homepage_product_pool(active, featured)
+    tokens = list(configured or [])[:slot_count]
+    tokens.extend([''] * max(0, slot_count - len(tokens)))
+    resolved = []
+    used = set()
+
+    def next_auto():
+        for product in pool:
+            slug = str(product.get('slug') or '').strip()
+            if slug and slug not in used:
+                used.add(slug)
+                return product
+        return None
+
+    for token in tokens[:slot_count]:
+        token = str(token or '').strip()
+        if allow_hide and token == '__hide__':
+            resolved.append(None)
+            continue
+        product = by_slug.get(token) if token else None
+        if product:
+            slug = str(product.get('slug') or '').strip()
+            if slug in used:
+                product = next_auto()
+            else:
+                used.add(slug)
+        else:
+            product = next_auto()
+        resolved.append(product)
+    return resolved
+
+
+def _homepage_single_product(active, featured, configured_slug='', fallback_index=0):
+    by_slug = {str(product.get('slug') or '').strip(): product for product in (active or [])}
+    configured_slug = str(configured_slug or '').strip()
+    if configured_slug in by_slug:
+        return by_slug[configured_slug]
+    pool = _homepage_product_pool(active, featured)
+    if not pool:
+        return None
+    return pool[min(max(int(fallback_index or 0), 0), len(pool)-1)]
 
 
 def _picture_sources_for_product(product, prefix=''):
@@ -848,16 +904,16 @@ def _home_visual_product(product, position='main', eager=False):
 
 
 def render_homepage_v3163(active, featured, field_items):
-    # V3.1.75: editorial copy and hero picks can be managed without touching code.
+    # V3.1.76: editorial copy and every homepage product placement can be managed without touching code.
     home_copy = read_site_content_v3175()['home']
-    products = _home_product_selection(active, featured, limit=6)
-    hero_products = products[:3]
+    hero_products = _homepage_slot_products(active, featured, home_copy.get('hero_product_slugs'), 3)
     hero_main = hero_products[0] if hero_products else None
     hero_side_1 = hero_products[1] if len(hero_products) > 1 else hero_main
     hero_side_2 = hero_products[2] if len(hero_products) > 2 else hero_side_1
-    product_cards = '\n'.join(render_home_showcase_product(p, i) for i, p in enumerate(products))
+    showcase_slots = _homepage_slot_products(active, featured, home_copy.get('showcase_product_slugs'), 6, allow_hide=True)
+    product_cards = '\n'.join(render_home_showcase_product(product, i) for i, product in enumerate(showcase_slots) if product)
     project_cards = '\n'.join(render_home_project_feature(x, i + 1, '') for i, x in enumerate((field_items or [])[:4]))
-    production_product = products[1] if len(products) > 1 else hero_main
+    production_product = _homepage_single_product(active, featured, home_copy.get('production_product_slug'), fallback_index=1)
     production_visual = _home_visual_product(production_product, 'production', eager=False)
 
     return f'''<main class="home-v3163" id="main-content">
@@ -942,9 +998,11 @@ def rebuild_homepage_v3163(text, active, featured, field_items):
         raise RuntimeError('V3.1.63 ana sayfa <main> alanı bulunamadı.')
     updated = pattern.sub(lambda _m: main_html, text, count=1)
 
-    selected = _home_product_selection(active, featured, limit=1)
-    if selected:
-        hero_src = str(selected[0].get('main_image') or '').strip()
+    home_copy = read_site_content_v3175().get('home', {})
+    selected = _homepage_slot_products(active, featured, home_copy.get('hero_product_slugs'), 3)
+    hero_first = selected[0] if selected else None
+    if hero_first:
+        hero_src = str(hero_first.get('main_image') or '').strip()
         if hero_src:
             preload = f'<!-- BGSTUDIO:HOME_HERO_PRELOAD --><link rel="preload" as="image" href="{esc(hero_src)}" fetchpriority="high"/>'
             if '<!-- BGSTUDIO:HOME_HERO_PRELOAD -->' in updated:
@@ -1430,7 +1488,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.75'
+SITE_ASSET_VERSION = '3.1.76'
 
 
 def _relative_prefix_for_html(html_path):
