@@ -1152,13 +1152,13 @@ main>.nfc-platform-hero+.nfc-reference-first+.nfc-stand-schema{padding-top:0}
 .home-hero-proof span{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.26);color:#6e5a49;font-size:.66rem;font-weight:700}
 .home-hero-stage-v3163{--home-parallax:0px;position:relative;min-height:clamp(560px,62vw,780px);border-radius:clamp(26px,3vw,42px);overflow:hidden;background:linear-gradient(145deg,#15110e 0%,#201711 62%,#2b1c11 100%);border:1px solid rgba(255,255,255,.06);box-shadow:0 38px 100px rgba(55,36,22,.2);transform:translate3d(0,var(--home-parallax),0);will-change:transform}
 .home-hero-stage-v3163:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 20%,rgba(211,153,90,.22),transparent 26%),linear-gradient(118deg,transparent 0 48%,rgba(255,255,255,.025) 48% 49%,transparent 49%);pointer-events:none}
-.home-hero-visual{position:absolute;margin:0;overflow:hidden;background:#efe6da;border:1px solid rgba(255,255,255,.09);box-shadow:0 26px 70px rgba(0,0,0,.24)}
+.home-hero-visual{position:absolute;margin:0;overflow:hidden;background:#17120f;border:0;box-shadow:0 26px 70px rgba(0,0,0,.24);isolation:isolate;transform:translateZ(0);backface-visibility:hidden}
 .home-hero-visual-main{left:7%;top:9%;width:64%;height:78%;border-radius:28px;z-index:2}
 .home-hero-visual-side-one{right:5%;top:8%;width:28%;height:33%;border-radius:22px;z-index:3}
 .home-hero-visual-side-two{right:5%;bottom:13%;width:31%;height:35%;border-radius:22px;z-index:3}
 .home-hero-picture,.home-hero-picture img{width:100%;height:100%;display:block}
-.home-hero-picture img{object-fit:cover;transition:transform 600ms cubic-bezier(.2,.7,.2,1)}
-.home-hero-visual:hover .home-hero-picture img{transform:scale(1.025)}
+.home-hero-picture img{object-fit:cover;transform:scale(1.002);transition:transform 600ms cubic-bezier(.2,.7,.2,1);backface-visibility:hidden;will-change:transform}
+.home-hero-visual:hover .home-hero-picture img{transform:scale(1.028)}
 .home-hero-visual figcaption{position:absolute;left:0;right:0;bottom:0;padding:46px 18px 16px;background:linear-gradient(transparent,rgba(17,13,10,.84));color:#fff;display:grid;gap:3px}
 .home-hero-visual figcaption span{font-size:.76rem;font-weight:800}.home-hero-visual figcaption small{font-size:.64rem;color:#d6c5b4}
 .home-hero-visual-fallback{position:absolute;display:grid;place-items:center;align-content:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#f3e7da}

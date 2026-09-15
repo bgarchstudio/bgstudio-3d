@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.74'
-CATALOG_ADMIN_REVISION = '3.1.74'
+PANEL_VERSION = '3.1.75'
+CATALOG_ADMIN_REVISION = '3.1.75'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -164,6 +164,18 @@ def ensure_catalog_admin_extensions():
         text = text.replace('</body>', project_js + '</body>', 1)
     else:
         text = re.sub(r'(project-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    site_content_css = f'<link rel="stylesheet" href="site-content-admin.css?v={rev}">'
+    if 'site-content-admin.css' not in text:
+        text = text.replace('</head>', site_content_css + '</head>', 1)
+    else:
+        text = re.sub(r'(site-content-admin\.css\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    site_content_js = f'<script src="site-content-admin.js?v={rev}"></script>'
+    if 'site-content-admin.js' not in text:
+        text = text.replace('</body>', site_content_js + '</body>', 1)
+    else:
+        text = re.sub(r'(site-content-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
 
     if text != original:
         path.write_text(text, encoding='utf-8')
@@ -1938,7 +1950,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3174-project-admin', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3175-site-content-consent-hero', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -1950,6 +1962,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(preflight())
         if u.path == '/api/projects-admin':
             return self.send_json({'ok': True, 'items': project_admin_items(), 'root': str(ROOT), 'storage': storage_status()})
+        if u.path == '/api/site-content-v3175':
+            module = _fresh_build_module()
+            return self.send_json({'ok': True, 'content': module.read_site_content_v3175(), 'products': [{'slug': p.get('slug'), 'name': p.get('name')} for p in read_products() if p.get('active', True)], 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/content':
             from urllib.parse import parse_qs
             kind = (parse_qs(u.query).get('kind') or [''])[0]
@@ -2246,6 +2261,14 @@ class Handler(BaseHTTPRequestHandler):
                 items, result = save_all_nfc_corporate_visibility(visible)
                 label = 'gösteriliyor' if visible else 'gizlendi'
                 return self.send_json({'ok': True, 'message': f'Tüm NFC aynaları Kurumsal sayfada {label}.', 'items': items, 'result': result})
+
+            if self.path == '/api/site-content-v3175/save':
+                payload = self.read_json()
+                full_backup('before-site-content-v3175-save')
+                module = _fresh_build_module()
+                content = module.write_site_content_v3175(payload.get('content') or {})
+                result = module.build_site()
+                return self.send_json({'ok': True, 'message': 'Site içerikleri kaydedildi ve site yeniden oluşturuldu.', 'content': content, 'result': result})
 
             if self.path == '/api/projects-admin/save':
                 payload = self.read_json()

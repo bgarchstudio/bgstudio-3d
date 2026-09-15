@@ -645,11 +645,116 @@ def render_home_field_case(item, index, prefix=''):
     return f'<article class="field-work-card{theme}" data-card-theme="{card_theme}" data-reference-target="{esc(target_key)}" data-reference-id="{esc(ref_id)}" data-reference-name="{esc(raw_name)}"><div class="field-work-top">{profile}<div><span class="field-work-no">{index:02d}</span><span class="field-work-type">{category}</span></div></div><h3>{headline}</h3><p>{desc}</p><div class="field-work-meta">{tags}</div><a class="field-work-link" href="{esc(link)}">İşi incele ↗</a></article>'
 
 
+SITE_CONTENT_V3175_COLLECTION = 'site_content_v3175'
+
+SITE_CONTENT_V3175_DEFAULTS = {
+    'home': {
+        'hero_eyebrow': 'BG STUDIO 3D',
+        'hero_title': 'Fikirden fiziksel ürüne.',
+        'hero_lead': '3D baskı ürünleri, özel üretim, prototip ve işletmelere özel fiziksel + dijital sistemler.',
+        'hero_primary_label': 'Ürünleri İncele', 'hero_primary_url': 'urunler/',
+        'hero_secondary_label': 'Özel Üretim', 'hero_secondary_url': 'ozel-uretim/',
+        'hero_product_slugs': [],
+        'production_eyebrow': 'ÖZEL ÜRETİM', 'production_title': 'Aklındaki parçayı üretelim.',
+        'production_lead': 'Fotoğraf, eskiz, ölçü veya fikirle başlayabiliriz. Tasarımı üretilebilir hale getirip baskı sürecine taşıyoruz.',
+        'production_cta_label': 'Teklif Al ↗', 'production_cta_url': 'teklif/?tur=ozel-uretim',
+        'why_eyebrow': 'NEDEN BG STUDIO', 'why_title': 'Tasarım ile|üretim aynı|masada.',
+        'final_eyebrow': 'BİR FİKRİN Mİ VAR?', 'final_title': 'Birlikte üretelim.',
+        'final_lead': 'Ürün, prototip, işletme çözümü veya özel üretim talebini gönder. Uygun üretim yolunu birlikte netleştirelim.',
+        'final_primary_label': 'Teklif Al ↗', 'final_primary_url': 'teklif/',
+    },
+    'corporate': {
+        'hero_eyebrow': 'KURUMSAL ÜRETİM',
+        'hero_title': 'İşletmenin ihtiyacına göre tasarla, üret, teslim et.',
+        'hero_lead': 'Tek bir sektöre bağlı kalmadan; işletmeye özel fiziksel ürün, promosyon, masaüstü çözüm ve saha uygulamalarını tasarımdan üretime tek süreçte yürütüyoruz.',
+        'primary_label': 'Kurumsal teklif al ↗', 'primary_url': '../teklif/?tur=kurumsal',
+        'secondary_label': 'Projeleri incele ↗', 'secondary_url': '../projeler/',
+    },
+    'prototype': {
+        'hero_eyebrow': 'PROTOTİP + PARÇA ÜRETİM',
+        'hero_title': 'Sorundan çalışan parçaya.',
+        'hero_lead': 'Kırılan, bulunamayan veya geliştirilmesi gereken parçaları ölçü, model ve üretim gereksinimine göre ele alıyoruz. Dekoratif üründen farklı olarak burada odak; uyum, işlev ve tekrar üretilebilirlik.',
+        'primary_label': 'Parçan için teklif al ↗', 'primary_url': '../teklif/?tur=prototip',
+        'secondary_label': 'Teknik projeleri incele ↗', 'secondary_url': '../projeler/',
+    },
+    'about': {
+        'hero_eyebrow': 'BG STUDIO 3D', 'hero_title': 'Fikirden fiziksel ürüne.',
+        'hero_lead': 'BG Studio 3D; ürün, özel üretim, prototip, kurumsal işler ve işletmelere yönelik NFC + QR sistemlerini aynı tasarım ve üretim yaklaşımında buluşturan Kuşadası merkezli bir stüdyodur.',
+        'primary_label': 'Ürünleri gör ↗', 'primary_url': '../urunler/',
+        'secondary_label': 'Birlikte üretelim ↗', 'secondary_url': '../teklif/',
+    },
+    'contact': {
+        'hero_eyebrow': 'İLETİŞİM', 'hero_title': 'Ne üretmek istediğini anlat.',
+        'hero_lead': 'Ürün siparişi, özel üretim, kurumsal çalışma, prototip veya NFC + QR sistemi için en uygun kanaldan bize ulaş.',
+    },
+}
+
+
+def _site_content_safe_url(value, fallback=''):
+    value = str(value or '').strip()
+    if not value:
+        return fallback
+    low = value.casefold()
+    if low.startswith(('javascript:', 'data:', 'vbscript:')):
+        return fallback
+    if re.match(r'^(?:https?://|/|\.\.?/|[a-z0-9][a-z0-9._~!$&\'()*+,;=:@%/-]*(?:\?[a-z0-9._~!$&\'()*+,;=:@%/?-]*)?(?:#[^\s]*)?)$', value, flags=re.I):
+        return value
+    return fallback
+
+
+def clean_site_content_v3175(value):
+    raw = value if isinstance(value, dict) else {}
+    out = {}
+    url_keys = {key for section in SITE_CONTENT_V3175_DEFAULTS.values() for key in section if key.endswith('_url')}
+    for section, defaults in SITE_CONTENT_V3175_DEFAULTS.items():
+        supplied = raw.get(section) if isinstance(raw.get(section), dict) else {}
+        row = {}
+        for key, default in defaults.items():
+            if key == 'hero_product_slugs':
+                items = supplied.get(key, default)
+                if not isinstance(items, list): items = []
+                row[key] = [re.sub(r'[^a-z0-9-]', '', str(x or '').casefold())[:100] for x in items if str(x or '').strip()][:3]
+                continue
+            text = str(supplied.get(key, default) or '').strip()
+            if not text:
+                text = str(default)
+            if key in url_keys:
+                text = _site_content_safe_url(text, str(default))
+            limit = 900 if key.endswith('_lead') else 220
+            row[key] = text[:limit]
+        out[section] = row
+    return out
+
+
+def read_site_content_v3175():
+    return clean_site_content_v3175(get_collection(SITE_CONTENT_V3175_COLLECTION, {}))
+
+
+def write_site_content_v3175(value):
+    clean = clean_site_content_v3175(value)
+    set_collection(SITE_CONTENT_V3175_COLLECTION, clean)
+    export_to_repo()
+    return clean
+
+
+def _site_text(section, key):
+    return read_site_content_v3175().get(section, {}).get(key, SITE_CONTENT_V3175_DEFAULTS.get(section, {}).get(key, ''))
+
+
+def _site_why_title_html(value):
+    parts = [part.strip() for part in re.split(r'[|\n]+', str(value or '')) if part.strip()][:3]
+    if not parts: parts = ['Tasarım ile', 'üretim aynı', 'masada.']
+    return ''.join(f'<span>{esc(part)}</span>' for part in parts)
+
+
 def _home_product_selection(active, featured, limit=6):
-    # Stable homepage product selection: featured first, then active without duplicates.
+    # Stable homepage product selection: panel-picked hero products first, then featured/active.
     picked = []
     seen = set()
-    for product in list(featured or []) + list(active or []):
+    by_slug = {str(product.get('slug') or '').strip(): product for product in (active or [])}
+    preferred = read_site_content_v3175().get('home', {}).get('hero_product_slugs') or []
+    ordered = [by_slug[slug] for slug in preferred if slug in by_slug] + list(featured or []) + list(active or [])
+    for product in ordered:
         slug = str(product.get('slug') or '').strip()
         if not slug or slug in seen:
             continue
@@ -743,7 +848,8 @@ def _home_visual_product(product, position='main', eager=False):
 
 
 def render_homepage_v3163(active, featured, field_items):
-    # V3.1.63 editorial homepage. Product/reference data always stays data-driven.
+    # V3.1.75: editorial copy and hero picks can be managed without touching code.
+    home_copy = read_site_content_v3175()['home']
     products = _home_product_selection(active, featured, limit=6)
     hero_products = products[:3]
     hero_main = hero_products[0] if hero_products else None
@@ -758,10 +864,10 @@ def render_homepage_v3163(active, featured, field_items):
 <section class="home-hero-v3163 bg-section-compact" aria-labelledby="home-hero-title">
   <div class="shell home-hero-grid-v3163">
     <div class="home-hero-copy-v3163 home-motion" data-home-motion>
-      <p class="eyebrow">BG STUDIO 3D</p>
-      <h1 id="home-hero-title">Fikirden fiziksel ürüne.</h1>
-      <p class="home-hero-lead">3D baskı ürünleri, özel üretim, prototip ve işletmelere özel fiziksel + dijital sistemler.</p>
-      <div class="hero-actions home-hero-actions-v3163"><a class="primary-cta" href="urunler/">Ürünleri İncele</a><a class="secondary-cta" href="ozel-uretim/">Özel Üretim</a></div>
+      <p class="eyebrow">{esc(home_copy["hero_eyebrow"])}</p>
+      <h1 id="home-hero-title">{esc(home_copy["hero_title"])}</h1>
+      <p class="home-hero-lead">{esc(home_copy["hero_lead"])}</p>
+      <div class="hero-actions home-hero-actions-v3163"><a class="primary-cta" href="{esc(home_copy["hero_primary_url"])}">{esc(home_copy["hero_primary_label"])}</a><a class="secondary-cta" href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
       <div class="home-hero-proof"><span>Kuşadası merkezli üretim</span><span>Tek adet + toplu üretim</span><span>Türkiye geneli kargo</span></div>
     </div>
     <div class="home-hero-stage-v3163" data-home-parallax="0.16" aria-label="BG Studio 3D ürün seçkisi">
@@ -786,7 +892,7 @@ def render_homepage_v3163(active, featured, field_items):
 
 <section class="home-production-v3163 bg-section" aria-labelledby="home-production-title">
   <div class="shell home-split-panel home-split-production">
-    <div class="home-split-copy home-motion" data-home-motion><p class="eyebrow">ÖZEL ÜRETİM</p><h2 id="home-production-title">Aklındaki parçayı üretelim.</h2><p>Fotoğraf, eskiz, ölçü veya fikirle başlayabiliriz. Tasarımı üretilebilir hale getirip baskı sürecine taşıyoruz.</p><a class="primary-cta" href="teklif/?tur=ozel-uretim">Teklif Al ↗</a></div>
+    <div class="home-split-copy home-motion" data-home-motion><p class="eyebrow">{esc(home_copy["production_eyebrow"])}</p><h2 id="home-production-title">{esc(home_copy["production_title"])}</h2><p>{esc(home_copy["production_lead"])}</p><a class="primary-cta" href="{esc(home_copy["production_cta_url"])}">{esc(home_copy["production_cta_label"])}</a></div>
     <div class="home-production-stage home-motion" data-home-motion>{production_visual}<div class="home-production-steps"><span><b>01</b>Fikir</span><span><b>02</b>Model</span><span><b>03</b>Baskı</span></div></div>
   </div>
 </section>
@@ -812,7 +918,7 @@ def render_homepage_v3163(active, featured, field_items):
 
 <section class="home-why-v3163 bg-section" aria-labelledby="home-why-title">
   <div class="shell home-why-shell">
-    <div class="home-why-heading home-motion" data-home-motion><div class="home-why-kicker"><p class="eyebrow">NEDEN BG STUDIO</p></div><h2 id="home-why-title"><span>Tasarım ile</span><span>üretim aynı</span><span>masada.</span></h2></div>
+    <div class="home-why-heading home-motion" data-home-motion><div class="home-why-kicker"><p class="eyebrow">{esc(home_copy["why_eyebrow"])}</p></div><h2 id="home-why-title">{_site_why_title_html(home_copy["why_title"])}</h2></div>
     <div class="home-why-grid">
       <article class="home-motion" data-home-motion><span>01</span><h3>Üretilebilir fikirler</h3><p>Görsel fikri baskı süresi, malzeme ve kullanım senaryosuyla birlikte değerlendiriyoruz.</p></article>
       <article class="home-motion" data-home-motion><span>02</span><h3>Gerçek kullanım</h3><p>Dekoratif ürün kadar fonksiyonel parça, stand, aparat ve işletme ihtiyaçlarına odaklanıyoruz.</p></article>
@@ -823,7 +929,7 @@ def render_homepage_v3163(active, featured, field_items):
 </section>
 
 <section class="home-final-v3163 bg-section-compact" aria-labelledby="home-final-title">
-  <div class="shell home-final-shell home-motion" data-home-motion><div><p class="eyebrow">BİR FİKRİN Mİ VAR?</p><h2 id="home-final-title">Birlikte üretelim.</h2><p>Ürün, prototip, işletme çözümü veya özel üretim talebini gönder. Uygun üretim yolunu birlikte netleştirelim.</p></div><div class="home-final-actions"><a class="primary-cta" href="teklif/">Teklif Al ↗</a><a class="secondary-cta" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp'tan Yaz ↗</a></div></div>
+  <div class="shell home-final-shell home-motion" data-home-motion><div><p class="eyebrow">{esc(home_copy["final_eyebrow"])}</p><h2 id="home-final-title">{esc(home_copy["final_title"])}</h2><p>{esc(home_copy["final_lead"])}</p></div><div class="home-final-actions"><a class="primary-cta" href="{esc(home_copy["final_primary_url"])}">{esc(home_copy["final_primary_label"])}</a><a class="secondary-cta" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp'tan Yaz ↗</a></div></div>
 </section>
 </main>'''
 
@@ -1324,7 +1430,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.74'
+SITE_ASSET_VERSION = '3.1.75'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1432,6 +1538,14 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/nfc-hub\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/projects\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/quote-center\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        # Every page receiving the global footer must be able to reopen cookie preferences.
+        if 'footer-consent-button' in updated and 'assets/js/consent.js' not in updated:
+            consent_tag = f'<script defer="" src="{prefix}assets/js/consent.js"></script>'
+            main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js(?:\?v=[^"]+)?"[^>]*></script>', updated, flags=re.I)
+            if main_match:
+                updated = updated[:main_match.start()] + consent_tag + updated[main_match.start():]
+            else:
+                updated = updated.replace('</body>', consent_tag + '</body>', 1)
         if 'assets/js/navigation.js' not in updated:
             nav_tag = f'<script defer="" src="{prefix}assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script>'
             main_match = re.search(r'<script\b[^>]*src="(?:\.\./)*assets/js/main\.js\?v=[^"]+"[^>]*></script>', updated, flags=re.I)
@@ -2422,6 +2536,7 @@ def _corporate_sector(item):
 
 
 def render_corporate_page_v3169(items):
+    page_copy = read_site_content_v3175()['corporate']
     sectors=[]
     for item in items:
         sector=_corporate_sector(item)
@@ -2429,23 +2544,26 @@ def render_corporate_page_v3169(items):
             sectors.append(sector)
     sector_html=''.join(f'<span>{esc(x)}</span>' for x in sectors[:8]) or '<span>Kurumsal üretim</span>'
     cards=''.join(render_corporate_case(item, '../') for item in items)
-    body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">KURUMSAL ÜRETİM</p><h1>İşletmenin ihtiyacına göre tasarla, üret, teslim et.</h1><p class="lead">Tek bir sektöre bağlı kalmadan; işletmeye özel fiziksel ürün, promosyon, masaüstü çözüm ve saha uygulamalarını tasarımdan üretime tek süreçte yürütüyoruz.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=kurumsal">Kurumsal teklif al ↗</a><a class="secondary-cta" href="../projeler/">Projeleri incele ↗</a></div></div><div class="v3169-sector-cloud"><small>ÇALIŞTIĞIMIZ İHTİYAÇ TİPLERİ</small>{sector_html}</div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">SÜREÇ</p><h2>İhtiyaçtan teslimata.</h2></div><p>Kurumsal işlerde ürün biçimi hazır kalıba göre değil, kullanım senaryosuna göre netleşir.</p></div><div class="v3169-process"><article><span>01</span><h3>İhtiyaç</h3><p>Adet, kullanım noktası, ölçü ve marka gereksinimini netleştiririz.</p></article><article><span>02</span><h3>Tasarım</h3><p>Ürünü marka kimliği ve üretim koşullarına göre geliştiririz.</p></article><article><span>03</span><h3>Üretim</h3><p>Onaylanan modeli 3D baskı üretim akışına alırız.</p></article><article><span>04</span><h3>Teslim</h3><p>Kontrol, paketleme ve teslim / kargo adımıyla işi tamamlarız.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">SAHADAN KURUMSAL İŞLER</p><h2>Farklı sektörler. Tek üretim disiplini.</h2></div><p>Yayınlanan kartlar panel ve saha kayıtlarından gelir. Ayrıntısı bulunan işler proje sayfasına bağlanır.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">TOPLU ÜRETİM</p><h2>Adedi ve ihtiyacı gönder.</h2><p>Kurumsal anahtarlık, masaüstü ürün, stand veya işletmeye özel parça için kapsamı birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=kurumsal">Toplu sipariş için teklif al ↗</a></div></section>'''
+    body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-sector-cloud"><small>ÇALIŞTIĞIMIZ İHTİYAÇ TİPLERİ</small>{sector_html}</div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">SÜREÇ</p><h2>İhtiyaçtan teslimata.</h2></div><p>Kurumsal işlerde ürün biçimi hazır kalıba göre değil, kullanım senaryosuna göre netleşir.</p></div><div class="v3169-process"><article><span>01</span><h3>İhtiyaç</h3><p>Adet, kullanım noktası, ölçü ve marka gereksinimini netleştiririz.</p></article><article><span>02</span><h3>Tasarım</h3><p>Ürünü marka kimliği ve üretim koşullarına göre geliştiririz.</p></article><article><span>03</span><h3>Üretim</h3><p>Onaylanan modeli 3D baskı üretim akışına alırız.</p></article><article><span>04</span><h3>Teslim</h3><p>Kontrol, paketleme ve teslim / kargo adımıyla işi tamamlarız.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">SAHADAN KURUMSAL İŞLER</p><h2>Farklı sektörler. Tek üretim disiplini.</h2></div><p>Yayınlanan kartlar panel ve saha kayıtlarından gelir. Ayrıntısı bulunan işler proje sayfasına bağlanır.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">TOPLU ÜRETİM</p><h2>Adedi ve ihtiyacı gönder.</h2><p>Kurumsal anahtarlık, masaüstü ürün, stand veya işletmeye özel parça için kapsamı birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=kurumsal">Toplu sipariş için teklif al ↗</a></div></section>'''
     return _editorial_page_shell('Kurumsal 3D Üretim | BG Studio 3D','İşletmelere özel kurumsal 3D baskı, promosyon, masaüstü ürün ve saha üretimleri. Kuşadası BG Studio 3D.','/kurumsal/',body,'corporate')
 
 
 def render_prototype_page_v3169(items):
+    page_copy = read_site_content_v3175()['prototype']
     cards=''.join(render_managed_case(item, '../') for item in items)
-    body=f'''<section class="v3169-hero v3169-tech-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">PROTOTİP + PARÇA ÜRETİM</p><h1>Sorundan çalışan parçaya.</h1><p class="lead">Kırılan, bulunamayan veya geliştirilmesi gereken parçaları ölçü, model ve üretim gereksinimine göre ele alıyoruz. Dekoratif üründen farklı olarak burada odak; uyum, işlev ve tekrar üretilebilirlik.</p><div class="hero-actions"><a class="primary-cta" href="../teklif/?tur=prototip">Parçan için teklif al ↗</a><a class="secondary-cta" href="../projeler/">Teknik projeleri incele ↗</a></div></div><div class="v3169-tech-flow"><span>SORUN</span><i>↓</i><span>MODEL / CAD</span><i>↓</i><span>3D BASKI</span><i>↓</i><span>ÇALIŞAN PARÇA</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">TEKNİK AKIŞ</p><h2>Ölçü. Model. Test. Üretim.</h2></div><p>Parçanın görevi, temas ettiği yüzeyler ve tolerans ihtiyacı üretim kararını belirler.</p></div><div class="v3169-process"><article><span>01</span><h3>İnceleme</h3><p>Mevcut parça, ölçü, fotoğraf veya teknik dosya üzerinden ihtiyaç belirlenir.</p></article><article><span>02</span><h3>Model</h3><p>Gerekirse model revize edilir veya üretime uygun geometri hazırlanır.</p></article><article><span>03</span><h3>3D Baskı</h3><p>Parçanın kullanımına uygun baskı yönü, malzeme ve üretim ayarları seçilir.</p></article><article><span>04</span><h3>Kontrol</h3><p>Uyum ve kullanım amacı kontrol edilerek teslim edilir.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">TEKNİK ÖRNEKLER</p><h2>Çalışan çözümler.</h2></div><p>Panelde yayınlanan prototip ve parça işleri burada otomatik listelenir.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">DOSYAN HAZIR MI?</p><h2>STL, 3MF, STEP, PDF veya görselle başlayabiliriz.</h2><p>Ölçü ve kullanım bilgisini ekle. Üretim yolunu birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=prototip">Teknik üretim teklifi al ↗</a></div></section>'''
+    body=f'''<section class="v3169-hero v3169-tech-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-tech-flow"><span>SORUN</span><i>↓</i><span>MODEL / CAD</span><i>↓</i><span>3D BASKI</span><i>↓</i><span>ÇALIŞAN PARÇA</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">TEKNİK AKIŞ</p><h2>Ölçü. Model. Test. Üretim.</h2></div><p>Parçanın görevi, temas ettiği yüzeyler ve tolerans ihtiyacı üretim kararını belirler.</p></div><div class="v3169-process"><article><span>01</span><h3>İnceleme</h3><p>Mevcut parça, ölçü, fotoğraf veya teknik dosya üzerinden ihtiyaç belirlenir.</p></article><article><span>02</span><h3>Model</h3><p>Gerekirse model revize edilir veya üretime uygun geometri hazırlanır.</p></article><article><span>03</span><h3>3D Baskı</h3><p>Parçanın kullanımına uygun baskı yönü, malzeme ve üretim ayarları seçilir.</p></article><article><span>04</span><h3>Kontrol</h3><p>Uyum ve kullanım amacı kontrol edilerek teslim edilir.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">TEKNİK ÖRNEKLER</p><h2>Çalışan çözümler.</h2></div><p>Panelde yayınlanan prototip ve parça işleri burada otomatik listelenir.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">DOSYAN HAZIR MI?</p><h2>STL, 3MF, STEP, PDF veya görselle başlayabiliriz.</h2><p>Ölçü ve kullanım bilgisini ekle. Üretim yolunu birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=prototip">Teknik üretim teklifi al ↗</a></div></section>'''
     return _editorial_page_shell('Prototip ve Parça Üretimi | BG Studio 3D','Prototip, yedek parça ve teknik 3D baskı üretimi. Model, ölçü ve kullanım ihtiyacına göre Kuşadası BG Studio 3D.','/prototip-parca/',body,'prototype')
 
 
 def render_about_page_v3169():
-    body='''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">BG STUDIO 3D</p><h1>Fikirden fiziksel ürüne.</h1><p class="lead">BG Studio 3D; ürün, özel üretim, prototip, kurumsal işler ve işletmelere yönelik NFC + QR sistemlerini aynı tasarım ve üretim yaklaşımında buluşturan Kuşadası merkezli bir stüdyodur.</p><div class="hero-actions"><a class="primary-cta" href="../urunler/">Ürünleri gör ↗</a><a class="secondary-cta" href="../teklif/">Birlikte üretelim ↗</a></div></div><div class="v3169-brand-panel"><span>TASARIM</span><span>3D ÜRETİM</span><span>PROTOTİP</span><span>İŞLETME SİSTEMLERİ</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">YAKLAŞIM</p><h2>Önce kullanım. Sonra biçim.</h2></div><p>Ürünün nasıl görüneceği kadar nerede, kim tarafından ve hangi üretim koşullarında kullanılacağı da tasarım kararının parçasıdır.</p></div><div class="v3169-about-grid"><article><span>01</span><h3>BG Studio nedir?</h3><p>Fiziksel ürün ve işletme çözümlerini tasarım, 3D üretim ve dijital sistemlerle bir araya getiren bağımsız üretim markası.</p></article><article><span>02</span><h3>Tasarım yaklaşımı</h3><p>Gereksiz form yerine işlev, temiz detay, üretilebilirlik ve marka bütünlüğüne odaklanırız.</p></article><article><span>03</span><h3>Üretim süreci</h3><p>Model, baskı hazırlığı, üretim, kontrol, paketleme ve teslim adımlarını tek akışta yürütürüz.</p></article><article><span>04</span><h3>Atölye mantığı</h3><p>Tek seferlik özel işten tekrar üretilecek kurumsal parçaya kadar ölçeklenebilen çalışma biçimi.</p></article></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">ÜRETİM HATTI</p><h2>Modelden teslimata.</h2></div></div><div class="v3169-process"><article><span>01</span><h3>Model</h3><p>Ürün veya parçanın dijital modeli hazırlanır ya da mevcut dosya kontrol edilir.</p></article><article><span>02</span><h3>Baskı hazırlığı</h3><p>Yön, destek, malzeme, renk ve üretim parametreleri belirlenir.</p></article><article><span>03</span><h3>Üretim</h3><p>3D yazıcıda üretim alınır ve parça kontrol edilir.</p></article><article><span>04</span><h3>Paketleme & teslim</h3><p>Kuşadası elden teslim veya Türkiye geneli kargo akışına geçilir.</p></article></div></section><section class="v3169-architecture"><div class="shell"><div><p class="eyebrow">DİĞER İŞ KOLU</p><h2>BG Studio Architecture</h2><p>Mimarlık, 3D görselleştirme ve proje çalışmalarımız ayrı marka kolunda devam eder.</p></div><a class="secondary-cta" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture sitesine geç ↗</a></div></section>'''
+    page_copy = read_site_content_v3175()['about']
+    body='''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-brand-panel"><span>TASARIM</span><span>3D ÜRETİM</span><span>PROTOTİP</span><span>İŞLETME SİSTEMLERİ</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">YAKLAŞIM</p><h2>Önce kullanım. Sonra biçim.</h2></div><p>Ürünün nasıl görüneceği kadar nerede, kim tarafından ve hangi üretim koşullarında kullanılacağı da tasarım kararının parçasıdır.</p></div><div class="v3169-about-grid"><article><span>01</span><h3>BG Studio nedir?</h3><p>Fiziksel ürün ve işletme çözümlerini tasarım, 3D üretim ve dijital sistemlerle bir araya getiren bağımsız üretim markası.</p></article><article><span>02</span><h3>Tasarım yaklaşımı</h3><p>Gereksiz form yerine işlev, temiz detay, üretilebilirlik ve marka bütünlüğüne odaklanırız.</p></article><article><span>03</span><h3>Üretim süreci</h3><p>Model, baskı hazırlığı, üretim, kontrol, paketleme ve teslim adımlarını tek akışta yürütürüz.</p></article><article><span>04</span><h3>Atölye mantığı</h3><p>Tek seferlik özel işten tekrar üretilecek kurumsal parçaya kadar ölçeklenebilen çalışma biçimi.</p></article></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">ÜRETİM HATTI</p><h2>Modelden teslimata.</h2></div></div><div class="v3169-process"><article><span>01</span><h3>Model</h3><p>Ürün veya parçanın dijital modeli hazırlanır ya da mevcut dosya kontrol edilir.</p></article><article><span>02</span><h3>Baskı hazırlığı</h3><p>Yön, destek, malzeme, renk ve üretim parametreleri belirlenir.</p></article><article><span>03</span><h3>Üretim</h3><p>3D yazıcıda üretim alınır ve parça kontrol edilir.</p></article><article><span>04</span><h3>Paketleme & teslim</h3><p>Kuşadası elden teslim veya Türkiye geneli kargo akışına geçilir.</p></article></div></section><section class="v3169-architecture"><div class="shell"><div><p class="eyebrow">DİĞER İŞ KOLU</p><h2>BG Studio Architecture</h2><p>Mimarlık, 3D görselleştirme ve proje çalışmalarımız ayrı marka kolunda devam eder.</p></div><a class="secondary-cta" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture sitesine geç ↗</a></div></section>'''
     return _editorial_page_shell('Hakkımızda | BG Studio 3D','BG Studio 3D; Kuşadası merkezli 3D baskı, özel üretim, prototip, kurumsal ürün ve NFC + QR işletme sistemleri stüdyosu.','/hakkimizda/',body,'about')
 
 
 def render_contact_page_v3169():
-    body='''<section class="v3169-hero v3169-contact-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">İLETİŞİM</p><h1>Ne üretmek istediğini anlat.</h1><p class="lead">Ürün siparişi, özel üretim, kurumsal çalışma, prototip veya NFC + QR sistemi için en uygun kanaldan bize ulaş.</p></div><div class="v3169-contact-primary"><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank"><small>EN HIZLI İLETİŞİM</small><strong>WhatsApp</strong><span>Mesaj gönder ↗</span></a><a href="https://instagram.com/bgstudio.3dtr" rel="noopener" target="_blank"><small>SOSYAL MEDYA</small><strong>@bgstudio.3dtr</strong><span>Instagram'a git ↗</span></a></div></div></section><section class="section-pad shell"><div class="v3169-contact-grid"><article><span>01</span><h2>Kuşadası</h2><p>BG Studio 3D üretim ve elden teslim süreci Kuşadası merkezlidir.</p></article><article><span>02</span><h2>Elden teslim</h2><p>Uygun siparişlerde Kuşadası elden teslim seçeneği bulunur.</p></article><article><span>03</span><h2>Türkiye geneli kargo</h2><p>Gönderime uygun ürün ve üretimler Türkiye geneline kargolanır.</p></article><article><span>04</span><h2>Teklif</h2><p>Özel üretim ve işletme projelerinde kapsamı form üzerinden düzenli şekilde iletebilirsin.</p><a class="text-cta" href="../teklif/">Teklif formuna geç ↗</a></article></div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">İLK MESAJDA</p><h2>İşi hızlı netleştirelim.</h2><p>Ürün / parça türü, adet, yaklaşık ölçü, renk ve varsa görsel veya dosya bilgisini paylaşman teklif sürecini hızlandırır.</p></div><a class="primary-cta" href="../teklif/">Teklif talebi gönder ↗</a></div></section>'''
+    page_copy = read_site_content_v3175()['contact']
+    body='''<section class="v3169-hero v3169-contact-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p></div><div class="v3169-contact-primary"><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank"><small>EN HIZLI İLETİŞİM</small><strong>WhatsApp</strong><span>Mesaj gönder ↗</span></a><a href="https://instagram.com/bgstudio.3dtr" rel="noopener" target="_blank"><small>SOSYAL MEDYA</small><strong>@bgstudio.3dtr</strong><span>Instagram'a git ↗</span></a></div></div></section><section class="section-pad shell"><div class="v3169-contact-grid"><article><span>01</span><h2>Kuşadası</h2><p>BG Studio 3D üretim ve elden teslim süreci Kuşadası merkezlidir.</p></article><article><span>02</span><h2>Elden teslim</h2><p>Uygun siparişlerde Kuşadası elden teslim seçeneği bulunur.</p></article><article><span>03</span><h2>Türkiye geneli kargo</h2><p>Gönderime uygun ürün ve üretimler Türkiye geneline kargolanır.</p></article><article><span>04</span><h2>Teklif</h2><p>Özel üretim ve işletme projelerinde kapsamı form üzerinden düzenli şekilde iletebilirsin.</p><a class="text-cta" href="../teklif/">Teklif formuna geç ↗</a></article></div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">İLK MESAJDA</p><h2>İşi hızlı netleştirelim.</h2><p>Ürün / parça türü, adet, yaklaşık ölçü, renk ve varsa görsel veya dosya bilgisini paylaşman teklif sürecini hızlandırır.</p></div><a class="primary-cta" href="../teklif/">Teklif talebi gönder ↗</a></div></section>'''
     return _editorial_page_shell('İletişim | BG Studio 3D','BG Studio 3D iletişim. Kuşadası elden teslim, Türkiye geneli kargo, WhatsApp ve Instagram üzerinden 3D baskı ve özel üretim talepleri.','/iletisim/',body,'contact')
 
 # ==============================================================
@@ -2454,7 +2572,7 @@ def render_contact_page_v3169():
 # ==============================================================
 
 def render_global_footer(prefix=''):
-    return f'''<footer class="footer footer-dark footer-v3171"><div class="shell footer-inner"><div class="footer-brand-row"><a class="brand footer-brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p>Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı, özel üretim ve işletme sistemleri.</p></div><div class="footer-mega" aria-label="Alt site haritası"><nav aria-label="Ürünler"><strong>ÜRÜNLER</strong><a href="{prefix}urunler/">Tüm Ürünler</a><a href="{prefix}urunler/?sirala=newest">Yeni Ürünler</a><a href="{prefix}urunler/?one-cikan=1">Öne Çıkanlar</a></nav><nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal</a></nav><nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC &amp; QR</a><a href="{prefix}nfc-qr/restoran/">Restoran</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Stand</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav><nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="{prefix}projeler/">Projeler</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav><nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a></nav></div><div class="footer-bottom"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><div class="footer-bottom-links"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram</a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><span>Kuşadası, Aydın</span></div></div></div></footer>'''
+    return f'''<footer class="footer footer-dark footer-v3171"><div class="shell footer-inner"><div class="footer-brand-row"><a class="brand footer-brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p>Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı, özel üretim ve işletme sistemleri.</p></div><div class="footer-mega" aria-label="Alt site haritası"><nav aria-label="Ürünler"><strong>ÜRÜNLER</strong><a href="{prefix}urunler/">Tüm Ürünler</a><a href="{prefix}urunler/?sirala=newest">Yeni Ürünler</a><a href="{prefix}urunler/?one-cikan=1">Öne Çıkanlar</a></nav><nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal</a></nav><nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC &amp; QR</a><a href="{prefix}nfc-qr/restoran/">Restoran</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Stand</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav><nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="{prefix}projeler/">Projeler</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav><nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a></nav></div><div class="footer-bottom"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><div class="footer-bottom-links"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram</a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><button class="footer-consent-button" type="button">Çerez tercihleri</button><span>Kuşadası, Aydın</span></div></div></div></footer>'''
 
 
 def sync_global_footer():
@@ -2517,7 +2635,7 @@ def render_legal_page_v3171(slug, title, intro, sections, indexable=True):
     blocks = ''.join(f'<article><h2>{esc(head)}</h2><p>{esc(text)}</p></article>' for head,text in sections)
     robots = 'index,follow' if indexable else 'noindex,follow'
     body = f'''<section class="legal-hero"><div class="shell"><p class="eyebrow">BİLGİLENDİRME</p><h1>{esc(title)}</h1><p class="lead">{esc(intro)}</p></div></section><section class="section-pad shell legal-layout"><div class="legal-content">{blocks}</div><aside class="legal-aside"><strong>BG Studio 3D</strong><p>Kuşadası merkezli 3D baskı ve özel üretim.</p><a class="text-cta" href="../iletisim/">İletişime geç ↗</a></aside></section>'''
-    return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} | BG Studio 3D</title><meta name="description" content="{esc(clip_seo_text(intro,160))}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="{esc(title)} | BG Studio 3D"><meta property="og:description" content="{esc(clip_seo_text(intro,160))}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="{robots}"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="legal-page-v3171">{body}</main>{render_global_footer('../')}<script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script></body></html>'''
+    return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} | BG Studio 3D</title><meta name="description" content="{esc(clip_seo_text(intro,160))}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="{esc(title)} | BG Studio 3D"><meta property="og:description" content="{esc(clip_seo_text(intro,160))}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="{robots}"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="legal-page-v3171">{body}</main>{render_global_footer('../')}<script defer src="../assets/js/consent.js"></script><script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script></body></html>'''
 
 
 def build_legal_pages_v3171():
@@ -3030,6 +3148,7 @@ def build_site(nfc_family_theme_overrides=None):
     nav_sync = sync_site_header_navigation()
     footer_sync = sync_global_footer()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
+    site_content_state = read_site_content_v3175()
 
     today = date.today().isoformat()
     static = [
@@ -3045,7 +3164,7 @@ def build_site(nfc_family_theme_overrides=None):
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
-    return {'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'seo_a11y_sync': seo_a11y_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'seo_a11y_sync': seo_a11y_sync, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
