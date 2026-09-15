@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.69';
-  const ASSET_VERSION = '3.1.69';
+  const HEADER_VERSION = 'v3.1.72';
+  const ASSET_VERSION = '3.1.72';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -953,7 +953,8 @@ if (backToTop) {
 const quoteForm = document.querySelector('[data-quote-form]');
 if (quoteForm) {
   const params = new URLSearchParams(window.location.search);
-  const requestedType = params.get('tur');
+  const requestedTypeRaw = params.get('tur');
+  const requestedType = ({'ozel-uretim':'kisiye-ozel','urun':'diger'}[requestedTypeRaw] || requestedTypeRaw);
   const requestedPackage = params.get('paket');
   const requestedCapacity = Number.parseInt(params.get('stand') || params.get('masa') || '', 10);
   const requestedQr = params.get('qr') === '1';
@@ -1170,7 +1171,7 @@ if (quoteForm) {
     event.preventDefault();
     if (!quoteForm.reportValidity()) return;
     const data = new FormData(quoteForm);
-    const labels = {'kisiye-ozel':'Kişiye özel üretim','kurumsal':'Kurumsal / toplu üretim','nfc':'NFC & QR sistemi','prototip':'Prototip / parça üretimi','urun':'Mevcut ürün hakkında','diger':'Diğer'};
+    const labels = {'kisiye-ozel':'Özel Üretim','ozel-uretim':'Özel Üretim','kurumsal':'Kurumsal / toplu üretim','nfc':'NFC & QR sistemi','prototip':'Prototip / parça üretimi','urun':'Mevcut ürün hakkında','diger':'Diğer'};
     const isNfc = data.get('talep_turu') === 'nfc';
     const ctx = isNfc ? computeNfcContext() : null;
     const lines = ['Merhaba BG Studio 3D, web sitesinden bir talep oluşturuyorum.','',`Talep türü: ${labels[data.get('talep_turu')] || data.get('talep_turu')}`,`Ad / Soyad: ${data.get('ad') || '-'}`,`İşletme / Marka: ${data.get('isletme') || '-'}`];
@@ -1185,7 +1186,17 @@ if (quoteForm) {
       lines.push(`Stand renk / tasarım: ${data.get('renk') || '-'}`);
     } else {
       lines.push(`Adet: ${data.get('adet') || '-'}`,`Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,`Renk / malzeme: ${data.get('renk') || '-'}`);
+      const optionalLines = [
+        ['Ürün / ihtiyaç tipi', data.get('urun_tipi')],
+        ['Kullanım / sektör', data.get('kurumsal_kullanim')],
+        ['Markalama / logo', data.get('kurumsal_markalama')],
+        ['Parçanın görevi', data.get('prototip_gorev')],
+        ['Tercih edilen malzeme', data.get('prototip_malzeme')],
+      ];
+      optionalLines.forEach(([label, value]) => { if (String(value || '').trim()) lines.push(`${label}: ${value}`); });
     }
+    const fileSummary = String(data.get('dosya_ozeti') || '').trim();
+    if (fileSummary) lines.push(`Seçilen dosyalar: ${fileSummary}`, 'Not: Dosyalar web sitesine yüklenmedi. WhatsApp açıldığında sohbete ayrıca eklenmelidir.');
     lines.push(`Şehir: ${data.get('sehir') || '-'}`,'',`Talep: ${data.get('detay') || '-'}`);
     const leadPayload = { method:'quote_form_whatsapp', lead_type:data.get('talep_turu')||'unknown', nfc_package:ctx?.pkg?.name||undefined, page_location:canonicalUrl };
     trackEvent('quote_request', leadPayload);
