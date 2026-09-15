@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.72'
-CATALOG_ADMIN_REVISION = '3.1.72'
+PANEL_VERSION = '3.1.73-R1'
+CATALOG_ADMIN_REVISION = '3.1.73-R1'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -130,6 +130,28 @@ def ensure_catalog_admin_extensions():
         text = text.replace('</body>', js_tag + '</body>', 1)
     else:
         text = re.sub(r'(catalog-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    tech_css = f'<link rel="stylesheet" href="product-tech-admin.css?v={rev}">'
+    if 'product-tech-admin.css' not in text:
+        text = text.replace('</head>', tech_css + '</head>', 1)
+    else:
+        text = re.sub(r'(product-tech-admin\.css\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
+
+    if 'id="productTechAdmin"' not in text:
+        tech_section = '''<div class="section product-tech-admin-section" id="productTechAdmin"><div class="section-head"><div><span>03</span><h2>Teknik &amp; üretim</h2></div><small>Boş bıraktığın bilgiler ürün sayfasında gösterilmez.</small></div><div class="grid two"><label>Ölçüler<input id="dimensions" maxlength="120" placeholder="Örn. 18 × 12 × 9 cm"><small>Ürünün yaklaşık dış ölçüsü.</small></label><label>Ağırlık<input id="weight" maxlength="120" placeholder="Örn. 240 g"><small>Paket hariç yaklaşık ürün ağırlığı.</small></label><label>Baskı yöntemi<input id="print_method" maxlength="120" placeholder="Örn. FDM · 0.4 mm nozzle"></label><label>Baskı / üretim süresi<input id="production_time" maxlength="120" placeholder="Örn. Yaklaşık 8 saat"><small>Tek ürünün üretim süresi gibi teknik süre.</small></label><label>Tahmini sipariş hazırlık süresi<input id="estimated_production_time" maxlength="120" placeholder="Örn. 1–3 iş günü"><small>Müşteriye gösterilecek tahmini hazırlık süresi.</small></label><label>Üretim durumu<select id="production_status"><option value="">Belirtilmedi</option><option value="active">Üretime açık</option><option value="busy">Yoğunluk yüksek</option><option value="preorder">Ön sipariş</option><option value="paused">Geçici olarak üretimde değil</option></select><small id="productionStatusHint">Durum seçersen ürün detayında rozet olarak görünür.</small></label></div><div class="grid two product-tech-textareas"><label>Kutu içeriği<textarea id="box_contents" rows="5" placeholder="Her satıra bir içerik yazabilirsin."></textarea></label><label>Teknik bilgiler<textarea id="technical_info" rows="5" placeholder="Her satıra bir teknik bilgi yazabilirsin."></textarea></label><label>Kullanım bilgisi<textarea id="usage_info" rows="4" placeholder="Varsa kullanım veya bakım bilgisi."></textarea></label><label>Kişiselleştirme bilgisi<textarea id="personalization_info" rows="4" placeholder="İsim, logo, renk veya ölçü kişiselleştirmesi varsa açıklayabilirsin."></textarea></label></div><div class="product-tech-preview"><span>Ürün sayfası</span><strong id="productTechPreviewState">Teknik bilgiler boşsa bölüm görünmez.</strong></div></div>'''
+        marker = '<div class="section"><div class="section-head"><div><span>03</span><h2>Görseller</h2>'
+        if marker in text:
+            text = text.replace(marker, '<div class="section"><div class="section-head"><div><span>04</span><h2>Görseller</h2>', 1)
+            text = text.replace('<div class="section"><div class="section-head"><div><span>04</span><h2>Google / SEO</h2>', '<div class="section"><div class="section-head"><div><span>05</span><h2>Google / SEO</h2>', 1)
+            text = text.replace('<div class="section"><div class="section-head"><div><span>04</span><h2>Görseller</h2>', tech_section + '<div class="section"><div class="section-head"><div><span>04</span><h2>Görseller</h2>', 1)
+        else:
+            text = text.replace('<div class="form-footer">', tech_section + '<div class="form-footer">', 1)
+
+    tech_js = f'<script src="product-tech-admin.js?v={rev}"></script>'
+    if 'product-tech-admin.js' not in text:
+        text = text.replace('</body>', tech_js + '</body>', 1)
+    else:
+        text = re.sub(r'(product-tech-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
 
     if text != original:
         path.write_text(text, encoding='utf-8')
@@ -1264,7 +1286,7 @@ def clean_product(p):
         'slug', 'name', 'category', 'price_text', 'price_value', 'sale_price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'material_ids', 'personalizable', 'tags'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'material_ids', 'personalizable', 'tags', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
@@ -1303,6 +1325,22 @@ def clean_product(p):
     seen_materials = set()
     out['material_ids'] = [mid for mid in (str(x).strip() for x in (out.get('material_ids') or [])) if mid in valid_material_ids and not (mid in seen_materials or seen_materials.add(mid))]
     out['personalizable'] = bool(out.get('personalizable'))
+    for key, limit in (
+        ('dimensions', 120), ('weight', 120), ('print_method', 120),
+        ('production_time', 120), ('estimated_production_time', 120),
+        ('box_contents', 1200), ('technical_info', 1600),
+        ('usage_info', 1200), ('personalization_info', 1200),
+    ):
+        value = str(out.get(key) or '').replace('\r\n', '\n').strip()
+        out[key] = value[:limit]
+    status = str(out.get('production_status') or '').strip().lower()
+    if status not in {'', 'active', 'busy', 'preorder', 'paused'}:
+        status = ''
+    out['production_status'] = status
+    og_source = str(out.get('og_image_source') or 'main').strip().lower()
+    if og_source not in {'main', 'poster', 'gallery'}:
+        og_source = 'main'
+    out['og_image_source'] = og_source
     out['features'] = [str(x).strip() for x in (out.get('features') or []) if str(x).strip()]
     clean_tags = []
     seen_tags = set()
@@ -1670,7 +1708,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3171', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'final-v3173-r1', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -1797,7 +1835,7 @@ class Handler(BaseHTTPRequestHandler):
                 idx = next((i for i, x in enumerate(products) if x['slug'] == original), None) if original else None
                 raw_product = dict(payload.get('product') or {})
                 old_for_meta = products[idx] if idx is not None else {}
-                for meta_key in ('material_ids', 'personalizable'):
+                for meta_key in ('material_ids', 'personalizable', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source'):
                     if meta_key not in raw_product and meta_key in old_for_meta:
                         raw_product[meta_key] = old_for_meta.get(meta_key)
                 p = clean_product(raw_product)

@@ -1,4 +1,4 @@
-// BG Studio 3D · V3.1.64 premium catalog controls
+// BG Studio 3D · V3.1.73-R1 premium catalog filter accuracy hotfix
 window.BGStudioCatalogV3164 = true;
 
 (() => {
@@ -32,7 +32,7 @@ window.BGStudioCatalogV3164 = true;
 
   const originalOrder = new Map(cards.map((card, index) => [card, index]));
 
-  const cardMatches = card => {
+  const matchesBase = (card, { ignoreFeatured = false, ignorePersonalizable = false } = {}) => {
     if (state.category !== 'all' && card.dataset.category !== state.category) return false;
     if (state.query && !normalize(card.dataset.search || card.textContent).includes(state.query)) return false;
 
@@ -41,10 +41,12 @@ window.BGStudioCatalogV3164 = true;
       if (!materials.includes(state.material)) return false;
     }
 
-    if (state.featured && card.dataset.featured !== '1') return false;
-    if (state.personalizable && card.dataset.personalizable !== '1') return false;
+    if (!ignoreFeatured && state.featured && card.dataset.featured !== '1') return false;
+    if (!ignorePersonalizable && state.personalizable && card.dataset.personalizable !== '1') return false;
     return true;
   };
+
+  const cardMatches = card => matchesBase(card);
 
   const compareCards = (a, b) => {
     if (state.sort === 'price-asc' || state.sort === 'price-desc') {
@@ -87,18 +89,36 @@ window.BGStudioCatalogV3164 = true;
     } catch (_) {}
   };
 
+  const contextualFlagCount = key => {
+    if (key === 'featured') {
+      return cards.filter(card => matchesBase(card, { ignoreFeatured: true }) && card.dataset.featured === '1').length;
+    }
+    if (key === 'personalizable') {
+      return cards.filter(card => matchesBase(card, { ignorePersonalizable: true }) && card.dataset.personalizable === '1').length;
+    }
+    return 0;
+  };
+
   const syncControls = () => {
     categoryButtons.forEach(button => {
       const active = button.dataset.filter === state.category;
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
+
     flagButtons.forEach(button => {
       const key = button.dataset.catalogFlag;
       const active = Boolean(state[key]);
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      const badge = button.querySelector('.filter-count');
+      if (badge && ['featured', 'personalizable'].includes(key)) {
+        const liveCount = contextualFlagCount(key);
+        badge.textContent = String(liveCount);
+        badge.setAttribute('aria-label', `${liveCount} ürün`);
+      }
     });
+
     if (sort && sort.value !== state.sort) sort.value = state.sort;
     if (material && material.value !== state.material) material.value = state.material;
   };

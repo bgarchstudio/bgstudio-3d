@@ -1,0 +1,9 @@
+/* BG Studio 3D · V3.1.73 technical product admin */
+.product-tech-admin-section{position:relative}
+.product-tech-admin-section .section-head small{max-width:340px;text-align:right;color:#866f5d;line-height:1.45}
+.product-tech-textareas{margin-top:14px}
+.product-tech-preview{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid rgba(92,62,39,.13);border-radius:14px;background:rgba(255,255,255,.34)}
+.product-tech-preview span{font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9a7551}.product-tech-preview strong{font-size:.7rem;color:#5f4938;text-align:right}
+.product-og-admin{margin-top:14px;padding-top:14px;border-top:1px solid rgba(92,62,39,.12)}
+.product-og-admin label{display:grid;gap:7px}.product-og-admin small{color:#806c5b;line-height:1.45}
+@media(max-width:760px){.product-tech-admin-section .section-head small{text-align:left}.product-tech-preview{align-items:flex-start;flex-direction:column}.product-tech-preview strong{text-align:left}}

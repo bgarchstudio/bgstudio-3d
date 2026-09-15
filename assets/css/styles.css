@@ -2093,3 +2093,27 @@ img,svg,video{max-width:100%}
     margin-top:8px;
   }
 }
+
+/* BG Studio 3D · V3.1.73 product technical details */
+.production-status{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 15px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.46);font-size:.68rem;color:var(--brown)}
+.production-status>span{width:7px;height:7px;border-radius:50%;background:#8b7764;box-shadow:0 0 0 4px rgba(139,119,100,.08)}
+.production-status strong{font-size:.7rem;color:var(--ink)}.production-status small{font-size:.64rem;color:var(--brown)}
+.production-status.status-active>span{background:#4f9a72}.production-status.status-busy>span{background:#c8953f}.production-status.status-preorder>span{background:#9071ad}.production-status.status-paused>span{background:#a45b52}
+.product-tech-accordion{margin:20px 0;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.28);overflow:hidden}
+.product-tech-accordion summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:58px;padding:0 18px;font-weight:700;color:var(--ink)}
+.product-tech-accordion summary::-webkit-details-marker{display:none}.product-tech-accordion summary small{font-size:.65rem;font-weight:600;color:var(--brown)}
+.product-tech-accordion summary:after{content:'+';display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--line);border-radius:50%;font-size:1rem;transition:transform .2s ease}
+.product-tech-accordion[open] summary:after{transform:rotate(45deg)}
+.product-tech-body{padding:0 18px 18px;border-top:1px solid rgba(80,56,35,.09)}
+.product-tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:6px 0 0}
+.product-tech-grid>div{display:grid;gap:4px;padding:14px 0;border-bottom:1px solid rgba(80,56,35,.08)}
+.product-tech-grid>div:nth-child(odd){padding-right:18px}.product-tech-grid>div:nth-child(even){padding-left:18px;border-left:1px solid rgba(80,56,35,.08)}
+.product-tech-grid dt{font-size:.62rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9b7048}.product-tech-grid dd{margin:0;font-size:.78rem;font-weight:650;color:var(--ink);line-height:1.5}
+.product-tech-list{padding-top:15px}.product-tech-list h3{margin:0 0 8px;font-family:var(--serif);font-size:1rem}.product-tech-list ul{margin:0;padding-left:18px;display:grid;gap:6px}.product-tech-list li{font-size:.76rem;line-height:1.55;color:var(--brown)}
+@media(max-width:680px){.product-tech-accordion{margin:16px 0}.product-tech-accordion summary{min-height:56px;padding:0 14px}.product-tech-body{padding:0 14px 14px}.product-tech-grid{grid-template-columns:1fr}.product-tech-grid>div:nth-child(odd),.product-tech-grid>div:nth-child(even){padding:12px 0;border-left:0}.production-status{margin-bottom:12px}.mobile-product-cta a{min-height:44px;display:flex;align-items:center;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.product-tech-accordion summary:after{transition:none}}
+
+
+/* V3.1.73-R1 · filter accuracy hotfix */
+.project-index-card[hidden],
+.project-index-card.project-card-hidden{display:none!important}

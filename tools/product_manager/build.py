@@ -901,6 +901,66 @@ def catalog_personalizable(p):
     return bool(p.get('personalizable'))
 
 
+PRODUCTION_STATUS = {
+    'active': ('Üretime açık', 'status-active'),
+    'busy': ('Yoğunluk yüksek', 'status-busy'),
+    'preorder': ('Ön sipariş', 'status-preorder'),
+    'paused': ('Geçici olarak üretimde değil', 'status-paused'),
+}
+
+def product_production_status(p):
+    key = str(p.get('production_status') or '').strip().lower()
+    return key if key in PRODUCTION_STATUS else ''
+
+def product_schema_availability(p):
+    key = product_production_status(p)
+    if key == 'preorder':
+        return 'https://schema.org/PreOrder'
+    if key == 'paused':
+        return 'https://schema.org/OutOfStock'
+    return 'https://schema.org/InStock'
+
+def product_og_media(p):
+    source = str(p.get('og_image_source') or 'main').strip().lower()
+    if source == 'poster' and p.get('poster_image'):
+        return (p.get('poster_image'), int(p.get('poster_image_width') or 1254), int(p.get('poster_image_height') or 1254))
+    if source == 'gallery':
+        for item in (p.get('gallery_images') or []):
+            if isinstance(item, str) and item:
+                return (item, 1000, 1000)
+            if isinstance(item, dict) and item.get('path'):
+                return (item.get('path'), int(item.get('width') or 1000), int(item.get('height') or 1000))
+    return (p.get('main_image'), int(p.get('main_image_width') or 1000), int(p.get('main_image_height') or 760))
+
+def _detail_lines(value):
+    return [line.strip() for line in str(value or '').splitlines() if line.strip()]
+
+def render_product_technical(p):
+    rows = []
+    materials = [label for _, label in catalog_materials(p)]
+    if materials:
+        rows.append(('Malzeme', ', '.join(materials)))
+    for label, key in (
+        ('Ölçüler', 'dimensions'), ('Ağırlık', 'weight'), ('Baskı yöntemi', 'print_method'),
+        ('Baskı / üretim süresi', 'production_time'), ('Tahmini hazırlık', 'estimated_production_time'),
+    ):
+        value = str(p.get(key) or '').strip()
+        if value:
+            rows.append((label, value))
+    box = _detail_lines(p.get('box_contents'))
+    tech = _detail_lines(p.get('technical_info'))
+    usage = _detail_lines(p.get('usage_info'))
+    personalization = _detail_lines(p.get('personalization_info'))
+    if not rows and not box and not tech and not usage and not personalization:
+        return ''
+    facts = ''.join(f'<div><dt>{esc(label)}</dt><dd>{esc(value)}</dd></div>' for label, value in rows)
+    blocks = []
+    for title, values in (('Kutu içeriği', box), ('Teknik notlar', tech), ('Kullanım', usage), ('Kişiselleştirme', personalization)):
+        if values:
+            blocks.append(f'<div class="product-tech-list"><h3>{esc(title)}</h3><ul>' + ''.join(f'<li>{esc(v)}</li>' for v in values) + '</ul></div>')
+    return '<details class="product-tech-accordion"><summary><span>Teknik &amp; üretim bilgileri</span><small>Detayları göster</small></summary><div class="product-tech-body">' + (f'<dl class="product-tech-grid">{facts}</dl>' if facts else '') + ''.join(blocks) + '</div></details>'
+
+
 def category_label(p):
     return CATEGORY_LABELS.get(p.get('category'), p.get('category', '').replace('-', ' ').title())
 
@@ -1071,7 +1131,7 @@ def render_schema(p):
                 'name': str(t.get('label') or f"{t.get('quantity', 1)} adet"),
                 'priceCurrency': 'TRY',
                 'price': str(t.get('price_value')),
-                'availability': 'https://schema.org/InStock',
+                'availability': product_schema_availability(p),
                 'eligibleQuantity': {'@type': 'QuantitativeValue', 'value': int(t.get('quantity') or 1), 'unitText': 'adet'},
             }
             for t in tiers if t.get('price_value') not in (None, '')
@@ -1081,7 +1141,7 @@ def render_schema(p):
             '@type': 'Offer',
             'priceCurrency': 'TRY',
             'price': str(active_price_value(p)),
-            'availability': 'https://schema.org/InStock',
+            'availability': product_schema_availability(p),
         }
     return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
 
@@ -1108,6 +1168,8 @@ def render_product_page(p, related):
     main_abs = f"{BASE_URL}/{p['main_image']}"
     w = int(p.get('main_image_width') or 1000)
     h = int(p.get('main_image_height') or 760)
+    og_path, og_w, og_h = product_og_media(p)
+    og_abs = f"{BASE_URL}/{og_path}" if og_path else main_abs
 
     poster_thumb = ''
     if p.get('poster_image'):
@@ -1229,6 +1291,12 @@ def render_product_page(p, related):
     robots = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' if p.get('active', True) else 'noindex,follow'
     notice = '' if p.get('active', True) else '<div class="shell"><div class="catalog-empty" style="display:block;margin-top:24px"><strong>Bu ürün şu anda katalogda yayında değil.</strong></div></div>'
     production = esc(p.get('production_note') or '3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.')
+    status_key = product_production_status(p)
+    status_badge_html = ''
+    if status_key:
+        status_label, status_class = PRODUCTION_STATUS[status_key]
+        status_badge_html = f'<div class="production-status {status_class}"><span></span><strong>{esc(status_label)}</strong>{f"<small>{esc(p.get('estimated_production_time'))}</small>" if p.get('estimated_production_time') else ""}</div>'
+    technical_html = render_product_technical(p)
 
     return f'''<!DOCTYPE html>
 <html lang="tr"><head>
@@ -1236,18 +1304,18 @@ def render_product_page(p, related):
 <title>{title}</title><meta content="{seo_desc}" name="description"/>
 <link href="{canonical}" rel="canonical"/>
 <meta content="product" property="og:type"/><meta content="tr_TR" property="og:locale"/><meta content="BG Studio 3D" property="og:site_name"/>
-<meta content="{title}" property="og:title"/><meta content="{card_desc}" property="og:description"/><meta content="{canonical}" property="og:url"/><meta content="{main_abs}" property="og:image"/><meta content="{name} | BG Studio 3D" property="og:image:alt"/>
-<meta content="summary_large_image" name="twitter:card"/><meta content="{title}" name="twitter:title"/><meta content="{card_desc}" name="twitter:description"/><meta content="{main_abs}" name="twitter:image"/>
+<meta content="{title}" property="og:title"/><meta content="{card_desc}" property="og:description"/><meta content="{canonical}" property="og:url"/><meta content="{og_abs}" property="og:image"/><meta content="{name} | BG Studio 3D" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/><meta content="{title}" name="twitter:title"/><meta content="{card_desc}" name="twitter:description"/><meta content="{og_abs}" name="twitter:image"/>
 <link href="../../favicon.ico" rel="icon" sizes="any"/><link href="../../assets/brand/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/><link href="../../assets/brand/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="../../apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="../../site.webmanifest" rel="manifest"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"/><link href="../../assets/css/styles.css?v=3.1.52" rel="stylesheet"/>
 <script type="application/ld+json">{render_schema(p)}</script><script data-schema="breadcrumb" type="application/ld+json">{breadcrumb}</script><script data-schema="faq" type="application/ld+json">{faq}</script>
-<meta content="{robots}" name="robots"/><meta content="strict-origin-when-cross-origin" name="referrer"/><meta content="{w}" property="og:image:width"/><meta content="{h}" property="og:image:height"/><meta content="light" name="color-scheme"/>
+<meta content="{robots}" name="robots"/><meta content="strict-origin-when-cross-origin" name="referrer"/><meta content="{og_w}" property="og:image:width"/><meta content="{og_h}" property="og:image:height"/><meta content="light" name="color-scheme"/>
 
 </head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>
 {render_site_header('../../', 'products')}
 {notice}
 <main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" fetchpriority="high" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
-<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p><div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div><div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
+<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p>{status_badge_html}<div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div>{technical_html}<div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
 <section class="order-process shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ SÜRECİ</p><h2>Nasıl ilerliyoruz?</h2></div></div><div class="order-steps"><article class="order-step"><span>01</span><h3>Ürünü seç</h3><p>Renk, adet ve varsa kişiselleştirme isteğini bize ilet.</p></article><article class="order-step"><span>02</span><h3>Detayları netleştir</h3><p>Üretim seçeneği ve teslim/kargo detaylarını sipariş öncesi netleştir.</p></article><article class="order-step"><span>03</span><h3>Üretim</h3><p>Ürün atölyede 3D baskı ile hazırlanır ve kontrol edilir.</p></article><article class="order-step"><span>04</span><h3>Teslim</h3><p>Kuşadası elden teslim veya uygun kargo seçeneğiyle gönderim.</p></article></div></section>
 <section class="product-faq shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ ÖNCESİ</p><h2>Bilmen gerekenler.</h2></div></div><div class="faq">{faq_html}</div></section>
 <section class="related-products shell"><div class="section-title"><div><p class="eyebrow">BUNLAR DA İLGİNİ ÇEKEBİLİR</p><h2>Atölyeden başka seçenekler.</h2></div></div><div class="related-grid">{related_html}</div></section><section class="detail-back shell"><a class="text-cta" href="../">← Tüm ürünlere dön</a></section></main>
@@ -1256,7 +1324,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.72'
+SITE_ASSET_VERSION = '3.1.73-r1'
 
 
 def _relative_prefix_for_html(html_path):
