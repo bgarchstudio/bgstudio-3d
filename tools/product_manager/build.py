@@ -1275,38 +1275,92 @@ def effective_pricing_tiers(p):
             dedup[q] = t
     return [dedup[q] for q in sorted(dedup)]
 
+def schema_price_value(p):
+    """Return a trustworthy numeric price for Google Product markup.
+
+    V3.1.77 keeps the authoritative numeric price fields first, but also
+    accepts legacy catalog records whose visible ``price_text`` is a plain
+    numeric TL amount (for example ``249 TL``). Quote-only labels such as
+    ``Ölçüye göre fiyatlandırma`` intentionally return ``None`` so we never
+    invent a price just to satisfy rich-result validation.
+    """
+    direct = active_price_value(p)
+    if direct not in (None, ''):
+        return direct
+    return canonical_price_value(p.get('price_text'))
+
+
 def render_schema(p):
+    canonical = f"{BASE_URL}/urunler/{p['slug']}/"
+    image = f"{BASE_URL}/{p['main_image']}"
+    tiers = effective_pricing_tiers(p)
+    fallback_price = schema_price_value(p)
+
+    # Google Product snippets require at least one of offers, review or
+    # aggregateRating. We do not fabricate ratings/reviews. Products whose
+    # price is genuinely quote/measurement based therefore use ItemPage
+    # markup instead of emitting an invalid Product rich-result item.
+    if not tiers and fallback_price in (None, ''):
+        obj = {
+            '@context': 'https://schema.org',
+            '@type': 'ItemPage',
+            'name': p['name'],
+            'description': p.get('description', ''),
+            'url': canonical,
+            'primaryImageOfPage': {
+                '@type': 'ImageObject',
+                'url': image,
+            },
+            'about': {
+                '@type': 'Thing',
+                'name': p['name'],
+            },
+        }
+        if p.get('tags'):
+            obj['keywords'] = ', '.join(str(x) for x in p.get('tags') or [])
+        return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
+
     obj = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         'name': p['name'],
         'description': p.get('description', ''),
         'brand': {'@type': 'Brand', 'name': 'BG Studio 3D'},
-        'url': f"{BASE_URL}/urunler/{p['slug']}/",
-        'image': f"{BASE_URL}/{p['main_image']}",
+        'url': canonical,
+        'image': image,
+        'category': category_label(p),
     }
-    tiers = effective_pricing_tiers(p)
     if p.get('tags'):
         obj['keywords'] = ', '.join(str(x) for x in p.get('tags') or [])
+
     if tiers:
-        obj['offers'] = [
-            {
+        offers = []
+        for t in tiers:
+            price_value = canonical_price_value(t.get('price_value'))
+            if price_value in (None, ''):
+                continue
+            offers.append({
                 '@type': 'Offer',
                 'name': str(t.get('label') or f"{t.get('quantity', 1)} adet"),
                 'priceCurrency': 'TRY',
-                'price': str(t.get('price_value')),
+                'price': str(price_value),
                 'availability': product_schema_availability(p),
+                'url': canonical,
+                'seller': {'@type': 'Organization', 'name': 'BG Studio 3D'},
                 'eligibleQuantity': {'@type': 'QuantitativeValue', 'value': int(t.get('quantity') or 1), 'unitText': 'adet'},
-            }
-            for t in tiers if t.get('price_value') not in (None, '')
-        ]
-    elif active_price_value(p) not in (None, ''):
+            })
+        if offers:
+            obj['offers'] = offers
+    elif fallback_price not in (None, ''):
         obj['offers'] = {
             '@type': 'Offer',
             'priceCurrency': 'TRY',
-            'price': str(active_price_value(p)),
+            'price': str(fallback_price),
             'availability': product_schema_availability(p),
+            'url': canonical,
+            'seller': {'@type': 'Organization', 'name': 'BG Studio 3D'},
         }
+
     return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
 
 
@@ -1488,7 +1542,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.76'
+SITE_ASSET_VERSION = '3.1.77'
 
 
 def _relative_prefix_for_html(html_path):

@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.76'
-CATALOG_ADMIN_REVISION = '3.1.76'
+PANEL_VERSION = '3.1.77'
+CATALOG_ADMIN_REVISION = '3.1.77'
 BACKUPS = BACKUPS_ROOT
 
 
