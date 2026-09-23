@@ -2281,3 +2281,190 @@ img,svg,video{max-width:100%}
   }
 }
 
+
+/* ==============================================================
+   V3.1.78-R5 · NFC LARGE CARD MEDIA / BODY HEIGHT LOCK
+   ============================================================== */
+/* R3 correctly restored the poster's intrinsic ratio and stopped cropping it.
+   On the wide Restaurant solution card the text column could still be a few
+   pixels taller than the poster. Because both live in one grid row, the outer
+   cream card then remained visible below the image as an empty strip.
+
+   Keep the poster completely uncropped and make the desktop copy column fit
+   inside the poster's natural height instead of stretching the media area. */
+@media(min-width:1101px){
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus){
+    align-items:start!important;
+  }
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-solution-card-body{
+    padding:22px 36px!important;
+    align-self:start!important;
+  }
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-solution-meta{
+    margin-bottom:12px!important;
+  }
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus) h3{
+    margin-bottom:10px!important;
+  }
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus) p{
+    margin-bottom:12px!important;
+  }
+  .nfc-solution-card-large:not(.nfc-solution-premium-plus) ul{
+    margin-bottom:18px!important;
+    gap:6px!important;
+  }
+}
+
+
+/* ==============================================================
+   V3.1.79 · CLEAN WHITE EDITORIAL SURFACES
+   ============================================================== */
+/* The old warm cream wash was visually consistent but too uniform across
+   pages. V3.1.79 keeps BG Studio's brown / bronze identity in typography,
+   accents and dark sections while moving normal content surfaces to true
+   white. The result is cleaner, more architectural and less template-like. */
+:root{
+  --paper:#ffffff;
+  --paper-2:#ffffff;
+  --line:rgba(31,27,24,.12);
+  --shadow:0 22px 60px rgba(26,22,18,.08);
+  --shadow-soft:0 18px 52px rgba(26,22,18,.065);
+}
+html,body{background:#fff}
+.site-header{
+  background:rgba(255,255,255,.94)!important;
+  border-bottom-color:rgba(31,27,24,.10)!important;
+  box-shadow:0 1px 16px rgba(24,20,17,.035);
+}
+
+/* Large light sections: no warm beige canvas. Separation now comes from
+   spacing, borders and typography rather than a cream tint. */
+.custom-band,
+.home-products-v3163,
+.home-why-v3163,
+.v3169-architecture,
+.project-facts-wrap{
+  background:#fff!important;
+}
+.home-why-v3163{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* General light cards / panels. Dark variants are intentionally excluded. */
+.product-card,
+.catalog-product-card,
+.service-card:not(.service-card-dark),
+.about-card,
+.info-panel:not(.info-panel-dark),
+.metric,
+.cap-card,
+.case-card:not(.dark),
+.package:not(.featured),
+.quote-form,
+.faq details,
+.mini-banner,
+.story-card:not(.dark),
+.field-work-card:not(.dark):not(.theme-dark):not([data-card-theme="dark"]),
+.bg-card,
+.home-showcase-card,
+.home-project-card,
+.home-architecture-branch,
+.project-index-stat,
+.project-index-card,
+.project-story-card,
+.project-related-card,
+.v3169-sector-cloud,
+.v3169-brand-panel,
+.v3169-process,
+.v3169-about-grid article,
+.v3169-contact-primary a,
+.v3169-contact-grid article,
+.quote-hero-note,
+.quote-type-card:not(.is-active),
+.quote-files,
+.legal-aside,
+.product-tech-accordion,
+.production-status,
+.nfc-quick-live,
+.nfc-duo-selector,
+.restaurant-common-platform,
+.restaurant-common-grid article,
+.nfc-stand-schema-points article,
+.duo-price-mini{
+  background:#fff!important;
+}
+
+/* Light theme cards controlled from the admin panel remain user-selectable,
+   but their light state now means true white rather than cream. */
+.field-work-card.theme-light,
+.field-work-card[data-card-theme="light"],
+.nfc-solution-card[data-family-theme="light"],
+.nfc-solution-premium-plus[data-family-theme="light"]{
+  background:#fff!important;
+}
+
+/* NFC hub / subpage light surfaces. Poster media remains untouched. */
+.nfc-solution-card:not(.dark):not([data-family-theme="dark"]):not(.nfc-solution-premium-plus),
+.nfc-v3167-package-card:not(.featured),
+.nfc-digital-flow span,
+.nfc-software-copy article,
+.nfc-premium-roadmap-grid article{
+  background:#fff!important;
+}
+.nfc-solution-premium-plus[data-family-theme="light"] .ghost-cta{
+  background:#fff!important;
+}
+
+/* Forms should feel like actual UI controls, not tinted cards. */
+.field input,
+.field select,
+.field textarea,
+.quote-form input,
+.quote-form select,
+.quote-form textarea,
+.quote-file-drop,
+.quote-file-list li:not(.is-error){
+  background:#fff!important;
+}
+.quote-form input:focus,
+.quote-form select:focus,
+.quote-form textarea:focus{
+  background:#fff!important;
+}
+
+/* Small chips / tags use white too, while brand brown remains the accent. */
+.hero-meta span,
+.secondary-cta,
+.filter-btn,
+.option-tags span,
+.home-hero-proof span,
+.nfc-hub-proof span,
+.special-ready-tags span,
+.v3169-sector-cloud span,
+.v3169-brand-panel span{
+  background:#fff;
+}
+
+/* Keep a tiny amount of neutral separation only where a whole section needs
+   to read as a separate editorial chapter. This is neutral gray, not beige. */
+.home-products-v3163{
+  background:#fafafa!important;
+  border-top-color:rgba(31,27,24,.08)!important;
+  border-bottom-color:rgba(31,27,24,.08)!important;
+}
+
+/* Neutralize legacy warm light-panel colors that remain visible around text. */
+.v3169-process,
+.v3169-about-grid article,
+.v3169-contact-primary a,
+.v3169-contact-grid article,
+.project-index-card,
+.project-story-card,
+.project-related-card,
+.nfc-digital-flow span,
+.nfc-software-copy article,
+.nfc-premium-roadmap-grid article{
+  box-shadow:none;
+}
+
+@media(max-width:760px){
+  .site-header{background:rgba(255,255,255,.97)!important}
+}
