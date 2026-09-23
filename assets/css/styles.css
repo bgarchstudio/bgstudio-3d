@@ -2120,3 +2120,19 @@ img,svg,video{max-width:100%}
 
 /* V3.1.74 · Project gallery managed from Product Manager */
 .project-gallery-section{padding-top:18px}.project-gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.project-gallery-item{appearance:none;border:1px solid rgba(51,39,29,.1);background:#f3ece3;border-radius:22px;padding:0;overflow:hidden;cursor:zoom-in;min-height:220px;display:grid;place-items:center;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}.project-gallery-item:hover{transform:translateY(-2px);border-color:rgba(51,39,29,.2);box-shadow:0 16px 36px rgba(42,31,23,.08)}.project-gallery-item img{display:block;width:100%;height:auto;max-height:680px;object-fit:contain;background:#f3ece3}@media(max-width:720px){.project-gallery-grid{grid-template-columns:1fr;gap:12px}.project-gallery-item{min-height:160px;border-radius:16px}}
+
+
+/* V3.1.78-R1 - NFC Profesyonel paket toplam satış kontrast düzeltmesi.
+   V3.1.67 kartı .nfc-v3167-package-card.featured kullandığı için eski
+   .package.featured seçicileri bu kartı kapsamıyordu. */
+.nfc-v3167-package-card.featured .nfc-config-total{
+  background:#ead9c3;
+  color:#241710;
+}
+.nfc-v3167-package-card.featured .nfc-config-total span,
+.nfc-v3167-package-card.featured .nfc-config-total small{
+  color:#76553d;
+}
+.nfc-v3167-package-card.featured .nfc-config-total strong{
+  color:#241710;
+}
