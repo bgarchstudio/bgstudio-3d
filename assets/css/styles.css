@@ -2136,3 +2136,76 @@ img,svg,video{max-width:100%}
 .nfc-v3167-package-card.featured .nfc-config-total strong{
   color:#241710;
 }
+
+
+/* ==============================================================
+   V3.1.78-R2 · NFC POSTER FIT / EDGE-TO-EDGE CARD ALIGNMENT
+   ============================================================== */
+/* All managed NFC poster artwork is authored as 16:9. Detail-page hero media
+   must show the complete poster instead of cropping it into the old 4:3 box. */
+.nfc-v3167-subpage .nfc-sub-hero-grid{
+  align-items:center;
+}
+.nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+  width:100%;
+  height:auto;
+  min-height:0;
+  aspect-ratio:16/9;
+  border-radius:24px;
+  background:#1a1410;
+  overflow:hidden;
+}
+.nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback) img{
+  width:100%;
+  height:100%;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:#1a1410;
+}
+
+/* Hub cards: poster touches the card shell. The large Restaurant card used to
+   have an 18px inset, which broke the shared top/bottom alignment language of
+   the two cards below it. Keep the source poster complete and make the media
+   edge-to-edge inside the rounded outer card. */
+.nfc-solution-card-large:not(.nfc-solution-premium-plus){
+  align-items:stretch;
+}
+.nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-family-media{
+  margin:0!important;
+  width:100%!important;
+  max-width:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  align-self:stretch;
+}
+.nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-family-media img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+
+/* The two lower solution cards follow exactly the same flush media rule. */
+.nfc-solution-card:not(.nfc-solution-card-large):not(.nfc-solution-premium-plus) .nfc-family-media{
+  margin:0!important;
+  width:100%!important;
+  border-left:0!important;
+  border-right:0!important;
+  border-top:0!important;
+  border-radius:0!important;
+}
+
+@media(max-width:1100px){
+  .nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+    max-width:760px;
+    justify-self:start;
+  }
+}
+@media(max-width:760px){
+  .nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+    max-width:none;
+    border-radius:20px;
+  }
+}
