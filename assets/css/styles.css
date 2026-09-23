@@ -2209,3 +2209,75 @@ img,svg,video{max-width:100%}
     border-radius:20px;
   }
 }
+
+/* ==============================================================
+   V3.1.78-R3 · NFC DETAIL POSTER INTRINSIC FIT
+   ============================================================== */
+/* Do not force every managed poster into one artificial aspect ratio.
+   The poster itself defines the media height: full artwork, no crop,
+   no letterbox bars, no background strip around the image. */
+.nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  overflow:hidden!important;
+}
+.nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback) img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:none!important;
+  aspect-ratio:auto!important;
+  object-fit:fill!important;
+  object-position:center!important;
+  background:transparent!important;
+  margin:0!important;
+}
+
+/* Hub posters also use their real artwork ratio instead of a forced 16:9
+   contain box. This keeps the artwork flush with the card edges. */
+.nfc-solution-card:not(.nfc-solution-premium-plus) .nfc-family-media{
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  padding:0!important;
+  background:transparent!important;
+}
+.nfc-solution-card:not(.nfc-solution-premium-plus) .nfc-family-media img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:none!important;
+  aspect-ratio:auto!important;
+  object-fit:fill!important;
+  object-position:center!important;
+  background:transparent!important;
+  margin:0!important;
+}
+
+/* On the large restaurant solution card the image must touch the shell on
+   every side. Let the intrinsic poster height establish the row instead of
+   stretching a contain-box to the text column. */
+.nfc-solution-card-large:not(.nfc-solution-premium-plus){
+  align-items:start!important;
+}
+.nfc-solution-card-large:not(.nfc-solution-premium-plus) .nfc-family-media{
+  align-self:start!important;
+}
+
+@media(max-width:1100px){
+  .nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+    max-width:760px;
+  }
+}
+@media(max-width:760px){
+  .nfc-v3167-subpage .nfc-v3167-media:not(.nfc-v3167-media-fallback){
+    max-width:none;
+  }
+}
+
