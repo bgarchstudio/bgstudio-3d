@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.81'
-CATALOG_ADMIN_REVISION = '3.1.81'
+PANEL_VERSION = '3.1.82'
+CATALOG_ADMIN_REVISION = '3.1.82'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -91,6 +91,31 @@ def _panel_ui_version_text(text, filename):
 
     return value
 
+
+
+ADMIN_UNIFIED_REVISION = '3.1.82'
+
+def _inject_admin_unified_assets(text):
+    """Attach the additive V3.1.82 admin UI layer to every Product Manager HTML page.
+
+    The existing HTML, ids and event handlers remain the source of truth. This
+    layer only adds CSS/JS references at response time, so content.html,
+    nfc-settings.html and future static admin screens share one visual system
+    without overwriting their working markup.
+    """
+    value = str(text or '')
+    rev = str(ADMIN_UNIFIED_REVISION)
+    css_tag = f'<link rel="stylesheet" href="admin-unified.css?v={rev}">'
+    js_tag = f'<script defer src="admin-unified.js?v={rev}"></script>'
+    if 'admin-unified.css' not in value:
+        value = value.replace('</head>', css_tag + '</head>', 1)
+    else:
+        value = re.sub(r'(admin-unified\.css\?v=)[^"\']+', lambda m: m.group(1) + rev, value)
+    if 'admin-unified.js' not in value:
+        value = value.replace('</body>', js_tag + '</body>', 1)
+    else:
+        value = re.sub(r'(admin-unified\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, value)
+    return value
 
 
 def ensure_catalog_admin_extensions():
@@ -1947,7 +1972,15 @@ class Handler(BaseHTTPRequestHandler):
         if not file.exists() or not file.is_file():
             self.send_error(404)
             return
-        b = file.read_bytes()
+        if base == STATIC.resolve() and file.suffix.lower() == '.html':
+            try:
+                rendered = file.read_text(encoding='utf-8')
+                rendered = _inject_admin_unified_assets(rendered)
+                b = rendered.encode('utf-8')
+            except Exception:
+                b = file.read_bytes()
+        else:
+            b = file.read_bytes()
         self.send_response(200)
         self.send_header('Content-Type', MIME.get(file.suffix.lower(), 'application/octet-stream'))
         self.send_header('Content-Length', str(len(b)))
@@ -1965,7 +1998,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'v3179-clean-white-editorial', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'v3182-admin-unified-experience', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
