@@ -72,5 +72,14 @@
     "active": true,
     "sort_order": 7,
     "show_in_corporate": true
+  },
+  {
+    "slug": "yenipazar-pidecisi",
+    "source_kind": "nfc",
+    "source_slug": "yenipazar-pidecisi",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 8,
+    "show_in_corporate": true
   }
 ]

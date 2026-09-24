@@ -165,5 +165,36 @@
     "theme": "dark",
     "image": "assets/images/references/planet-yucca.webp",
     "profile_image": "assets/images/references/planet-yucca-profile.webp"
+  },
+  {
+    "slug": "yenipazar-pidecisi",
+    "name": "Yenipazar Pidecisi",
+    "headline": "Adisyon Tutuculu BG Studio NFC Premium Feedback Trio",
+    "description": "Yenipazar Pidecisi için BG Studio NFC Premium Feedback Trio sistemi, adisyon tutuculu masaüstü stand formunda tasarlanıp işletmeye teslim edildi. Stand, 3 NFC ve 3 QR erişim noktasıyla BG Studio NFC altyapısına bağlandı.\n\nAdisyon tutucu bölümü sayesinde hesap ve adisyon kağıtları masa veya kasa üzerinde düzenli biçimde sunulurken, aynı ürün üzerinden müşterilerin dijital etkileşim akışlarına erişmesi sağlanıyor. NFC ve QR seçenekleri, müşterinin telefonuna uygun erişim yöntemini tercih etmesine imkân tanıyor.\n\nPremium Feedback Trio altyapısıyla değerlendirme, Google yorum ve ilgili dijital yönlendirme akışları BG Studio NFC sistemi altında yönetiliyor. NFC ve QR kullanımları, yönlendirmeler ve ziyaret etkileşimleri işletmeye özel panel üzerinden takip edilebiliyor.",
+    "tags": [
+      "BG Studio NFC",
+      "Premium Feedback Trio",
+      "Adisyon Tutuculu Stand",
+      "3 NFC",
+      "3 QR",
+      "NFC + QR",
+      "Premium Feedback",
+      "Değerlendirme Paneli",
+      "Google Yorum",
+      "Müşteri Etkileşimi",
+      "İşletme Paneli",
+      "Stand Bazlı Analitik",
+      "Restoran",
+      "Yenipazar Pidecisi",
+      "Yenipazar",
+      "Aydın"
+    ],
+    "active": true,
+    "sort_order": 7,
+    "category": "Restoran • Premium Feedback Trio",
+    "show_in_corporate": true,
+    "theme": "light",
+    "image": "assets/images/references/yenipazar-pidecisi.webp",
+    "profile_image": "assets/images/references/yenipazar-pidecisi-profile.webp"
   }
 ]
