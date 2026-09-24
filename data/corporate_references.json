@@ -63,5 +63,14 @@
     "active": true,
     "sort_order": 6,
     "show_in_corporate": true
+  },
+  {
+    "slug": "planet-yucca",
+    "source_kind": "nfc",
+    "source_slug": "planet-yucca",
+    "theme": "light",
+    "active": true,
+    "sort_order": 7,
+    "show_in_corporate": true
   }
 ]

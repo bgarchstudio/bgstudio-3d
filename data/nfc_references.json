@@ -134,5 +134,36 @@
     "theme": "dark",
     "image": "assets/images/references/circolo-kusadasi.webp",
     "profile_image": "assets/images/references/circolo-kusadasi-profile.webp"
+  },
+  {
+    "slug": "planet-yucca",
+    "name": "Planet Yucca",
+    "headline": "10 Adet Adisyon Tutuculu BG Studio NFC Premium Feedback Duo",
+    "description": "Planet Yucca için adisyon tutuculu 10 adet BG Studio NFC Premium Feedback Duo standı tasarlanıp işletmeye entegre edildi. Her stand 2 NFC ve 2 QR erişimiyle çalışacak şekilde hazırlanarak toplam 20 NFC + 20 QR altyapısı kuruldu.\n\nStandların adisyon tutucu bölümü sayesinde hesap ve adisyon kağıtları masa üzerinde düzenli biçimde sunulurken, aynı ürün üzerinden dijital müşteri etkileşimi sağlanıyor. Misafirler NFC veya QR üzerinden doğrudan Google yorum ekranına ya da Planet Yucca’nın Instagram hesabına geçebiliyor.\n\nGoogle ve Instagram yönlendirmeleri, NFC ve QR erişimleri, stand bazlı etkileşimler ve ziyaret verileri BG Studio NFC işletme panelinden takip ediliyor. Google tarafında canlı puan, toplam yorum sayısı ve güncel yorum verileri de sistem içerisinde görüntüleniyor.",
+    "tags": [
+      "BG Studio NFC",
+      "Premium Feedback Duo",
+      "10 Stand",
+      "Adisyon Tutuculu Stand",
+      "20 NFC",
+      "20 QR",
+      "NFC + QR",
+      "Direct Google",
+      "Google Yorum",
+      "Instagram",
+      "Müşteri Etkileşimi",
+      "İşletme Paneli",
+      "Stand Bazlı Analitik",
+      "Restoran",
+      "Planet Yucca",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 6,
+    "category": "Restoran • Premium Feedback Duo",
+    "show_in_corporate": true,
+    "theme": "dark",
+    "image": "assets/images/references/planet-yucca.webp",
+    "profile_image": "assets/images/references/planet-yucca-profile.webp"
   }
 ]
