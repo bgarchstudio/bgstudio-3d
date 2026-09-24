@@ -1,0 +1,72 @@
+/* BG Studio 3D Product Manager · V3.1.80 · top toolbar consolidation */
+
+.bg-v3180-toolbar-row {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.bg-v3180-toolbar-row::-webkit-scrollbar {
+  display: none;
+}
+
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item {
+  position: static !important;
+  inset: auto !important;
+  float: none !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  transform: none !important;
+}
+
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item,
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item * {
+  white-space: nowrap !important;
+}
+
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item .bg-v3180-toolbar-secondary {
+  display: none !important;
+}
+
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item strong,
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item b,
+.bg-v3180-toolbar-row > .bg-v3180-toolbar-item span {
+  font-size: inherit !important;
+  line-height: 1 !important;
+}
+
+.bg-v3180-empty-source {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .bg-v3180-toolbar-row > .bg-v3180-toolbar-item {
+    height: 36px !important;
+    min-height: 36px !important;
+    padding-inline: 12px !important;
+  }
+}
