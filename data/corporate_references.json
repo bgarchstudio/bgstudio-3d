@@ -54,5 +54,14 @@
     "active": true,
     "sort_order": 5,
     "show_in_corporate": false
+  },
+  {
+    "slug": "circolo-kusadasi",
+    "source_kind": "nfc",
+    "source_slug": "circolo-kusadasi",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 6,
+    "show_in_corporate": true
   }
 ]

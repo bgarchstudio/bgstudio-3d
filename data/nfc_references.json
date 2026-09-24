@@ -103,5 +103,36 @@
     "theme": "light",
     "image": "assets/images/references/yusuf-sef.webp",
     "profile_image": "assets/images/references/yusuf-sef-profile.webp"
+  },
+  {
+    "slug": "circolo-kusadasi",
+    "name": "Circolo Kuşadası",
+    "headline": "5 Adet Adisyon Tutuculu BG Studio NFC Premium Feedback Duo",
+    "description": "Circolo Kuşadası için adisyon tutuculu 5 adet BG Studio NFC Premium Feedback Duo standı tasarlanıp işletmeye entegre edildi. Her stand 2 NFC ve 2 QR erişimiyle çalışacak şekilde hazırlanarak toplam 10 NFC + 10 QR altyapısı kuruldu.\n\nStandların adisyon tutucu bölümü sayesinde hesap ve adisyon kağıtları masa üzerinde düzenli biçimde sunulurken, aynı ürün üzerinden dijital müşteri etkileşimi sağlanıyor. Misafirler NFC veya QR üzerinden doğrudan Google yorum ekranına ya da Circolo’nun Instagram hesabına geçebiliyor.\n\nGoogle ve Instagram yönlendirmeleri, NFC ve QR erişimleri, stand bazlı etkileşimler ve ziyaret verileri BG Studio NFC işletme panelinden takip ediliyor. Google tarafında canlı puan, toplam yorum sayısı ve güncel yorum verileri de sistem içerisinde görüntüleniyor.",
+    "tags": [
+      "BG Studio NFC",
+      "Premium Feedback Duo",
+      "5 Stand",
+      "Adisyon Tutuculu Stand",
+      "10 NFC",
+      "10 QR",
+      "NFC + QR",
+      "Direct Google",
+      "Google Yorum",
+      "Instagram",
+      "Müşteri Etkileşimi",
+      "İşletme Paneli",
+      "Stand Bazlı Analitik",
+      "Restoran",
+      "Circolo",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 5,
+    "category": "Restoran • Premium Feedback Duo",
+    "show_in_corporate": true,
+    "theme": "dark",
+    "image": "assets/images/references/circolo-kusadasi.webp",
+    "profile_image": "assets/images/references/circolo-kusadasi-profile.webp"
   }
 ]
