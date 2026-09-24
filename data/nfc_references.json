@@ -84,7 +84,7 @@
     "active": true,
     "sort_order": 3,
     "category": "Restoran • Başlangıç Paketi",
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/references/istavrit-restaurant.webp",
     "profile_image": "assets/images/references/istavrit-restaurant-profile.webp",
     "show_in_corporate": true
@@ -139,7 +139,7 @@
     "sort_order": 5,
     "category": "Restoran • QR Yorum Sistemi",
     "show_in_corporate": true,
-    "theme": "light",
+    "theme": "dark",
     "image": "assets/images/references/naz-balik-restaurant.webp",
     "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp"
   },
@@ -170,7 +170,7 @@
     "sort_order": 6,
     "category": "Restoran • Premium Feedback Trio",
     "show_in_corporate": true,
-    "theme": "light",
+    "theme": "dark",
     "image": "assets/images/references/yenipazar-pidecisi.webp",
     "profile_image": "assets/images/references/yenipazar-pidecisi-profile.webp"
   },
@@ -193,7 +193,7 @@
     "sort_order": 7,
     "category": "Petshop • Hızlı Bağlantı Standı",
     "show_in_corporate": true,
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/references/koala-petshop.webp",
     "profile_image": "assets/images/references/koala-petshop-profile.webp"
   }
