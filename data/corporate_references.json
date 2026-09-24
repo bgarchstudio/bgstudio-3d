@@ -6,7 +6,7 @@
     "theme": "dark",
     "active": true,
     "sort_order": 1,
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "koala-petshop",
@@ -15,7 +15,7 @@
     "theme": "dark",
     "active": true,
     "sort_order": 2,
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "naz-balik-restaurant",
@@ -24,7 +24,7 @@
     "theme": "light",
     "active": true,
     "sort_order": 3,
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "kusadasi-asansor",
@@ -53,7 +53,7 @@
     "theme": "light",
     "active": true,
     "sort_order": 5,
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "circolo-kusadasi",

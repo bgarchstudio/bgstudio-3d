@@ -25,7 +25,7 @@
     "theme": "dark",
     "image": "assets/images/references/istavrit-restaurant.webp",
     "profile_image": "assets/images/references/istavrit-restaurant-profile.webp",
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "koala-petshop",
@@ -48,7 +48,7 @@
     "theme": "dark",
     "image": "assets/images/references/koala-petshop.webp",
     "profile_image": "assets/images/references/koala-petshop-profile.webp",
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "naz-balik-restaurant",
@@ -71,7 +71,7 @@
     "theme": "light",
     "image": "assets/images/references/naz-balik-restaurant.webp",
     "profile_image": "assets/images/references/naz-balik-restaurant-profile.webp",
-    "show_in_corporate": false
+    "show_in_corporate": true
   },
   {
     "slug": "yusuf-sef",
@@ -99,7 +99,7 @@
     "active": true,
     "sort_order": 4,
     "category": "Restoran • Profesyonel Paket",
-    "show_in_corporate": false,
+    "show_in_corporate": true,
     "theme": "light",
     "image": "assets/images/references/yusuf-sef.webp",
     "profile_image": "assets/images/references/yusuf-sef-profile.webp"
