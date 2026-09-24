@@ -1,72 +1,87 @@
-/* BG Studio 3D Product Manager · V3.1.80 · top toolbar consolidation */
+/* BG Studio 3D Product Manager · V3.1.81
+   Only the moved shortcuts are styled. The toolbar container itself is left intact. */
 
+/* Neutralize the V3.1.80 host overrides if the previous stylesheet is cached. */
 .bg-v3180-toolbar-row {
-  display: flex !important;
-  align-items: center !important;
-  flex-wrap: nowrap !important;
-  gap: 8px !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: revert !important;
+  align-items: revert !important;
+  flex-wrap: revert !important;
+  gap: revert !important;
+  overflow-x: revert !important;
+  overflow-y: revert !important;
 }
 
-.bg-v3180-toolbar-row::-webkit-scrollbar {
-  display: none;
-}
-
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item {
+.bg-v3181-toolbar-shortcut,
+.bg-v3180-toolbar-row > .bg-v3181-toolbar-shortcut {
   position: static !important;
   inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
   float: none !important;
+  transform: none !important;
   width: auto !important;
   min-width: max-content !important;
   max-width: none !important;
   height: 38px !important;
   min-height: 38px !important;
+  max-height: 38px !important;
   margin: 0 !important;
   padding: 0 14px !important;
-  border-radius: 999px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
   flex: 0 0 auto !important;
   box-sizing: border-box !important;
-  line-height: 1 !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f5f0ea !important;
   text-align: center !important;
-  transform: none !important;
+  line-height: 1 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  z-index: auto !important;
 }
 
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item,
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item * {
+.bg-v3181-toolbar-shortcut:hover {
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.26) !important;
+}
+
+.bg-v3181-toolbar-shortcut > *,
+.bg-v3181-toolbar-shortcut strong,
+.bg-v3181-toolbar-shortcut b,
+.bg-v3181-toolbar-shortcut span {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: 1 !important;
   white-space: nowrap !important;
 }
 
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item > * {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item .bg-v3180-toolbar-secondary {
+.bg-v3181-toolbar-shortcut .bg-v3181-toolbar-secondary {
   display: none !important;
 }
 
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item strong,
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item b,
-.bg-v3180-toolbar-row > .bg-v3180-toolbar-item span {
-  font-size: inherit !important;
-  line-height: 1 !important;
+/* If V3.1.80 left the moved-item class in a cached DOM, do not let its old
+   dimensions affect the corrected shortcuts. */
+.bg-v3181-toolbar-shortcut.bg-v3180-toolbar-item {
+  width: auto !important;
+  height: 38px !important;
+  min-height: 38px !important;
 }
 
-.bg-v3180-empty-source {
-  display: none !important;
-}
-
-@media (max-width: 900px) {
-  .bg-v3180-toolbar-row > .bg-v3180-toolbar-item {
-    height: 36px !important;
-    min-height: 36px !important;
-    padding-inline: 12px !important;
+@media (max-width: 1100px) {
+  [data-bg-v3181-toolbar-host="1"] {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
   }
+  [data-bg-v3181-toolbar-host="1"]::-webkit-scrollbar { display: none; }
 }

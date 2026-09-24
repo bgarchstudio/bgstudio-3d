@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.80'
-CATALOG_ADMIN_REVISION = '3.1.80'
+PANEL_VERSION = '3.1.81'
+CATALOG_ADMIN_REVISION = '3.1.81'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -177,8 +177,8 @@ def ensure_catalog_admin_extensions():
     else:
         text = re.sub(r'(site-content-admin\.js\?v=)[^"\']+', lambda m: m.group(1) + rev, text)
 
-    # V3.1.80: Site İçerikleri + Projeler kısayollarını sol kart kolonundan
-    # mevcut üst işlem satırına taşır. Gerçek DOM düğümleri taşındığı için mevcut
+    # V3.1.81: Site İçerikleri + Projeler kısayollarını gerçek üst işlem satırına
+    # taşır. V3.1.80 seçim hatası düzeltilmiştir. Gerçek DOM düğümleri taşındığı için mevcut
     # click handler / id / modal bağlantıları korunur; yeni sahte buton üretilmez.
     toolbar_css = f'<link rel="stylesheet" href="panel-toolbar-layout.css?v={rev}">'
     if 'panel-toolbar-layout.css' not in text:

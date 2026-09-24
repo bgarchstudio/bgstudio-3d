@@ -1,150 +1,200 @@
-/* BG Studio 3D Product Manager · V3.1.80
-   Move Site İçerikleri + Projeler into the existing top action row.
-   The original nodes are moved, not cloned, so all existing listeners stay intact. */
+/* BG Studio 3D Product Manager · V3.1.81
+   Safe toolbar consolidation.
+   Only the two compact shortcut cards are moved. Project manager panels/modals
+   are explicitly excluded and the existing toolbar layout is never rewritten. */
 (() => {
   'use strict';
 
   const compact = (value) => String(value || '').replace(/\s+/g, ' ').trim();
   const fold = (value) => compact(value).toLocaleLowerCase('tr-TR');
 
-  const labels = {
-    live: 'canlı site',
-    publish: 'yayın kontrolü',
-    colors: 'benim renklerim',
-    campaign: 'kampanya şeridi',
-    close: 'paneli kapat',
+  const LABELS = {
     field: 'saha / kurumsal / prototip & parça',
+    rebuild: 'siteyi yeniden oluştur',
+    close: 'paneli kapat',
     content: 'site içerikleri',
-    projects: 'projeler'
+    projects: 'projeler',
+    caseStudy: 'case study'
   };
 
-  function textHas(el, value) {
-    return !!el && fold(el.textContent).includes(value);
-  }
+  const visible = (el) => {
+    if (!el || !el.isConnected) return false;
+    const style = getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  };
 
-  function candidates() {
-    return Array.from(document.querySelectorAll(
-      'button, a, [role="button"], [tabindex], .card, .quick-card, .shortcut, .action-card, .admin-card, .tool-card, .panel-card'
-    ));
-  }
+  const interactiveCandidates = () => Array.from(document.querySelectorAll(
+    'button, a, [role="button"], [onclick], [tabindex], .quick-card, .shortcut, .action-card, .admin-card, .tool-card, .panel-card'
+  )).filter(visible);
 
-  function smallestMatch(label, reject = []) {
-    const hits = candidates().filter((el) => {
-      const t = fold(el.textContent);
-      return t.includes(label) && !reject.some((bad) => t.includes(bad));
+  function shortControlMatch(predicate) {
+    const hits = interactiveCandidates().filter((el) => {
+      const text = fold(el.textContent);
+      const r = el.getBoundingClientRect();
+      if (!predicate(text, el)) return false;
+      if (r.width < 38 || r.width > 260 || r.height < 24 || r.height > 125) return false;
+      if (el.querySelector('input, textarea, select, form, dialog')) return false;
+      return true;
     });
-    if (!hits.length) return null;
     hits.sort((a, b) => {
-      const ta = compact(a.textContent).length;
-      const tb = compact(b.textContent).length;
-      if (ta !== tb) return ta - tb;
-      return a.childElementCount - b.childElementCount;
+      const ra = a.getBoundingClientRect();
+      const rb = b.getBoundingClientRect();
+      const areaDiff = (ra.width * ra.height) - (rb.width * rb.height);
+      if (areaDiff) return areaDiff;
+      return compact(a.textContent).length - compact(b.textContent).length;
     });
-    return hits[0];
+    return hits[0] || null;
   }
 
-  function findToolbar(anchor) {
-    if (!anchor) return null;
-    let node = anchor.parentElement;
-    let fallback = null;
-    for (let depth = 0; node && node !== document.body && depth < 8; depth += 1, node = node.parentElement) {
-      const t = fold(node.textContent);
-      if (!fallback && t.includes(labels.publish) && t.includes(labels.close)) fallback = node;
-      if (
-        t.includes(labels.live) &&
-        t.includes(labels.publish) &&
-        t.includes(labels.colors) &&
-        t.includes(labels.campaign) &&
-        t.includes(labels.close)
-      ) return node;
+  function topAction(label) {
+    return shortControlMatch((text) => text.includes(label) && text.length < 80);
+  }
+
+  function lowestCommonAncestor(nodes) {
+    const valid = nodes.filter(Boolean);
+    if (!valid.length) return null;
+    let current = valid[0];
+    while (current && current !== document.body) {
+      if (valid.every((node) => current.contains(node))) return current;
+      current = current.parentElement;
     }
-    return fallback;
+    return null;
   }
 
-  function cardRoot(node, label, secondaryLabel) {
+  function findToolbarHost() {
+    const field = topAction(LABELS.field);
+    const rebuild = topAction(LABELS.rebuild);
+    const close = topAction(LABELS.close);
+    if (!field || !rebuild || !close) return null;
+
+    let host = lowestCommonAncestor([field, rebuild, close]);
+    if (!host) return null;
+
+    // The correct toolbar is a shallow strip, not the whole header/page shell.
+    // If the common ancestor is too tall, walk down the field branch until the
+    // smallest child still containing the other two controls is reached.
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const child of Array.from(host.children)) {
+        if (child.contains(field) && child.contains(rebuild) && child.contains(close)) {
+          host = child;
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    const r = host.getBoundingClientRect();
+    if (r.height > 130 || r.width < 320) return null;
+    return { host, field, rebuild, close };
+  }
+
+  function directChild(host, node) {
+    let current = node;
+    while (current && current.parentElement && current.parentElement !== host) current = current.parentElement;
+    return current && current.parentElement === host ? current : null;
+  }
+
+  function shortcutRoot(node, kind) {
     if (!node) return null;
     let best = node;
-    let current = node;
-    for (let depth = 0; current && current !== document.body && depth < 4; depth += 1, current = current.parentElement) {
-      const t = fold(current.textContent);
-      if (!t.includes(label)) break;
-      const rect = current.getBoundingClientRect();
-      if (rect.width > 60 && rect.width < 280 && rect.height > 28 && rect.height < 150) best = current;
-      if (secondaryLabel && t.includes(secondaryLabel)) best = current;
+    let current = node.parentElement;
+    const predicate = kind === 'content'
+      ? (text) => text.includes(LABELS.content) && !text.includes('yönetimi')
+      : (text) => text.includes(LABELS.projects) && text.includes(LABELS.caseStudy) && !text.includes('yönetimi');
+
+    for (let depth = 0; current && current !== document.body && depth < 3; depth += 1, current = current.parentElement) {
+      const text = fold(current.textContent);
+      const r = current.getBoundingClientRect();
+      if (!predicate(text)) break;
+      if (r.width > 280 || r.height > 140) break;
+      if (current.querySelector('input, textarea, select, form, dialog')) break;
+      best = current;
     }
     return best;
   }
 
-  function cleanupOldParent(parent) {
-    if (!parent || parent === document.body) return;
-    requestAnimationFrame(() => {
-      const visibleChildren = Array.from(parent.children).filter((child) => {
-        if (child.classList.contains('bg-v3180-toolbar-item')) return false;
-        const style = getComputedStyle(child);
-        return style.display !== 'none' && style.visibility !== 'hidden';
-      });
-      if (!visibleChildren.length && !compact(parent.textContent)) {
-        parent.classList.add('bg-v3180-empty-source');
+  function findContentShortcut(host) {
+    const node = shortControlMatch((text) => {
+      return text.includes(LABELS.content) &&
+        !text.includes('yönetimi') &&
+        !text.includes('ana sayfa') &&
+        text.length < 55;
+    });
+    if (!node || host.contains(node)) return null;
+    return shortcutRoot(node, 'content');
+  }
+
+  function findProjectShortcut(host) {
+    const node = shortControlMatch((text) => {
+      return text.includes(LABELS.projects) &&
+        text.includes(LABELS.caseStudy) &&
+        !text.includes('yönetimi') &&
+        !text.includes('bir proje seç') &&
+        !text.includes('mevcut saha kayıt') &&
+        text.length < 45;
+    });
+    if (!node || host.contains(node)) return null;
+    return shortcutRoot(node, 'projects');
+  }
+
+  function markSecondary(root) {
+    Array.from(root.querySelectorAll('*')).forEach((el) => {
+      const text = fold(el.textContent);
+      if (!text) return;
+      if (text === LABELS.caseStudy || /^v?3\.1\.\d+(?:[-._a-z0-9]+)?$/i.test(compact(el.textContent))) {
+        el.classList.add('bg-v3181-toolbar-secondary');
       }
     });
   }
 
-  function moveIntoToolbar(node, toolbar, beforeNode, kind) {
-    if (!node || !toolbar || toolbar.contains(node)) return false;
-    const oldParent = node.parentElement;
-    node.classList.add('bg-v3180-toolbar-item', `bg-v3180-toolbar-${kind}`);
-    node.setAttribute('data-bg-v3180-toolbar-item', kind);
-
-    // Secondary stacked metadata belongs to the old card presentation.
-    Array.from(node.querySelectorAll('small, em, .eyebrow, .kicker, .meta, .subtitle, .sub, .version, .badge')).forEach((el) => {
-      const t = fold(el.textContent);
-      if (t.includes('case study') || /^v?3\.1\./.test(t)) el.classList.add('bg-v3180-toolbar-secondary');
-    });
-
-    if (beforeNode && beforeNode.parentElement === toolbar) toolbar.insertBefore(node, beforeNode);
-    else toolbar.appendChild(node);
-    cleanupOldParent(oldParent);
+  function moveShortcut(root, host, beforeNode, kind) {
+    if (!root || !host || host.contains(root)) return false;
+    root.classList.remove('bg-v3180-toolbar-item', 'bg-v3180-toolbar-content', 'bg-v3180-toolbar-projects');
+    root.classList.add('bg-v3181-toolbar-shortcut', `bg-v3181-toolbar-${kind}`);
+    root.setAttribute('data-bg-v3181-toolbar-shortcut', kind);
+    markSecondary(root);
+    if (beforeNode && beforeNode.parentElement === host) host.insertBefore(root, beforeNode);
+    else host.appendChild(root);
     return true;
   }
 
   function apply() {
-    if (document.documentElement.dataset.bgV3180ToolbarDone === '1') return;
+    const toolbar = findToolbarHost();
+    if (!toolbar) return false;
 
-    const live = smallestMatch(labels.live);
-    const toolbar = findToolbar(live);
-    if (!toolbar) return;
+    const beforeNode = directChild(toolbar.host, toolbar.field);
+    if (!beforeNode) return false;
 
-    const fieldButton = smallestMatch(labels.field);
-    const beforeNode = fieldButton && toolbar.contains(fieldButton)
-      ? Array.from(toolbar.children).find((child) => child === fieldButton || child.contains(fieldButton)) || null
-      : null;
+    const content = findContentShortcut(toolbar.host);
+    const projects = findProjectShortcut(toolbar.host);
+    if (!content || !projects) return false;
 
-    const contentHit = smallestMatch(labels.content);
-    const projectsHit = smallestMatch(labels.projects, ['siteyi yeniden oluştur']);
-    const contentCard = cardRoot(contentHit, labels.content, '3.1.');
-    const projectsCard = cardRoot(projectsHit, labels.projects, 'case study');
+    const contentMoved = moveShortcut(content, toolbar.host, beforeNode, 'content');
+    const projectsMoved = moveShortcut(projects, toolbar.host, beforeNode, 'projects');
 
-    let changed = false;
-    changed = moveIntoToolbar(contentCard, toolbar, beforeNode, 'content') || changed;
-    changed = moveIntoToolbar(projectsCard, toolbar, beforeNode, 'projects') || changed;
-
-    if (changed) {
-      toolbar.classList.add('bg-v3180-toolbar-row');
-      toolbar.setAttribute('data-bg-v3180-toolbar', '1');
-      document.documentElement.dataset.bgV3180ToolbarDone = '1';
+    if (contentMoved || projectsMoved) {
+      toolbar.host.setAttribute('data-bg-v3181-toolbar-host', '1');
+      document.documentElement.dataset.bgV3181ToolbarDone = '1';
+      return true;
     }
+    return false;
   }
 
-  const boot = () => {
-    apply();
-    if (document.documentElement.dataset.bgV3180ToolbarDone === '1') return;
+  function boot() {
+    // Remove V3.1.80 runtime markers if the browser retained the old shell via cache.
+    document.documentElement.removeAttribute('data-bg-v3180-toolbar-done');
+
+    if (apply()) return;
     const observer = new MutationObserver(() => {
-      apply();
-      if (document.documentElement.dataset.bgV3180ToolbarDone === '1') observer.disconnect();
+      if (apply()) observer.disconnect();
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    window.setTimeout(() => observer.disconnect(), 8000);
-  };
+    window.setTimeout(() => observer.disconnect(), 10000);
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
