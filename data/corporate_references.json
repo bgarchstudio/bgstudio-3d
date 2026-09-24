@@ -1,20 +1,38 @@
 [
   {
-    "slug": "istavrit-restaurant",
+    "slug": "circolo-kusadasi",
     "source_kind": "nfc",
-    "source_slug": "istavrit-restaurant",
+    "source_slug": "circolo-kusadasi",
     "theme": "dark",
     "active": true,
     "sort_order": 1,
     "show_in_corporate": true
   },
   {
-    "slug": "koala-petshop",
+    "slug": "planet-yucca",
     "source_kind": "nfc",
-    "source_slug": "koala-petshop",
-    "theme": "dark",
+    "source_slug": "planet-yucca",
+    "theme": "light",
     "active": true,
     "sort_order": 2,
+    "show_in_corporate": true
+  },
+  {
+    "slug": "istavrit-restaurant",
+    "source_kind": "nfc",
+    "source_slug": "istavrit-restaurant",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 3,
+    "show_in_corporate": true
+  },
+  {
+    "slug": "yusuf-sef",
+    "source_kind": "nfc",
+    "source_slug": "yusuf-sef",
+    "theme": "light",
+    "active": true,
+    "sort_order": 4,
     "show_in_corporate": true
   },
   {
@@ -23,7 +41,25 @@
     "source_slug": "naz-balik-restaurant",
     "theme": "light",
     "active": true,
-    "sort_order": 3,
+    "sort_order": 5,
+    "show_in_corporate": true
+  },
+  {
+    "slug": "yenipazar-pidecisi",
+    "source_kind": "nfc",
+    "source_slug": "yenipazar-pidecisi",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 6,
+    "show_in_corporate": true
+  },
+  {
+    "slug": "koala-petshop",
+    "source_kind": "nfc",
+    "source_slug": "koala-petshop",
+    "theme": "dark",
+    "active": true,
+    "sort_order": 7,
     "show_in_corporate": true
   },
   {
@@ -40,46 +76,10 @@
       "Kuşadası"
     ],
     "active": true,
-    "sort_order": 4,
+    "sort_order": 8,
     "theme": "light",
     "image": "assets/images/references/kusadasi-asansor.webp",
     "profile_image": "assets/images/references/kusadasi-asansor-profile.webp",
     "category": "Kurumsal üretim"
-  },
-  {
-    "slug": "yusuf-sef",
-    "source_kind": "nfc",
-    "source_slug": "yusuf-sef",
-    "theme": "light",
-    "active": true,
-    "sort_order": 5,
-    "show_in_corporate": true
-  },
-  {
-    "slug": "circolo-kusadasi",
-    "source_kind": "nfc",
-    "source_slug": "circolo-kusadasi",
-    "theme": "dark",
-    "active": true,
-    "sort_order": 6,
-    "show_in_corporate": true
-  },
-  {
-    "slug": "planet-yucca",
-    "source_kind": "nfc",
-    "source_slug": "planet-yucca",
-    "theme": "light",
-    "active": true,
-    "sort_order": 7,
-    "show_in_corporate": true
-  },
-  {
-    "slug": "yenipazar-pidecisi",
-    "source_kind": "nfc",
-    "source_slug": "yenipazar-pidecisi",
-    "theme": "dark",
-    "active": true,
-    "sort_order": 8,
-    "show_in_corporate": true
   }
 ]
