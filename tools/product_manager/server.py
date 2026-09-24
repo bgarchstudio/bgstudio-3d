@@ -33,8 +33,8 @@ def sync_public_shell_from_current_build():
     verify = module.verify_v3164_public_shell(include_home=False, include_catalog=False)
     return {'navigation_sync': nav, 'asset_sync': assets, 'shell_verify': verify}
 
-PANEL_VERSION = '3.1.82'
-CATALOG_ADMIN_REVISION = '3.1.82'
+PANEL_VERSION = '3.1.82-R1'
+CATALOG_ADMIN_REVISION = '3.1.82-R1'
 BACKUPS = BACKUPS_ROOT
 
 
@@ -93,7 +93,7 @@ def _panel_ui_version_text(text, filename):
 
 
 
-ADMIN_UNIFIED_REVISION = '3.1.82'
+ADMIN_UNIFIED_REVISION = '3.1.82-R1'
 
 def _inject_admin_unified_assets(text):
     """Attach the additive V3.1.82 admin UI layer to every Product Manager HTML page.
@@ -1998,7 +1998,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'v3182-admin-unified-experience', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'v3182-r1-admin-loop-toolbar-hotfix', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':

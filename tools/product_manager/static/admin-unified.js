@@ -1,4 +1,4 @@
-/* BG Studio 3D Product Manager V3.1.82
+/* BG Studio 3D Product Manager V3.1.82-R1
    Additive admin UX helpers. Existing ids, handlers and API flows stay intact. */
 (() => {
   'use strict';
@@ -103,7 +103,8 @@
         row.hidden = !(matchText && matchStock);
         if (!row.hidden) visible += 1;
       });
-      count.textContent = `${visible} gösteriliyor · ${rows.length} renk · ${inStock} stokta`;
+      const nextCount = `${visible} gösteriliyor · ${rows.length} renk · ${inStock} stokta`;
+      if (count.textContent !== nextCount) count.textContent = nextCount;
     };
 
     if (!tools.dataset.bound) {
@@ -143,13 +144,15 @@
       list.insertAdjacentElement('afterend', toggle);
       toggle.addEventListener('click', () => {
         const collapsed = list.classList.toggle('bg-v3182-collapse-pass');
-        toggle.textContent = collapsed ? `Temiz kontrolleri göster (${passCount})` : `Temiz kontrolleri gizle (${passCount})`;
+        const nextLabel = collapsed ? `Temiz kontrolleri göster (${passCount})` : `Temiz kontrolleri gizle (${passCount})`;
+        if (toggle.textContent !== nextLabel) toggle.textContent = nextLabel;
       });
     }
 
     if (toggle) {
       list.classList.add('bg-v3182-collapse-pass');
-      toggle.textContent = `Temiz kontrolleri göster (${passCount})`;
+      const nextLabel = `Temiz kontrolleri göster (${passCount})`;
+      if (toggle.textContent !== nextLabel) toggle.textContent = nextLabel;
     }
   }
 
@@ -185,24 +188,24 @@
     }
   }
 
-  function keepEnhancementsAlive() {
-    const observer = new MutationObserver(() => {
-      if (pageKind() === 'manager') {
-        if (document.querySelector('.colors-card')) enhanceColors();
-        if (document.querySelector('.preflight-item')) enhancePreflight();
-      } else if (pageKind() === 'content') {
-        enhanceContentPage();
-      }
-    });
-    observer.observe(document.body, {childList: true, subtree: true});
-    window.setTimeout(() => observer.disconnect(), 15000);
+  function scheduleSafeRetries() {
+    // Dynamic manager sections are mounted after the first API response.
+    // Use a short bounded retry window instead of observing the entire body.
+    // This prevents an observer feedback loop from starving fetch/render work.
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      if (pageKind() === 'manager') enhanceManager();
+      else if (pageKind() === 'content') enhanceContentPage();
+      if (attempts >= 16) window.clearInterval(timer);
+    }, 400);
   }
 
   function boot() {
     bootIdentity();
     if (pageKind() === 'content') enhanceContentPage();
     if (pageKind() === 'manager') enhanceManager();
-    keepEnhancementsAlive();
+    scheduleSafeRetries();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
