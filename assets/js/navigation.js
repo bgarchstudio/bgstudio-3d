@@ -1,6 +1,6 @@
-/* BG Studio 3D navigation v3.1.87 */
+/* BG Studio 3D navigation v3.1.88 */
 (() => {
-  const INIT_VERSION = '3.1.87';
+  const INIT_VERSION = '3.1.88';
   const init = () => {
     const header = document.querySelector('.site-header');
     const nav = document.querySelector('.main-nav');
@@ -17,16 +17,35 @@
           group.style.removeProperty('--submenu-drop-offset');
           group.style.removeProperty('--submenu-bridge-top');
           group.style.removeProperty('--submenu-bridge-height');
+          group.style.removeProperty('--submenu-viewport-top');
+          group.style.removeProperty('--submenu-viewport-left');
+          group.style.removeProperty('--submenu-hover-bridge');
         });
         return;
       }
-      const headerBottom = header.getBoundingClientRect().bottom;
+
+      const headerRect = header.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const submenuTop = Math.round(headerRect.bottom + 8);
+
       groups.forEach((group) => {
-        const groupBottom = group.getBoundingClientRect().bottom;
-        const gap = Math.max(8, Math.round(headerBottom - groupBottom + 8));
-        group.style.setProperty('--submenu-drop-offset', `${gap}px`);
-        group.style.setProperty('--submenu-bridge-top', `${-gap}px`);
-        group.style.setProperty('--submenu-bridge-height', `${gap}px`);
+        const toggle = group.querySelector(':scope > .nav-group-toggle');
+        const submenu = group.querySelector(':scope > .nav-submenu');
+        if (!toggle || !submenu) return;
+
+        const toggleRect = toggle.getBoundingClientRect();
+        const menuWidth = Math.max(238, submenu.offsetWidth || 0);
+        const half = menuWidth / 2;
+        const desiredCenter = toggleRect.left + toggleRect.width / 2;
+        const safeCenter = Math.min(
+          Math.max(desiredCenter, half + 12),
+          Math.max(half + 12, viewportWidth - half - 12)
+        );
+        const bridge = Math.max(8, Math.ceil(submenuTop - toggleRect.bottom));
+
+        group.style.setProperty('--submenu-viewport-top', `${submenuTop}px`);
+        group.style.setProperty('--submenu-viewport-left', `${Math.round(safeCenter)}px`);
+        group.style.setProperty('--submenu-hover-bridge', `${bridge}px`);
       });
     };
 
@@ -76,8 +95,20 @@
         toggle.focus();
       });
 
-      // Pointer hover is visual-only on desktop. Dropdown state changes only
-      // through click/tap or explicit keyboard controls.
+      // Desktop pointer behavior: hover opens immediately, click can still
+      // keep the group open for keyboard/touchpad users. Position is synced
+      // against the real viewport/header geometry before every hover open.
+      group.addEventListener('pointerenter', () => {
+        if (mobileMq.matches || !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+        syncDesktopSubmenuOffsets();
+        closeAllGroups(group);
+        toggle.setAttribute('aria-expanded', 'true');
+      });
+
+      group.addEventListener('pointerleave', () => {
+        if (mobileMq.matches || !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+        if (!group.classList.contains('is-open')) toggle.setAttribute('aria-expanded', 'false');
+      });
     });
 
     document.addEventListener('click', (event) => {

@@ -2648,3 +2648,49 @@ body{min-height:100dvh;background:#fff}
     transform:rotate(225deg) translate(-1px,-1px)!important;
   }
 }
+
+
+/* ==========================================================
+   V3.1.88 · DESKTOP DROPDOWN HOVER + TRUE BELOW-HEADER PLACEMENT
+   ========================================================== */
+@media(min-width:1041px){
+  .main-nav .nav-group > .nav-submenu{
+    position:fixed!important;
+    top:var(--submenu-viewport-top,90px)!important;
+    left:var(--submenu-viewport-left,50vw)!important;
+    transform:translate(-50%,-6px)!important;
+  }
+
+  .main-nav .nav-group:hover > .nav-submenu,
+  .main-nav .nav-group.is-open > .nav-submenu,
+  .main-nav .nav-group:focus-within > .nav-submenu{
+    display:grid!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transform:translate(-50%,0)!important;
+  }
+
+  .main-nav .nav-group:hover > .nav-group-toggle,
+  .main-nav .nav-group.is-open > .nav-group-toggle,
+  .main-nav .nav-group:focus-within > .nav-group-toggle{
+    color:var(--accent)!important;
+    background:rgba(138,78,14,.07)!important;
+  }
+
+  .main-nav .nav-group:hover > .nav-group-toggle:after,
+  .main-nav .nav-group.is-open > .nav-group-toggle:after,
+  .main-nav .nav-group:focus-within > .nav-group-toggle:after{
+    transform:rotate(225deg) translate(-1px,-1px)!important;
+  }
+
+  .main-nav .nav-group > .nav-submenu:before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:calc(-1 * var(--submenu-hover-bridge,28px))!important;
+    height:var(--submenu-hover-bridge,28px)!important;
+    background:transparent;
+  }
+}
