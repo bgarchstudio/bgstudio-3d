@@ -2605,3 +2605,46 @@ body{min-height:100dvh;background:#fff}
     height:var(--submenu-bridge-height,25px)!important;
   }
 }
+
+
+/* ==========================================================
+   V3.1.87 · DESKTOP NAV HOVER HIGHLIGHT + CLICK-ONLY DROPDOWN
+   ========================================================== */
+@media(min-width:1041px){
+  .main-nav > a:hover,
+  .main-nav .nav-link:hover,
+  .main-nav .nav-group > .nav-group-toggle:hover{
+    color:var(--accent)!important;
+    background:rgba(138,78,14,.07)!important;
+  }
+
+  .main-nav .nav-group.is-open > .nav-group-toggle{
+    color:var(--accent)!important;
+    background:rgba(138,78,14,.07)!important;
+  }
+
+  /* Focus and pointer hover alone never open a desktop dropdown. */
+  .main-nav .nav-group:not(.is-open) > .nav-submenu,
+  .main-nav .nav-group:not(.is-open):hover > .nav-submenu,
+  .main-nav .nav-group:not(.is-open):focus-within > .nav-submenu{
+    opacity:0!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+    transform:translate(-50%,-6px)!important;
+  }
+
+  .main-nav .nav-group.is-open > .nav-submenu{
+    display:grid!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transform:translate(-50%,0)!important;
+  }
+
+  .main-nav .nav-group:not(.is-open):focus-within > .nav-group-toggle:after{
+    transform:rotate(45deg) translateY(-2px)!important;
+  }
+  .main-nav .nav-group.is-open > .nav-group-toggle:after{
+    transform:rotate(225deg) translate(-1px,-1px)!important;
+  }
+}

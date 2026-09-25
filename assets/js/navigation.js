@@ -1,6 +1,6 @@
-/* BG Studio 3D navigation v3.1.86 */
+/* BG Studio 3D navigation v3.1.87 */
 (() => {
-  const INIT_VERSION = '3.1.86';
+  const INIT_VERSION = '3.1.87';
   const init = () => {
     const header = document.querySelector('.site-header');
     const nav = document.querySelector('.main-nav');
@@ -10,7 +10,6 @@
 
     const groups = [...nav.querySelectorAll('.nav-group')];
     const mobileMq = window.matchMedia('(max-width: 1040px)');
-    const closeTimers = new WeakMap();
 
     const syncDesktopSubmenuOffsets = () => {
       if (mobileMq.matches) {
@@ -31,15 +30,8 @@
       });
     };
 
-    const clearCloseTimer = (group) => {
-      const timer = closeTimers.get(group);
-      if (timer) window.clearTimeout(timer);
-      closeTimers.delete(group);
-    };
-
     const closeGroup = (group) => {
       if (!group) return;
-      clearCloseTimer(group);
       group.classList.remove('is-open');
       const toggle = group.querySelector(':scope > .nav-group-toggle');
       toggle?.setAttribute('aria-expanded', 'false');
@@ -53,15 +45,9 @@
 
     const openGroup = (group) => {
       if (!group) return;
-      clearCloseTimer(group);
       closeAllGroups(group);
       group.classList.add('is-open');
       group.querySelector(':scope > .nav-group-toggle')?.setAttribute('aria-expanded', 'true');
-    };
-
-    const scheduleClose = (group, delay = 240) => {
-      clearCloseTimer(group);
-      closeTimers.set(group, window.setTimeout(() => closeGroup(group), delay));
     };
 
     groups.forEach((group) => {
@@ -90,21 +76,8 @@
         toggle.focus();
       });
 
-      // Desktop hover intent. The short grace period bridges the visual gap
-      // between the pill and the floating submenu, so it cannot disappear while
-      // the pointer travels down to the first option.
-      group.addEventListener('pointerenter', (event) => {
-        if (mobileMq.matches || event.pointerType === 'touch') return;
-        openGroup(group);
-      });
-      group.addEventListener('pointerleave', (event) => {
-        if (mobileMq.matches || event.pointerType === 'touch') return;
-        scheduleClose(group, 260);
-      });
-      submenu.addEventListener('pointerenter', () => clearCloseTimer(group));
-      submenu.addEventListener('pointerleave', () => {
-        if (!mobileMq.matches) scheduleClose(group, 220);
-      });
+      // Pointer hover is visual-only on desktop. Dropdown state changes only
+      // through click/tap or explicit keyboard controls.
     });
 
     document.addEventListener('click', (event) => {
