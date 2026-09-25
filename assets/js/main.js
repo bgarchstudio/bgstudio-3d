@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.83';
+  const HEADER_VERSION = 'v3.1.84';
+  const ASSET_VERSION = '3.1.84';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -468,38 +468,81 @@ document.addEventListener('click', (event) => {
 });
 
 // Mobile navigation
+// V3.1.84: the drawer is portalled to <body> while open. This keeps it tied to
+// the viewport instead of the sticky header's document position when the page
+// has already been scrolled. It also avoids iOS Safari losing the drawer above
+// the visible viewport after body scroll-lock is applied.
+let mobileNavPortalMarker = null;
+let mobileNavPortalParent = null;
+let mobileNavPortalNext = null;
+
+const mountMobileNavPortal = () => {
+  if (!nav || nav.parentElement === document.body) return;
+  mobileNavPortalParent = nav.parentNode;
+  mobileNavPortalNext = nav.nextSibling;
+  mobileNavPortalMarker = document.createComment('bgstudio-mobile-nav-home');
+  mobileNavPortalParent.insertBefore(mobileNavPortalMarker, nav);
+  document.body.appendChild(nav);
+  nav.classList.add('mobile-viewport-menu');
+};
+
+const restoreMobileNavPortal = () => {
+  if (!nav || !mobileNavPortalParent) return;
+  if (mobileNavPortalMarker?.parentNode) {
+    mobileNavPortalMarker.parentNode.insertBefore(nav, mobileNavPortalMarker);
+    mobileNavPortalMarker.remove();
+  } else if (mobileNavPortalNext?.parentNode === mobileNavPortalParent) {
+    mobileNavPortalParent.insertBefore(nav, mobileNavPortalNext);
+  } else {
+    mobileNavPortalParent.appendChild(nav);
+  }
+  nav.classList.remove('mobile-viewport-menu');
+  mobileNavPortalMarker = null;
+  mobileNavPortalParent = null;
+  mobileNavPortalNext = null;
+};
+
 const syncMobileNavGeometry = () => {
   const header = document.querySelector('.site-header');
   if (!header) return;
   const rect = header.getBoundingClientRect();
-  const bottom = Math.max(0, Math.min(window.innerHeight || rect.bottom, rect.bottom));
+  const viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 0;
+  const bottom = Math.max(0, Math.min(viewportHeight || rect.bottom, rect.bottom));
   document.documentElement.style.setProperty('--mobile-header-bottom', `${Math.round(bottom)}px`);
 };
 
 let mobileNavScrollY = 0;
 const setMenuState = (open) => {
   if (!nav || !menuButton) return;
-  if (open) {
+  const isMobile = window.matchMedia('(max-width: 1040px)').matches;
+  if (open && isMobile) {
+    mobileNavScrollY = window.scrollY || window.pageYOffset || 0;
     syncMobileNavGeometry();
-    mobileNavScrollY = window.scrollY || 0;
+    mountMobileNavPortal();
   }
+
   nav.classList.toggle('open', open);
   menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
   menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
   document.body.classList.toggle('nav-open', open);
-  if (open && window.matchMedia('(max-width: 1040px)').matches) {
+  document.documentElement.classList.toggle('nav-open', open);
+
+  if (open && isMobile) {
+    // Keep the page at its current position while the viewport-fixed drawer is open.
     document.body.style.position = 'fixed';
     document.body.style.top = `-${mobileNavScrollY}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
     document.body.style.width = '100%';
-  } else if (!open && document.body.style.position === 'fixed') {
+  } else if (!open) {
+    const wasLocked = document.body.style.position === 'fixed';
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
-    window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
+    restoreMobileNavPortal();
+    if (wasLocked) window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
   }
 };
 
@@ -524,6 +567,9 @@ window.addEventListener('resize', () => {
   if (nav?.classList.contains('open')) syncMobileNavGeometry();
 }, { passive: true });
 window.visualViewport?.addEventListener('resize', () => {
+  if (nav?.classList.contains('open')) syncMobileNavGeometry();
+}, { passive: true });
+window.visualViewport?.addEventListener('scroll', () => {
   if (nav?.classList.contains('open')) syncMobileNavGeometry();
 }, { passive: true });
 

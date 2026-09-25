@@ -1614,7 +1614,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.83'
+SITE_ASSET_VERSION = '3.1.84'
 
 
 def _relative_prefix_for_html(html_path):
