@@ -2552,3 +2552,40 @@ body{min-height:100dvh;background:#fff}
     }
   }
 }
+
+/* ==========================================================
+   V3.1.85 · NFC REFERENCE VISIBILITY + DESKTOP NAV DROPDOWN
+   ========================================================== */
+/* The NFC reference wrapper is taller than one mobile viewport. A reveal
+   threshold on the whole wrapper can therefore leave the complete section at
+   opacity:0. Keep this managed proof section render-safe on every viewport. */
+.nfc-reference-first > .shell,
+.nfc-reference-first > .shell.reveal{
+  opacity:1!important;
+  transform:none!important;
+  visibility:visible!important;
+}
+
+/* V3.1.83 critical CSS is intentionally inlined after the async stylesheet.
+   Desktop submenus must therefore explicitly defeat the first-paint fallback
+   rule instead of inheriting display:none forever. */
+@media(min-width:1041px){
+  .main-nav .nav-group > .nav-submenu{
+    display:grid!important;
+  }
+  .main-nav .nav-group.is-open > .nav-submenu,
+  .main-nav .nav-group:focus-within > .nav-submenu{
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transform:translate(-50%,0)!important;
+  }
+}
+@media(min-width:1041px) and (hover:hover) and (pointer:fine){
+  .main-nav .nav-group:hover > .nav-submenu{
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transform:translate(-50%,0)!important;
+  }
+}
