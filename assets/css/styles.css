@@ -2589,3 +2589,19 @@ body{min-height:100dvh;background:#fff}
     transform:translate(-50%,0)!important;
   }
 }
+
+
+/* ==========================================================
+   V3.1.86 · DESKTOP SUBMENU BELOW HEADER
+   ========================================================== */
+@media(min-width:1041px){
+  .main-nav .nav-group > .nav-submenu{
+    top:calc(100% + var(--submenu-drop-offset,25px))!important;
+  }
+}
+@media(min-width:1041px) and (hover:hover) and (pointer:fine){
+  .main-nav .nav-group > .nav-submenu:before{
+    top:var(--submenu-bridge-top,-25px)!important;
+    height:var(--submenu-bridge-height,25px)!important;
+  }
+}

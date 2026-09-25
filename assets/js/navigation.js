@@ -1,6 +1,6 @@
-/* BG Studio 3D navigation v3.1.85 */
+/* BG Studio 3D navigation v3.1.86 */
 (() => {
-  const INIT_VERSION = '3.1.85';
+  const INIT_VERSION = '3.1.86';
   const init = () => {
     const header = document.querySelector('.site-header');
     const nav = document.querySelector('.main-nav');
@@ -11,6 +11,25 @@
     const groups = [...nav.querySelectorAll('.nav-group')];
     const mobileMq = window.matchMedia('(max-width: 1040px)');
     const closeTimers = new WeakMap();
+
+    const syncDesktopSubmenuOffsets = () => {
+      if (mobileMq.matches) {
+        groups.forEach((group) => {
+          group.style.removeProperty('--submenu-drop-offset');
+          group.style.removeProperty('--submenu-bridge-top');
+          group.style.removeProperty('--submenu-bridge-height');
+        });
+        return;
+      }
+      const headerBottom = header.getBoundingClientRect().bottom;
+      groups.forEach((group) => {
+        const groupBottom = group.getBoundingClientRect().bottom;
+        const gap = Math.max(8, Math.round(headerBottom - groupBottom + 8));
+        group.style.setProperty('--submenu-drop-offset', `${gap}px`);
+        group.style.setProperty('--submenu-bridge-top', `${-gap}px`);
+        group.style.setProperty('--submenu-bridge-height', `${gap}px`);
+      });
+    };
 
     const clearCloseTimer = (group) => {
       const timer = closeTimers.get(group);
@@ -100,7 +119,10 @@
       header.classList.toggle('is-scrolled', window.scrollY > 12);
     };
     syncHeaderState();
+    syncDesktopSubmenuOffsets();
     window.addEventListener('scroll', syncHeaderState, { passive: true });
+    window.addEventListener('resize', syncDesktopSubmenuOffsets, { passive: true });
+    window.addEventListener('load', syncDesktopSubmenuOffsets, { once: true });
 
     const menuButton = document.querySelector('.menu-toggle');
     menuButton?.addEventListener('click', () => {
@@ -110,7 +132,8 @@
     });
 
     const clearDesktopClickState = () => {
-      if (!mobileMq.matches) closeAllGroups();
+      closeAllGroups();
+      syncDesktopSubmenuOffsets();
     };
     if (typeof mobileMq.addEventListener === 'function') mobileMq.addEventListener('change', clearDesktopClickState);
     else if (typeof mobileMq.addListener === 'function') mobileMq.addListener(clearDesktopClickState);
