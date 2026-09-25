@@ -1,5 +1,6 @@
 (() => {
   const STORAGE_KEY = 'bgstudio3d_consent_v1';
+  const CONSENT_VERSION = '3.1.83';
   const MEASUREMENT_ID = 'G-WHJ7Y7KN3L';
   let banner = null;
 
@@ -66,11 +67,15 @@
     if (!banner) return;
     banner.classList.remove('show');
     banner.setAttribute('aria-hidden', 'true');
+    banner.inert = true;
+    banner.hidden = true;
   };
 
   const showBanner = (manageMode = false) => {
     if (!banner) return;
     const saved = readChoice();
+    banner.hidden = false;
+    banner.inert = false;
     banner.classList.add('show');
     banner.setAttribute('aria-hidden', 'false');
     const status = banner.querySelector('[data-consent-status]');
@@ -89,6 +94,8 @@
     banner.setAttribute('role', 'dialog');
     banner.setAttribute('aria-label', 'Çerez ve analitik tercihleri');
     banner.setAttribute('aria-hidden', 'true');
+    banner.hidden = true;
+    banner.inert = true;
     banner.innerHTML = `
       <div class="consent-copy">
         <span class="consent-kicker">GİZLİLİK TERCİHİ</span>
@@ -105,8 +112,14 @@
     banner.querySelector('[data-consent-accept]')?.addEventListener('click', () => setChoice(true));
     banner.querySelector('[data-consent-necessary]')?.addEventListener('click', () => setChoice(false));
 
+    const existingFooterButton = document.querySelector('.footer-consent-button');
+    if (existingFooterButton && !existingFooterButton.dataset.consentBound) {
+      existingFooterButton.dataset.consentBound = '1';
+      existingFooterButton.addEventListener('click', () => showBanner(true));
+    }
+
     const footerLinks = document.querySelector('.footer-links');
-    if (footerLinks && !footerLinks.querySelector('[data-open-consent]')) {
+    if (!existingFooterButton && footerLinks && !footerLinks.querySelector('[data-open-consent]')) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'footer-consent-button';

@@ -1,4 +1,4 @@
-/* BG Studio 3D homepage motion v3.1.63 */
+/* BG Studio 3D homepage motion v3.1.83 */
 (() => {
   const home = document.querySelector('.home-v3163');
   if (!home) return;
@@ -26,6 +26,8 @@
 
   if (reduceMotion) return;
 
+  const parallaxMq = window.matchMedia('(min-width: 1101px) and (hover: hover) and (pointer: fine)');
+  if (!parallaxMq.matches) return;
   const parallaxItems = [...home.querySelectorAll('[data-home-parallax]')];
   if (!parallaxItems.length) return;
 

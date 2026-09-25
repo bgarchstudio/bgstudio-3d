@@ -2,6 +2,11 @@ from pathlib import Path
 import json, re, html, sys
 from datetime import date
 
+try:
+    from PIL import Image as PILImage
+except Exception:
+    PILImage = None
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'data' / 'products.json'
 NFC_DATA = ROOT / 'data' / 'nfc_references.json'
@@ -821,6 +826,64 @@ def _homepage_single_product(active, featured, configured_slug='', fallback_inde
     return pool[min(max(int(fallback_index or 0), 0), len(pool)-1)]
 
 
+RESPONSIVE_IMAGE_WIDTHS_V3183 = (480, 800)
+
+
+def _responsive_variant_path(raw, width):
+    raw = str(raw or '').strip()
+    if not raw:
+        return ''
+    src = Path(raw)
+    return src.with_name(f'{src.stem}-{int(width)}.webp').as_posix()
+
+
+def _ensure_responsive_variant(raw, width):
+    """Create a lightweight WebP derivative when Pillow is available.
+    Existing derivatives are reused. Failure is non-fatal so Product Manager
+    still builds normally on machines without Pillow.
+    """
+    raw = str(raw or '').strip()
+    if not raw:
+        return ''
+    variant_rel = _responsive_variant_path(raw, width)
+    source = ROOT / raw
+    target = ROOT / variant_rel
+    if target.exists() and source.exists() and target.stat().st_mtime >= source.stat().st_mtime:
+        return variant_rel
+    if not source.exists() or PILImage is None:
+        return variant_rel if target.exists() else ''
+    try:
+        with PILImage.open(source) as im:
+            ow, oh = im.size
+            if ow <= width:
+                return ''
+            nh = max(1, round(oh * (width / ow)))
+            work = im.convert('RGBA') if im.mode in ('RGBA', 'LA', 'P') else im.convert('RGB')
+            work = work.resize((int(width), int(nh)), PILImage.Resampling.LANCZOS)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            save_kwargs = dict(format='WEBP', quality=78, method=6)
+            if work.mode == 'RGBA':
+                save_kwargs['lossless'] = False
+            work.save(target, **save_kwargs)
+            return variant_rel
+    except Exception:
+        return variant_rel if target.exists() else ''
+
+
+def _responsive_srcset_for_product(product, prefix=''):
+    raw = str(product.get('main_image') or '').strip()
+    if not raw:
+        return ''
+    entries = []
+    for width in RESPONSIVE_IMAGE_WIDTHS_V3183:
+        variant = _ensure_responsive_variant(raw, width)
+        if variant:
+            entries.append(f'{prefix}{variant} {width}w')
+    original_width = int(product.get('main_image_width') or 1000)
+    entries.append(f'{prefix}{raw} {original_width}w')
+    return ', '.join(entries)
+
+
 def _picture_sources_for_product(product, prefix=''):
     # Use AVIF/WebP only when the matching optimized file really exists.
     raw = str(product.get('main_image') or '').strip()
@@ -836,12 +899,13 @@ def _picture_sources_for_product(product, prefix=''):
     return candidates
 
 
-def render_home_product_picture(product, prefix='', eager=False, css_class=''):
+def render_home_product_picture(product, prefix='', eager=False, css_class='', sizes='100vw'):
     name = esc(product.get('name') or 'BG Studio 3D ürünü')
     sources = _picture_sources_for_product(product, prefix)
-    fallback = sources.get('fallback') or prefix + 'assets/brand/bgstudio3d-monogram.png'
+    fallback = sources.get('fallback') or prefix + 'assets/brand/bgstudio3d-monogram.webp'
     width = int(product.get('main_image_width') or 1000)
     height = int(product.get('main_image_height') or 760)
+    responsive = _responsive_srcset_for_product(product, prefix)
     source_html = ''
     if sources.get('avif'):
         source_html += f'<source srcset="{esc(sources["avif"])}" type="image/avif"/>'
@@ -850,7 +914,8 @@ def render_home_product_picture(product, prefix='', eager=False, css_class=''):
     loading = 'eager' if eager else 'lazy'
     priority = ' fetchpriority="high"' if eager else ''
     klass = f' class="{esc(css_class)}"' if css_class else ''
-    return f'<picture{klass}>{source_html}<img alt="{name}" decoding="async" height="{height}" loading="{loading}" src="{esc(fallback)}" width="{width}"{priority}/></picture>'
+    srcset_attr = f' srcset="{esc(responsive)}" sizes="{esc(sizes)}"' if responsive else ''
+    return f'<picture{klass}>{source_html}<img alt="{name}" decoding="async" height="{height}" loading="{loading}" src="{esc(fallback)}" width="{width}"{srcset_attr}{priority}/></picture>'
 
 
 def render_home_showcase_product(product, index=0):
@@ -858,7 +923,7 @@ def render_home_showcase_product(product, index=0):
     href = esc('urunler/' + str(product.get('slug') or '').strip('/') + '/')
     label = esc(category_label(product))
     price_html = card_price_html(product)
-    picture = render_home_product_picture(product, '', eager=False, css_class='home-showcase-picture')
+    picture = render_home_product_picture(product, '', eager=False, css_class='home-showcase-picture', sizes='(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 34vw')
     lead_class = ' is-lead' if index == 0 else ''
     return (
         f'<article class="home-showcase-card home-motion{lead_class}" data-home-motion>'
@@ -894,11 +959,12 @@ def render_home_project_feature(item, index, prefix=''):
 def _home_visual_product(product, position='main', eager=False):
     if not product:
         return f'<div class="home-hero-visual-fallback home-hero-visual-{esc(position)}"><span>BG</span><small>STUDIO 3D</small></div>'
-    picture = render_home_product_picture(product, '', eager=eager, css_class='home-hero-picture')
+    sizes = '(max-width: 760px) 70vw, (max-width: 1100px) 72vw, 42vw' if position == 'main' else '(max-width: 760px) 1px, (max-width: 1100px) 30vw, 18vw'
+    picture = render_home_product_picture(product, '', eager=eager, css_class='home-hero-picture', sizes=sizes)
     name = esc(product.get('name') or 'BG Studio 3D')
     price = esc(active_price_text(product))
     return (
-        f'<figure class="home-hero-visual home-hero-visual-{esc(position)}">{picture}'
+        f'<figure class="home-hero-visual home-hero-visual-{esc(position)}{" home-hero-visual-desktop-extra" if position in ("side-one", "side-two") else ""}">{picture}'
         f'<figcaption><span>{name}</span><small>{price}</small></figcaption></figure>'
     )
 
@@ -1004,7 +1070,10 @@ def rebuild_homepage_v3163(text, active, featured, field_items):
     if hero_first:
         hero_src = str(hero_first.get('main_image') or '').strip()
         if hero_src:
-            preload = f'<!-- BGSTUDIO:HOME_HERO_PRELOAD --><link rel="preload" as="image" href="{esc(hero_src)}" fetchpriority="high"/>'
+            hero_srcset = _responsive_srcset_for_product(hero_first, '')
+            hero_sizes = '(max-width: 760px) 70vw, (max-width: 1100px) 72vw, 42vw'
+            srcset_bits = f' imagesrcset="{esc(hero_srcset)}" imagesizes="{esc(hero_sizes)}"' if hero_srcset else ''
+            preload = f'<!-- BGSTUDIO:HOME_HERO_PRELOAD --><link rel="preload" as="image" href="{esc(hero_src)}"{srcset_bits} fetchpriority="high"/>'
             if '<!-- BGSTUDIO:HOME_HERO_PRELOAD -->' in updated:
                 updated = re.sub(r'<!-- BGSTUDIO:HOME_HERO_PRELOAD -->\s*<link\b[^>]*>', preload, updated, count=1, flags=re.I)
             elif '</head>' in updated:
@@ -1182,6 +1251,9 @@ def render_card(p, prefix='', catalog=False, catalog_index=0):
     ]).casefold()
     w = int(p.get('main_image_width') or 1000)
     h = int(p.get('main_image_height') or 760)
+    responsive_srcset = _responsive_srcset_for_product(p, prefix)
+    card_sizes = '(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 33vw'
+    responsive_attrs = f' srcset="{esc(responsive_srcset)}" sizes="{card_sizes}"' if responsive_srcset else ''
 
     if catalog:
         price_value = active_price_value(p) or ''
@@ -1207,7 +1279,7 @@ def render_card(p, prefix='', catalog=False, catalog_index=0):
             f'data-featured="{"1" if p.get("featured") else "0"}" '
             f'data-personalizable="{"1" if personalizable else "0"}" '
             f'data-materials="{esc(material_keys)}" aria-hidden="false">\n'
-            f'<a class="product-image" href="{href}">{badge_markup}<img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"/></a>\n'
+            f'<a class="product-image" href="{href}">{badge_markup}<img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"{responsive_attrs}/></a>\n'
             f'<div class="product-card-body"><span class="catalog-card-category">{label}</span>'
             f'<h3><a href="{href}">{name}</a></h3>'
             f'<div class="catalog-card-footer"><span class="catalog-card-price">{price_markup}</span>'
@@ -1217,7 +1289,7 @@ def render_card(p, prefix='', catalog=False, catalog_index=0):
 
     return (
         f'<article class="product-card" data-category="{esc(p.get("category"))}" data-search="{esc(search)}">\n'
-        f'<a class="product-image" href="{href}"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"/></a>\n'
+        f'<a class="product-image" href="{href}"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{img}" width="{w}"{responsive_attrs}/></a>\n'
         f'<div class="product-card-body"><div class="product-topline"><span>{label}</span>{price_markup}</div>\n'
         f'<h3><a href="{href}">{name}</a></h3><p>{desc}</p>\n'
         f'<a class="product-link" href="{href}">Ürünü incele ↗</a>\n</div>\n</article>'
@@ -1542,7 +1614,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.79'
+SITE_ASSET_VERSION = '3.1.83'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1643,6 +1715,8 @@ def sync_site_header_navigation():
     return {'scanned': scanned, 'changed': changed, 'missing_header': missing_header}
 
 
+CRITICAL_CSS_V3183 = ':root{--paper:#f4ede3;--paper-2:#fbf7f1;--ink:#2d1f14;--ink-soft:#6d5b4b;--brown:#8a4e0e;--line:rgba(72,46,25,.15);--border:var(--line);--accent:var(--brown);--text-secondary:var(--ink-soft);--dark:#16120f}*{box-sizing:border-box}html{background:#fff;scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}a{color:inherit}img{display:block;width:100%;height:auto}.shell{width:min(1360px,calc(100% - 48px));margin-inline:auto}.site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}.nav-shell{height:82px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:max-content}.brand-monogram{display:inline-block;width:38px;height:38px;flex:0 0 38px;font-size:0;background:url("/assets/brand/bgstudio3d-monogram.webp") center/contain no-repeat}.brand-text{display:grid;line-height:1}.brand-text strong{font-size:.95rem;letter-spacing:.24em;font-weight:600}.brand-text small{font-size:.63rem;letter-spacing:.35em;margin-top:5px;color:var(--ink-soft)}.main-nav{display:flex;align-items:center;gap:15px}.main-nav a,.nav-group-toggle{text-decoration:none;font-size:.82rem;font-weight:600;color:#514235}.nav-group{position:relative;display:flex;align-items:center}.nav-group-toggle{border:0;background:transparent;min-height:44px;padding:0 9px}.nav-submenu{display:none}.nav-whatsapp{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff!important;text-decoration:none}.menu-toggle{display:none;width:44px;height:44px;border:1px solid var(--line);background:transparent;border-radius:50%;position:relative}.menu-toggle span{position:absolute;left:12px;right:12px;height:1px;background:var(--ink)}.menu-toggle span:first-child{top:16px}.menu-toggle span:last-child{top:25px}.primary-cta,.secondary-cta,.ghost-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:999px;text-decoration:none;font-size:.82rem;font-weight:700}.primary-cta{background:var(--ink);color:#fff}.secondary-cta{border:1px solid var(--line);background:rgba(255,255,255,.36)}.home-v3163{overflow:clip}.home-v3163 .eyebrow{margin:0 0 14px;color:var(--accent);font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.home-v3163 h1,.home-v3163 h2,.home-v3163 h3{font-family:Georgia,serif;font-weight:500}.home-hero-v3163{position:relative;padding-top:clamp(54px,6vw,92px);padding-bottom:clamp(74px,8vw,128px)}.home-hero-grid-v3163{display:grid;grid-template-columns:minmax(0,.82fr) minmax(520px,1.18fr);gap:clamp(38px,6vw,92px);align-items:center}.home-hero-copy-v3163{position:relative;z-index:2;max-width:680px}.home-hero-copy-v3163 h1{font-size:clamp(4.6rem,8.2vw,9.1rem);line-height:.84;letter-spacing:-.06em;margin:0 0 28px;max-width:8.4ch}.home-hero-lead{margin:0;max-width:620px;color:var(--text-secondary);font-size:clamp(1.06rem,1.35vw,1.28rem);line-height:1.68}.home-hero-actions-v3163{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}.home-hero-proof{display:flex;gap:9px;flex-wrap:wrap;margin-top:30px}.home-hero-proof span{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.26);font-size:.66rem;font-weight:700}.home-hero-stage-v3163{position:relative;min-height:clamp(560px,62vw,780px);border-radius:clamp(26px,3vw,42px);overflow:hidden;background:linear-gradient(145deg,#15110e,#201711 62%,#2b1c11);border:1px solid rgba(255,255,255,.06)}.home-hero-visual{position:absolute;margin:0;overflow:hidden;background:#17120f}.home-hero-visual-main{left:7%;top:9%;width:64%;height:78%;border-radius:28px;z-index:2}.home-hero-visual-side-one{right:5%;top:8%;width:28%;height:33%;border-radius:22px;z-index:3}.home-hero-visual-side-two{right:5%;bottom:13%;width:31%;height:35%;border-radius:22px;z-index:3}.home-hero-picture,.home-hero-picture img{width:100%;height:100%;display:block}.home-hero-picture img{object-fit:cover}.home-hero-visual figcaption{position:absolute;left:0;right:0;bottom:0;padding:46px 18px 16px;background:linear-gradient(transparent,rgba(17,13,10,.84));color:#fff;display:grid;gap:3px}.home-hero-stage-label{position:absolute;left:7%;bottom:4%;z-index:4;color:#fff}.page-hero{padding:clamp(64px,8vw,112px) 0}.page-hero h1{font-family:Georgia,serif;font-size:clamp(3.2rem,7vw,7rem);line-height:.9;margin:0}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:12px;top:12px;z-index:999;background:#fff;padding:10px}@media(max-width:1040px){.nav-shell{height:72px}.menu-toggle{display:block}.main-nav{position:absolute;left:24px;right:24px;top:calc(100% + 8px);display:none;flex-direction:column;align-items:stretch;gap:5px;padding:12px;border-radius:22px;background:#fff;border:1px solid var(--border);max-height:calc(100dvh - 100px);overflow:auto}.main-nav.open{display:flex}.main-nav>a,.nav-link,.nav-group-toggle{width:100%;min-height:48px;justify-content:space-between;padding:0 14px}.nav-group{display:grid}.nav-group.is-open>.nav-submenu{display:grid}.nav-submenu{position:static;padding-left:10px}.nav-actions{display:grid}.nav-whatsapp{width:100%;min-height:50px}.home-hero-grid-v3163{grid-template-columns:1fr}.home-hero-stage-v3163{min-height:680px}}@media(max-width:760px){.shell{width:min(100% - 24px,1360px)}.nav-shell{height:68px}.brand-monogram{width:34px;height:34px;flex-basis:34px}.home-hero-v3163{padding-top:32px;padding-bottom:58px}.home-hero-grid-v3163{gap:24px}.home-hero-copy-v3163 h1{font-size:clamp(3.55rem,18vw,5.6rem);line-height:.88;margin-bottom:20px}.home-hero-lead{font-size:.96rem}.home-hero-proof{gap:6px;margin-top:20px}.home-hero-proof span{font-size:.58rem}.home-hero-stage-v3163{min-height:390px;border-radius:24px}.home-hero-visual-main{left:4%;top:5%;width:92%;height:88%;border-radius:20px}.home-hero-visual-desktop-extra{display:none!important}.home-hero-stage-label{left:6%;bottom:3%}.home-hero-actions-v3163{display:grid;grid-template-columns:1fr}.home-hero-actions-v3163 a{width:100%}}'
+
 def sync_site_asset_versions():
     """Bump shared assets and install the separate navigation module on every public page."""
     changed = 0
@@ -1656,7 +1730,7 @@ def sync_site_asset_versions():
         except Exception:
             continue
         prefix = _relative_prefix_for_html(html_path)
-        updated = re.sub(r'((?:\.\./)*assets/css/styles\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
+        updated = re.sub(r'((?:\.\./)*assets/css/(?:styles|styles\.min)\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/homepage\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
@@ -1714,6 +1788,40 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + quote_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', quote_tag + '</body>', 1)
+        # V3.1.83: iOS safe-area viewport and non-blocking first-paint assets.
+        updated = re.sub(
+            r'<meta\s+[^>]*name=["\']viewport["\'][^>]*>',
+            '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',
+            updated, count=1, flags=re.I
+        )
+        if 'name="viewport"' not in updated and '</head>' in updated:
+            updated = updated.replace('</head>', '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head>', 1)
+
+        # Clean previous async blocks and old blocking links so rebuilds stay idempotent.
+        updated = re.sub(r'<!-- BGSTUDIO:ASYNC_FONTS_V3183_START -->.*?<!-- BGSTUDIO:ASYNC_FONTS_V3183_END -->', '', updated, flags=re.I | re.S)
+        updated = re.sub(r'<!-- BGSTUDIO:ASYNC_CSS_V3183_START -->.*?<!-- BGSTUDIO:ASYNC_CSS_V3183_END -->', '', updated, flags=re.I | re.S)
+        updated = re.sub(r'<link\b[^>]*href=["\']https://fonts\.googleapis\.com/css2\?[^"\']+["\'][^>]*>', '', updated, flags=re.I)
+        updated = re.sub(r'<link\b[^>]*href=["\'](?:\.\./)*assets/css/(?:styles|styles\.min)\.css(?:\?v=[^"\']*)?["\'][^>]*>', '', updated, flags=re.I)
+        updated = re.sub(r'<noscript>\s*</noscript>', '', updated, flags=re.I)
+
+        font_url = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap'
+        async_font = (f'<!-- BGSTUDIO:ASYNC_FONTS_V3183_START -->'
+                      f'<link rel="preload" as="style" href="{font_url}">'
+                      f'<link rel="stylesheet" href="{font_url}" media="print" onload="this.media=\'all\'">'
+                      f'<noscript><link rel="stylesheet" href="{font_url}"></noscript>'
+                      f'<!-- BGSTUDIO:ASYNC_FONTS_V3183_END -->')
+
+        target_css = f'{prefix}assets/css/styles.min.css?v={SITE_ASSET_VERSION}'
+        async_css = (f'<!-- BGSTUDIO:ASYNC_CSS_V3183_START -->'
+                     f'<link rel="preload" as="style" href="{target_css}">'
+                     f'<link rel="stylesheet" href="{target_css}" media="print" onload="this.media=\'all\'">'
+                     f'<noscript><link rel="stylesheet" href="{target_css}"></noscript>'
+                     f'<!-- BGSTUDIO:ASYNC_CSS_V3183_END -->')
+
+        # Keep only one critical first-paint block and inject canonical async assets.
+        updated = re.sub(r'<style\s+data-critical-v3183[^>]*>.*?</style>', '', updated, flags=re.I | re.S)
+        updated = updated.replace('</head>', async_font + async_css + f'<style data-critical-v3183>{CRITICAL_CSS_V3183}</style></head>', 1)
+
         build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
         if 'name="bgstudio-build"' in updated:
             updated = re.sub(r'<meta\s+name="bgstudio-build"\s+content="[^"]*"\s*/?>', build_meta, updated, count=1, flags=re.I)

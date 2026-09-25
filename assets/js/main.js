@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.72';
-  const ASSET_VERSION = '3.1.72';
+  const HEADER_VERSION = 'v3.1.83';
+  const ASSET_VERSION = '3.1.83';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -476,13 +476,31 @@ const syncMobileNavGeometry = () => {
   document.documentElement.style.setProperty('--mobile-header-bottom', `${Math.round(bottom)}px`);
 };
 
+let mobileNavScrollY = 0;
 const setMenuState = (open) => {
   if (!nav || !menuButton) return;
-  if (open) syncMobileNavGeometry();
+  if (open) {
+    syncMobileNavGeometry();
+    mobileNavScrollY = window.scrollY || 0;
+  }
   nav.classList.toggle('open', open);
   menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
   menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
   document.body.classList.toggle('nav-open', open);
+  if (open && window.matchMedia('(max-width: 1040px)').matches) {
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${mobileNavScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  } else if (!open && document.body.style.position === 'fixed') {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
+  }
 };
 
 menuButton?.addEventListener('click', () => setMenuState(!nav?.classList.contains('open')));
@@ -1509,6 +1527,8 @@ if (floatingWhatsApp) {
   panel.className = 'wa-quick-panel';
   panel.setAttribute('aria-label', 'WhatsApp hızlı iletişim');
   panel.setAttribute('aria-hidden', 'true');
+  panel.hidden = true;
+  panel.inert = true;
   panel.innerHTML = `
     <div class="wa-panel-head">
       <div><h2>Merhaba 👋</h2><p>Ürün, özel üretim, prototip veya işletme çözümü için mesajını birkaç saniyede hazırla.</p></div>
@@ -1553,6 +1573,8 @@ if (floatingWhatsApp) {
   try { if (sessionStorage.getItem(seenKey)) floatingWhatsApp.classList.add('wa-seen'); } catch (_) {}
   floatingWhatsApp.title = 'WhatsApp ile hızlı iletişim';
   const setPanel = (open) => {
+    panel.hidden = !open;
+    panel.inert = !open;
     panel.classList.toggle('open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     floatingWhatsApp.classList.toggle('is-open', open);
