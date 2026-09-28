@@ -1080,7 +1080,6 @@ def render_homepage_v3163(active, featured, field_items):
         <div class="home-spatial-spec-card">
           <div><span>Aktif fiyat</span><strong data-spatial-price>{esc(_home_spatial_product_copy(hero_main, 0)["price"])}</strong></div>
           <div><span>Üretim</span><strong>Kuşadası</strong></div>
-          <div class="home-spatial-spec-actions"><a class="home-spatial-product-link" data-spatial-link href="{esc(_home_spatial_product_copy(hero_main, 0)["href"])}">Ürünü incele ↗</a><a href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
         </div>
       </div>
 
@@ -1712,7 +1711,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.93'
+SITE_ASSET_VERSION = '3.1.94'
 
 
 def _relative_prefix_for_html(html_path):
