@@ -1069,6 +1069,12 @@ def render_homepage_v3163(active, featured, field_items):
     project_cards = '\n'.join(render_home_project_feature(x, i + 1, '') for i, x in enumerate((field_items or [])[:4]))
     production_product = _homepage_single_product(active, featured, home_copy.get('production_product_slug'), fallback_index=1)
     production_visual = _home_visual_product(production_product, 'production', eager=False)
+    # V3.1.98: homepage stats are derived only from currently published panel data.
+    # No marketing number is hardcoded here.
+    home_active_product_count = len(active or [])
+    home_personalizable_count = sum(1 for product in (active or []) if catalog_personalizable(product))
+    home_field_count = len(field_items or [])
+    home_category_count = len({str(product.get('category') or '').strip() for product in (active or []) if str(product.get('category') or '').strip()})
 
     return f'''<main class="home-v3163" id="main-content">
 <section class="home-hero-v3191" aria-labelledby="home-hero-title" data-spatial-hero data-spatial-variant="0">
@@ -1169,6 +1175,22 @@ def render_homepage_v3163(active, featured, field_items):
 <!-- CONTENT_MANAGER:HOME_FIELD_END -->
     </div>
     <div class="home-project-actions"><a class="secondary-cta" href="kurumsal/">Kurumsal işleri gör ↗</a><a class="ghost-cta" href="nfc-qr/">NFC saha çözümleri ↗</a></div>
+  </div>
+</section>
+
+<section class="home-stats-v3198 bg-section-compact" aria-labelledby="home-stats-title">
+  <div class="shell home-stats-shell-v3198">
+    <div class="home-stats-head-v3198 home-motion" data-home-motion>
+      <div><p class="eyebrow">RAKAMLARLA BG STUDIO</p><h2 id="home-stats-title">Yayındaki üretim yapısı, tek bakışta.</h2></div>
+      <p>Rakamlar Product Manager ve sahadan işler kayıtlarında yayında olan içerikten otomatik hesaplanır.</p>
+    </div>
+    <div class="home-stats-grid-v3198">
+      <article class="home-stat-card-v3198 home-motion" data-home-motion><span>01</span><strong>{home_active_product_count}</strong><div><b>Yayındaki ürün</b><small>Aktif katalog kaydı</small></div></article>
+      <article class="home-stat-card-v3198 home-motion" data-home-motion><span>02</span><strong>{home_personalizable_count}</strong><div><b>Kişiselleştirilebilir</b><small>İsim, renk veya ürün seçeneği</small></div></article>
+      <article class="home-stat-card-v3198 home-motion" data-home-motion><span>03</span><strong>{home_field_count}</strong><div><b>Sahadan kayıt</b><small>Yayındaki işletme ve üretim işleri</small></div></article>
+      <article class="home-stat-card-v3198 home-motion" data-home-motion><span>04</span><strong>{home_category_count}</strong><div><b>Ürün kategorisi</b><small>Aktif katalogda temsil edilen gruplar</small></div></article>
+    </div>
+    <div class="home-stats-foot-v3198 home-motion" data-home-motion><span>KUŞADASI MERKEZLİ ÜRETİM</span><i></i><strong>TÜRKİYE GENELİ KARGO</strong></div>
   </div>
 </section>
 
@@ -1765,7 +1787,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.97'
+SITE_ASSET_VERSION = '3.1.98'
 
 
 def _relative_prefix_for_html(html_path):
