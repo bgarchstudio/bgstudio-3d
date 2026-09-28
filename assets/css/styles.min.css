@@ -3728,3 +3728,10 @@ body{min-height:100dvh;background:#fff}
 @media(max-width:680px){.bg-assistant-trigger{width:54px;height:54px;min-width:54px}.bg-assistant-panel{right:max(12px,env(safe-area-inset-right));left:max(12px,env(safe-area-inset-left));bottom:max(78px,calc(68px + env(safe-area-inset-bottom)));width:auto;max-height:min(68dvh,620px);border-radius:22px}body.has-mobile-product-cta .bg-assistant-panel{bottom:max(146px,calc(134px + env(safe-area-inset-bottom)))}.bg-assistant-head{min-height:70px;padding:12px 13px}.bg-assistant-input-wrap input{font-size:16px}.bg-assistant-bubble p{font-size:.78rem}}
 @media(max-width:390px){.bg-assistant-panel{max-height:66dvh}.bg-assistant-quick{padding-inline:12px}.bg-assistant-messages{padding-inline:12px}}
 @media(prefers-reduced-motion:reduce){.bg-assistant-trigger,.bg-assistant-message-actions a{transition:none!important}}
+
+
+/* V3.3.01 · OpenAI connector states */
+.bg-assistant-message.is-pending .bg-assistant-bubble{opacity:.72;background:#f5eee5}
+.bg-assistant-panel.is-thinking .bg-assistant-send{opacity:.55;cursor:wait}
+.bg-assistant-panel.is-thinking .bg-assistant-input-wrap input{cursor:wait}
+.bg-assistant-send:disabled,.bg-assistant-input-wrap input:disabled{opacity:.65}

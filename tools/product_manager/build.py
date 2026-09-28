@@ -1943,8 +1943,8 @@ def render_product_page(p, related):
 
 
 
-# V3.3.00 · BG Assistant Foundation
-SITE_ASSET_VERSION = '3.3.00'
+# V3.3.01 · OpenAI-connected BG Assistant
+SITE_ASSET_VERSION = '3.3.01'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2089,6 +2089,7 @@ def _bg_assistant_payload(prefix=''):
     pricing = active_nfc_pricing()
     return {
         'version': SITE_ASSET_VERSION,
+        'assistant_api': {'endpoint': '/api/bg-assistant'},
         'products': product_rows,
         'nfc': {
             'year': str(pricing.get('year') or '2026'),
@@ -2116,9 +2117,9 @@ def _bg_assistant_payload(prefix=''):
 def render_bg_assistant_widget(prefix=''):
     payload = json.dumps(_bg_assistant_payload(prefix), ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     return f"""<!-- BGSTUDIO:ASSISTANT_START -->
-<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.00" aria-label="BG Assistant" aria-hidden="true" hidden>
+<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.01" aria-label="BG Assistant" aria-hidden="true" hidden>
   <header class="bg-assistant-head">
-    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>Ürün &amp; çözüm danışmanı · Beta</small></div></div>
+    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>OpenAI destekli ürün &amp; çözüm danışmanı · Beta</small></div></div>
     <button class="bg-assistant-close" data-bg-assistant-close type="button" aria-label="BG Assistant'ı kapat">×</button>
   </header>
   <div class="bg-assistant-body">
@@ -2139,7 +2140,7 @@ def render_bg_assistant_widget(prefix=''):
       <button class="bg-assistant-send" type="submit" aria-label="Mesajı gönder">↑</button>
     </form>
     <button class="bg-assistant-handoff" data-bg-assistant-whatsapp type="button">WhatsApp'a aktar <span aria-hidden="true">↗</span></button>
-    <small class="bg-assistant-note">Yanıtlar BG Studio 3D katalog ve hizmet verilerinden hazırlanır.</small>
+    <small class="bg-assistant-note">OpenAI destekli yanıtlar BG Studio 3D katalog ve hizmet verileriyle sınırlandırılır.</small>
   </footer>
 </aside>
 <script type="application/json" data-bg-assistant-data>{payload}</script>
@@ -2148,7 +2149,7 @@ def render_bg_assistant_widget(prefix=''):
 
 
 def sync_bg_assistant_widget():
-    """Install the data-driven BG Assistant foundation on every public page."""
+    """Install the OpenAI-connected BG Assistant on every public page."""
     scanned = changed = 0
     marker_pattern = re.compile(
         r'<!-- BGSTUDIO:ASSISTANT_START -->.*?<!-- BGSTUDIO:ASSISTANT_END -->',
@@ -2271,7 +2272,7 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + quote_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', quote_tag + '</body>', 1)
-        if 'data-bg-assistant="v3.3.00"' in updated and 'assets/js/bg-assistant.js' not in updated:
+        if 'data-bg-assistant="v3.3.01"' in updated and 'assets/js/bg-assistant.js' not in updated:
             assistant_tag = f'<script defer="" src="{prefix}assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}"></script>'
             updated = updated.replace('</body>', assistant_tag + '</body>', 1)
         # V3.1.83: iOS safe-area viewport and non-blocking first-paint assets.
@@ -2705,7 +2706,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the current V3.3.00 public shell."""
+    """Fail loudly if a public page misses the current V3.3.01 public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -2727,7 +2728,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             '>Projeler</a>',
             '>BG Studio</button>',
             f'assets/js/navigation.js?v={SITE_ASSET_VERSION}',
-            'data-bg-assistant="v3.3.00"',
+            'data-bg-assistant="v3.3.01"',
             'data-bg-assistant-trigger',
             f'assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}',
         )
@@ -2764,7 +2765,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.3.00 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.01 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
