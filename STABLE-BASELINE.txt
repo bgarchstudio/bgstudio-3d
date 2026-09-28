@@ -1,0 +1,22 @@
+BG Studio 3D
+STABLE BASELINE
+
+Version: V3.3.15
+Asset version: 3.3.15
+Channel: stable
+Based on: V3.3.14-R1 / RC2
+
+Validated before promotion:
+- release_check.py --strict => READY
+- Critical: 0
+- Public pages checked: 69
+- Quote Center asset hotfix included
+- Launch Audit 2.0 included
+- Mobile Final Polish included
+- BG Assistant Conversational State Engine included
+- Cloudflare Worker baseline: V3.3.10-R4 or newer
+
+Rule:
+Future site development should branch from V3.3.15 unless a newer STABLE baseline supersedes it.
+
+Cloudflare redeploy for V3.3.15: NO

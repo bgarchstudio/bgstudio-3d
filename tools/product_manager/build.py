@@ -1944,9 +1944,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.14-R1'
-RELEASE_CHANNEL = 'rc'
-RELEASE_CANDIDATE = 'V3.3.14-RC2'
+SITE_ASSET_VERSION = '3.3.15'
+RELEASE_CHANNEL = 'stable'
+RELEASE_CANDIDATE = 'V3.3.15-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2938,7 +2938,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.3.14 RC public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.15 STABLE public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -4347,7 +4347,7 @@ def release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit):
         'critical_issue_count': critical_count,
         'seo_issue_count': seo_count,
         'shell_ok': bool(shell.get('ok')),
-        'next_step': 'V3.3.15 STABLE adayı' if ready else 'launch_audit / SEO uyarılarını temizle',
+        'next_step': 'STABLE baseline kilitli' if ready else 'launch_audit / SEO uyarılarını temizle',
     }
 
 
@@ -4360,7 +4360,7 @@ def enforce_strict_release_v3314(release_summary):
     strict = str(os.environ.get('BG_STUDIO_STRICT_RELEASE') or '').strip().lower() in ('1','true','yes','on')
     if strict and not bool((release_summary or {}).get('ready')):
         raise RuntimeError(
-            'V3.3.14 release gate başarısız: production audit temiz değil. '
+            'V3.3.15 STABLE release gate başarısız: production audit temiz değil. '
             'Build JSON içindeki release_candidate ve launch_audit alanlarını kontrol et.'
         )
     return {'strict': strict, 'passed': (not strict) or bool((release_summary or {}).get('ready'))}
