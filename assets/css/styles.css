@@ -3524,3 +3524,46 @@ body{min-height:100dvh;background:#fff}
     transition:opacity 260ms ease,transform 300ms cubic-bezier(.2,.75,.2,1),filter 260ms ease;
   }
 }
+
+
+/* ==========================================================
+   V3.2.02-R2 · Spatial hero control scale + dock scroll polish
+   Larger stage focal product, circular control thumbs, clearer UI labels
+   and smoother mobile dock behavior.
+   ========================================================== */
+.home-spatial-product{width:min(560px,74%)}
+.home-spatial-product.is-active{transform:translate3d(0,0,42px) scale(1.02) rotateX(var(--spatial-rx)) rotateY(var(--spatial-ry))}
+.home-spatial-visual-status{bottom:7.2%;gap:10px;min-height:46px;padding:0 16px;border-color:rgba(255,255,255,.10);background:rgba(10,12,16,.76);box-shadow:0 18px 42px rgba(0,0,0,.28)}
+.home-spatial-dot{width:7px;height:7px}
+.home-spatial-visual-status b{font-size:.6rem;letter-spacing:.14em}
+.home-spatial-visual-status strong{font-size:.72rem;letter-spacing:.04em}
+.home-spatial-dock-wrap{width:min(880px,calc(100% - 40px));gap:10px}
+.home-spatial-progress{height:3px;margin-inline:20px;background:rgba(255,255,255,.1)}
+.home-spatial-dock{padding:8px;gap:6px;border-radius:26px;overflow-x:auto;overscroll-behavior-x:contain;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch}
+.home-spatial-control{grid-template-columns:46px minmax(0,1fr);gap:12px;min-height:64px;padding:9px 12px;border-radius:18px}
+.home-spatial-control-thumb{width:46px!important;height:46px!important;border-radius:50%!important;border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.055)}
+.home-spatial-control-thumb img{border-radius:50%;object-fit:cover}
+.home-spatial-control-copy{gap:4px}
+.home-spatial-control-copy small{font-size:.54rem;color:#798293}
+.home-spatial-control-copy strong{font-size:.74rem;line-height:1.18}
+.home-spatial-visual::after{left:20px;top:20px;padding:11px 14px;border-radius:999px;background:rgba(10,12,16,.58);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);font-size:.58rem;letter-spacing:.16em;color:rgba(230,236,245,.72)}
+
+@media(max-width:1100px){
+  .home-spatial-product{width:min(540px,68%)}
+  .home-spatial-dock-wrap{width:min(860px,calc(100% - 32px))}
+}
+@media(max-width:760px){
+  .home-spatial-visual{min-height:470px;margin-top:8px}
+  .home-spatial-product{width:min(84vw,390px)}
+  .home-spatial-visual-status{left:18px;bottom:90px;transform:none;min-height:40px;padding:0 13px}
+  .home-spatial-visual-status b{font-size:.56rem}
+  .home-spatial-visual-status strong{font-size:.68rem}
+  .home-spatial-stage-controls{top:18px;right:18px}
+  .home-spatial-visual::after{left:18px;top:18px;padding:10px 12px;font-size:.54rem}
+  .home-spatial-dock-wrap{left:12px;right:12px;bottom:14px;gap:7px}
+  .home-spatial-progress{margin-inline:10px}
+  .home-spatial-dock{padding:7px;gap:6px;scroll-snap-type:x mandatory;scroll-padding-inline:12px}
+  .home-spatial-control{flex:0 0 min(72vw,272px);grid-template-columns:42px minmax(0,1fr);gap:11px;min-height:58px;padding:8px 10px;scroll-snap-align:center}
+  .home-spatial-control-thumb{width:42px!important;height:42px!important}
+  .home-spatial-control-copy strong{font-size:.68rem}
+}

@@ -1727,6 +1727,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     let progressAnimation = null;
     let pointerPaused = false;
     let focusPaused = false;
+    let dockInteracting = false;
+    let dockInteractTimer = 0;
+    let dockScrollFrame = 0;
     let pageHidden = document.hidden;
     let heroVisible = (() => {
       const rect = hero.getBoundingClientRect();
@@ -1757,7 +1760,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       else copyTimer = window.setTimeout(apply, 110);
     };
 
-    const canAutoplay = () => !reduceMotion && !pointerPaused && !focusPaused && !pageHidden && heroVisible && count > 1;
+    const canAutoplay = () => !reduceMotion && !pointerPaused && !focusPaused && !dockInteracting && !pageHidden && heroVisible && count > 1;
 
     const stopProgress = () => {
       if (progressAnimation) {
@@ -1810,18 +1813,53 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       }, duration);
     };
 
+    const setDockInteracting = value => {
+      dockInteracting = Boolean(value);
+      if (dockInteractTimer) window.clearTimeout(dockInteractTimer);
+      if (dockInteracting) {
+        syncAutoplay();
+        return;
+      }
+      dockInteractTimer = window.setTimeout(() => {
+        dockInteracting = false;
+        syncAutoplay();
+      }, 160);
+    };
+
     const centerActiveControl = index => {
       if (!dock || window.innerWidth > 760) return;
       const control = controls[index];
       if (!control) return;
-      const maxLeft = Math.max(0, dock.scrollWidth - dock.clientWidth);
-      const targetLeft = Math.max(0, Math.min(maxLeft, control.offsetLeft - (dock.clientWidth - control.offsetWidth) / 2));
-      if (typeof dock.scrollTo === 'function') {
-        dock.scrollTo({ left: targetLeft, top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
-      } else {
-        dock.scrollLeft = targetLeft;
-      }
+      const run = () => {
+        const dockRect = dock.getBoundingClientRect();
+        const controlRect = control.getBoundingClientRect();
+        const visibilityPad = 16;
+        const fullyVisible = controlRect.left >= dockRect.left + visibilityPad && controlRect.right <= dockRect.right - visibilityPad;
+        if (fullyVisible) return;
+        const maxLeft = Math.max(0, dock.scrollWidth - dock.clientWidth);
+        const targetLeft = Math.max(0, Math.min(maxLeft, control.offsetLeft - (dock.clientWidth - control.offsetWidth) / 2));
+        if (Math.abs(targetLeft - dock.scrollLeft) < 2) return;
+        if (typeof dock.scrollTo === 'function') {
+          dock.scrollTo({ left: targetLeft, top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        } else {
+          dock.scrollLeft = targetLeft;
+        }
+      };
+      if (dockScrollFrame) cancelAnimationFrame(dockScrollFrame);
+      dockScrollFrame = requestAnimationFrame(run);
     };
+
+    if (dock) {
+      dock.addEventListener('pointerdown', () => setDockInteracting(true), { passive: true });
+      dock.addEventListener('touchstart', () => setDockInteracting(true), { passive: true });
+      dock.addEventListener('scroll', () => {
+        if (window.innerWidth > 760) return;
+        setDockInteracting(true);
+      }, { passive: true });
+      ['pointerup', 'touchend', 'touchcancel'].forEach(eventName => {
+        dock.addEventListener(eventName, () => setDockInteracting(false), { passive: true });
+      });
+    }
 
     const setActive = (nextIndex, userInitiated = false, fromAutoplay = false) => {
       if (!count) return;
@@ -1886,6 +1924,14 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       }, { threshold: [0, 0.12, 0.35] });
       observer.observe(hero);
     }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 760) {
+        dockInteracting = false;
+        if (dockInteractTimer) window.clearTimeout(dockInteractTimer);
+      }
+      centerActiveControl(activeIndex);
+    }, { passive: true });
 
     // Mobile swipe. Vertical page scrolling remains untouched.
     stage.addEventListener('touchstart', event => {
