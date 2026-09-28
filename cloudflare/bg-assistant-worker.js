@@ -193,6 +193,30 @@ const deriveNfcFacts = (text, context) => {
   };
 };
 
+const deterministicNfcPriceReply = (conversationText, facts) => {
+  if (!facts || !facts.selected_package || facts.base_price === null || facts.base_price === undefined) return '';
+  if (!includesAny(conversationText, ['fiyat','fiyatı','fiyati','kaç tl','kac tl','kaç para','kac para','ne kadar','kaça','kaca','ücret','ucret','toplam'])) return '';
+
+  const lines = [];
+  const tableLabel = facts.package_tables ? `${facts.package_tables} masalık ` : '';
+  lines.push(`${tableLabel}${facts.selected_package}: ${formatTl(facts.base_price)}.`);
+
+  if (facts.qr_requested) {
+    lines.push(`QR ek maliyeti: ${facts.package_tables} masa × 3 QR × ${formatTl(facts.qr_unit)} = ${formatTl(facts.qr_cost)}.`);
+  }
+  if (facts.menu_design_requested && facts.menu_design_cost) {
+    lines.push(`Menü tasarımı: ${formatTl(facts.menu_design_cost)}.`);
+  }
+  if (facts.logo_design_requested && facts.logo_design_cost) {
+    lines.push(`Logo tasarımı: ${formatTl(facts.logo_design_cost)}.`);
+  }
+
+  if (facts.calculated_scope_total !== null && facts.calculated_scope_total !== undefined) {
+    lines.push(`Toplam: ${formatTl(facts.calculated_scope_total)}.`);
+  }
+  return lines.join(' ');
+};
+
 const outputText = payload => {
   if (typeof payload?.output_text === 'string' && payload.output_text.trim()) return payload.output_text.trim();
   const chunks = [];
@@ -252,6 +276,7 @@ export default {
       'SITE_CONTEXT içinde olmayan stok, indirim, garanti, malzeme, ölçü, kesin teslim tarihi, aktif özellik veya fiyat uydurma.',
       'BG Studio kurucusu sorulursa SITE_CONTEXT.business.founder bilgisini kullan. Berkant Gökbel’i tanımıyorum deme.',
       'NFC fiyatı/paketi sorularında SITE_CONTEXT.nfc verilerini kullan. DERIVED_NFC_FACTS varsa paket seçimi ve aritmetik için bunu öncelikli gerçek kabul et.',
+      'DERIVED_NFC_FACTS içindeki calculated_scope_total, qr_cost veya base_price değerlerini ASLA yeniden zihinden toplama/hesaplama; verilen sayıları aynen kullan.',
       'Kullanıcı yalnızca paket fiyatını soruyorsa başka ek kalem ekleme. QR, menü tasarımı veya logo tasarımı yalnızca kullanıcı açıkça istediyse toplam hesaba dahil edilir.',
       'Kullanıcı masa sayısı verirse mevcut kapasitelere göre uygun paketi belirt. Tam eşleşme yoksa bir üst mevcut kapasiteyi söyle ve bunun paket kapasitesi olduğunu açıkça belirt.',
       'NFC sistemini yalnızca dijital menü veya doğrudan Google yorum linki diye daraltma. system_summary ve feedback_rule bilgilerini esas al.',
@@ -272,6 +297,14 @@ export default {
       ...history.map(item => ({ role: item.role, content: item.content })),
       { role: 'user', content: message }
     ];
+
+    const deterministicNfcText = intent === 'nfc'
+      ? deterministicNfcPriceReply(conversationText, derivedNfc)
+      : '';
+
+    if (deterministicNfcText) {
+      return json({ ok: true, text: deterministicNfcText, intent: 'nfc', source: 'deterministic-pricing' }, 200, corsOrigin);
+    }
 
     const apiResponse = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',

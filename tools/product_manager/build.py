@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.10'
+SITE_ASSET_VERSION = '3.3.10-R1'
 
 
 def _relative_prefix_for_html(html_path):
