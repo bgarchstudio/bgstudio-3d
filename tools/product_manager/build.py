@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.01 · OpenAI-connected BG Assistant
-SITE_ASSET_VERSION = '3.3.01'
+SITE_ASSET_VERSION = '3.3.01-R1'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2089,7 +2089,7 @@ def _bg_assistant_payload(prefix=''):
     pricing = active_nfc_pricing()
     return {
         'version': SITE_ASSET_VERSION,
-        'assistant_api': {'endpoint': '/api/bg-assistant'},
+        'assistant_api': {'endpoint': 'https://ai.bgstudio.com.tr/api/bg-assistant'},
         'products': product_rows,
         'nfc': {
             'year': str(pricing.get('year') or '2026'),

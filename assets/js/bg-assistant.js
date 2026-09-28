@@ -16,7 +16,7 @@
   const sendButton = panel.querySelector('.bg-assistant-send');
   const quickButtons = [...panel.querySelectorAll('[data-bg-assistant-prompt]')];
   const handoff = panel.querySelector('[data-bg-assistant-whatsapp]');
-  const endpoint = window.BG_ASSISTANT_ENDPOINT || data.assistant_api?.endpoint || '/api/bg-assistant';
+  const endpoint = window.BG_ASSISTANT_ENDPOINT || data.assistant_api?.endpoint || 'https://ai.bgstudio.com.tr/api/bg-assistant';
   const state = { started: false, lastUser: '', busy: false, history: [] };
 
   const fold = value => String(value || '')
@@ -162,7 +162,7 @@
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        credentials: 'same-origin',
+        credentials: 'omit',
         body: JSON.stringify(payload),
         signal: controller.signal
       });
