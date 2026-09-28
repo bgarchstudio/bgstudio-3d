@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, re, html, sys
+import json, re, html, sys, os
 from datetime import date
 
 try:
@@ -1944,7 +1944,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.13'
+SITE_ASSET_VERSION = '3.3.14'
+RELEASE_CHANNEL = 'rc'
+RELEASE_CANDIDATE = 'V3.3.14-RC1'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2936,7 +2938,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.3.03 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.14 RC public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -4311,6 +4313,48 @@ def render_project_detail(item, project_items):
     return _project_page_shell(seo_title,seo_description,f'/projeler/{slug}/',body,'../../')
 
 
+
+def release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit):
+    """Compact production-readiness status for Product Manager output."""
+    launch = launch_audit if isinstance(launch_audit, dict) else {}
+    shell = shell_verify if isinstance(shell_verify, dict) else {}
+    seo = seo_audit if isinstance(seo_audit, dict) else {}
+    critical_keys = (
+        'blocking_local_scripts', 'images_missing_alt', 'broken_internal_links',
+        'missing_local_assets', 'mixed_content', 'unsafe_blank_targets',
+        'stale_asset_versions', 'forbidden_public_claims'
+    )
+    critical_count = sum(len(launch.get(key) or []) for key in critical_keys)
+    seo_count = sum(len(seo.get(key) or []) for key in (
+        'missing_title','missing_description','missing_canonical','missing_main','missing_alt'
+    ))
+    ready = bool(launch.get('ready')) and bool(shell.get('ok')) and critical_count == 0 and seo_count == 0
+    return {
+        'name': RELEASE_CANDIDATE,
+        'channel': RELEASE_CHANNEL,
+        'asset_version': SITE_ASSET_VERSION,
+        'ready': ready,
+        'critical_issue_count': critical_count,
+        'seo_issue_count': seo_count,
+        'shell_ok': bool(shell.get('ok')),
+        'next_step': 'V3.3.15 STABLE adayı' if ready else 'launch_audit / SEO uyarılarını temizle',
+    }
+
+
+def enforce_strict_release_v3314(release_summary):
+    """Optional CI/release gate.
+
+    Normal Product Manager builds stay non-blocking. Set BG_STUDIO_STRICT_RELEASE=1
+    in CI or before a production release to make critical RC failures stop the build.
+    """
+    strict = str(os.environ.get('BG_STUDIO_STRICT_RELEASE') or '').strip().lower() in ('1','true','yes','on')
+    if strict and not bool((release_summary or {}).get('ready')):
+        raise RuntimeError(
+            'V3.3.14 release gate başarısız: production audit temiz değil. '
+            'Build JSON içindeki release_candidate ve launch_audit alanlarını kontrol et.'
+        )
+    return {'strict': strict, 'passed': (not strict) or bool((release_summary or {}).get('ready'))}
+
 def build_site(nfc_family_theme_overrides=None):
     # V3.1.38: every reference page uses the same explicit card-tone source.
     ensure_explicit_reference_themes()
@@ -4506,7 +4550,11 @@ def build_site(nfc_family_theme_overrides=None):
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'launch_audit': audit_v3312_launch_readiness(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    seo_audit = audit_v3171_public_pages()
+    launch_audit = audit_v3312_launch_readiness()
+    release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
+    release_gate = enforce_strict_release_v3314(release_candidate)
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
