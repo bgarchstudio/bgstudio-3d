@@ -924,9 +924,8 @@ def render_home_showcase_product(product, index=0):
     label = esc(category_label(product))
     price_html = card_price_html(product)
     picture = render_home_product_picture(product, '', eager=False, css_class='home-showcase-picture', sizes='(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 34vw')
-    lead_class = ' is-lead' if index == 0 else ''
     return (
-        f'<article class="home-showcase-card home-motion{lead_class}" data-home-motion>'
+        f'<article class="home-showcase-card home-motion" data-home-motion data-product-carousel-card>'
         f'<a class="home-showcase-media" href="{href}">{picture}</a>'
         f'<div class="home-showcase-body"><div class="home-showcase-top"><span>{label}</span>{price_html}</div>'
         f'<h3><a href="{href}">{name}</a></h3>'
@@ -1100,11 +1099,23 @@ def render_homepage_v3163(active, featured, field_items):
 
 <section class="home-products-v3163 bg-section" aria-labelledby="home-products-title">
   <div class="shell">
-    <div class="home-section-head home-motion" data-home-motion><div><p class="eyebrow">ÜRÜNLER</p><h2 id="home-products-title">Tasarlandı. Basıldı. Kullanıma hazır.</h2></div><a class="text-cta" href="urunler/">Ürünleri Gör ↗</a></div>
-    <div class="home-showcase-grid">
+    <div class="home-product-carousel-head home-motion" data-home-motion>
+      <div class="home-product-carousel-heading"><p class="eyebrow">ÜRÜNLER</p><h2 id="home-products-title">Tasarlandı. Basıldı. Kullanıma hazır.</h2></div>
+      <div class="home-product-carousel-actions">
+        <a class="text-cta" href="urunler/">Tüm ürünler ↗</a>
+        <div class="home-product-carousel-nav" aria-label="Ürün vitrini kontrolleri">
+          <span data-product-carousel-status>01 / 06</span>
+          <button type="button" data-product-carousel-prev aria-label="Önceki ürün">←</button>
+          <button type="button" data-product-carousel-next aria-label="Sonraki ürün">→</button>
+        </div>
+      </div>
+    </div>
+    <div class="home-product-carousel-viewport" data-product-carousel-viewport>
+      <div class="home-showcase-grid home-product-carousel-track" data-product-carousel-track tabindex="0" aria-label="Öne çıkan ürünler">
 <!-- PRODUCT_MANAGER:FEATURED_START -->
 {product_cards}
 <!-- PRODUCT_MANAGER:FEATURED_END -->
+      </div>
     </div>
   </div>
 </section>
@@ -1135,15 +1146,32 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
-<section class="home-why-v3163 bg-section" aria-labelledby="home-why-title">
-  <div class="shell home-why-shell">
-    <div class="home-why-heading home-motion" data-home-motion><div class="home-why-kicker"><p class="eyebrow">{esc(home_copy["why_eyebrow"])}</p></div><h2 id="home-why-title">{_site_why_title_html(home_copy["why_title"])}</h2></div>
-    <div class="home-why-grid">
-      <article class="home-motion" data-home-motion><span>01</span><h3>Üretilebilir fikirler</h3><p>Görsel fikri baskı süresi, malzeme ve kullanım senaryosuyla birlikte değerlendiriyoruz.</p></article>
-      <article class="home-motion" data-home-motion><span>02</span><h3>Gerçek kullanım</h3><p>Dekoratif ürün kadar fonksiyonel parça, stand, aparat ve işletme ihtiyaçlarına odaklanıyoruz.</p></article>
-      <article class="home-motion" data-home-motion><span>03</span><h3>Tek üretim altyapısı</h3><p>Tek üründen toplu üretime ve NFC + QR sistemlerine uzanan aynı tasarım yaklaşımı.</p></article>
+<section class="home-why-v3163 home-why-v3196 bg-section" aria-labelledby="home-why-title">
+  <div class="shell home-why-shell home-why-shell-v3196">
+    <div class="home-why-heading home-motion" data-home-motion><div class="home-why-kicker"><p class="eyebrow">{esc(home_copy["why_eyebrow"])}</p><p class="home-why-intro">Fikir, model, üretim ve teslim adımlarını birbirinden koparmadan tek stüdyo içinde yürütüyoruz.</p></div><h2 id="home-why-title">{_site_why_title_html(home_copy["why_title"])}</h2></div>
+    <div class="home-bento-grid-v3196">
+      <article class="home-bento-card-v3196 home-bento-primary-v3196 home-motion" data-home-motion>
+        <div class="home-bento-card-head-v3196"><span class="home-bento-index-v3196">01</span><span class="home-bento-label-v3196">TASARIM + ÜRETİM</span></div>
+        <div class="home-bento-copy-v3196"><h3>Fikirden üretilebilir ürüne.</h3><p>Görsel fikri ölçü, malzeme, baskı süresi ve kullanım senaryosuyla birlikte ele alıyoruz. Tasarım ekranda kalmıyor, üretime bağlanıyor.</p></div>
+        <div class="home-bento-flow-v3196" aria-hidden="true"><span>Fikir</span><i></i><span>Model</span><i></i><span>Test</span><i></i><span>Üretim</span></div>
+      </article>
+      <article class="home-bento-card-v3196 home-bento-volume-v3196 home-motion" data-home-motion>
+        <div class="home-bento-card-head-v3196"><span class="home-bento-index-v3196">02</span><span class="home-bento-label-v3196">ÖLÇEKLENEBİLİR ÜRETİM</span></div>
+        <div class="home-bento-copy-v3196"><h3>Tek adetten toplu üretime.</h3><p>Prototip, kişisel sipariş ve işletme için adetli üretim aynı süreçte ilerler.</p></div>
+        <div class="home-bento-quantity-v3196" aria-hidden="true"><span><b>1</b><small>PROTOTİP</small></span><span><b>10</b><small>KÜÇÜK SERİ</small></span><span><b>100+</b><small>TOPLU</small></span></div>
+      </article>
+      <article class="home-bento-card-v3196 home-bento-digital-v3196 home-motion" data-home-motion>
+        <div class="home-bento-card-head-v3196"><span class="home-bento-index-v3196">03</span><span class="home-bento-label-v3196">İŞLETME SİSTEMLERİ</span></div>
+        <div class="home-bento-copy-v3196"><h3>Fiziksel + dijital.</h3><p>3D üretilen standları NFC, QR ve işletmeye özel dijital deneyimlerle bir araya getiriyoruz.</p></div>
+        <div class="home-bento-signal-v3196" aria-hidden="true"><span>NFC</span><span>QR</span><span>MENÜ</span><span>YORUM</span><span>SOSYAL</span></div>
+      </article>
+      <article class="home-bento-card-v3196 home-bento-local-v3196 home-motion" data-home-motion>
+        <div class="home-bento-card-head-v3196"><span class="home-bento-index-v3196">04</span><span class="home-bento-label-v3196">KUŞADASI MERKEZLİ</span></div>
+        <div class="home-bento-copy-v3196"><h3>Yakında üret, Türkiye'ye gönder.</h3><p>Kuşadası'nda üretim ve elden teslim. Uygun siparişlerde Türkiye geneli kargo.</p></div>
+        <div class="home-bento-route-v3196" aria-hidden="true"><span class="home-bento-route-origin-v3196">KUŞADASI</span><i></i><span>TÜRKİYE</span></div>
+      </article>
     </div>
-    <a class="home-architecture-branch home-motion" data-home-motion href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>BG Studio'nun diğer iş kolu</span><strong>Architecture ↗</strong></a>
+    <a class="home-architecture-branch home-architecture-branch-v3196 home-motion" data-home-motion href="https://bgstudio.com.tr" rel="noopener" target="_blank"><span>BG Studio'nun diğer iş kolu</span><strong>Architecture ↗</strong></a>
   </div>
 </section>
 
@@ -1711,7 +1739,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.94'
+SITE_ASSET_VERSION = '3.1.96'
 
 
 def _relative_prefix_for_html(html_path):

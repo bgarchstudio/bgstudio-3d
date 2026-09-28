@@ -16,7 +16,7 @@
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
   const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.92';
+  const ASSET_VERSION = '3.1.96';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -1889,4 +1889,88 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSpatialHero, { once: true });
   else initSpatialHero();
+})();
+
+
+// V3.1.95: 21st.dev Product Carousel-inspired homepage product rail.
+// Keeps Product Manager showcase slots as the source and adapts the horizontal
+// product-card navigation pattern to the existing vanilla site stack.
+(() => {
+  const initHomeProductCarousel = () => {
+    const viewport = document.querySelector('[data-product-carousel-viewport]');
+    const track = document.querySelector('[data-product-carousel-track]');
+    if (!viewport || !track || track.dataset.carouselReady === '1') return;
+    const cards = [...track.querySelectorAll('[data-product-carousel-card]')];
+    const prev = document.querySelector('[data-product-carousel-prev]');
+    const next = document.querySelector('[data-product-carousel-next]');
+    const status = document.querySelector('[data-product-carousel-status]');
+    if (!cards.length) return;
+
+    track.dataset.carouselReady = '1';
+    const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+    let activeIndex = 0;
+    let raf = 0;
+
+    const cardLeft = card => Math.max(0, card.offsetLeft - track.offsetLeft);
+    const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+    const closestIndex = () => {
+      const x = track.scrollLeft;
+      let winner = 0;
+      let distance = Infinity;
+      cards.forEach((card, index) => {
+        const delta = Math.abs(cardLeft(card) - x);
+        if (delta < distance) {
+          distance = delta;
+          winner = index;
+        }
+      });
+      return winner;
+    };
+
+    const paint = () => {
+      raf = 0;
+      activeIndex = closestIndex();
+      const total = cards.length;
+      if (status) status.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      const start = track.scrollLeft <= 3;
+      const end = track.scrollLeft >= maxScroll() - 3;
+      if (prev) {
+        prev.disabled = start;
+        prev.setAttribute('aria-disabled', start ? 'true' : 'false');
+      }
+      if (next) {
+        next.disabled = end;
+        next.setAttribute('aria-disabled', end ? 'true' : 'false');
+      }
+      cards.forEach((card, index) => card.classList.toggle('is-carousel-current', index === activeIndex));
+    };
+
+    const schedulePaint = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(paint);
+    };
+
+    const goTo = index => {
+      const normalized = Math.max(0, Math.min(cards.length - 1, index));
+      const target = Math.min(maxScroll(), cardLeft(cards[normalized]));
+      track.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });
+      activeIndex = normalized;
+      window.setTimeout(paint, reduceMotion ? 0 : 260);
+    };
+
+    prev?.addEventListener('click', () => goTo(activeIndex - 1));
+    next?.addEventListener('click', () => goTo(activeIndex + 1));
+    track.addEventListener('scroll', schedulePaint, { passive: true });
+    track.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
+    });
+    window.addEventListener('resize', schedulePaint, { passive: true });
+
+    paint();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHomeProductCarousel, { once: true });
+  else initHomeProductCarousel();
 })();
