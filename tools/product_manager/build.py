@@ -1943,8 +1943,8 @@ def render_product_page(p, related):
 
 
 
-# V3.3.01 · OpenAI-connected BG Assistant
-SITE_ASSET_VERSION = '3.3.01-R1'
+# V3.3.02 · BG Assistant Knowledge Upgrade
+SITE_ASSET_VERSION = '3.3.02'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2075,26 +2075,161 @@ def _bg_assistant_payload(prefix=''):
     product_rows = []
     for product in products:
         description = str(product.get('card_description') or product.get('description') or '').strip()
+        materials = [label for _key, label in catalog_materials(product)]
+        tiers = []
+        for tier in effective_pricing_tiers(product):
+            price_value = tier.get('price_value')
+            tiers.append({
+                'label': str(tier.get('label') or ''),
+                'quantity': int(tier.get('quantity') or 1),
+                'price': format_try(price_value) or str(price_value or ''),
+                'note': str(tier.get('note') or '')[:140],
+            })
         product_rows.append({
             'slug': str(product.get('slug') or '').strip(),
             'name': str(product.get('name') or 'Ürün').strip(),
             'category': str(category_label(product) or '').strip(),
             'price': str(active_price_text(product) or 'Fiyat için iletişim').strip(),
-            'description': clip_seo_text(description, 180),
+            'description': clip_seo_text(description, 280),
             'href': f"{prefix}urunler/{str(product.get('slug') or '').strip()}/",
             'featured': bool(product.get('featured')),
             'personalizable': bool(catalog_personalizable(product)),
+            'materials': materials[:8],
+            'features': [str(x)[:140] for x in (product.get('features') or []) if str(x).strip()][:10],
+            'tags': [str(x)[:80] for x in (product.get('tags') or []) if str(x).strip()][:12],
+            'dimensions': str(product.get('dimensions') or '')[:120],
+            'weight': str(product.get('weight') or '')[:100],
+            'production_time': str(product.get('estimated_production_time') or product.get('production_time') or '')[:120],
+            'technical_info': clip_seo_text(product.get('technical_info') or '', 260),
+            'usage_info': clip_seo_text(product.get('usage_info') or '', 220),
+            'personalization_info': clip_seo_text(product.get('personalization_info') or '', 220),
+            'pricing_tiers': tiers[:8],
+            'production_status': str(product_production_status(product) or 'active'),
         })
 
     pricing = active_nfc_pricing()
+    package_labels = {
+        'baslangic': ('Başlangıç', 10),
+        'profesyonel': ('Profesyonel', 15),
+        'premium': ('Premium', 20),
+        'hizli_stand': ('Hızlı Bağlantı Standı', 1),
+        'feedback_duo': ('Premium Feedback Duo', None),
+    }
+    package_rows = []
+    for key, row in (pricing.get('packages') or {}).items():
+        label, capacity = package_labels.get(key, (key, None))
+        item = {
+            'key': key,
+            'name': label,
+            'price': row.get('price'),
+            'list_price': row.get('list_price'),
+            'renewal': row.get('renewal'),
+        }
+        if key in ('baslangic', 'profesyonel', 'premium'):
+            item.update({
+                'tables': capacity,
+                'nfc_per_table': 3,
+                'total_nfc': int(capacity or 0) * 3,
+                'qr_optional': True,
+                'qr_per_table_if_selected': 3,
+            })
+        elif key == 'hizli_stand':
+            item.update({'stands': 1, 'total_nfc': 3, 'qr_optional': True, 'qr_if_selected': 3})
+        package_rows.append(item)
+
+    duo_rows = []
+    for key, row in (pricing.get('feedback_duo_packages') or {}).items():
+        duo_rows.append({
+            'stands': int(row.get('stands') or key),
+            'nfc': int(row.get('nfc') or 0),
+            'price': row.get('price'),
+            'renewal': row.get('renewal'),
+        })
+
+    restaurant_rows = []
+    for key, row in (pricing.get('special_restaurant_packages') or {}).items():
+        restaurant_rows.append({
+            'tables': int(row.get('tables') or key),
+            'nfc': int(row.get('nfc') or 0),
+            'price': row.get('price'),
+            'renewal': row.get('renewal'),
+        })
+
+    def reference_rows(items, kind, limit=24):
+        out = []
+        seen = set()
+        for item in items:
+            if not item.get('active', True):
+                continue
+            name = str(item.get('name') or '').strip()
+            if not name or name.casefold() in seen:
+                continue
+            seen.add(name.casefold())
+            out.append({
+                'name': name,
+                'kind': kind,
+                'headline': str(item.get('headline') or '')[:180],
+                'description': clip_seo_text(item.get('description') or item.get('headline') or '', 280),
+                'category': str(item.get('category') or '')[:120],
+                'tags': [str(x)[:80] for x in (item.get('tags') or []) if str(x).strip()][:10],
+            })
+            if len(out) >= limit:
+                break
+        return out
+
+    nfc_refs = reference_rows(resolve_nfc_items(), 'NFC + QR')
+    corporate_refs = reference_rows(resolve_corporate_items(), 'Kurumsal')
+    prototype_refs = reference_rows(load_managed_content(PROTOTYPE_DATA), 'Prototip / Parça')
+
     return {
         'version': SITE_ASSET_VERSION,
         'assistant_api': {'endpoint': 'https://ai.bgstudio.com.tr/api/bg-assistant'},
+        'business': {
+            'brand': 'BG Studio 3D',
+            'location': 'Kuşadası, Aydın',
+            'scope': ['3D baskı ürünleri', 'kişiye özel üretim', 'prototip ve parça üretimi', 'kurumsal toplu üretim', 'NFC + QR işletme sistemleri'],
+            'production_note': 'Ürünler ürün kaydında aksi belirtilmedikçe doğrudan baskı kalitesiyle sunulur; özel son işlem veya boya vaat edilmez.',
+            'pricing_rule': 'Hazır ürünlerde sitedeki güncel fiyat geçerlidir. Özel üretim, prototip, kurumsal ve kapsamı değişen işlerde ölçü/adet/detaya göre teklif hazırlanır.',
+        },
         'products': product_rows,
         'nfc': {
             'year': str(pricing.get('year') or '2026'),
-            'package_names': ['Başlangıç', 'Profesyonel', 'Premium', 'Hızlı Bağlantı Standı', 'Premium Feedback Duo / Trio'],
+            'definition': 'NFC, uyumlu telefonun standa veya etikete çok yaklaştırılmasıyla bağlantı ya da dijital içeriği temassız açan kısa menzilli iletişim teknolojisidir.',
+            'qr_definition': 'QR kod, telefon kamerasıyla taranan görsel koddur. NFC ile aynı hedefe alternatif erişim sunabilir; NFC dokundur/yaklaştır, QR ise kamerayla tara mantığıyla çalışır.',
+            'system_summary': 'BG Studio NFC + QR sistemi yalnızca dijital menü değildir; masa/stand bazlı erişim, dijital menü, sosyal yönlendirmeler, işletme içi feedback akışı, Google yorumuna devam adımı, müşteri paneli ve etkileşim analitiği gibi modülleri işletmeye göre bir araya getirir.',
+            'feedback_rule': 'Değerlendirme akışında kullanıcı önce BG Studio işletme içi feedback/değerlendirme ekranına yönlenebilir; uygun akışta ardından Google yorum adımı gösterilir. Sistemi doğrudan Google linki olarak tanımlama.',
+            'menu': 'Menüler işletmeye göre TR/EN görsel içerik, ek dillerde metin içerik, ürün içeriği, alerjen ve kalori bilgileri barındırabilir.',
+            'analytics': 'İşletmeye göre masa, NFC tarama, menü tıklaması, değerlendirme/yorum ve sosyal medya gibi etkileşimler panelde izlenebilir.',
+            'premium_plus': 'Premium Plus geliştiriliyor/yakında. Aktif olmayan özellikleri varmış gibi vaat etme; garson çağır veya hesap iste gibi özellikleri güncel paketin parçası diye söyleme.',
+            'qr_unit': pricing.get('qr_unit'),
+            'menu_design': pricing.get('menu_design'),
+            'logo_design': pricing.get('logo_design'),
+            'packages': package_rows,
+            'feedback_duo_packages': duo_rows,
+            'special_restaurant_packages': restaurant_rows,
+            'package_rules': {
+                'standard_packages': 'Başlangıç, Profesyonel ve Premium restoran paketlerinde masa başına 3 NFC mantığı kullanılır.',
+                'qr': 'QR opsiyoneldir; seçilirse standart restoran kapsamlarında masa başına 3 QR hesabı kullanılabilir. Güncel birim QR bedelini nfc.qr_unit alanından kullan.',
+                'design': 'Menü ve logo tasarımı ayrı kalem olabilir; güncel bedelleri nfc.menu_design ve nfc.logo_design alanından kullan.',
+                'quick_stand': 'Hızlı Bağlantı Standı 1 stand / 3 NFC temel yapısındadır; QR seçilirse 3 QR eklenebilir.',
+                'feedback_duo': 'Feedback Duo kapasite ve fiyatı feedback_duo_packages tablosundan seçilir; her stand için 2 NFC hesabı kullanılır.',
+                'special_restaurant': '25-120 masa özel restoran hazır paketleri special_restaurant_packages tablosundan seçilir; her masa için 3 NFC hesabı kullanılır.',
+            },
         },
+        'services': {
+            'custom_production': 'Fikir, fotoğraf, eskiz, ölçü veya örnek üründen başlanabilir. Üretilebilir geometri, malzeme ve kullanım koşulu değerlendirilir; kapsam netleşince teklif hazırlanır.',
+            'prototype': 'Ölçü, uyum ve işlev odaklı prototip/parça üretimi yapılabilir. Teknik ölçüler ve kullanım koşulları önemlidir.',
+            'corporate': 'İşletmelere logolu, markalı veya adetli 3D üretim yapılabilir. Adet, ebat, malzeme ve kişiselleştirme teklif üzerinde etkilidir.',
+            'architecture': 'Mimarlık ve mimari görselleştirme BG Studio Architecture tarafında yürütülür: https://bgstudio.com.tr',
+            'materials_general': 'PLA ve PETG gibi malzemeler ürün ve kullanım yerine göre değerlendirilebilir. Belirli ürün için yalnızca ürün kaydındaki material bilgisini kesin kabul et.',
+            '3d_printing_general': 'FDM 3D baskıda katman çizgileri üretim yönteminin doğal karakteridir. Tolerans, duvar kalınlığı, yönlendirme ve malzeme seçimi parçanın kullanımına göre değişir.',
+        },
+        'references': {
+            'nfc': nfc_refs,
+            'corporate': corporate_refs,
+            'prototype': prototype_refs,
+        },
+        'faq': [{'question': q, 'answer': a} for q, a in FAQ],
         'links': {
             'products': f'{prefix}urunler/',
             'nfc': f'{prefix}nfc-qr/',
@@ -2110,6 +2245,7 @@ def _bg_assistant_payload(prefix=''):
         'delivery': {
             'local': 'Kuşadası elden teslim',
             'shipping': 'Türkiye geneli kargo',
+            'timing': 'Üretim ve teslim süresi ürün, adet ve atölye yoğunluğuna göre değişir; kesin süreyi sipariş/teklif öncesinde netleştir.',
         },
     }
 
@@ -2117,16 +2253,16 @@ def _bg_assistant_payload(prefix=''):
 def render_bg_assistant_widget(prefix=''):
     payload = json.dumps(_bg_assistant_payload(prefix), ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     return f"""<!-- BGSTUDIO:ASSISTANT_START -->
-<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.01" aria-label="BG Assistant" aria-hidden="true" hidden>
+<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.02" aria-label="BG Assistant" aria-hidden="true" hidden>
   <header class="bg-assistant-head">
-    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>OpenAI destekli ürün &amp; çözüm danışmanı · Beta</small></div></div>
+    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>OpenAI destekli BG Studio danışmanı · Beta</small></div></div>
     <button class="bg-assistant-close" data-bg-assistant-close type="button" aria-label="BG Assistant'ı kapat">×</button>
   </header>
   <div class="bg-assistant-body">
     <div class="bg-assistant-messages" data-bg-assistant-messages aria-live="polite"></div>
     <div class="bg-assistant-quick" aria-label="Hızlı sorular">
       <button type="button" data-bg-assistant-prompt="Bana uygun ürün bul">Ürün bul</button>
-      <button type="button" data-bg-assistant-prompt="NFC ve QR sistemlerini anlat">NFC + QR</button>
+      <button type="button" data-bg-assistant-prompt="NFC nedir, BG Studio sisteminde nasıl kullanılıyor?">NFC nedir?</button>
       <button type="button" data-bg-assistant-prompt="Özel üretim nasıl çalışıyor">Özel üretim</button>
       <button type="button" data-bg-assistant-prompt="Teklif almak istiyorum">Teklif</button>
     </div>
@@ -2135,12 +2271,12 @@ def render_bg_assistant_widget(prefix=''):
     <form data-bg-assistant-form>
       <label class="bg-assistant-input-wrap">
         <span class="bg-assistant-sr">BG Assistant'a mesaj yaz</span>
-        <input data-bg-assistant-input type="text" maxlength="240" autocomplete="off" placeholder="Ürün, NFC, özel üretim..." />
+        <input data-bg-assistant-input type="text" maxlength="240" autocomplete="off" placeholder="Ürün, NFC, 3D baskı... her şeyi sor" />
       </label>
       <button class="bg-assistant-send" type="submit" aria-label="Mesajı gönder">↑</button>
     </form>
     <button class="bg-assistant-handoff" data-bg-assistant-whatsapp type="button">WhatsApp'a aktar <span aria-hidden="true">↗</span></button>
-    <small class="bg-assistant-note">OpenAI destekli yanıtlar BG Studio 3D katalog ve hizmet verileriyle sınırlandırılır.</small>
+    <small class="bg-assistant-note">BG Studio verilerini bilen OpenAI destekli danışman. Genel 3D baskı ve NFC sorularını da yanıtlar.</small>
   </footer>
 </aside>
 <script type="application/json" data-bg-assistant-data>{payload}</script>
@@ -2272,7 +2408,7 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + quote_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', quote_tag + '</body>', 1)
-        if 'data-bg-assistant="v3.3.01"' in updated and 'assets/js/bg-assistant.js' not in updated:
+        if 'data-bg-assistant="v3.3.02"' in updated and 'assets/js/bg-assistant.js' not in updated:
             assistant_tag = f'<script defer="" src="{prefix}assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}"></script>'
             updated = updated.replace('</body>', assistant_tag + '</body>', 1)
         # V3.1.83: iOS safe-area viewport and non-blocking first-paint assets.
@@ -2706,7 +2842,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the current V3.3.01 public shell."""
+    """Fail loudly if a public page misses the current V3.3.02 public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -2728,7 +2864,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             '>Projeler</a>',
             '>BG Studio</button>',
             f'assets/js/navigation.js?v={SITE_ASSET_VERSION}',
-            'data-bg-assistant="v3.3.01"',
+            'data-bg-assistant="v3.3.02"',
             'data-bg-assistant-trigger',
             f'assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}',
         )
@@ -2765,7 +2901,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.3.01 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.02 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const panel = document.querySelector('[data-bg-assistant="v3.3.01"]');
+  const panel = document.querySelector('[data-bg-assistant="v3.3.02"]');
   const trigger = document.querySelector('[data-bg-assistant-trigger]');
   const dataNode = document.querySelector('[data-bg-assistant-data]');
   if (!panel || !trigger || !dataNode) return;
@@ -96,8 +96,20 @@
     const asksPrice = hasAny(query, ['fiyat','kaç tl','kac tl','kaç para','kac para','ücret','ucret']);
     const refersCurrent = hasAny(query, ['bu ürün','bu urun','bunun','şu ürün','su urun']);
 
-    if (hasAny(query, ['merhaba','selam','selamlar','hey','sa','günaydın','gunaydin','iyi akşamlar','iyi aksamlar'])) {
-      return { text: 'Merhaba 👋 BG Studio 3D ürünleri, NFC + QR sistemleri, özel üretim ve teklif sürecinde yardımcı olabilirim. Ne bakıyorsun?', actions: [] };
+    if (hasAny(query, ['merhaba','selam','selamlar','hey','sa','günaydın','gunaydin','iyi akşamlar','iyi aksamlar','naber'])) {
+      return { text: 'Merhaba 👋 Buradayım. Ürün, NFC + QR, 3D baskı, malzeme, özel üretim, prototip, kurumsal üretim veya teklif hakkında sorabilirsin.', actions: [] };
+    }
+    if (hasAny(query, ['nfc nedir','nfc ne','nfc nasıl','nfc nasil','nfc ne işe','nfc ne ise'])) {
+      return { text: data.nfc?.definition || 'NFC, uyumlu telefonu etikete veya standa yaklaştırınca bağlantı ya da dijital içeriği temassız açabilen kısa menzilli iletişim teknolojisidir.', actions: [makeAction('BG Studio NFC + QR', links.nfc)] };
+    }
+    if (hasAny(query, ['qr nedir','qr ne','nfc qr fark','qr nfc fark'])) {
+      return { text: data.nfc?.qr_definition || 'QR kamerayla taranır; NFC ise uyumlu telefonu etikete veya standa yaklaştırarak çalışır. İkisi aynı hedefe alternatif erişim sağlayabilir.', actions: [makeAction('NFC + QR sistemleri', links.nfc)] };
+    }
+    if (hasAny(query, ['3d baskı nedir','3d baski nedir','3d yazıcı','3d yazici','fdm nedir'])) {
+      return { text: data.services?.['3d_printing_general'] || '3D baskı, dijital bir modeli katman katman fiziksel parçaya dönüştüren üretim yöntemidir. FDM baskıda katman dokusu doğal olarak görülebilir.', actions: [makeAction('Ürünler', links.products), makeAction('Özel üretim', links.custom)] };
+    }
+    if (hasAny(query, ['pla petg','petg pla','pla nedir','petg nedir','malzeme fark'])) {
+      return { text: 'PLA genelde kolay baskı ve iyi yüzey kalitesiyle öne çıkar. PETG ise kullanım senaryosuna göre daha yüksek dayanım ve neme karşı avantaj sağlayabilir. Belirli ürün için ürün kaydındaki malzemeyi esas alırım.', actions: [makeAction('Ürünleri incele', links.products)] };
     }
     if (current && (refersCurrent || (asksPrice && matches.length === 0))) {
       return { text: `${current.name} için sitedeki güncel fiyat ${current.price}.`, actions: [makeAction('Ürün sayfası', current.href), makeAction('WhatsApp', links.whatsapp)] };
@@ -107,16 +119,16 @@
       return { text: matches.length === 1 ? `${first.name} eşleşiyor. Güncel site fiyatı ${first.price}.` : `Katalogda soruna yakın ${matches.length} seçenek buldum.`, actions: productActions(matches) };
     }
     if (hasAny(query, ['nfc','qr','restoran','dijital menü','dijital menu','feedback','google yorum','yorum sistemi'])) {
-      return { text: 'BG Studio NFC + QR sistemi menü, feedback, Google devam akışı, sosyal yönlendirmeler ve işletme analitiğini tek yapıda toplar.', actions: [makeAction('NFC + QR sistemleri', links.nfc), makeAction('NFC teklifi al', `${links.quote}?tur=nfc`)] };
+      return { text: data.nfc?.system_summary || 'BG Studio NFC + QR sistemi menü, feedback, sosyal yönlendirmeler ve işletme analitiğini tek yapıda toplar.', actions: [makeAction('NFC + QR sistemleri', links.nfc), makeAction('NFC teklifi al', `${links.quote}?tur=nfc`)] };
     }
     if (hasAny(query, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','bana özel','bana ozel','model yaptır','tasarım yaptır'])) {
-      return { text: 'Özel üretimde fikir, görsel, ölçü veya mevcut parçadan ilerleyebiliriz.', actions: [makeAction('Özel üretimi incele', links.custom), makeAction('Teklif oluştur', `${links.quote}?tur=ozel-uretim`)] };
+      return { text: data.services?.custom_production || 'Özel üretimde fikir, görsel, ölçü veya mevcut parçadan ilerleyebiliriz.', actions: [makeAction('Özel üretimi incele', links.custom), makeAction('Teklif oluştur', `${links.quote}?tur=ozel-uretim`)] };
     }
     if (hasAny(query, ['prototip','parça','parca','yedek','ölçülü','olculu','teknik model'])) {
-      return { text: 'Prototip ve parça üretiminde ölçü, uyum ve işlev önceliklidir.', actions: [makeAction('Prototip & Parça', links.prototype), makeAction('Teklif oluştur', `${links.quote}?tur=prototip`)] };
+      return { text: data.services?.prototype || 'Prototip ve parça üretiminde ölçü, uyum ve işlev önceliklidir.', actions: [makeAction('Prototip & Parça', links.prototype), makeAction('Teklif oluştur', `${links.quote}?tur=prototip`)] };
     }
     if (hasAny(query, ['kurumsal','toptan','işletme','isletme','logolu','adetli üretim','adetli uretim'])) {
-      return { text: 'Kurumsal tarafta markalı ve işletmeye özel seri üretimler planlanabilir.', actions: [makeAction('Kurumsal üretim', links.corporate), makeAction('Sahadan projeler', links.projects)] };
+      return { text: data.services?.corporate || 'Kurumsal tarafta markalı ve işletmeye özel seri üretimler planlanabilir.', actions: [makeAction('Kurumsal üretim', links.corporate), makeAction('Sahadan projeler', links.projects)] };
     }
     if (hasAny(query, ['kargo','teslim','kuşadası','kusadasi','elden'])) {
       return { text: `${data.delivery?.local || 'Kuşadası elden teslim'} seçeneği bulunur. Gönderime uygun ürünlerde ${data.delivery?.shipping || 'Türkiye geneli kargo'} yapılır.`, actions: [makeAction('İletişim', links.contact)] };
@@ -125,13 +137,13 @@
       return { text: 'Mimarlık ve mimari görselleştirme tarafı BG Studio Architecture altında ilerliyor.', actions: [makeAction('BG Studio Architecture', links.architecture)] };
     }
     if (asksPrice || hasAny(query, ['teklif','fiyatlandır','fiyatlandir','sipariş','siparis'])) {
-      return { text: 'Hazır ürünlerde fiyat ürün sayfasında görünür. Özel üretim, kurumsal ve NFC işlerinde teklif akışı daha doğru sonuç verir.', actions: [makeAction('Ürünleri gör', links.products), makeAction('Teklif al', links.quote)] };
+      return { text: 'Hazır ürünlerde fiyat ürün sayfasında görünür. Özel üretim, kurumsal ve NFC işlerinde kapsam değiştiği için teklif akışı daha doğru sonuç verir.', actions: [makeAction('Ürünleri gör', links.products), makeAction('Teklif al', links.quote)] };
     }
     if (hasAny(query, ['whatsapp','iletişim','iletisim','konuşalım','konusalim'])) {
       return { text: 'WhatsApp üzerinden doğrudan BG Studio 3D ile devam edebilirsin.', actions: [makeAction('WhatsApp’a geç', links.whatsapp)] };
     }
     if (matches.length) return { text: 'Katalogda soruna yakın ürünler buldum.', actions: productActions(matches) };
-    return { text: 'Ürün seçimi, NFC + QR, özel üretim, prototip, kurumsal işler ve teklif sürecinde yardımcı olabilirim.', actions: [makeAction('Ürünler', links.products), makeAction('NFC + QR', links.nfc), makeAction('Özel üretim', links.custom), makeAction('Teklif', links.quote)] };
+    return { text: 'Sorunu biraz daha detaylandırırsan yardımcı olayım. BG Studio ürünleri ve hizmetlerinin yanında NFC, QR ve temel 3D baskı konularını da açıklayabilirim.', actions: [makeAction('Ürünler', links.products), makeAction('NFC + QR', links.nfc), makeAction('Teklif', links.quote)] };
   };
 
   const setBusy = busy => {
@@ -141,10 +153,23 @@
     panel.classList.toggle('is-thinking', busy);
   };
 
-  const compactCatalog = () => (data.products || []).slice(0, 40).map(product => ({
-    name: product.name, category: product.category, price: product.price,
-    description: String(product.description || '').slice(0, 220),
-    href: product.href, personalizable: Boolean(product.personalizable)
+  const compactCatalog = () => (data.products || []).slice(0, 60).map(product => ({
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    description: String(product.description || '').slice(0, 300),
+    href: product.href,
+    personalizable: Boolean(product.personalizable),
+    materials: product.materials || [],
+    features: product.features || [],
+    tags: product.tags || [],
+    dimensions: product.dimensions || '',
+    production_time: product.production_time || '',
+    technical_info: product.technical_info || '',
+    usage_info: product.usage_info || '',
+    personalization_info: product.personalization_info || '',
+    pricing_tiers: product.pricing_tiers || [],
+    production_status: product.production_status || ''
   }));
 
   const askOpenAI = async message => {
@@ -153,11 +178,18 @@
       history: state.history.slice(-8),
       page: { path: window.location.pathname, title: document.title },
       context: {
-        products: compactCatalog(), nfc: data.nfc || {}, delivery: data.delivery || {}, links: data.links || {}
+        business: data.business || {},
+        products: compactCatalog(),
+        nfc: data.nfc || {},
+        services: data.services || {},
+        references: data.references || {},
+        faq: data.faq || [],
+        delivery: data.delivery || {},
+        links: data.links || {}
       }
     };
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), 18000);
+    const timer = window.setTimeout(() => controller.abort(), 25000);
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -177,7 +209,7 @@
   const start = () => {
     if (state.started) return;
     state.started = true;
-    addMessage('assistant', 'Merhaba 👋 Ben BG Assistant. Ürünler, NFC + QR, özel üretim ve teklif tarafında yardımcı olabilirim. Ne hakkında konuşalım?');
+    addMessage('assistant', 'Merhaba 👋 Ben BG Assistant. BG Studio 3D ürünlerini ve sistemlerini biliyorum; NFC, QR ve 3D baskı gibi genel konuları da sorabilirsin. Ne hakkında konuşalım?');
   };
 
   const openPanel = () => {
