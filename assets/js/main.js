@@ -2136,14 +2136,23 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       }
     };
 
-    steps.forEach((step, index) => {
-      step.addEventListener('mouseenter', () => setActive(index));
-      step.addEventListener('focusin', () => setActive(index));
-    });
-
     let activeStep = 0;
     let scrollRaf = 0;
     let walkTimer = 0;
+
+    const activateDirectly = index => {
+      activeStep = Math.max(0, Math.min(steps.length - 1, index));
+      if (walkTimer) {
+        window.clearTimeout(walkTimer);
+        walkTimer = 0;
+      }
+      setActive(activeStep);
+    };
+
+    steps.forEach((step, index) => {
+      step.addEventListener('mouseenter', () => activateDirectly(index));
+      step.addEventListener('focusin', () => activateDirectly(index));
+    });
 
     const targetStepFromScroll = () => {
       const triggerY = Math.max(150, window.innerHeight * 0.38);
@@ -2197,4 +2206,38 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHowItWorks, { once: true });
   else initHowItWorks();
+})();
+
+
+// V3.2.04: final performance polish.
+(() => {
+  const initViewportMarquees = () => {
+    const marquees = [...document.querySelectorAll('.home-client-marquee-v3199r1, .home-testimonial-marquee-v3199')];
+    if (!marquees.length) return;
+    const setPaused = (node, paused) => node.classList.toggle('is-viewport-paused', Boolean(paused));
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => setPaused(entry.target, !entry.isIntersecting));
+      }, { rootMargin: '180px 0px', threshold: 0.01 });
+      marquees.forEach(node => observer.observe(node));
+    }
+
+    const syncVisibility = () => {
+      marquees.forEach(node => {
+        if (document.hidden) {
+          setPaused(node, true);
+          return;
+        }
+        const rect = node.getBoundingClientRect();
+        const nearViewport = rect.bottom >= -180 && rect.top <= window.innerHeight + 180;
+        setPaused(node, !nearViewport);
+      });
+    };
+
+    document.addEventListener('visibilitychange', syncVisibility);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initViewportMarquees, { once: true });
+  else initViewportMarquees();
 })();

@@ -3680,3 +3680,28 @@ body{min-height:100dvh;background:#fff}
 .quote-nfc-config .field select option,.quote-nfc-config select option{background:#fff!important;color:#1b1511!important;-webkit-text-fill-color:#1b1511!important}
 .quote-nfc-config .field select:focus,.quote-nfc-config select:focus{background:#fff!important;color:#1b1511!important;-webkit-text-fill-color:#1b1511!important;border-color:#d49a59!important;box-shadow:0 0 0 4px rgba(212,154,89,.14)!important}
 @media(max-width:680px){.quote-nfc-config .field select,.quote-nfc-config select{min-height:60px;padding:14px 16px;font-size:16px!important;line-height:1.25}}
+
+
+/* ==========================================================
+   V3.2.04 · FINAL POLISH
+   ========================================================== */
+.section-pad{padding-top:clamp(76px,7vw,108px);padding-bottom:clamp(76px,7vw,108px)}
+.section-pad-sm{padding-bottom:clamp(76px,7vw,108px)}
+.split-title{gap:clamp(34px,5vw,72px);margin-bottom:clamp(34px,4vw,50px)}
+.split-title h2,.home-product-carousel-heading h2,.home-why-heading h2,.home-stats-head-v3198 h2,.home-clients-head-v3199r1 h2,.home-process-copy-v3200 h2{text-wrap:balance}
+.home-product-carousel-viewport,.home-bento-card-v3196,.home-stat-card-v3198,.home-client-card-v3199r1,.home-process-visual-v3200,.nfc-compare-frame{contain:paint}
+.home-product-carousel-nav button{width:46px;height:46px;touch-action:manipulation}
+.home-product-carousel-actions>a{min-height:46px;display:inline-flex;align-items:center}
+.home-showcase-grid.home-product-carousel-track{overscroll-behavior-inline:contain;touch-action:pan-x pan-y}
+.home-client-marquee-v3199r1.is-viewport-paused .home-client-marquee-track-v3199r1,.home-testimonial-marquee-v3199.is-viewport-paused .home-testimonial-marquee-track-v3199{animation-play-state:paused!important;will-change:auto}
+.home-process-step-v3200{transition:opacity .26s ease,transform .26s ease}
+.home-process-step-v3200.is-active{transform:translateX(6px)}
+.home-process-rail-v3200 span{transition:height .32s cubic-bezier(.2,.7,.2,1)}
+@media(min-width:1041px){.main-nav .nav-submenu-rich{max-height:min(72vh,620px);overflow:auto;overscroll-behavior:contain}.main-nav .nav-submenu-rich>a{border-radius:14px}}
+.footer-v3202-shell{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}
+.floating-actions{right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom))}
+.main-nav a:focus-visible,.main-nav button:focus-visible,.home-product-carousel-nav button:focus-visible,.home-spatial-control:focus-visible,.footer-v3202 a:focus-visible,.footer-v3202 button:focus-visible{outline:2px solid rgba(138,78,14,.72);outline-offset:3px}
+@media(max-width:900px){.section-pad{padding-top:clamp(68px,9vw,88px);padding-bottom:clamp(68px,9vw,88px)}.home-product-carousel-head{margin-bottom:26px}.home-clients-head-v3199r1,.home-stats-head-v3198{gap:20px}.home-process-grid-v3200{gap:38px}}
+@media(max-width:680px){.section-pad{padding-top:64px;padding-bottom:64px}.section-pad-sm{padding-bottom:64px}.split-title{gap:18px;margin-bottom:28px}.home-product-carousel-actions{align-items:center}.home-product-carousel-actions>a{min-height:44px}.home-product-carousel-nav button{width:44px;height:44px}.home-bento-card-v3196{border-radius:22px}.home-client-card-v3199r1{min-height:82px}.home-process-grid-v3200{gap:28px}.home-process-step-v3200{min-height:176px}.home-process-step-v3200.is-active{transform:translateX(3px)}.footer-v3202-primary,.footer-v3202-secondary,.footer-v3202-socials a,.footer-v3202-consent{min-height:44px}.floating-actions{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}}
+@media(hover:none),(pointer:coarse){.home-bento-card-v3196:hover,.home-client-card-v3199r1:hover,.home-stat-card-v3198:hover,.footer-v3202-primary:hover,.footer-v3202-secondary:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.home-bento-card-v3196,.home-bento-card-v3196::before,.home-stat-card-v3198,.home-client-card-v3199r1,.home-process-step-v3200,.home-process-step-v3200>span,.home-process-rail-v3200 span,.nav-rich-arrow,.footer-v3202-primary,.footer-v3202-secondary{transition:none!important}.home-client-marquee-track-v3199r1,.home-testimonial-marquee-track-v3199{animation:none!important}}
