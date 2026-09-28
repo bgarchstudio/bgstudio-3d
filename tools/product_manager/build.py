@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.11'
+SITE_ASSET_VERSION = '3.3.12'
 
 
 def _relative_prefix_for_html(html_path):
@@ -3740,9 +3740,198 @@ def _schema_script(data, marker):
     return f'<script type="application/ld+json" data-schema="{marker}">{payload}</script>'
 
 
+# ============================================================
+# V3.3.12 · PERFORMANCE & LAUNCH AUDIT
+# ============================================================
+
+def _minify_css_v3312(source):
+    """Conservative CSS minifier.
+
+    Removes comments and collapses whitespace only outside quoted strings.
+    It deliberately keeps spaces around +/- so calc() arithmetic stays valid.
+    """
+    out = []
+    i = 0
+    n = len(source)
+    quote = None
+    pending_space = False
+    prev = ''
+    no_space_before = set('}:;,>~)')
+    no_space_after = set('{:;,>~(')
+
+    while i < n:
+        ch = source[i]
+        nxt = source[i + 1] if i + 1 < n else ''
+
+        if quote:
+            out.append(ch)
+            if ch == '\\' and i + 1 < n:
+                out.append(source[i + 1])
+                i += 2
+                continue
+            if ch == quote:
+                quote = None
+            i += 1
+            prev = ch
+            continue
+
+        if ch in ('"', "'"):
+            if pending_space:
+                if out and out[-1] not in no_space_after:
+                    out.append(' ')
+                pending_space = False
+            quote = ch
+            out.append(ch)
+            prev = ch
+            i += 1
+            continue
+
+        if ch == '/' and nxt == '*':
+            end = source.find('*/', i + 2)
+            if end < 0:
+                break
+            i = end + 2
+            pending_space = True
+            continue
+
+        if ch.isspace():
+            pending_space = True
+            i += 1
+            continue
+
+        if pending_space:
+            last = out[-1] if out else ''
+            if last and last not in no_space_after and ch not in no_space_before:
+                out.append(' ')
+            pending_space = False
+
+        # Trim an already emitted space before punctuation where it is safe.
+        if ch in no_space_before and out and out[-1] == ' ':
+            out.pop()
+        out.append(ch)
+        prev = ch
+        i += 1
+
+    return ''.join(out).strip()
+
+
+def write_minified_css_v3312():
+    source_path = ROOT / 'assets/css/styles.css'
+    target_path = ROOT / 'assets/css/styles.min.css'
+    if not source_path.exists():
+        return {'written': False, 'reason': 'styles.css missing'}
+    source = source_path.read_text(encoding='utf-8')
+    minified = _minify_css_v3312(source)
+    target_path.write_text(minified + '\n', encoding='utf-8')
+    before = len(source.encode('utf-8'))
+    after = len((minified + '\n').encode('utf-8'))
+    return {
+        'written': True,
+        'source_bytes': before,
+        'minified_bytes': after,
+        'saved_bytes': max(0, before - after),
+        'saved_percent': round(((before - after) / before * 100), 1) if before else 0,
+    }
+
+
+def _local_image_dimensions_v3312(html_path, src, cache):
+    if PILImage is None or not src:
+        return None
+    raw = html.unescape(str(src)).strip()
+    if not raw or raw.startswith(('http://','https://','//','data:','blob:','#')):
+        return None
+    raw = raw.split('#', 1)[0].split('?', 1)[0]
+    if not raw:
+        return None
+    try:
+        candidate = (html_path.parent / raw).resolve()
+        root = ROOT.resolve()
+        if candidate != root and root not in candidate.parents:
+            return None
+        if candidate.suffix.lower() == '.svg' or not candidate.is_file():
+            return None
+        key = str(candidate)
+        if key in cache:
+            return cache[key]
+        with PILImage.open(candidate) as image:
+            width, height = image.size
+        value = (int(width), int(height)) if width and height else None
+        cache[key] = value
+        return value
+    except Exception:
+        return None
+
+
+def audit_v3312_launch_readiness():
+    result = {
+        'pages': 0,
+        'blocking_local_scripts': [],
+        'images_missing_alt': [],
+        'images_missing_dimensions': [],
+        'mixed_content': [],
+        'duplicate_ids': [],
+        'css': {},
+    }
+    source_css = ROOT / 'assets/css/styles.css'
+    min_css = ROOT / 'assets/css/styles.min.css'
+    if source_css.exists() and min_css.exists():
+        before = source_css.stat().st_size
+        after = min_css.stat().st_size
+        result['css'] = {
+            'source_bytes': before,
+            'minified_bytes': after,
+            'saved_bytes': max(0, before - after),
+            'saved_percent': round(((before - after) / before * 100), 1) if before else 0,
+        }
+
+    for html_path in ROOT.rglob('*.html'):
+        if 'tools' in html_path.relative_to(ROOT).parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        rel = html_path.relative_to(ROOT).as_posix()
+        result['pages'] += 1
+
+        for tag in re.findall(r'<script\b[^>]*>', text, flags=re.I):
+            if re.search(r'type=["\']application/(?:ld\+json|json)["\']', tag, flags=re.I):
+                continue
+            src_match = re.search(r'\bsrc=["\']([^"\']+)["\']', tag, flags=re.I)
+            if not src_match:
+                continue
+            src_value = src_match.group(1)
+            local = not src_value.startswith(('http://','https://','//'))
+            if local and not re.search(r'\b(?:defer|async)\b', tag, flags=re.I) and not re.search(r'type=["\']module["\']', tag, flags=re.I):
+                result['blocking_local_scripts'].append(f'{rel}: {src_value}')
+
+        if re.search(r'<img\b(?![^>]*\balt=)[^>]*>', text, flags=re.I):
+            result['images_missing_alt'].append(rel)
+        for tag in re.findall(r'<img\b[^>]*>', text, flags=re.I):
+            if not ('width=' in tag.lower() and 'height=' in tag.lower()):
+                result['images_missing_dimensions'].append(rel)
+                break
+
+        if re.search(r'(?:src|href)=["\']http://', text, flags=re.I):
+            result['mixed_content'].append(rel)
+
+        ids = re.findall(r'\bid=["\']([^"\']+)["\']', text, flags=re.I)
+        seen = set()
+        duplicates = sorted({value for value in ids if value in seen or seen.add(value)})
+        if duplicates:
+            result['duplicate_ids'].append({'page': rel, 'ids': duplicates[:8]})
+
+    # Keep build output compact.
+    for key in ('blocking_local_scripts','images_missing_alt','images_missing_dimensions','mixed_content'):
+        result[key] = result[key][:20]
+    result['duplicate_ids'] = result['duplicate_ids'][:20]
+    return result
+
+
 def sync_seo_accessibility_performance_v3171():
     scanned=changed=0
     heading_warnings=[]
+    image_dimension_cache={}
     for html_path in ROOT.rglob('*.html'):
         if 'tools' in html_path.relative_to(ROOT).parts:
             continue
@@ -3808,6 +3997,16 @@ def sync_seo_accessibility_performance_v3171():
             if 'decoding=' not in tag: tag=add_attr(tag, 'decoding="async"')
             priority=('fetchpriority="high"' in tag or 'loading="eager"' in tag or img_index==1)
             if not priority and 'loading=' not in tag: tag=add_attr(tag, 'loading="lazy"')
+
+            # V3.3.12: local intrinsic dimensions reduce layout shift without
+            # changing the responsive CSS size. Remote/data/SVG assets are skipped.
+            if not ('width=' in tag.lower() and 'height=' in tag.lower()):
+                src_match=re.search(r'\bsrc=["\']([^"\']+)["\']',tag,re.I)
+                dims=_local_image_dimensions_v3312(html_path,src_match.group(1),image_dimension_cache) if src_match else None
+                if dims:
+                    width,height=dims
+                    if 'width=' not in tag.lower(): tag=add_attr(tag,f'width="{width}"')
+                    if 'height=' not in tag.lower(): tag=add_attr(tag,f'height="{height}"')
             return tag
         updated=re.sub(r'<img\b[^>]*>',tune_img,updated,flags=re.I)
         h1_count=len(re.findall(r'<h1\b',updated,re.I))
@@ -4208,6 +4407,7 @@ def build_site(nfc_family_theme_overrides=None):
     nav_sync = sync_site_header_navigation()
     footer_sync = sync_global_footer()
     assistant_sync = sync_bg_assistant_widget()
+    css_minify = write_minified_css_v3312()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
     site_content_state = read_site_content_v3175()
 
@@ -4225,7 +4425,7 @@ def build_site(nfc_family_theme_overrides=None):
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'launch_audit': audit_v3312_launch_readiness(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
