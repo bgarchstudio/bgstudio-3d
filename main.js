@@ -1,0 +1,1976 @@
+
+// v2.4.1 — direct/search-engine landings should start at the top, not at a restored footer position.
+(() => {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const goTop = () => {
+    if (!window.location.hash) window.scrollTo({top:0,left:0,behavior:'auto'});
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', goTop, {once:true});
+  else goTop();
+  window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
+})();
+
+// V3.1.63 - public header runtime compatibility layer.
+// Some already-published static pages may still carry the pre-V3.1.63 header until
+// their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
+// the shell before the rest of the page logic captures nav/menu references.
+(() => {
+  const HEADER_VERSION = 'v3.1.83';
+  const ASSET_VERSION = '3.1.95';
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+
+  const path = String(window.location.pathname || '/').replace(/\/index\.html$/i, '/');
+  const isRoute = route => path === route || path.startsWith(route);
+  const activeKey = isRoute('/urunler/') ? 'products'
+    : isRoute('/ozel-uretim/') ? 'custom-production'
+    : isRoute('/prototip-parca/') ? 'prototype'
+    : isRoute('/kurumsal/') ? 'corporate'
+    : isRoute('/nfc-qr/') ? 'nfc'
+    : isRoute('/projeler/') ? 'projects'
+    : isRoute('/hakkimizda/') ? 'about'
+    : isRoute('/iletisim/') ? 'contact'
+    : '';
+
+  const directActive = key => activeKey === key ? ' aria-current="page" class="nav-link is-active"' : ' class="nav-link"';
+  const groupClass = (...keys) => keys.includes(activeKey) ? 'nav-group is-active' : 'nav-group';
+  const childActive = key => activeKey === key ? ' aria-current="page" class="is-active"' : '';
+
+  const canonicalHeader = () => `
+    <header class="site-header" id="top" data-bg-nav="${HEADER_VERSION}">
+      <div class="shell nav-shell">
+        <a aria-label="BG Studio 3D ana sayfa" class="brand" href="/"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>
+        <button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>
+        <nav aria-label="Ana menü" class="main-nav" id="primary-navigation">
+          <a${directActive('products')} href="/urunler/">Ürünler</a>
+          <div class="${groupClass('custom-production','prototype')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a${childActive('custom-production')} href="/ozel-uretim/">Özel Üretim</a><a${childActive('prototype')} href="/prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>
+          <div class="${groupClass('corporate','nfc')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a${childActive('corporate')} href="/kurumsal/">Kurumsal</a><a${childActive('nfc')} href="/nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>
+          <a${directActive('projects')} href="/projeler/">Projeler</a>
+          <div class="${groupClass('about','contact')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a${childActive('about')} href="/hakkimizda/">Hakkımızda</a><a${childActive('contact')} href="/iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>
+          <div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>
+        </nav>
+      </div>
+    </header>`;
+
+  const alreadyCurrent = header.dataset.bgNav === HEADER_VERSION && header.querySelector('.nav-group-toggle');
+  if (!alreadyCurrent) {
+    const holder = document.createElement('div');
+    holder.innerHTML = canonicalHeader().trim();
+    const replacement = holder.firstElementChild;
+    if (replacement) header.replaceWith(replacement);
+  }
+
+  const ensureNavigationRuntime = () => {
+    if (typeof window.BGStudioNavigationInit === 'function') {
+      window.BGStudioNavigationInit();
+      return;
+    }
+    if (document.querySelector(`script[data-bg-nav-runtime="${ASSET_VERSION}"]`)) return;
+    const script = document.createElement('script');
+    script.src = `/assets/js/navigation.js?v=${ASSET_VERSION}`;
+    script.dataset.bgNavRuntime = ASSET_VERSION;
+    script.async = true;
+    document.head.appendChild(script);
+  };
+  ensureNavigationRuntime();
+})();
+
+// v3.1.17 — stronger managed-reference deep jump.
+// “İşi incele” links now land on the exact managed card on every listing page,
+// including NFC & QR. Native anchor jumps are normalized and then re-positioned
+// with repeated center/alignment passes so the target never stays clipped under
+// the sticky header on desktop or mobile.
+(() => {
+  const STORE_KEY = 'bgstudio3d.referenceJump.v3';
+  const clean = value => String(value || '').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
+  const cssEsc = value => {
+    try { return CSS.escape(String(value || '')); }
+    catch (_) { return String(value || '').replace(/[\"\\]/g, '\\$&'); }
+  };
+  const canonicalFromHash = value => String(value || '').replace(/^#/, '').replace(/^referans-/, '').trim();
+  const normalizedPath = value => {
+    const raw = String(value || '').trim() || '/';
+    const noOrigin = raw.replace(/^https?:\/\/[^/]+/i, '');
+    const noIndex = noOrigin.replace(/\/index\.html$/i, '/');
+    const tidy = noIndex.replace(/\/+/g, '/').replace(/\/$/, '');
+    return tidy || '/';
+  };
+
+  const findTarget = data => {
+    const id = canonicalFromHash(data?.id || data?.key || data?.ref || '');
+    const hashKey = id ? 'referans-' + id : String(data?.key || '');
+    if (id) {
+      try {
+        const byIdentity = document.querySelector(`.case-card[data-reference-id="${cssEsc(id)}"]`);
+        if (byIdentity) return byIdentity;
+      } catch (_) {}
+      const byId = document.getElementById(hashKey) || document.getElementById(id);
+      if (byId) return byId;
+    }
+
+    const wantedName = clean(data?.name);
+    if (wantedName) {
+      const cards = [...document.querySelectorAll('.case-card')];
+      const exactName = cards.find(card => clean(card.dataset.referenceName) === wantedName);
+      if (exactName) return exactName;
+      const headingName = cards.find(card => clean(card.querySelector('.case-identity .case-type')?.textContent) === wantedName || clean(card.querySelector('h3')?.textContent) === wantedName);
+      if (headingName) return headingName;
+    }
+
+    const wantedHeadline = clean(data?.headline);
+    if (!wantedHeadline) return null;
+    return [...document.querySelectorAll('.case-card')].find(card => clean(card.querySelector('h3')?.textContent) === wantedHeadline)
+      || [...document.querySelectorAll('.case-card')].find(card => {
+        const title = clean(card.querySelector('h3')?.textContent);
+        return title && (title.includes(wantedHeadline) || wantedHeadline.includes(title));
+      }) || null;
+  };
+
+  const headerHeight = () => {
+    const header = document.querySelector('.site-header');
+    if (!header) return 0;
+    return Math.max(0, Math.round(header.getBoundingClientRect().height));
+  };
+
+  const viewportGap = () => (window.innerWidth <= 760 ? 14 : 18);
+
+  const computeScrollTop = target => {
+    const header = headerHeight();
+    const gap = viewportGap();
+    const rect = target.getBoundingClientRect();
+    const usableHeight = Math.max(120, window.innerHeight - header - gap * 2);
+    const targetTopAbs = window.scrollY + rect.top;
+    const desiredTop = rect.height <= usableHeight
+      ? header + gap + Math.max(0, (usableHeight - rect.height) / 2)
+      : header + gap;
+    const docMax = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return Math.max(0, Math.min(docMax, Math.round(targetTopAbs - desiredTop)));
+  };
+
+  const highlightTarget = target => {
+    target.classList.add('reference-jump-focus');
+    window.clearTimeout(target.__bgRefFocusTimer);
+    target.__bgRefFocusTimer = window.setTimeout(() => target.classList.remove('reference-jump-focus'), 1700);
+  };
+
+  const placeTarget = target => {
+    if (!target) return false;
+    const top = computeScrollTop(target);
+    window.scrollTo({ top, left: 0, behavior: 'auto' });
+    highlightTarget(target);
+    return true;
+  };
+
+  const jump = data => {
+    const target = findTarget(data);
+    if (!target) return false;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => placeTarget(target)));
+    return true;
+  };
+
+  const scheduleJump = data => {
+    if (!data) return;
+    document.documentElement.classList.add('reference-jump-active');
+    // Neutralize native anchor placement first, then center precisely.
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    [0, 40, 120, 260, 520, 900, 1400, 2100].forEach(delay => window.setTimeout(() => jump(data), delay));
+
+    const target = findTarget(data);
+    if (target && typeof ResizeObserver === 'function') {
+      const ro = new ResizeObserver(() => placeTarget(target));
+      ro.observe(target);
+      window.setTimeout(() => ro.disconnect(), 2400);
+    }
+
+    const imgs = [...document.querySelectorAll('.case-card img')];
+    imgs.forEach(img => {
+      if (img.complete) return;
+      img.addEventListener('load', () => jump(data), { once: true });
+      img.addEventListener('error', () => jump(data), { once: true });
+    });
+  };
+
+  const buildPayloadFromLink = link => {
+    const card = link.closest('.field-work-card, .case-card, [data-reference-id], [data-reference-target]');
+    let url;
+    try { url = new URL(link.href, window.location.href); } catch (_) { return null; }
+    const id = card?.dataset.referenceId || canonicalFromHash(url.hash) || canonicalFromHash(card?.dataset.referenceTarget);
+    const name = card?.dataset.referenceName || card?.querySelector('.case-profile img')?.alt?.replace(/\s+profil(?:\s+fotoğrafı|\s+görseli)?$/i, '') || '';
+    const headline = card?.querySelector('h3')?.textContent?.trim() || '';
+    const pathname = normalizedPath(url.pathname);
+    return { id, ref: id, key: id ? 'referans-' + id : canonicalFromHash(url.hash), name, headline, pathname, at: Date.now() };
+  };
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest('.field-work-link, a[href*="#referans-"]');
+    if (!link) return;
+    const payload = buildPayloadFromLink(link);
+    if (!payload?.id) return;
+
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify(payload)); } catch (_) {}
+
+    let url;
+    try { url = new URL(link.href, window.location.href); } catch (_) { return; }
+    if (/^https?:$/.test(url.protocol) && url.origin === window.location.origin) {
+      event.preventDefault();
+      url.hash = 'referans-' + payload.id;
+      url.searchParams.set('ref', payload.id);
+      window.location.assign(url.href);
+    }
+  }, true);
+
+  const resolveIncomingJump = () => {
+    const params = new URLSearchParams(window.location.search);
+    const hashRaw = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    const hashId = canonicalFromHash(hashRaw);
+    const queryRef = canonicalFromHash(params.get('ref') || '');
+    let stored = null;
+    try { stored = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null'); } catch (_) {}
+    const currentPath = normalizedPath(window.location.pathname);
+    const storedIsFresh = stored && Date.now() - Number(stored.at || 0) < 60000;
+    const storedMatches = storedIsFresh && normalizedPath(stored.pathname || '/') === currentPath;
+
+    const id = hashId || queryRef || canonicalFromHash(stored?.id || '');
+    const payload = id
+      ? { ...(storedMatches ? stored : {}), id, ref: id, key: 'referans-' + id }
+      : (storedMatches ? stored : null);
+    if (!payload?.id) return;
+    scheduleJump(payload);
+    window.setTimeout(() => {
+      try { sessionStorage.removeItem(STORE_KEY); } catch (_) {}
+      if (params.has('ref')) {
+        params.delete('ref');
+        const qs = params.toString();
+        const nextUrl = `${window.location.pathname}${qs ? '?' + qs : ''}${window.location.hash || ('#referans-' + payload.id)}`;
+        history.replaceState(null, '', nextUrl);
+      }
+    }, 2600);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', resolveIncomingJump, { once: true });
+  else resolveIncomingJump();
+  window.addEventListener('load', resolveIncomingJump, { once: true });
+  window.addEventListener('pageshow', resolveIncomingJump);
+  window.addEventListener('hashchange', resolveIncomingJump);
+})();
+
+const menuButton = document.querySelector('.menu-toggle');
+const nav = document.querySelector('.main-nav');
+const canonicalUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
+
+const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
+  enabled: true,
+  speed: 'normal',
+  direction: 'rtl',
+  separator: '✦',
+  messages: [
+    { text: '1.000 TL üzeri ücretsiz kargo', url: '', enabled: true },
+    { text: 'Kuşadası elden teslim', url: '', enabled: true },
+    { text: 'Kişiye özel 3D üretim', url: '/ozel-uretim/', enabled: true },
+    { text: 'Kurumsal toplu sipariş', url: '/kurumsal/', enabled: true },
+    { text: 'NFC + QR işletme çözümleri', url: '/nfc-qr/', enabled: true }
+  ]
+};
+
+const announcementPixelsPerSecond = speed => ({ slow: 55, normal: 85, fast: 130 }[String(speed || '').toLowerCase()] || 85);
+
+const safeAnnouncementHref = value => {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (/^(?:javascript|data|vbscript):/i.test(raw)) return '';
+  if (raw.startsWith('/') || raw.startsWith('#') || /^https?:\/\//i.test(raw)) return raw;
+  return '/' + raw.replace(/^\/+/, '');
+};
+
+const loadAnnouncementBarConfig = async () => {
+  try {
+    const response = await fetch('/data/site_settings.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('site settings unavailable');
+    const settings = await response.json();
+    const config = settings?.announcement_bar;
+    if (!config || typeof config !== 'object') throw new Error('announcement settings unavailable');
+    return config;
+  } catch (_) {
+    return DEFAULT_ANNOUNCEMENT_BAR_CONFIG;
+  }
+};
+
+const mountAnnouncementBar = async () => {
+  const header = document.querySelector('.site-header');
+  const navShell = header?.querySelector('.nav-shell');
+  if (!header || !navShell || header.querySelector('.announcement-marquee')) return;
+
+  const config = await loadAnnouncementBarConfig();
+  if (config?.enabled === false) return;
+  const messages = (Array.isArray(config?.messages) ? config.messages : [])
+    .filter(item => item && item.enabled !== false && String(item.text || '').trim())
+    .slice(0, 30);
+  if (!messages.length) return;
+
+  const separator = '✦';
+  const direction = ['rtl', 'ltr'].includes(String(config?.direction || '').toLowerCase()) ? String(config.direction).toLowerCase() : 'rtl';
+  const makeSequence = duplicate => messages.map(item => {
+    const text = String(item.text || '').trim();
+    const safeText = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    const href = safeAnnouncementHref(item.url);
+    let itemHtml = '';
+    if (!href) itemHtml = `<span class="announcement-marquee-item">${safeText}</span>`;
+    else {
+      const external = /^https?:\/\//i.test(href) && !href.startsWith(window.location.origin);
+      const attrs = duplicate ? ' tabindex="-1"' : '';
+      const target = external ? ' target="_blank" rel="noopener"' : '';
+      const safeHref = href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      itemHtml = `<a class="announcement-marquee-item is-link" href="${safeHref}"${target}${attrs}>${safeText}</a>`;
+    }
+    // A trailing separator is intentional. It makes the boundary between the end
+    // of one segment and the beginning of the next visually identical to every
+    // internal boundary, so the animation never looks like it restarts.
+    return `${itemHtml}<span class="announcement-marquee-separator" aria-hidden="true">${separator}</span>`;
+  }).join('');
+
+  const bar = document.createElement('div');
+  bar.className = 'announcement-marquee';
+  bar.dataset.direction = direction;
+  bar.setAttribute('role', 'region');
+  bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
+  const announcementSpeed = announcementPixelsPerSecond(config?.speed);
+  bar.dataset.speed = String(config?.speed || 'normal').toLowerCase();
+  bar.innerHTML = `
+    <div class="announcement-marquee-viewport">
+      <div class="announcement-marquee-track">
+        <div class="announcement-marquee-group" data-marquee-primary></div>
+        <div class="announcement-marquee-group" data-marquee-clone aria-hidden="true"></div>
+      </div>
+    </div>`;
+
+  header.insertBefore(bar, navShell);
+
+  const viewport = bar.querySelector('.announcement-marquee-viewport');
+  const primary = bar.querySelector('[data-marquee-primary]');
+  const clone = bar.querySelector('[data-marquee-clone]');
+  const firstSequence = makeSequence(false);
+  const duplicateSequence = makeSequence(true);
+  primary.innerHTML = firstSequence;
+  clone.innerHTML = duplicateSequence;
+
+  // Build two pixel-identical segments and move by the EXACT measured width
+  // of one segment. This avoids the small percentage/sub-pixel jump that can
+  // appear on mobile when a -50% transform is rounded differently.
+  let lastViewportWidth = 0;
+  let resizeTimer = 0;
+  const fitSegments = (force = false) => {
+    const viewportWidth = Math.max(1, Math.round(viewport.getBoundingClientRect().width));
+    if (!force && Math.abs(viewportWidth - lastViewportWidth) < 4) return;
+    lastViewportWidth = viewportWidth;
+
+    primary.innerHTML = firstSequence;
+    clone.innerHTML = duplicateSequence;
+
+    requestAnimationFrame(() => {
+      const baseWidth = Math.max(1, primary.scrollWidth);
+      // Keep each half comfortably wider than the viewport. The extra headroom
+      // prevents mobile browser chrome changes from exposing an empty edge.
+      const targetWidth = Math.max(viewportWidth * 1.35, viewportWidth + 120);
+      const repeats = Math.max(1, Math.ceil(targetWidth / baseWidth));
+      primary.innerHTML = firstSequence + duplicateSequence.repeat(repeats - 1);
+      clone.innerHTML = duplicateSequence.repeat(repeats);
+
+      requestAnimationFrame(() => {
+        const segmentWidth = Math.max(1, primary.scrollWidth);
+        const duration = Math.max(4, segmentWidth / announcementSpeed);
+        bar.style.setProperty('--announcement-distance', `${segmentWidth}px`);
+        bar.style.setProperty('--announcement-duration', `${duration.toFixed(3)}s`);
+      });
+    });
+  };
+
+  fitSegments(true);
+  if (typeof ResizeObserver === 'function') {
+    const observer = new ResizeObserver(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => fitSegments(false), 140);
+    });
+    observer.observe(viewport);
+  }
+};
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { mountAnnouncementBar(); }, { once: true });
+else mountAnnouncementBar();
+
+
+
+// Google Analytics helper. gtag is defined in every page head and queues events until GA4 loads.
+const trackEvent = (name, params = {}) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', name, params);
+  }
+};
+
+const analyticsProductContext = () => {
+  const config = document.querySelector('[data-order-config]');
+  if (!config) return null;
+  const itemName = config.dataset.productName || document.querySelector('.product-info h1')?.textContent?.trim() || 'Ürün';
+  const itemId = canonicalUrl.match(/\/urunler\/([^/]+)\/?$/)?.[1] || itemName;
+  const priceText = config.dataset.productPrice || '';
+  const numeric = Number(String(priceText).replace(/[^0-9,]/g, '').replace(',', '.')) || undefined;
+  return { item_name: itemName, item_id: itemId, price: numeric };
+};
+
+let initialAnalyticsTracked = false;
+const trackInitialAnalyticsContext = () => {
+  if (initialAnalyticsTracked || typeof window.gtag !== 'function') return;
+  const product = analyticsProductContext();
+  if (product) {
+    const item = { item_id: product.item_id, item_name: product.item_name };
+    if (product.price) item.price = product.price;
+    const payload = { currency: 'TRY', items: [item] };
+    if (product.price) payload.value = product.price;
+    trackEvent('view_item', payload);
+  }
+  initialAnalyticsTracked = true;
+};
+trackInitialAnalyticsContext();
+window.addEventListener('bg-consent-granted', trackInitialAnalyticsContext);
+
+// Track high-intent outbound actions without changing navigation behavior.
+document.addEventListener('click', (event) => {
+  const link = event.target.closest?.('a[href]');
+  if (!link) return;
+  const href = link.getAttribute('href') || '';
+  if (href.includes('wa.me/')) {
+    // Dedicated order/quick-contact buttons have richer event payloads below; avoid double counting.
+    if (link.classList.contains('floating-whatsapp') && link.getAttribute('aria-haspopup') === 'dialog') return;
+    if (link.matches('[data-order-whatsapp],[data-mobile-order-whatsapp],.wa-panel-send')) return;
+    const payload = {
+      method: 'whatsapp_generic',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    };
+    trackEvent('whatsapp_click', payload);
+    trackEvent('generate_lead', payload);
+  } else if (href.includes('instagram.com/bgstudio.3dtr')) {
+    trackEvent('social_click', {
+      network: 'instagram',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    });
+  } else if (href.includes('facebook.com/bgstudio.3dtr')) {
+    trackEvent('social_click', {
+      network: 'facebook',
+      link_text: (link.textContent || '').trim().slice(0, 100),
+      page_location: canonicalUrl
+    });
+  }
+});
+
+// Mobile navigation
+const syncMobileNavGeometry = () => {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  const rect = header.getBoundingClientRect();
+  const bottom = Math.max(0, Math.min(window.innerHeight || rect.bottom, rect.bottom));
+  document.documentElement.style.setProperty('--mobile-header-bottom', `${Math.round(bottom)}px`);
+};
+
+let mobileNavScrollY = 0;
+const setMenuState = (open) => {
+  if (!nav || !menuButton) return;
+  if (open) {
+    syncMobileNavGeometry();
+    mobileNavScrollY = window.scrollY || 0;
+  }
+  nav.classList.toggle('open', open);
+  menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+  menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
+  document.body.classList.toggle('nav-open', open);
+  if (open && window.matchMedia('(max-width: 1040px)').matches) {
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${mobileNavScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  } else if (!open && document.body.style.position === 'fixed') {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
+  }
+};
+
+menuButton?.addEventListener('click', () => setMenuState(!nav?.classList.contains('open')));
+document.querySelectorAll('.main-nav a').forEach(link => link.addEventListener('click', () => setMenuState(false)));
+document.addEventListener('click', (event) => {
+  if (!nav?.classList.contains('open')) return;
+  if (nav.contains(event.target) || menuButton?.contains(event.target)) return;
+  setMenuState(false);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && nav?.classList.contains('open')) {
+    setMenuState(false);
+    menuButton?.focus();
+  }
+});
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 1040 && nav?.classList.contains('open')) {
+    setMenuState(false);
+    return;
+  }
+  if (nav?.classList.contains('open')) syncMobileNavGeometry();
+}, { passive: true });
+window.visualViewport?.addEventListener('resize', () => {
+  if (nav?.classList.contains('open')) syncMobileNavGeometry();
+}, { passive: true });
+
+// Reveal animations with graceful fallback
+const revealItems = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealItems.forEach(el => observer.observe(el));
+} else {
+  revealItems.forEach(el => el.classList.add('visible'));
+}
+
+// Product catalog filters + live search
+const filterButtons = document.querySelectorAll('.filter-btn');
+const catalogCards = document.querySelectorAll('.catalog-grid .product-card');
+const productSearch = document.querySelector('#product-search');
+const catalogCount = document.querySelector('#catalog-count');
+const catalogEmpty = document.querySelector('#catalog-empty');
+if (catalogCards.length && !window.BGStudioCatalogV3164) {
+  let activeFilter = 'all';
+  let searchTerm = '';
+  const normalize = (value) => String(value || '').toLocaleLowerCase('tr-TR').trim();
+  const applyCatalog = () => {
+    let visible = 0;
+    catalogCards.forEach(card => {
+      const categoryOK = activeFilter === 'all' || card.dataset.category === activeFilter;
+      const searchOK = !searchTerm || normalize(card.dataset.search || card.textContent).includes(searchTerm);
+      const show = categoryOK && searchOK;
+      card.classList.toggle('hidden', !show);
+      card.setAttribute('aria-hidden', show ? 'false' : 'true');
+      if (show) visible += 1;
+    });
+    filterButtons.forEach(btn => {
+      const active = btn.dataset.filter === activeFilter;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    if (catalogCount) catalogCount.textContent = `${visible} ürün gösteriliyor`;
+    if (catalogEmpty) catalogEmpty.hidden = visible !== 0;
+    try {
+      const url = new URL(window.location.href);
+      if (activeFilter !== 'all') url.searchParams.set('kategori', activeFilter); else url.searchParams.delete('kategori');
+      if (searchTerm && productSearch) url.searchParams.set('q', productSearch.value.trim()); else url.searchParams.delete('q');
+      history.replaceState({}, '', url);
+    } catch (_) {}
+  };
+  filterButtons.forEach(btn => btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.filter || 'all';
+    applyCatalog();
+  }));
+  productSearch?.addEventListener('input', () => {
+    searchTerm = normalize(productSearch.value);
+    applyCatalog();
+  });
+  const params = new URLSearchParams(window.location.search);
+  const requested = params.get('kategori');
+  if (requested && [...filterButtons].some(btn => btn.dataset.filter === requested)) activeFilter = requested;
+  const query = params.get('q');
+  if (query && productSearch) {
+    productSearch.value = query;
+    searchTerm = normalize(query);
+  }
+  applyCatalog();
+}
+
+// Product image lightbox
+const zoomableMedia = document.querySelectorAll('.zoomable-media');
+if (zoomableMedia.length) {
+  const lightbox = document.createElement('div');
+  lightbox.className = 'image-lightbox';
+  lightbox.setAttribute('role', 'dialog');
+  lightbox.setAttribute('aria-modal', 'true');
+  lightbox.setAttribute('aria-label', 'Ürün görseli');
+  lightbox.hidden = true;
+
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Görseli kapat');
+  close.textContent = '×';
+  const img = document.createElement('img');
+  img.alt = '';
+  lightbox.append(img, close);
+  document.body.append(lightbox);
+  let returnFocus = null;
+
+  const closeBox = () => {
+    lightbox.classList.remove('open');
+    lightbox.hidden = true;
+    document.body.style.overflow = '';
+    returnFocus?.focus?.();
+  };
+  const openBox = (media) => {
+    const source = media.querySelector('img');
+    if (!source) return;
+    returnFocus = media;
+    img.src = source.currentSrc || source.src;
+    img.alt = source.alt || 'Ürün görseli';
+    lightbox.hidden = false;
+    requestAnimationFrame(() => lightbox.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+    close.focus();
+  };
+
+  zoomableMedia.forEach(media => {
+    media.addEventListener('click', () => openBox(media));
+    media.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openBox(media);
+      }
+    });
+  });
+  close.addEventListener('click', closeBox);
+  lightbox.addEventListener('click', event => { if (event.target === lightbox) closeBox(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !lightbox.hidden) closeBox();
+  });
+}
+
+// Back to top
+const backToTop = document.querySelector('.back-to-top');
+if (backToTop) {
+  const updateTopButton = () => backToTop.classList.toggle('show', window.scrollY > 650);
+  window.addEventListener('scroll', updateTopButton, { passive: true });
+  updateTopButton();
+  backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
+// V3.1.61 — NFC top-flow order + always-visible Stand Şeması + Premium Plus reveal fix.
+// Runtime compatibility is intentional: copying this repo-safe patch is enough even
+// before Product Manager rebuilds the managed NFC page HTML.
+(() => {
+  const money = value => Number(value || 0).toLocaleString('tr-TR') + ' TL';
+  const numberOrNull = value => {
+    const n = Number(value);
+    return Number.isFinite(n) && String(value ?? '').trim() !== '' ? n : null;
+  };
+  const setPressed = (button, pressed) => {
+    button.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    button.classList.toggle('is-selected', pressed);
+  };
+  const optionFlags = selected => [
+    selected.has('qr') ? 'qr=1' : '',
+    selected.has('menu') ? 'menu=1' : '',
+    selected.has('logo') ? 'logo=1' : ''
+  ].filter(Boolean);
+
+  // V3.1.63 keeps the proven V3.1.61 NFC runtime but points stale pages to the current shared stylesheet.
+  document.querySelectorAll('link[rel="stylesheet"][href*="assets/css/styles.css"]').forEach(link => {
+    try {
+      const url = new URL(link.href, window.location.href);
+      if (url.searchParams.get('v') !== '3.1.67') { url.searchParams.set('v', '3.1.67'); link.href = url.toString(); }
+    } catch (_) {}
+  });
+
+  const restaurantReadyFallback = {
+    25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},
+    45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},
+    65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},
+    85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},
+    110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}
+  };
+
+  const arrangeNfcTopFlow = () => {
+    const main = document.querySelector('main');
+    const hero = document.querySelector('.nfc-platform-hero');
+    if (!main || !hero) return;
+    const referenceSection = [...main.querySelectorAll('section')].find(section => {
+      const title = section.querySelector('h2');
+      return title && title.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.';
+    });
+    const schema = document.querySelector('[data-nfc-stand-schema]');
+    if (main.firstElementChild !== hero) main.insertBefore(hero, main.firstElementChild);
+    if (referenceSection) {
+      referenceSection.classList.add('nfc-reference-first');
+      hero.insertAdjacentElement('afterend', referenceSection);
+      if (schema) referenceSection.insertAdjacentElement('afterend', schema);
+    } else if (schema) {
+      hero.insertAdjacentElement('afterend', schema);
+    }
+  };
+
+  const ensureNfcStandSchematic = () => {
+    if (!document.querySelector('.nfc-platform-hero')) return;
+    const currentSchema = document.querySelector('[data-nfc-stand-schema]');
+    if (currentSchema) { currentSchema.dataset.nfcStandSchemaVersion = '3.1.61'; return; }
+    const refs = document.querySelector('main > .nfc-reference-first') || [...document.querySelectorAll('main section')].find(section => section.querySelector('h2')?.textContent.trim().toLocaleLowerCase('tr-TR') === 'sahada çalışan örnekler.');
+    const hero = document.querySelector('.nfc-platform-hero');
+    if (!hero) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<section class="section-pad-sm nfc-stand-schema" id="stand-semasi" data-nfc-stand-schema data-nfc-stand-schema-version="3.1.61"><div class="shell"><div class="split-title nfc-stand-schema-heading"><div><p class="eyebrow">STAND YAPISI</p><h2>Tek stand üzerinde tüm erişim noktaları.</h2></div><p>Logo, QR alanları, uygulama ikonları ve NFC temas bölgeleri işletmenize özel tasarlanır. Restoran sistemlerinde arka yüz her masa için numaralandırılabilir.</p></div><figure class="nfc-stand-schema-figure zoomable-media" tabindex="0" role="button" aria-label="BG Studio NFC stand şemasını büyüt"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması; işletmeye özel logo, menü, Google ve sosyal medya QR alanları, NFC temas bölgeleri ve arka yüzde masa numarası gösterimi" width="1254" height="1254" loading="lazy" decoding="async"><figcaption><span>Büyütmek için görsele dokun veya tıkla</span></figcaption></figure><div class="nfc-stand-schema-points"><article><span>01</span><div><strong>İşletmeye özel kimlik</strong><p>Logo ve fiziksel stand görünümü işletmeye göre hazırlanır.</p></div></article><article><span>02</span><div><strong>QR erişim alanları</strong><p>Menü, Google ve sosyal medya hedefleri QR ile de erişilebilir.</p></div></article><article><span>03</span><div><strong>NFC temas noktaları</strong><p>Telefonu temas alanına yaklaştıran misafir ilgili dijital hedefe geçer.</p></div></article><article><span>04</span><div><strong>Masa numaralı arka yüz</strong><p>Restoran kurulumunda her standın arka yüzü masa numarasına göre ayrıştırılabilir.</p></div></article></div><div class="nfc-stand-schema-actions"><a class="secondary-cta" href="#restoran-sistemleri">Paketleri incele ↓</a><a class="primary-cta" href="../teklif/?tur=nfc">İşletmen için teklif al ↗</a></div></div></section>`;
+    const schema = wrap.firstElementChild;
+    if (!schema) return;
+    if (refs && refs.parentNode) refs.insertAdjacentElement('afterend', schema); else hero.insertAdjacentElement('beforebegin', schema);
+    const media = schema.querySelector('.zoomable-media');
+    if (media) {
+      const openRuntimeLightbox = () => {
+        const source = media.querySelector('img'); if (!source) return;
+        let box = document.querySelector('.image-lightbox');
+        if (!box) {
+          box = document.createElement('div'); box.className='image-lightbox'; box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('aria-label','Stand şeması görseli'); box.hidden=true;
+          const image=document.createElement('img'); image.alt=''; const close=document.createElement('button'); close.type='button'; close.setAttribute('aria-label','Görseli kapat'); close.textContent='×'; box.append(image,close); document.body.append(box);
+          const closeBox=()=>{box.classList.remove('open');box.hidden=true;document.body.style.overflow='';}; close.addEventListener('click',closeBox); box.addEventListener('click',e=>{if(e.target===box)closeBox();}); document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!box.hidden)closeBox();});
+        }
+        const image=box.querySelector('img'); if(!image)return; image.src=source.currentSrc||source.src; image.alt=source.alt||'BG Studio NFC stand şeması'; box.hidden=false; requestAnimationFrame(()=>box.classList.add('open')); document.body.style.overflow='hidden'; box.querySelector('button')?.focus();
+      };
+      media.addEventListener('click', openRuntimeLightbox);
+      media.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();openRuntimeLightbox();} });
+    }
+  };
+
+  const ensureReadyRestaurantCalculator = () => {
+    const card = document.querySelector('.special-ready-card');
+    if (!card || card.querySelector('[data-special-package-calculator]')) return;
+    const capacities = Object.keys(restaurantReadyFallback).map(Number);
+    const first = capacities[0];
+    const firstRow = restaurantReadyFallback[first];
+    const chips = capacities.map((tables, index) => {
+      const row = restaurantReadyFallback[tables];
+      return `<button class="nfc-capacity-choice${index === 0 ? ' is-selected' : ''}" type="button" data-special-capacity="${tables}" data-special-nfc="${tables * 3}" data-special-price="${row.price}" data-special-renewal="${row.renewal}" aria-pressed="${index === 0 ? 'true' : 'false'}"><span>${tables} masa</span><small>${money(row.price)}</small></button>`;
+    }).join('');
+    const qrCount = first * 3;
+    const qrUnit = 150;
+    const menuPrice = 2500;
+    const logoPrice = 2500;
+    card.innerHTML = `
+      <div class="special-ready-copy">
+        <p class="eyebrow">ÖZEL RESTORAN HAZIR PAKETLERİ</p>
+        <h3>Yüksek kapasitede restoran altyapısı.</h3>
+        <p>20 masanın üzerindeki restoranlarda aynı Standart Restoran altyapısı işletmenin kapasitesine göre ölçeklenir. Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ve Garson Çağır + Hesap İste mevcut kapsamda devam eder. Masa sayını seç; paket bedeli ve ek hizmet hesabı sağdaki kartta anında yenilensin.</p>
+        <div class="special-ready-tags"><span>Akıllı Menü + çoklu dil</span><span>14 alerjen + yaklaşık kalori</span><span>Google performansı + değerlendirme</span><span>Garson Çağır + Hesap İste</span></div>
+        <div class="nfc-capacity-selector-head"><strong>Masa sayını seç</strong><span>Bir karta tıkla. Seçimin ve toplam hesabın sağ tarafta anında görünür.</span></div>
+        <div class="nfc-capacity-chips" role="group" aria-label="Özel Restoran hazır masa kapasitesi">${chips}</div>
+      </div>
+      <div class="special-ready-highlight" data-special-package-calculator data-qr-unit="${qrUnit}" data-menu-price="${menuPrice}" data-logo-price="${logoPrice}">
+        <span class="package-kicker" data-special-title>GÜNCEL ${first} MASA HAZIR PAKETİ</span>
+        <div class="special-ready-metrics"><span><b data-special-tables>${first}</b>Masa</span><span><b data-special-nfc>${qrCount}</b>NFC</span></div>
+        <div class="special-ready-price"><small data-special-price-year>2026 paket plan bedeli</small><strong data-special-base-price>${money(firstRow.price)}</strong><span data-special-renewal>Yıllık yenileme: ${money(firstRow.renewal)}</span></div>
+        <div class="special-ready-options">
+          <button type="button" data-special-option="qr" aria-pressed="false"><span>QR sistemi</span><b data-special-qr-cost>+${money(qrCount * qrUnit)}</b><small data-special-qr-copy>${qrCount} QR × ${money(qrUnit)} / QR</small></button>
+          <button type="button" data-special-option="menu" aria-pressed="false"><span>Menü Tasarımı</span><b data-special-menu-cost>+${money(menuPrice)}</b><small>Türkçe + İngilizce görsel menü · 8 ek dilde dijital metin menü · ürün içerikleri · 14 alerjen bilgi katmanı · yaklaşık kalori bilgileri</small></button>
+          <button type="button" data-special-option="logo" aria-pressed="false"><span>Logo Tasarımı</span><b data-special-logo-cost>+${money(logoPrice)}</b><small>İşletmeye özel logo · stand ve dijital menü kullanımına uyumlu</small></button>
+        </div>
+        <div class="special-ready-breakdown"><div><span>NFC hazır paket</span><b data-special-line-base>${money(firstRow.price)}</b></div><div><span>QR sistemi</span><b data-special-line-qr>Seçilmedi</b></div><div><span>Menü Tasarımı</span><b data-special-line-menu>Seçilmedi</b></div><div><span>Logo Tasarımı</span><b data-special-line-logo>Seçilmedi</b></div></div>
+        <div class="special-ready-total"><span>Seçili toplam</span><strong data-special-total>${money(firstRow.price)}</strong><small>Paket plan bedeli + seçtiğin ek hizmetler</small></div>
+        <a class="secondary-cta" data-special-offer href="../teklif/?tur=nfc&amp;paket=ozel-kapasite&amp;masa=${first}">${first} masa için teklifi al</a>
+      </div>`;
+  };
+
+  const ensureRestaurantCommonPlatformV160 = () => {
+    const packages = document.querySelector('#restoran-sistemleri');
+    if (!packages || packages.querySelector('.restaurant-common-platform')) return;
+    const special = packages.querySelector('.special-ready-card');
+    const rule = packages.querySelector('.nfc-package-rule');
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div class="restaurant-common-platform"><div class="restaurant-common-head"><div><p class="eyebrow">TÜM STANDART RESTORAN PAKETLERİNDE MEVCUT</p><h3>Mevcut restoran altyapısı tüm kapasitelerde devam eder.</h3></div><p>Başlangıç, Profesyonel, Premium ve 25–120 masa Özel Restoran Hazır Paketleri aynı sistem çekirdeğini kullanır. Premium Plus bu kapsamın yerine geçmez.</p></div><div class="restaurant-common-grid"><article><h4>Akıllı Menü</h4><ul><li>Akıllı Menü ve çoklu dil altyapısı</li><li>Türkçe + İngilizce görsel menü</li><li>8 ek dilde dijital metin menü</li><li>Ürün içerikleri</li><li>14 alerjen bilgi katmanı</li><li>Yaklaşık kalori bilgileri</li></ul></article><article><h4>Değerlendirme & Google</h4><ul><li>Müşteri değerlendirme sistemi</li><li>Google değerlendirme devam akışı</li><li>Google puan ve yorum performansı</li><li>Sosyal medya / iletişim yönlendirmeleri</li></ul></article><article><h4>Panel & Analitik</h4><ul><li>İşletme müşteri paneli</li><li>Masa ve alan bazlı kullanım analitikleri</li><li>Bildirim / push altyapısı</li><li>Uzaktan sistem yönetimi</li></ul></article><article class="restaurant-common-accent"><h4>Servis Talepleri</h4><ul><li>Garson Çağır</li><li>Hesap İste</li><li>Talebin masa / alan bilgisiyle panele düşmesi</li><li>İşletme bazında aktif / pasif yönetim</li></ul><p>Garson Çağır + Hesap İste, Premium Plus avantajı değildir. Tüm Standart Restoran paketlerinin mevcut ortak özelliğidir.</p></article></div></div>`;
+    const block = wrap.firstElementChild;
+    if (!block) return;
+    if (special) packages.insertBefore(block, special); else if (rule) rule.insertAdjacentElement('afterend', block); else packages.append(block);
+  };
+
+  const ensurePremiumPlusRoadmapV161 = () => {
+    if (!document.querySelector('.nfc-platform-hero')) return;
+    const existing = document.querySelector('#premium-plus');
+    if (existing?.dataset.premiumPlusRoadmap === '3.1.61') return;
+    const html = `<section class="section-pad-sm shell premium-plus-teaser" id="premium-plus" data-premium-plus-roadmap="3.1.61" aria-labelledby="premium-plus-title"><div class="premium-plus-shell"><div class="premium-plus-head"><div class="premium-plus-copy"><p class="eyebrow">YAKINDA</p><h2 id="premium-plus-title">Premium Plus</h2><p>Mevcut Akıllı Menü, çoklu dil, ürün içerikleri, 14 alerjen, yaklaşık kalori, Google performansı, müşteri değerlendirme sistemi ile Garson Çağır + Hesap İste özellikleri tüm Standart Restoran paketlerinde devam eder.</p><p>Premium Plus bunların üzerine doğrudan masa siparişi, Akıllı Misafir Profili ve CRM, sadakat sistemi, rezervasyon / masa yönetimi ve AI destekli müşteri deneyimi araçlarını ekleyen gelişmiş üst katman olarak konumlandırılacaktır.</p></div><div class="premium-plus-state" aria-label="Premium Plus ürün durumu"><span class="premium-plus-badge">YAKINDA</span><span class="premium-plus-progress">Geliştiriliyor</span><small>Henüz satışta değil</small></div></div><div class="premium-plus-roadmap-head"><div><p class="eyebrow">YAKINDA GELECEK ÖZELLİKLER</p><h3>Restoran deneyiminin bir sonraki katmanı.</h3></div><p>Özellik başlığına tıklayarak planlanan kapsamın ayrıntısını görebilirsin.</p></div><div class="premium-plus-grid">
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">01</span><div><h4>NFC dijital menüden masaya doğrudan sipariş oluşturma</h4><p>Müşteri, Akıllı Menü üzerinden seçimini doğrudan bulunduğu masadan iletebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri Akıllı Menü içerisinden ürünlerini seçerek siparişi doğrudan bulunduğu masadan işletmeye iletebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">02</span><div><h4>Soğansız gibi müşteri notlarını masa siparişine ekleme</h4><p>Siparişe ürün tercihi ve özel talepler eklenebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Müşteri siparişine:</p><ul><li>Soğansız</li><li>Acısız</li><li>Buzsuz</li><li>Ekstra sos</li><li>Pişirme tercihi</li><li>veya özel not</li></ul><p>gibi talepler ekleyebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">03</span><div><h4>Akıllı Misafir Profili ve CRM</h4><p>İzinli müşteri ilişkileri tek misafir profili altyapısında yönetilebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletmenin izinli müşteri ilişkilerini tek noktada yönetebilmesini sağlayacak gelişmiş misafir profili altyapısı.</p><p>Sistem ileride ziyaret geçmişi, müşteri tercihleri ve işletmeyle olan etkileşimleri kullanarak daha kişiselleştirilmiş müşteri deneyimi sunabilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">04</span><div><h4>Sadakat, puan ve ziyaret ödülleri</h4><p>İşletme kendi sadakat ve ziyaret ödülü kurgusunu yönetebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletmeler kendi sadakat sistemlerini oluşturabilecek.</p><p>Örnek kullanım:</p><ul><li>5 ziyaret sonrası ödül</li><li>10 ziyaret sonrası özel avantaj</li><li>Puan biriktirme</li><li>Ziyaret bazlı ödül</li><li>İşletmeye özel kampanya veya ayrıcalık</li></ul></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">05</span><div><h4>VIP ve tekrar gelen misafir tanıma</h4><p>İzinli kullanıcılar üzerinden tekrar gelen misafirler ayrıştırılabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Sistem izinli kullanıcılar üzerinden tekrar gelen misafirleri tanıyabilecek.</p><p>Örnek segmentler:</p><ul><li>İlk kez gelen</li><li>Tekrar gelen</li><li>Sadık misafir</li><li>VIP misafir</li></ul></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">06</span><div><h4>Otomatik segmentler ve geri kazanım</h4><p>Davranışlara göre müşteri segmentleri ve geri kazanım grupları tanımlanabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>İşletme müşterileri davranışlarına göre segmentleyebilecek.</p><p>Örnekler:</p><ul><li>30 gündür ziyaret etmeyen müşteriler</li><li>3 veya daha fazla kez gelen müşteriler</li><li>VIP müşteriler</li><li>Yüksek memnuniyet bırakan müşteriler</li><li>Geri kazanılması hedeflenen müşteriler</li></ul><p>Bu segmentler gelecekte işletmeye özel kampanya ve müşteri geri kazanım akışlarında kullanılabilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">07</span><div><h4>Rezervasyon, bekleme listesi ve masa yönetimi</h4><p>Ön salon ve masa operasyonları tek akışta yönetilebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Premium Plus kapsamında gelecekte:</p><ul><li>Online rezervasyon</li><li>Walk-in müşteri kaydı</li><li>Dijital bekleme listesi</li><li>Rezervasyon durumu</li><li>Masa hazır bilgisi</li><li>Müşterinin masaya alınması</li><li>Rezervasyon tamamlandı / gelmedi durumu</li></ul><p>gibi ön salon ve masa operasyon araçları geliştirilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">08</span><div><h4>AI ürün eşleştirme ve akıllı upsell</h4><p>Akıllı Menü seçilen ürüne göre tamamlayıcı öneriler sunabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Akıllı Menü müşterinin seçtiği ürüne göre tamamlayıcı ürünler önerebilecek.</p><p>Örnek:</p><ul><li>“Bu ürünle birlikte en çok tercih edilenler”</li><li>“Şefin önerisi”</li><li>“Menünü tamamla”</li><li>“Ana yemeğinin yanında bunu da deneyebilirsin”</li></ul><p>İşletme gerektiğinde öneri ilişkilerini manuel olarak da yönetebilecek.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">09</span><div><h4>AI günlük yönetici özeti</h4><p>İşletme verileri sade günlük özet ve kısa aksiyon önerilerine dönüşebilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Sistem işletme verilerini sade bir günlük özet halinde yöneticinin önüne getirebilecek.</p><p>Örnek:</p><ul><li>Bugünkü NFC etkileşimleri</li><li>Yeni müşteri değerlendirmeleri</li><li>Google performansındaki değişimler</li><li>Memnuniyet kategorilerindeki yükseliş / düşüşler</li><li>Yoğun etkileşim alanları</li><li>Tekrar gelen misafirler</li><li>Dikkat edilmesi gereken müşteri deneyimi sinyalleri</li></ul><p>ve bunlara göre kısa aksiyon önerileri.</p></div></details>
+<details class="premium-plus-feature"><summary><span class="premium-plus-no">10</span><div><h4>Gelişmiş modüllerde öncelikli erişim</h4><p>Yeni CRM, sadakat, rezervasyon ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div><span class="premium-plus-toggle" aria-hidden="true"></span></summary><div class="premium-plus-feature-body"><p>Premium Plus kullanıcıları gelecekte geliştirilecek ileri seviye CRM, sadakat, rezervasyon, müşteri deneyimi ve AI modüllerinde öncelikli kapsama alınabilecek.</p></div></details>
+</div><div class="premium-plus-note-group"><p class="premium-plus-note"><strong>Premium Plus mevcut paket özelliklerini yeniden paketlemez.</strong> Garson Çağır + Hesap İste zaten tüm Standart Restoran paketlerinin mevcut kapsamındadır. Premium Plus; NFC menüden doğrudan sipariş, müşteri sipariş notları, Akıllı Misafir Profili ve CRM, sadakat ve ziyaret ödülleri, VIP / tekrar gelen misafir tanıma, otomatik müşteri segmentleri, geri kazanım kampanyaları, rezervasyon ve dijital bekleme listesi, AI ürün önerileri ve AI yönetici özetleri için geliştirilen ayrı bir üst katmandır.</p><p class="premium-plus-release-note">Çıkış tarihi, kesin özellik kapsamı ve fiyatlandırma tamamlandığında BG Studio tarafından duyurulacaktır.</p></div><div class="premium-plus-footer"><span class="premium-plus-follow">Premium Plus gelişmelerini takip et</span><span class="premium-plus-coming">YAKINDA</span></div></div></section>`;
+    const wrap = document.createElement('div'); wrap.innerHTML = html; const next = wrap.firstElementChild; if (!next) return;
+    if (existing) existing.replaceWith(next); else document.querySelector('#hizli-stand')?.insertAdjacentElement('beforebegin', next);
+  };
+
+  const modernNfcExperience = !!document.querySelector('[data-nfc-hub-v3167]');
+  // V3.1.67 keeps legacy repair only for stale pages. The new hub/subpages must
+  // not receive the old long Premium Plus or capacity-card markup again.
+  if (!modernNfcExperience) {
+    ensureNfcStandSchematic();
+    ensureReadyRestaurantCalculator();
+    ensureRestaurantCommonPlatformV160();
+    ensurePremiumPlusRoadmapV161();
+  }
+  if (document.querySelector('.nfc-platform-hero')) arrangeNfcTopFlow();
+
+  document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
+    const base = numberOrNull(root.dataset.basePrice);
+    const qrCount = Number(root.dataset.qrCount || 0);
+    const qrUnit = Number(root.dataset.qrUnit || 0);
+    const menuPrice = Number(root.dataset.menuPrice || 0);
+    const logoPrice = Number(root.dataset.logoPrice || 0);
+    const code = root.dataset.packageCode || '';
+    const offerBase = root.dataset.offerBase || '../teklif/';
+    const buttons = [...root.querySelectorAll('[data-package-option]')];
+    const totalEl = root.querySelector('[data-package-total]');
+    const breakdownEl = root.querySelector('[data-package-breakdown]');
+    const offerEl = root.querySelector('[data-package-offer]');
+    const selected = new Set();
+
+    const update = () => {
+      const qrCost = selected.has('qr') ? qrCount * qrUnit : 0;
+      const menuCost = selected.has('menu') ? menuPrice : 0;
+      const logoCost = selected.has('logo') ? logoPrice : 0;
+      const total = base == null ? null : base + qrCost + menuCost + logoCost;
+      if (totalEl) totalEl.textContent = total == null ? 'Özel teklif' : money(total);
+      const extras = [];
+      if (selected.has('qr')) extras.push(`QR +${money(qrCost)}`);
+      if (selected.has('menu')) extras.push(`Menü +${money(menuPrice)}`);
+      if (selected.has('logo')) extras.push(`Logo +${money(logoPrice)}`);
+      if (breakdownEl) breakdownEl.textContent = extras.length ? `Paket plan bedeli dahil · ${extras.join(' · ')}` : 'Paket plan bedeli dahil · Ek hizmet seçilmedi';
+      if (offerEl && code) {
+        const flags = optionFlags(selected);
+        offerEl.href = `${offerBase}?tur=nfc&paket=${encodeURIComponent(code)}${flags.length ? '&' + flags.join('&') : ''}`;
+      }
+    };
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const key = button.dataset.packageOption;
+      if (!key) return;
+      selected.has(key) ? selected.delete(key) : selected.add(key);
+      setPressed(button, selected.has(key));
+      update();
+    }));
+    update();
+  });
+
+  const special = document.querySelector('[data-special-package-calculator]');
+  const capacityButtons = [...document.querySelectorAll('[data-special-capacity]')];
+  if (special && capacityButtons.length) {
+    let qrUnit = Number(special.dataset.qrUnit || 150);
+    let menuPrice = Number(special.dataset.menuPrice || 2500);
+    let logoPrice = Number(special.dataset.logoPrice || 2500);
+    let priceYear = '2026';
+    const optionButtons = [...special.querySelectorAll('[data-special-option]')];
+    const selectedOptions = new Set();
+    let selectedCapacity = capacityButtons.find(btn => btn.getAttribute('aria-pressed') === 'true') || capacityButtons[0];
+
+    const titleEl = special.querySelector('[data-special-title]');
+    const tablesEl = special.querySelector('[data-special-tables]');
+    const nfcEl = special.querySelector('[data-special-nfc]');
+    const priceYearEl = special.querySelector('[data-special-price-year]');
+    const basePriceEl = special.querySelector('[data-special-base-price]');
+    const renewalEl = special.querySelector('[data-special-renewal]');
+    const qrCostEl = special.querySelector('[data-special-qr-cost]');
+    const qrCopyEl = special.querySelector('[data-special-qr-copy]');
+    const menuCostEl = special.querySelector('[data-special-menu-cost]');
+    const logoCostEl = special.querySelector('[data-special-logo-cost]');
+    const baseLineEl = special.querySelector('[data-special-line-base]');
+    const qrLineEl = special.querySelector('[data-special-line-qr]');
+    const menuLineEl = special.querySelector('[data-special-line-menu]');
+    const logoLineEl = special.querySelector('[data-special-line-logo]');
+    const totalEl = special.querySelector('[data-special-total]');
+    const offerEl = special.querySelector('[data-special-offer]');
+    const specialOfferBase = special.dataset.offerBase || '../teklif/';
+
+    const updateSpecial = () => {
+      const tables = Number(selectedCapacity?.dataset.specialCapacity || 0);
+      const nfc = Number(selectedCapacity?.dataset.specialNfc || tables * 3);
+      const base = numberOrNull(selectedCapacity?.dataset.specialPrice);
+      const renewal = numberOrNull(selectedCapacity?.dataset.specialRenewal);
+      const fullQrCost = nfc * qrUnit;
+      const qrCost = selectedOptions.has('qr') ? fullQrCost : 0;
+      const menuCost = selectedOptions.has('menu') ? menuPrice : 0;
+      const logoCost = selectedOptions.has('logo') ? logoPrice : 0;
+      const total = base == null ? null : base + qrCost + menuCost + logoCost;
+      if (titleEl) titleEl.textContent = `GÜNCEL ${tables} MASA HAZIR PAKETİ`;
+      if (tablesEl) tablesEl.textContent = String(tables);
+      if (nfcEl) nfcEl.textContent = String(nfc);
+      if (priceYearEl) priceYearEl.textContent = `${priceYear} paket plan bedeli`;
+      if (basePriceEl) basePriceEl.textContent = base == null ? 'Özel teklif' : money(base);
+      if (renewalEl) renewalEl.textContent = renewal == null ? 'Yıllık yenileme: Özel teklif' : `Yıllık yenileme: ${money(renewal)}`;
+      if (qrCostEl) qrCostEl.textContent = `+${money(fullQrCost)}`;
+      if (qrCopyEl) qrCopyEl.textContent = `${nfc} QR × ${money(qrUnit)} / QR`;
+      if (menuCostEl) menuCostEl.textContent = `+${money(menuPrice)}`;
+      if (logoCostEl) logoCostEl.textContent = `+${money(logoPrice)}`;
+      if (baseLineEl) baseLineEl.textContent = base == null ? 'Özel teklif' : money(base);
+      if (qrLineEl) qrLineEl.textContent = selectedOptions.has('qr') ? `+${money(qrCost)}` : 'Seçilmedi';
+      if (menuLineEl) menuLineEl.textContent = selectedOptions.has('menu') ? `+${money(menuPrice)}` : 'Seçilmedi';
+      if (logoLineEl) logoLineEl.textContent = selectedOptions.has('logo') ? `+${money(logoPrice)}` : 'Seçilmedi';
+      if (totalEl) totalEl.textContent = total == null ? 'Özel teklif' : money(total);
+      if (offerEl) {
+        const flags = optionFlags(selectedOptions);
+        offerEl.href = `${specialOfferBase}?tur=nfc&paket=ozel-kapasite&masa=${tables}${flags.length ? '&' + flags.join('&') : ''}`;
+        offerEl.textContent = `${tables} masa için bu kapsamla teklif al`;
+      }
+    };
+
+    capacityButtons.forEach(button => button.addEventListener('click', () => {
+      selectedCapacity = button;
+      capacityButtons.forEach(item => setPressed(item, item === button));
+      updateSpecial();
+    }));
+    optionButtons.forEach(button => button.addEventListener('click', () => {
+      const key = button.dataset.specialOption;
+      if (!key) return;
+      selectedOptions.has(key) ? selectedOptions.delete(key) : selectedOptions.add(key);
+      setPressed(button, selectedOptions.has(key));
+      updateSpecial();
+    }));
+    capacityButtons.forEach(item => setPressed(item, item === selectedCapacity));
+    updateSpecial();
+
+    // Published site settings win over the built-in 2026 fallback when present.
+    fetch('/data/site_settings.json', { cache: 'no-store' }).then(response => response.ok ? response.json() : null).then(settings => {
+      const nfc = settings?.nfc_site;
+      const year = String(nfc?.active_year || '2026');
+      const yearData = nfc?.years?.[year];
+      if (!yearData || typeof yearData !== 'object') return;
+      priceYear = year;
+      qrUnit = Number(yearData.qr_unit ?? qrUnit) || qrUnit;
+      menuPrice = Number(yearData.menu_design ?? menuPrice) || menuPrice;
+      logoPrice = Number(yearData.logo_design ?? logoPrice) || logoPrice;
+      const rows = yearData.special_restaurant_packages || {};
+      capacityButtons.forEach(button => {
+        const tables = Number(button.dataset.specialCapacity || 0);
+        const row = rows[tables] || rows[String(tables)];
+        if (!row || typeof row !== 'object') return;
+        if (row.price != null) button.dataset.specialPrice = String(Number(row.price));
+        if (row.renewal != null) button.dataset.specialRenewal = String(Number(row.renewal));
+        const priceCopy = button.querySelector('small');
+        if (priceCopy && row.price != null) priceCopy.textContent = money(row.price);
+      });
+      special.dataset.qrUnit = String(qrUnit);
+      special.dataset.menuPrice = String(menuPrice);
+      special.dataset.logoPrice = String(logoPrice);
+      updateSpecial();
+    }).catch(() => {});
+  }
+})();
+
+// Static-site quote form -> WhatsApp handoff
+const quoteForm = document.querySelector('[data-quote-form]');
+if (quoteForm) {
+  const params = new URLSearchParams(window.location.search);
+  const requestedTypeRaw = params.get('tur');
+  const requestedType = ({'ozel-uretim':'kisiye-ozel','urun':'diger'}[requestedTypeRaw] || requestedTypeRaw);
+  const requestedPackage = params.get('paket');
+  const requestedCapacity = Number.parseInt(params.get('stand') || params.get('masa') || '', 10);
+  const requestedQr = params.get('qr') === '1';
+  const requestedMenu = params.get('menu') === '1';
+  const requestedLogo = params.get('logo') === '1';
+  const typeSelect = quoteForm.querySelector('[name="talep_turu"]');
+  const packageConfig = quoteForm.querySelector('[data-nfc-quote-config]');
+  const packageSelect = quoteForm.querySelector('[name="nfc_paket"]');
+  const packageSummary = quoteForm.querySelector('[data-nfc-package-summary]');
+  const packageTitle = quoteForm.querySelector('[data-nfc-package-title]');
+  const packageCapacity = quoteForm.querySelector('[data-nfc-package-capacity]');
+  const packagePrice = quoteForm.querySelector('[data-nfc-package-price]');
+  const packageRenewal = quoteForm.querySelector('[data-nfc-package-renewal]');
+  const priceYearLabel = quoteForm.querySelector('[data-nfc-price-year]');
+  const feedbackCapacityWrap = quoteForm.querySelector('[data-feedback-capacity-wrap]');
+  const feedbackCapacitySelect = quoteForm.querySelector('[name="feedback_duo_capacity"]');
+  const qrCopy = quoteForm.querySelector('[data-nfc-qr-copy]');
+  const menuPriceCopy = quoteForm.querySelector('[data-nfc-menu-price-copy]');
+  const logoPriceCopy = quoteForm.querySelector('[data-nfc-logo-price-copy]');
+  const qrOptionInput = quoteForm.querySelector('[name="nfc_qr"]');
+  const qrOptionLabel = qrOptionInput?.closest('label');
+  const menuOptionInput = quoteForm.querySelector('[name="nfc_menu_design"]');
+  const menuOptionLabel = menuOptionInput?.closest('label');
+  const logoOptionInput = quoteForm.querySelector('[name="nfc_logo_design"]');
+  const logoOptionLabel = logoOptionInput?.closest('label');
+  const totalBox = quoteForm.querySelector('[data-nfc-quote-total]');
+  const totalValue = quoteForm.querySelector('[data-nfc-total-value]');
+  const qtyInput = quoteForm.querySelector('[name="adet"]');
+  const qtyField = qtyInput?.closest('.field');
+  const qtyLabel = qtyField?.querySelector('label');
+  const sizeInput = quoteForm.querySelector('[name="olcu"]');
+  const sizeField = sizeInput?.closest('.field');
+  const colorInput = quoteForm.querySelector('[name="renk"]');
+  const colorLabel = colorInput?.closest('.field')?.querySelector('label');
+  const detailInput = quoteForm.querySelector('[name="detay"]');
+
+  let nfcPricingYear = '2026';
+  let qrUnitPrice = 150;
+  let menuDesignPrice = 2500;
+  let logoDesignPrice = 2500;
+  let feedbackRows = {
+    10:{price:14900,renewal:4900},15:{price:19900,renewal:6900},20:{price:24900,renewal:8900},25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}
+  };
+  let specialRestaurantRows = {25:{price:29900,renewal:9900},30:{price:34900,renewal:10900},35:{price:39900,renewal:11900},40:{price:44900,renewal:12900},45:{price:49900,renewal:13900},50:{price:54900,renewal:14900},55:{price:59900,renewal:15900},60:{price:64900,renewal:16900},65:{price:68900,renewal:17900},70:{price:72900,renewal:18900},75:{price:76900,renewal:19900},80:{price:80900,renewal:20900},85:{price:84900,renewal:21900},90:{price:88900,renewal:22900},95:{price:92900,renewal:23900},100:{price:96900,renewal:24900},110:{price:104900,renewal:26900},120:{price:112900,renewal:28900}};
+
+  const nfcPackages = {
+    'baslangic': { name:'Başlangıç', qty:10, perUnitNfc:3, perUnitQr:3, price:13900, renewal:4900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'profesyonel': { name:'Profesyonel', qty:15, perUnitNfc:3, perUnitQr:3, price:19900, renewal:6900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'premium': { name:'Premium', qty:20, perUnitNfc:3, perUnitQr:3, price:25900, renewal:8900, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true },
+    'feedback-duo': { name:'Premium Feedback Duo', qty:10, perUnitNfc:2, perUnitQr:0, price:14900, renewal:4900, qtyLabel:'Stand adedi', feedback:true, supportsQr:false, supportsMenu:false, supportsLogo:false },
+    'hizli-stand': { name:'Hızlı Bağlantı Standı', qty:1, perUnitNfc:3, perUnitQr:3, price:2000, renewal:990, quick:true, qtyLabel:'Stand adedi', supportsQr:true, supportsMenu:false, supportsLogo:true },
+    'ozel-kapasite-custom': { name:'Özel Restoran · farklı kapasite', qty:null, perUnitNfc:3, perUnitQr:3, price:null, renewal:null, custom:true, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true }
+  };
+  const money = value => Number(value || 0).toLocaleString('tr-TR') + ' TL';
+  const checked = name => !!quoteForm.querySelector(`[name="${name}"]`)?.checked;
+
+  if (requestedType && typeSelect && [...typeSelect.options].some(option => option.value === requestedType)) typeSelect.value = requestedType;
+  if (packageSelect) {
+    let requestedValue = requestedPackage || '';
+    if (requestedPackage === 'ozel-kapasite') requestedValue = Number.isFinite(requestedCapacity) && specialRestaurantRows[requestedCapacity] ? `ozel-kapasite-${requestedCapacity}` : 'ozel-kapasite-custom';
+    if (requestedValue && [...packageSelect.options].some(option => option.value === requestedValue)) packageSelect.value = requestedValue;
+  }
+  if (requestedPackage === 'feedback-duo' && Number.isFinite(requestedCapacity) && feedbackCapacitySelect && [...feedbackCapacitySelect.options].some(o => Number(o.value) === requestedCapacity)) feedbackCapacitySelect.value = String(requestedCapacity);
+  if (requestedQr && qrOptionInput) qrOptionInput.checked = true;
+  if (requestedMenu && menuOptionInput) menuOptionInput.checked = true;
+  if (requestedPackage === 'ozel-kapasite' && packageSelect?.value === 'ozel-kapasite-custom' && Number.isFinite(requestedCapacity) && requestedCapacity > 120 && qtyInput) qtyInput.value = String(requestedCapacity);
+  if (requestedPackage === 'ozel-kapasite-custom' && Number.isFinite(requestedCapacity) && requestedCapacity > 0 && qtyInput) qtyInput.value = String(requestedCapacity);
+  if (requestedLogo && logoOptionInput) logoOptionInput.checked = true;
+
+  const currentNfcPackage = () => {
+    const value = String(packageSelect?.value || '');
+    const readyMatch = value.match(/^ozel-kapasite-(\d+)$/);
+    if (readyMatch) {
+      const qty = Number(readyMatch[1]);
+      const row = specialRestaurantRows[qty] || {};
+      return { name:`Özel Restoran Hazır Paketi · ${qty} Masa`, qty, perUnitNfc:3, perUnitQr:3, price:row.price ?? null, renewal:row.renewal ?? null, readySpecial:true, qtyLabel:'Masa adedi', supportsQr:true, supportsMenu:true, supportsLogo:true };
+    }
+    return nfcPackages[value] || null;
+  };
+
+  const resolvePackageForContext = () => {
+    const base = currentNfcPackage();
+    if (!base) return null;
+    if (base.feedback) {
+      const qty = Math.max(10, Number.parseInt(feedbackCapacitySelect?.value || '10', 10) || 10);
+      const row = feedbackRows[qty] || {};
+      return {...base, qty, price:row.price ?? null, renewal:row.renewal ?? null};
+    }
+    if (base.custom) {
+      const manualQty = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
+      return {...base, qty:manualQty || null};
+    }
+    return base;
+  };
+
+  const computeNfcContext = () => {
+    const pkg = resolvePackageForContext();
+    if (!pkg) return null;
+    const enteredQty = Math.max(0, Number.parseInt(qtyInput?.value || '', 10) || 0);
+    const qty = Number.isFinite(pkg.qty) && pkg.qty > 0 ? pkg.qty : enteredQty;
+    const nfc = qty && pkg.perUnitNfc ? qty * pkg.perUnitNfc : null;
+    const qrCount = pkg.supportsQr !== false && qty && pkg.perUnitQr ? qty * pkg.perUnitQr : null;
+    const qrCost = pkg.supportsQr !== false && checked('nfc_qr') && qrCount ? qrCount * qrUnitPrice : 0;
+    const menuCost = pkg.supportsMenu !== false && checked('nfc_menu_design') ? menuDesignPrice : 0;
+    const logoCost = pkg.supportsLogo !== false && checked('nfc_logo_design') ? logoDesignPrice : 0;
+    const total = pkg.price == null ? null : pkg.price + qrCost + menuCost + logoCost;
+    return { pkg, qty, nfc, qrCount, qrCost, menuCost, logoCost, total };
+  };
+
+  const syncNfcOptionVisibility = (isNfc, pkg) => {
+    const supportsQr = !!(isNfc && pkg && pkg.supportsQr !== false);
+    const supportsMenu = !!(isNfc && pkg && pkg.supportsMenu !== false);
+    const supportsLogo = !!(isNfc && pkg && pkg.supportsLogo !== false);
+    if (qrOptionInput) { if (!supportsQr) qrOptionInput.checked = false; qrOptionInput.disabled = !supportsQr; }
+    if (qrOptionLabel) qrOptionLabel.hidden = !supportsQr;
+    if (menuOptionInput) { if (!supportsMenu) menuOptionInput.checked = false; menuOptionInput.disabled = !supportsMenu; }
+    if (menuOptionLabel) menuOptionLabel.hidden = !supportsMenu;
+    if (logoOptionInput) { if (!supportsLogo) logoOptionInput.checked = false; logoOptionInput.disabled = !supportsLogo; }
+    if (logoOptionLabel) logoOptionLabel.hidden = !supportsLogo;
+  };
+
+  const updateNfcSummary = ({ syncQty = false } = {}) => {
+    const pkg = resolvePackageForContext();
+    const isNfc = typeSelect?.value === 'nfc';
+    if (packageConfig) packageConfig.hidden = !isNfc;
+    if (feedbackCapacityWrap) feedbackCapacityWrap.hidden = !(isNfc && pkg?.feedback);
+    syncNfcOptionVisibility(isNfc, pkg);
+    if (qtyLabel) qtyLabel.textContent = isNfc ? (pkg?.qtyLabel || 'Masa / stand adedi') : 'Adet';
+    if (qtyInput) {
+      const lock = !!(isNfc && pkg && !pkg.custom && Number.isFinite(pkg.qty) && pkg.qty > 0);
+      qtyInput.placeholder = isNfc ? (pkg?.quick ? '1' : pkg?.feedback ? '10' : pkg?.custom ? 'Örn. 135' : 'Örn. 15') : 'Örn. 50';
+      qtyInput.readOnly = lock;
+      qtyInput.classList.toggle('is-package-locked', lock);
+      qtyInput.title = lock ? 'Bu hazır çözümde adet paket kapasitesinden gelir.' : '';
+      if (syncQty && lock) qtyInput.value = String(pkg.qty);
+      if (syncQty && pkg?.custom && Number.parseInt(qtyInput.value || '', 10) <= 120) qtyInput.value = '';
+    }
+    if (sizeField) sizeField.hidden = isNfc;
+    if (colorLabel) colorLabel.textContent = isNfc ? 'Stand renk / tasarım tercihi' : 'Renk / malzeme tercihi';
+    if (colorInput) colorInput.placeholder = isNfc ? 'Örn. Siyah, işletme renkleri, fark etmez' : 'Örn. Siyah PLA / fark etmez';
+    if (detailInput && isNfc && pkg?.feedback) detailInput.placeholder = 'Feedback Duo için işletme yapısını, seçilecek sosyal / iletişim hedefini ve özel talepleri yazın…';
+    else if (detailInput && isNfc && pkg?.quick) detailInput.placeholder = 'Hızlı Stand için 3 NFC hedefini, varsa QR / logo talebini ve özel notları yazın…';
+    else if (detailInput && isNfc) detailInput.placeholder = 'İşletme yapısını, hedef kanalları, varsa QR / menü / logo taleplerini ve özel notları yazın…';
+    else if (detailInput) detailInput.placeholder = 'Ürün, ölçü, kullanım amacı, adet ve varsa özel talepleri yazın…';
+
+    if (!isNfc || !pkg) {
+      if (packageSummary) packageSummary.hidden = true;
+      if (totalBox) totalBox.hidden = true;
+      return;
+    }
+    const ctx = computeNfcContext();
+    if (!ctx) return;
+    if (packageSummary) packageSummary.hidden = false;
+    if (packageTitle) packageTitle.textContent = ctx.pkg.name;
+    if (packageCapacity) {
+      if (ctx.pkg.feedback) packageCapacity.textContent = `${ctx.qty} stand · ${ctx.nfc} NFC · 2 NFC / stand`;
+      else if (ctx.pkg.readySpecial) packageCapacity.textContent = `${ctx.qty} masa · ${ctx.nfc} NFC · hazır kapasite`;
+      else if (ctx.pkg.custom) packageCapacity.textContent = ctx.qty ? `${ctx.qty} masa · ${ctx.nfc} NFC · özel teklif` : '120 masa üzeri / farklı kapasite · özel teklif';
+      else if (ctx.pkg.quick) packageCapacity.textContent = '1 özel stand · 3 bağımsız NFC erişim noktası';
+      else packageCapacity.textContent = `${ctx.qty} masa · ${ctx.nfc} NFC erişim noktası`;
+    }
+    if (priceYearLabel) priceYearLabel.textContent = `${nfcPricingYear} başlangıç`;
+    if (menuPriceCopy) menuPriceCopy.textContent = `${nfcPricingYear} liste bedeli · +${money(menuDesignPrice)} · Türkçe + İngilizce görsel menü · 8 ek dil dijital · içerik, 14 alerjen ve yaklaşık kalori bilgisi`;
+    if (logoPriceCopy) logoPriceCopy.textContent = `${nfcPricingYear} liste bedeli · +${money(logoDesignPrice)} · işletmeye özel logo · stand ve dijital menü uyumu`;
+    if (packagePrice) packagePrice.textContent = ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price);
+    if (packageRenewal) packageRenewal.textContent = ctx.pkg.renewal ? `Yıllık yenileme: ${money(ctx.pkg.renewal)}` : (ctx.pkg.custom ? 'Kapasiteye göre hesaplanır' : 'Proje kapsamına göre');
+    if (qrCopy && ctx.pkg.supportsQr !== false) {
+      if (ctx.pkg.quick) qrCopy.textContent = `3 QR · ${money(qrUnitPrice)} / QR · +${money(qrUnitPrice * 3)}`;
+      else qrCopy.textContent = ctx.qrCount ? `${ctx.qrCount} QR · ${money(qrUnitPrice)} / QR · +${money(ctx.qrCount * qrUnitPrice)}` : `Masa başına 3 QR · ${money(qrUnitPrice)} / QR`;
+    }
+    if (totalBox) totalBox.hidden = ctx.total == null;
+    if (totalValue && ctx.total != null) totalValue.textContent = money(ctx.total);
+  };
+
+  const applyPublishedNfcPricing = async () => {
+    try {
+      const response = await fetch('/data/site_settings.json', { cache:'no-store' });
+      if (!response.ok) return;
+      const settings = await response.json();
+      const nfc = settings?.nfc_site;
+      const year = String(nfc?.active_year || '2026');
+      const yearData = nfc?.years?.[year];
+      if (!yearData || typeof yearData !== 'object') return;
+      nfcPricingYear = year;
+      qrUnitPrice = Number(yearData.qr_unit ?? qrUnitPrice) || qrUnitPrice;
+      menuDesignPrice = Number(yearData.menu_design ?? menuDesignPrice) || menuDesignPrice;
+      logoDesignPrice = Number(yearData.logo_design ?? logoDesignPrice) || logoDesignPrice;
+      const packs = yearData.packages || {};
+      const map = { baslangic:'baslangic', profesyonel:'profesyonel', premium:'premium', hizli_stand:'hizli-stand' };
+      Object.entries(map).forEach(([sourceKey,targetKey]) => {
+        const row = packs[sourceKey];
+        if (!row || !nfcPackages[targetKey]) return;
+        nfcPackages[targetKey].price = row.price == null ? null : Number(row.price);
+        nfcPackages[targetKey].renewal = row.renewal == null ? null : Number(row.renewal);
+      });
+      const duo = yearData.feedback_duo_packages || {};
+      Object.entries(duo).forEach(([key,row]) => { if (row && typeof row === 'object') feedbackRows[Number(key)] = {price:row.price==null?null:Number(row.price),renewal:row.renewal==null?null:Number(row.renewal)}; });
+      const special = yearData.special_restaurant_packages || {};
+      Object.entries(special).forEach(([key,row]) => { if (row && typeof row === 'object') specialRestaurantRows[Number(key)] = {price:row.price==null?null:Number(row.price),renewal:row.renewal==null?null:Number(row.renewal)}; });
+      updateNfcSummary({ syncQty:false });
+    } catch (_) {}
+  };
+
+  const initialNfc = typeSelect?.value === 'nfc';
+  updateNfcSummary({ syncQty: initialNfc && !!requestedPackage });
+  applyPublishedNfcPricing();
+  typeSelect?.addEventListener('change', () => updateNfcSummary());
+  packageSelect?.addEventListener('change', () => updateNfcSummary({ syncQty:true }));
+  feedbackCapacitySelect?.addEventListener('change', () => updateNfcSummary({ syncQty:true }));
+  quoteForm.querySelectorAll('[data-nfc-option]').forEach(input => input.addEventListener('change', () => updateNfcSummary()));
+  qtyInput?.addEventListener('input', () => { if (typeSelect?.value === 'nfc' && packageSelect?.value) updateNfcSummary(); });
+
+  quoteForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!quoteForm.reportValidity()) return;
+    const data = new FormData(quoteForm);
+    const labels = {'kisiye-ozel':'Özel Üretim','ozel-uretim':'Özel Üretim','kurumsal':'Kurumsal / toplu üretim','nfc':'NFC & QR sistemi','prototip':'Prototip / parça üretimi','urun':'Mevcut ürün hakkında','diger':'Diğer'};
+    const isNfc = data.get('talep_turu') === 'nfc';
+    const ctx = isNfc ? computeNfcContext() : null;
+    const lines = ['Merhaba BG Studio 3D, web sitesinden bir talep oluşturuyorum.','',`Talep türü: ${labels[data.get('talep_turu')] || data.get('talep_turu')}`,`Ad / Soyad: ${data.get('ad') || '-'}`,`İşletme / Marka: ${data.get('isletme') || '-'}`];
+    if (ctx) {
+      const options = [];
+      if (ctx.pkg.supportsQr !== false && checked('nfc_qr')) options.push(`QR sistemi${ctx.qrCount ? ` (${ctx.qrCount} QR / +${money(ctx.qrCost)})` : ''}`);
+      if (ctx.pkg.supportsMenu !== false && checked('nfc_menu_design')) options.push(`Menü Tasarımı (+${money(menuDesignPrice)})`);
+      if (ctx.pkg.supportsLogo !== false && checked('nfc_logo_design')) options.push(`Logo Tasarımı (+${money(logoDesignPrice)})`);
+      lines.push('',`Seçilen çözüm: ${ctx.pkg.name}`,`${ctx.pkg.feedback || ctx.pkg.quick ? 'Stand' : 'Masa'}: ${ctx.qty || data.get('adet') || '-'}`,`NFC erişim noktası: ${ctx.nfc || '-'}`,`Opsiyonlar: ${options.length ? options.join(', ') : 'Ek opsiyon seçilmedi'}`,`Kurulum / başlangıç bedeli: ${ctx.pkg.price == null ? 'Özel teklif' : money(ctx.pkg.price)}`);
+      if (ctx.total != null && ctx.total !== ctx.pkg.price) lines.push(`Seçili opsiyonlarla tahmini başlangıç: ${money(ctx.total)}`);
+      if (ctx.pkg.renewal) lines.push(`Yıllık yenileme: ${money(ctx.pkg.renewal)}`);
+      lines.push(`Stand renk / tasarım: ${data.get('renk') || '-'}`);
+    } else {
+      lines.push(`Adet: ${data.get('adet') || '-'}`,`Yaklaşık ölçü / ebat: ${data.get('olcu') || '-'}`,`Renk / malzeme: ${data.get('renk') || '-'}`);
+      const optionalLines = [
+        ['Ürün / ihtiyaç tipi', data.get('urun_tipi')],
+        ['Kullanım / sektör', data.get('kurumsal_kullanim')],
+        ['Markalama / logo', data.get('kurumsal_markalama')],
+        ['Parçanın görevi', data.get('prototip_gorev')],
+        ['Tercih edilen malzeme', data.get('prototip_malzeme')],
+      ];
+      optionalLines.forEach(([label, value]) => { if (String(value || '').trim()) lines.push(`${label}: ${value}`); });
+    }
+    const fileSummary = String(data.get('dosya_ozeti') || '').trim();
+    if (fileSummary) lines.push(`Seçilen dosyalar: ${fileSummary}`, 'Not: Dosyalar web sitesine yüklenmedi. WhatsApp açıldığında sohbete ayrıca eklenmelidir.');
+    lines.push(`Şehir: ${data.get('sehir') || '-'}`,'',`Talep: ${data.get('detay') || '-'}`);
+    const leadPayload = { method:'quote_form_whatsapp', lead_type:data.get('talep_turu')||'unknown', nfc_package:ctx?.pkg?.name||undefined, page_location:canonicalUrl };
+    trackEvent('quote_request', leadPayload);
+    trackEvent('generate_lead', leadPayload);
+    window.open('https://wa.me/905302466903?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
+  });
+}
+
+// Product gallery switcher
+const galleryMain = document.querySelector('[data-gallery-main]');
+const galleryStage = document.querySelector('[data-gallery-stage]');
+const galleryThumbs = document.querySelectorAll('[data-gallery-src]');
+if (galleryMain && galleryThumbs.length) {
+  galleryThumbs.forEach(btn => btn.addEventListener('click', () => {
+    galleryMain.src = btn.dataset.gallerySrc || galleryMain.src;
+    galleryMain.alt = btn.dataset.galleryAlt || '';
+    galleryStage?.setAttribute('aria-label', `${galleryMain.alt || 'Ürün görseli'} büyüt`);
+    galleryThumbs.forEach(item => {
+      const active = item === btn;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }));
+}
+
+// Share product URL. Canonical URL prevents local file paths from being shared during PC testing.
+const shareProduct = document.querySelector('.share-product');
+if (shareProduct) {
+  const originalText = shareProduct.textContent;
+  shareProduct.addEventListener('click', async () => {
+    const title = shareProduct.dataset.shareTitle || document.title;
+    try {
+      if (navigator.share && location.protocol.startsWith('http')) {
+        await navigator.share({ title, url: canonicalUrl });
+        trackEvent('share', { method: 'native_share', content_type: 'product', item_id: canonicalUrl });
+        return;
+      }
+      await navigator.clipboard.writeText(canonicalUrl);
+      trackEvent('share', { method: 'copy_link', content_type: 'product', item_id: canonicalUrl });
+      shareProduct.textContent = 'Link kopyalandı ✓';
+      shareProduct.classList.add('copied');
+      setTimeout(() => {
+        shareProduct.textContent = originalText;
+        shareProduct.classList.remove('copied');
+      }, 1800);
+    } catch (_) {
+      shareProduct.textContent = 'Link: 3d.bgstudio.com.tr';
+      setTimeout(() => { shareProduct.textContent = originalText; }, 1800);
+    }
+  });
+}
+
+// Smart product order configurator
+const orderConfig = document.querySelector('[data-order-config]');
+if (orderConfig) {
+  const name = orderConfig.dataset.productName || document.querySelector('.product-info h1')?.textContent?.trim() || 'Ürün';
+  const fallbackPriceText = orderConfig.dataset.productPrice || '';
+  const basePriceValue = Number(String(orderConfig.dataset.productBasePriceValue || '').replace(',', '.')) || 0;
+  const option = orderConfig.querySelector('[data-order-option]');
+  const tier = orderConfig.querySelector('[data-order-tier]');
+  const qty = orderConfig.querySelector('[data-order-qty]');
+  const note = orderConfig.querySelector('[data-order-note]');
+  const summary = orderConfig.querySelector('[data-order-summary]');
+  const send = orderConfig.querySelector('[data-order-whatsapp]');
+  const mobileSend = document.querySelector('[data-mobile-order-whatsapp]');
+  const priceDisplay = document.querySelector('[data-product-price-display]');
+  const mobilePrice = document.querySelector('[data-mobile-price]');
+  const discountListPrices = document.querySelectorAll('[data-discount-list-price]');
+  const discountBadges = document.querySelectorAll('[data-discount-badge]');
+  const tierBtns = document.querySelectorAll('[data-order-tier-choice]');
+  const colorSlotsWrap = orderConfig.querySelector('[data-order-color-slots]');
+  const colorDataNode = orderConfig.querySelector('[data-product-colors]');
+  let colorOptions = [];
+  try { colorOptions = colorDataNode ? JSON.parse(colorDataNode.textContent || '[]') : []; } catch (_) { colorOptions = []; }
+  let colorSelections = [];
+
+  const formatTL = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '';
+    return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(n) + ' TL';
+  };
+  const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  const clampQty = () => {
+    let value = parseInt(qty?.value || '1', 10);
+    if (!Number.isFinite(value)) value = 1;
+    value = Math.min(12, Math.max(1, value));
+    if (qty) qty.value = value;
+    return value;
+  };
+  const selectedTier = () => {
+    const opt = tier?.selectedOptions?.[0];
+    if (!opt) return null;
+    const packQty = parseInt(opt.dataset.tierQty || '1', 10) || 1;
+    const packPrice = Number(String(opt.dataset.tierPrice || '').replace(',', '.'));
+    return {
+      index: opt.value,
+      label: opt.dataset.tierLabel || opt.textContent.trim(),
+      packQty,
+      packPrice: Number.isFinite(packPrice) ? packPrice : 0,
+      priceLabel: opt.dataset.tierPriceLabel || (Number.isFinite(packPrice) ? formatTL(packPrice) : '')
+    };
+  };
+  const totalItemCount = () => {
+    const amount = clampQty();
+    const t = selectedTier();
+    return Math.max(1, (t ? t.packQty : 1) * amount);
+  };
+  const syncTierUi = () => {
+    const t = selectedTier();
+    const baseSaleSelected = !t || t.packQty === 1;
+    discountListPrices.forEach(el => { el.hidden = !baseSaleSelected; });
+    discountBadges.forEach(el => { el.hidden = !baseSaleSelected; });
+    tierBtns.forEach(btn => {
+      const active = !!t && btn.dataset.orderTierChoice === t.index;
+      btn.classList.toggle('selected', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    const label = t?.priceLabel || (basePriceValue ? formatTL(basePriceValue) : fallbackPriceText);
+    if (priceDisplay && label) priceDisplay.textContent = label;
+    if (mobilePrice && label) mobilePrice.textContent = label;
+  };
+  const renderColorSlots = () => {
+    if (!colorSlotsWrap || !colorOptions.length) return;
+    const count = totalItemCount();
+    const previous = colorSelections.slice();
+    colorSelections = Array.from({ length: count }, (_, i) => previous[i] || colorOptions[0]?.name || '');
+    colorSlotsWrap.innerHTML = colorSelections.map((selected, index) => {
+      const buttons = colorOptions.map(color => {
+        const active = color.name === selected;
+        return `<button type="button" class="color-choice${active ? ' selected' : ''}" data-color-slot="${index}" data-color-name="${escapeHtml(color.name)}" aria-pressed="${active ? 'true' : 'false'}"><i style="--swatch:${escapeHtml(color.hex || '#c7b9a6')}"></i><span>${escapeHtml(color.name)}</span></button>`;
+      }).join('');
+      return `<div class="color-slot"><div class="color-slot-title"><strong>${index + 1}. ürün</strong><span data-color-slot-value="${index}">${escapeHtml(selected)}</span></div><div class="color-choice-grid">${buttons}</div></div>`;
+    }).join('');
+    colorSlotsWrap.querySelectorAll('.color-choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.dataset.colorSlot || 0);
+        colorSelections[index] = btn.dataset.colorName || colorOptions[0]?.name || '';
+        const slot = btn.closest('.color-slot');
+        slot?.querySelectorAll('.color-choice').forEach(item => {
+          const active = item === btn;
+          item.classList.toggle('selected', active);
+          item.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        const value = slot?.querySelector('[data-color-slot-value]');
+        if (value) value.textContent = colorSelections[index];
+        buildMessage(false);
+      });
+    });
+  };
+  const colorSummaryText = () => {
+    if (!colorSelections.length) return '';
+    if (colorSelections.length === 1) return colorSelections[0];
+    return colorSelections.map((color, i) => `${i + 1}. ${color}`).join(' / ');
+  };
+  const buildMessage = (refreshColors = false) => {
+    const amount = clampQty();
+    const selected = option?.value || '';
+    const t = selectedTier();
+    const totalItems = t ? t.packQty * amount : amount;
+    let totalValue = basePriceValue ? basePriceValue * amount : 0;
+    if (t) totalValue = t.packPrice * amount;
+    if (refreshColors && colorOptions.length) renderColorSlots();
+    const colors = colorSummaryText();
+    const summaryParts = [];
+    if (selected) summaryParts.push(selected);
+    if (t) summaryParts.push(`${t.label} • ${amount} set (${totalItems} adet)`);
+    else summaryParts.push(`${amount} adet`);
+    if (colors) summaryParts.push(colors);
+    if (totalValue) summaryParts.push(formatTL(totalValue));
+    if (summary) summary.textContent = summaryParts.join(' • ');
+
+    const lines = [
+      'Merhaba BG Studio 3D, web sitesinden sipariş için yazıyorum.',
+      '',
+      `Ürün: ${name}`,
+      selected ? `Seçenek: ${selected}` : '',
+      t ? `Paket: ${t.label}` : '',
+      t ? `Paket adedi: ${amount}` : `Adet: ${amount}`,
+      t ? `Toplam ürün: ${totalItems} adet` : '',
+      colorSelections.length === 1 ? `Renk: ${colorSelections[0]}` : '',
+      colorSelections.length > 1 ? 'Renkler:' : '',
+      ...colorSelections.map((color, i) => colorSelections.length > 1 ? `  ${i + 1}. ürün: ${color}` : '').filter(Boolean),
+      t && t.packPrice ? `Paket fiyatı: ${formatTL(t.packPrice)}` : '',
+      totalValue ? `Toplam: ${formatTL(totalValue)}` : (fallbackPriceText ? `Sayfadaki fiyat: ${fallbackPriceText}` : ''),
+      note?.value.trim() ? `Not: ${note.value.trim()}` : '',
+      '',
+      `Ürün sayfası: ${canonicalUrl}`
+    ].filter(Boolean);
+    const href = 'https://wa.me/905302466903?text=' + encodeURIComponent(lines.join('\n'));
+    if (send) send.href = href;
+    if (mobileSend) mobileSend.href = href;
+    syncTierUi();
+  };
+  const trackProductOrder = () => {
+    const amount = clampQty();
+    const selected = option?.value || '';
+    const t = selectedTier();
+    const product = analyticsProductContext();
+    const totalItems = t ? t.packQty * amount : amount;
+    const totalValue = t?.packPrice ? t.packPrice * amount : (product?.price ? product.price * amount : basePriceValue * amount);
+    const payload = {
+      method: 'product_order_whatsapp',
+      item_id: product?.item_id || name,
+      item_name: product?.item_name || name,
+      option: selected || undefined,
+      colors: colorSelections.length ? colorSelections.join(' | ') : undefined,
+      quantity: totalItems,
+      set_count: t ? amount : undefined,
+      set_label: t?.label || undefined,
+      page_location: canonicalUrl
+    };
+    if (totalValue) { payload.value = totalValue; payload.currency = 'TRY'; }
+    trackEvent('whatsapp_order', payload);
+    trackEvent('generate_lead', payload);
+  };
+  send?.addEventListener('click', trackProductOrder);
+  mobileSend?.addEventListener('click', trackProductOrder);
+
+  orderConfig.querySelector('[data-qty-minus]')?.addEventListener('click', () => {
+    if (qty) qty.value = clampQty() - 1;
+    clampQty();
+    buildMessage(true);
+  });
+  orderConfig.querySelector('[data-qty-plus]')?.addEventListener('click', () => {
+    if (qty) qty.value = clampQty() + 1;
+    clampQty();
+    buildMessage(true);
+  });
+  qty?.addEventListener('input', () => buildMessage(true));
+  option?.addEventListener('change', () => buildMessage(false));
+  tier?.addEventListener('change', () => buildMessage(true));
+  note?.addEventListener('input', () => buildMessage(false));
+  tierBtns.forEach(btn => btn.addEventListener('click', () => {
+    if (tier) tier.value = btn.dataset.orderTierChoice;
+    buildMessage(true);
+  }));
+  mobileSend?.addEventListener('click', event => {
+    if (mobileSend.getAttribute('href') === '#') {
+      event.preventDefault();
+      orderConfig.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+  if (colorOptions.length) renderColorSlots();
+  buildMessage(false);
+}
+
+// Navigation active state
+const normalizePath = (url) => {
+  try {
+    const parsed = new URL(url, window.location.href);
+    let path = parsed.pathname.replace(/\/index\.html$/, '/');
+    if (!path.endsWith('/') && !/\.[a-z0-9]+$/i.test(path)) path += '/';
+    return path;
+  } catch (_) {
+    return '';
+  }
+};
+document.querySelectorAll('.main-nav a[href]').forEach(link => {
+  const href = link.getAttribute('href') || '';
+  if (href.startsWith('http') || href.startsWith('https://wa.me')) return;
+  const current = normalizePath(link.href) === normalizePath(window.location.href);
+  if (current) {
+    link.setAttribute('aria-current', 'page');
+    link.classList.add('is-active');
+  }
+});
+
+// Footer year
+const currentYear = String(new Date().getFullYear());
+document.querySelectorAll('[data-current-year]').forEach(el => { el.textContent = currentYear; });
+
+// Clean legacy index.html URLs without reloading the page.
+(() => {
+  const { pathname, search, hash } = window.location;
+  if (/\/index\.html$/i.test(pathname)) {
+    const cleanPath = pathname.replace(/index\.html$/i, "");
+    window.history.replaceState(null, "", `${cleanPath}${search}${hash}`);
+  }
+})();
+
+
+// v1.4 — Brand-family icon treatment and Architecture-inspired WhatsApp quick panel.
+document.querySelectorAll('a[href*="wa.me/"]').forEach(link => link.classList.add('has-brand-icon', 'icon-whatsapp'));
+document.querySelectorAll('a[href*="instagram.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-instagram'));
+document.querySelectorAll('a[href*="facebook.com/bgstudio.3dtr"]').forEach(link => link.classList.add('has-brand-icon', 'icon-facebook'));
+document.querySelectorAll('a[href^="https://bgstudio.com.tr"]').forEach(link => {
+  if (!link.closest('.footer-socials') && !link.classList.contains('brand-branch-card')) {
+    link.classList.add('has-brand-icon', 'icon-architecture');
+  }
+});
+
+if (document.querySelector('.mobile-product-cta')) document.body.classList.add('has-mobile-product-cta');
+
+const floatingWhatsApp = document.querySelector('.floating-whatsapp');
+if (floatingWhatsApp) {
+  const originalHref = floatingWhatsApp.href;
+  const productName = document.querySelector('.product-info h1')?.textContent?.trim();
+  const defaultMessage = productName
+    ? `Merhaba BG Studio 3D, ${productName} hakkında bilgi almak istiyorum.`
+    : 'Merhaba BG Studio 3D, web sitenizden yazıyorum. Ürün ve üretim seçenekleri hakkında bilgi almak istiyorum.';
+  const options = [
+    ['Ürün siparişi', productName ? `Merhaba BG Studio 3D, ${productName} hakkında bilgi almak istiyorum.` : 'Merhaba BG Studio 3D, bir ürün hakkında bilgi almak istiyorum.'],
+    ['Kişiye özel üretim', 'Merhaba BG Studio 3D, kişiye özel 3D baskı üretim için teklif almak istiyorum.'],
+    ['Toplu / kurumsal', 'Merhaba BG Studio 3D, işletmem için toplu veya kurumsal üretim hakkında görüşmek istiyorum.'],
+    ['Prototip / parça', 'Merhaba BG Studio 3D, prototip veya yedek parça üretimi için görüşmek istiyorum. Parçanın fotoğrafını ve yaklaşık ölçülerini paylaşacağım.'],
+    ['NFC & QR', 'Merhaba BG Studio 3D, NFC & QR sistemleri hakkında bilgi almak istiyorum.']
+  ];
+
+  const panel = document.createElement('aside');
+  panel.className = 'wa-quick-panel';
+  panel.setAttribute('aria-label', 'WhatsApp hızlı iletişim');
+  panel.setAttribute('aria-hidden', 'true');
+  panel.hidden = true;
+  panel.inert = true;
+  panel.innerHTML = `
+    <div class="wa-panel-head">
+      <div><h2>Merhaba 👋</h2><p>Ürün, özel üretim, prototip veya işletme çözümü için mesajını birkaç saniyede hazırla.</p></div>
+      <button class="wa-panel-close" type="button" aria-label="WhatsApp panelini kapat">×</button>
+    </div>
+    <span class="wa-panel-label">HIZLI SEÇENEKLER</span>
+    <div class="wa-panel-options"></div>
+    <div class="wa-panel-message" aria-live="polite"></div>
+    <a class="wa-panel-send has-brand-icon icon-whatsapp" target="_blank" rel="noopener">WhatsApp'ta Gönder</a>
+    <p class="wa-panel-meta">Ortalama yanıt süresi: aynı gün içinde</p>`;
+  document.body.append(panel);
+
+  const messageBox = panel.querySelector('.wa-panel-message');
+  const sendLink = panel.querySelector('.wa-panel-send');
+  const optionWrap = panel.querySelector('.wa-panel-options');
+  const closeButton = panel.querySelector('.wa-panel-close');
+  let selectedContactType = productName ? 'product' : 'general';
+  const setMessage = (message, activeButton = null, contactType = selectedContactType) => {
+    selectedContactType = contactType;
+    messageBox.textContent = message;
+    sendLink.href = 'https://wa.me/905302466903?text=' + encodeURIComponent(message);
+    optionWrap.querySelectorAll('.wa-panel-option').forEach(btn => btn.classList.toggle('active', btn === activeButton));
+  };
+  setMessage(defaultMessage);
+  const contactTypeMap = ['product', 'custom_production', 'corporate', 'prototype_part', 'nfc_qr'];
+  options.forEach(([label, message], index) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wa-panel-option';
+    btn.textContent = label;
+    btn.addEventListener('click', () => setMessage(message, btn, contactTypeMap[index] || 'general'));
+    optionWrap.append(btn);
+  });
+  sendLink.addEventListener('click', () => {
+    const payload = { method: 'quick_whatsapp_panel', contact_type: selectedContactType, page_location: canonicalUrl };
+    if (productName) payload.item_name = productName;
+    trackEvent('whatsapp_quick_contact', payload);
+    trackEvent('generate_lead', payload);
+  });
+
+  const seenKey = 'bgstudio-wa-seen-v1';
+  try { if (sessionStorage.getItem(seenKey)) floatingWhatsApp.classList.add('wa-seen'); } catch (_) {}
+  floatingWhatsApp.title = 'WhatsApp ile hızlı iletişim';
+  const setPanel = (open) => {
+    panel.toggleAttribute('hidden', !open);
+    if ('inert' in panel) panel.inert = !open;
+    else panel.toggleAttribute('inert', !open);
+    panel.classList.toggle('open', open);
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    floatingWhatsApp.classList.toggle('is-open', open);
+    floatingWhatsApp.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      floatingWhatsApp.classList.add('wa-seen');
+      try { sessionStorage.setItem(seenKey, '1'); } catch (_) {}
+      trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
+      requestAnimationFrame(() => panel.scrollTo?.({ top: 0, behavior: 'auto' }));
+    }
+  };
+  floatingWhatsApp.setAttribute('aria-haspopup', 'dialog');
+  floatingWhatsApp.setAttribute('aria-expanded', 'false');
+
+  // V3.1.89: Mobile Safari/Chrome tap hardening. Some fixed-layer stacks can
+  // suppress or delay the synthetic click after touchend. Toggle on touchend
+  // and ignore the follow-up click so one tap always equals one action.
+  let lastTouchToggleAt = 0;
+  const toggleWhatsAppPanel = () => setPanel(!panel.classList.contains('open'));
+  floatingWhatsApp.addEventListener('touchend', event => {
+    if (event.changedTouches && event.changedTouches.length > 1) return;
+    lastTouchToggleAt = Date.now();
+    event.preventDefault();
+    event.stopPropagation();
+    toggleWhatsAppPanel();
+  }, { passive: false });
+  floatingWhatsApp.addEventListener('click', event => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+    event.preventDefault();
+    if (Date.now() - lastTouchToggleAt < 700) return;
+    toggleWhatsAppPanel();
+  });
+  closeButton.addEventListener('click', () => { setPanel(false); floatingWhatsApp.focus(); });
+  document.addEventListener('click', event => {
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(event.target) || floatingWhatsApp.contains(event.target)) return;
+    setPanel(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && panel.classList.contains('open')) {
+      setPanel(false);
+      floatingWhatsApp.focus();
+    }
+  });
+}
+
+// v2.4 — Playfair Display has an ornamental ampersand.
+// Normalize any ampersand rendered with the display serif, not only h1/h2/h3.
+const normalizeDisplayAmpersands = (root = document) => {
+  const candidates = root?.matches?.('h1,h2,h3,h4,a,span,strong,p') ? [root] : [...(root?.querySelectorAll?.('h1,h2,h3,h4,a,span,strong,p') || [])];
+  candidates.forEach((el) => {
+    if (!el.textContent?.includes('&') || el.querySelector?.('.plain-amp')) return;
+    const family = getComputedStyle(el).fontFamily || '';
+    if (!family.toLowerCase().includes('playfair')) return;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) { const node = walker.currentNode; if (node.nodeValue?.includes('&')) nodes.push(node); }
+    nodes.forEach((node) => {
+      const parts = node.nodeValue.split('&'); const fragment = document.createDocumentFragment();
+      parts.forEach((part, index) => {
+        if (part) fragment.append(document.createTextNode(part));
+        if (index < parts.length - 1) { const amp = document.createElement('span'); amp.className='plain-amp'; amp.textContent='&'; fragment.append(amp); }
+      });
+      node.replaceWith(fragment);
+    });
+  });
+};
+normalizeDisplayAmpersands();
+const displayAmpObserver = new MutationObserver((mutations) => mutations.forEach((m) => {
+  if (m.type === 'characterData') normalizeDisplayAmpersands(m.target.parentElement);
+  m.addedNodes?.forEach((node) => { if (node.nodeType === 1) normalizeDisplayAmpersands(node); });
+}));
+displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
+
+// v2.8.2 — navigation self-heal: every page must expose the same Prototip & Parça Üretim tab.
+(() => {
+  const normalizePrototypeNav = () => {
+    const nav = document.querySelector('.main-nav');
+    if (!nav) return;
+    const links = [...nav.querySelectorAll('a[href]')];
+    let prototypeLink = links.find(a => (a.getAttribute('href') || '').includes('prototip-parca/'));
+    const nfcLink = links.find(a => (a.getAttribute('href') || '').includes('nfc-qr/'));
+    if (!prototypeLink && nfcLink) {
+      prototypeLink = document.createElement('a');
+      prototypeLink.href = (nfcLink.getAttribute('href') || '').replace('nfc-qr/', 'prototip-parca/');
+      nfcLink.insertAdjacentElement('afterend', prototypeLink);
+    }
+    if (!prototypeLink) return;
+    prototypeLink.textContent = 'Prototip & Parça Üretim';
+
+    // Active state is also repaired from the URL so static pages cannot drift visually.
+    const path = window.location.pathname.replace(/index\.html$/, '');
+    const routeMap = [
+      ['/urunler/', 'urunler/'],
+      ['/ozel-uretim/', 'ozel-uretim/'],
+      ['/kurumsal/', 'kurumsal/'],
+      ['/nfc-qr/', 'nfc-qr/'],
+      ['/prototip-parca/', 'prototip-parca/'],
+      ['/hakkimizda/', 'hakkimizda/'],
+      ['/iletisim/', 'iletisim/']
+    ];
+    const matched = routeMap.find(([route]) => path.includes(route));
+    if (matched) {
+      nav.querySelectorAll('a[aria-current="page"],a.is-active').forEach(a => {
+        a.removeAttribute('aria-current');
+        a.classList.remove('is-active');
+      });
+      const active = [...nav.querySelectorAll('a[href]')].find(a => (a.getAttribute('href') || '').includes(matched[1]));
+      if (active) {
+        active.setAttribute('aria-current', 'page');
+        active.classList.add('is-active');
+      }
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizePrototypeNav, { once:true });
+  else normalizePrototypeNav();
+})();
+
+
+// V3.1.92: 21st-inspired Spatial Product Showcase interaction polish.
+// Keeps Product Manager hero slots as the source while adding thumbnail controls,
+// timed progress, previous/next navigation and touch swipe without framework churn.
+(() => {
+  const initSpatialHero = () => {
+    const hero = document.querySelector('[data-spatial-hero]');
+    if (!hero || hero.dataset.spatialReady === '1') return;
+    const stage = hero.querySelector('[data-spatial-stage]');
+    const slides = [...hero.querySelectorAll('[data-spatial-slide]')];
+    const controls = [...hero.querySelectorAll('[data-spatial-control]')];
+    const status = hero.querySelector('[data-spatial-status]');
+    const counter = hero.querySelector('[data-spatial-counter]');
+    const category = hero.querySelector('[data-spatial-category]');
+    const name = hero.querySelector('[data-spatial-name]');
+    const description = hero.querySelector('[data-spatial-description]');
+    const price = hero.querySelector('[data-spatial-price]');
+    const productLink = hero.querySelector('[data-spatial-link]');
+    const productCopy = hero.querySelector('.home-spatial-product-copy');
+    const prevButton = hero.querySelector('[data-spatial-prev]');
+    const nextButton = hero.querySelector('[data-spatial-next]');
+    const liveRegion = hero.querySelector('[data-spatial-live]');
+    const dock = hero.querySelector('.home-spatial-dock');
+    if (!stage || !slides.length || !controls.length) return;
+
+    hero.dataset.spatialReady = '1';
+    const duration = 7200;
+    let activeIndex = 0;
+    let autoplayTimer = 0;
+    let paused = false;
+    let copyTimer = 0;
+    let suppressClickUntil = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+    const count = Math.min(slides.length, controls.length);
+
+    const updateCopy = control => {
+      if (!control) return;
+      if (copyTimer) window.clearTimeout(copyTimer);
+      if (productCopy && !reduceMotion) productCopy.classList.add('is-switching');
+      const apply = () => {
+        const selectedName = control.dataset.spatialName || 'BG Studio 3D';
+        if (category) category.textContent = control.dataset.spatialCategory || 'BG Studio 3D';
+        if (name) name.textContent = selectedName;
+        if (description) description.textContent = control.dataset.spatialDescription || '';
+        if (price) price.textContent = control.dataset.spatialPrice || 'Teklif al';
+        if (productLink) productLink.href = control.dataset.spatialHref || 'urunler/';
+        if (liveRegion) liveRegion.textContent = `Seçili ürün: ${selectedName}`;
+        productCopy?.classList.remove('is-switching');
+      };
+      if (reduceMotion) apply();
+      else copyTimer = window.setTimeout(apply, 135);
+    };
+
+    const stopAutoplay = () => {
+      if (autoplayTimer) window.clearTimeout(autoplayTimer);
+      autoplayTimer = 0;
+      hero.classList.remove('is-spatial-running');
+    };
+
+    const restartProgress = () => {
+      hero.classList.remove('is-spatial-running', 'is-spatial-paused');
+      if (reduceMotion || paused || count < 2) return;
+      // Force a fresh CSS animation timeline after every selection.
+      void hero.offsetWidth;
+      hero.classList.add('is-spatial-running');
+    };
+
+    const scheduleNext = () => {
+      stopAutoplay();
+      if (reduceMotion || paused || count < 2) return;
+      restartProgress();
+      autoplayTimer = window.setTimeout(() => {
+        setActive(activeIndex + 1, false, true);
+        scheduleNext();
+      }, duration);
+    };
+
+    const centerActiveControl = index => {
+      if (!dock || window.innerWidth > 760) return;
+      const control = controls[index];
+      if (!control) return;
+      control.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+    };
+
+    const setActive = (nextIndex, userInitiated = false, fromAutoplay = false) => {
+      if (!count) return;
+      const normalized = ((Number(nextIndex) || 0) % count + count) % count;
+      activeIndex = normalized;
+      hero.dataset.spatialVariant = String(normalized % 3);
+      slides.forEach((slide, index) => {
+        const active = index === normalized;
+        slide.classList.toggle('is-active', active);
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+        if (slide.matches('a,button,[tabindex]')) slide.tabIndex = active ? 0 : -1;
+      });
+      controls.forEach((control, index) => {
+        const active = index === normalized;
+        control.classList.toggle('is-active', active);
+        control.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      const label = `${String(normalized + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
+      if (status) status.textContent = label;
+      if (counter) counter.textContent = label;
+      updateCopy(controls[normalized]);
+      centerActiveControl(normalized);
+      if (userInitiated) scheduleNext();
+      else if (!fromAutoplay) restartProgress();
+    };
+
+    controls.forEach((control, index) => {
+      control.addEventListener('click', () => setActive(index, true));
+      control.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const delta = event.key === 'ArrowRight' ? 1 : -1;
+        const next = ((index + delta) % count + count) % count;
+        controls[next]?.focus();
+        setActive(next, true);
+      });
+    });
+
+    prevButton?.addEventListener('click', () => setActive(activeIndex - 1, true));
+    nextButton?.addEventListener('click', () => setActive(activeIndex + 1, true));
+
+    const setPaused = value => {
+      paused = Boolean(value);
+      if (paused) {
+        stopAutoplay();
+        hero.classList.add('is-spatial-paused');
+      } else {
+        hero.classList.remove('is-spatial-paused');
+        scheduleNext();
+      }
+    };
+    hero.addEventListener('mouseenter', () => setPaused(true));
+    hero.addEventListener('mouseleave', () => setPaused(false));
+    hero.addEventListener('focusin', () => setPaused(true));
+    hero.addEventListener('focusout', event => {
+      if (!hero.contains(event.relatedTarget)) setPaused(false);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) setPaused(true);
+      else setPaused(false);
+    });
+
+    // Mobile swipe. Vertical page scrolling remains untouched.
+    stage.addEventListener('touchstart', event => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+    stage.addEventListener('touchend', event => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) < 52 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
+      suppressClickUntil = Date.now() + 450;
+      setActive(activeIndex + (dx < 0 ? 1 : -1), true);
+    }, { passive: true });
+    stage.addEventListener('click', event => {
+      if (Date.now() >= suppressClickUntil) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
+
+    if (!reduceMotion && window.matchMedia?.('(hover:hover) and (pointer:fine)')?.matches) {
+      let raf = 0;
+      const updateTilt = event => {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const rect = stage.getBoundingClientRect();
+          const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left)) / Math.max(1, rect.width) - .5;
+          const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top)) / Math.max(1, rect.height) - .5;
+          stage.style.setProperty('--spatial-ry', `${(x * 4.2).toFixed(2)}deg`);
+          stage.style.setProperty('--spatial-rx', `${(-y * 3.4).toFixed(2)}deg`);
+        });
+      };
+      stage.addEventListener('pointermove', updateTilt, { passive: true });
+      stage.addEventListener('pointerleave', () => {
+        if (raf) cancelAnimationFrame(raf);
+        stage.style.setProperty('--spatial-ry', '0deg');
+        stage.style.setProperty('--spatial-rx', '0deg');
+      });
+    }
+
+    setActive(0);
+    scheduleNext();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSpatialHero, { once: true });
+  else initSpatialHero();
+})();
+
+
+// V3.1.95: 21st.dev Product Carousel-inspired homepage product rail.
+// Keeps Product Manager showcase slots as the source and adapts the horizontal
+// product-card navigation pattern to the existing vanilla site stack.
+(() => {
+  const initHomeProductCarousel = () => {
+    const viewport = document.querySelector('[data-product-carousel-viewport]');
+    const track = document.querySelector('[data-product-carousel-track]');
+    if (!viewport || !track || track.dataset.carouselReady === '1') return;
+    const cards = [...track.querySelectorAll('[data-product-carousel-card]')];
+    const prev = document.querySelector('[data-product-carousel-prev]');
+    const next = document.querySelector('[data-product-carousel-next]');
+    const status = document.querySelector('[data-product-carousel-status]');
+    if (!cards.length) return;
+
+    track.dataset.carouselReady = '1';
+    const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+    let activeIndex = 0;
+    let raf = 0;
+
+    const cardLeft = card => Math.max(0, card.offsetLeft - track.offsetLeft);
+    const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
+    const closestIndex = () => {
+      const x = track.scrollLeft;
+      let winner = 0;
+      let distance = Infinity;
+      cards.forEach((card, index) => {
+        const delta = Math.abs(cardLeft(card) - x);
+        if (delta < distance) {
+          distance = delta;
+          winner = index;
+        }
+      });
+      return winner;
+    };
+
+    const paint = () => {
+      raf = 0;
+      activeIndex = closestIndex();
+      const total = cards.length;
+      if (status) status.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      const start = track.scrollLeft <= 3;
+      const end = track.scrollLeft >= maxScroll() - 3;
+      if (prev) {
+        prev.disabled = start;
+        prev.setAttribute('aria-disabled', start ? 'true' : 'false');
+      }
+      if (next) {
+        next.disabled = end;
+        next.setAttribute('aria-disabled', end ? 'true' : 'false');
+      }
+      cards.forEach((card, index) => card.classList.toggle('is-carousel-current', index === activeIndex));
+    };
+
+    const schedulePaint = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(paint);
+    };
+
+    const goTo = index => {
+      const normalized = Math.max(0, Math.min(cards.length - 1, index));
+      const target = Math.min(maxScroll(), cardLeft(cards[normalized]));
+      track.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });
+      activeIndex = normalized;
+      window.setTimeout(paint, reduceMotion ? 0 : 260);
+    };
+
+    prev?.addEventListener('click', () => goTo(activeIndex - 1));
+    next?.addEventListener('click', () => goTo(activeIndex + 1));
+    track.addEventListener('scroll', schedulePaint, { passive: true });
+    track.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
+    });
+    window.addEventListener('resize', schedulePaint, { passive: true });
+
+    paint();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHomeProductCarousel, { once: true });
+  else initHomeProductCarousel();
+})();
