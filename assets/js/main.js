@@ -16,7 +16,7 @@
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
   const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.83';
+  const ASSET_VERSION = '3.1.90';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -1692,4 +1692,109 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizePrototypeNav, { once:true });
   else normalizePrototypeNav();
+})();
+
+
+// V3.1.90: homepage spatial product showcase.
+// Keeps the managed homepage product slots as the source of truth and adds
+// lightweight product switching, pointer depth and keyboard controls.
+(() => {
+  const initSpatialHero = () => {
+    const hero = document.querySelector('[data-spatial-hero]');
+    if (!hero || hero.dataset.spatialReady === '1') return;
+    const stage = hero.querySelector('[data-spatial-stage]');
+    const slides = [...hero.querySelectorAll('[data-spatial-slide]')];
+    const controls = [...hero.querySelectorAll('[data-spatial-control]')];
+    const status = hero.querySelector('[data-spatial-status]');
+    if (!stage || !slides.length || !controls.length) return;
+
+    hero.dataset.spatialReady = '1';
+    let activeIndex = 0;
+    let autoplayTimer = 0;
+    let paused = false;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+
+    const setActive = (nextIndex, userInitiated = false) => {
+      const count = Math.min(slides.length, controls.length);
+      if (!count) return;
+      const normalized = ((Number(nextIndex) || 0) % count + count) % count;
+      activeIndex = normalized;
+      slides.forEach((slide, index) => {
+        const active = index === normalized;
+        slide.classList.toggle('is-active', active);
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+        if (slide.matches('a,button,[tabindex]')) slide.tabIndex = active ? 0 : -1;
+      });
+      controls.forEach((control, index) => {
+        const active = index === normalized;
+        control.classList.toggle('is-active', active);
+        control.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      if (status) status.textContent = `${String(normalized + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
+      if (userInitiated) restartAutoplay();
+    };
+
+    const stopAutoplay = () => {
+      if (autoplayTimer) window.clearInterval(autoplayTimer);
+      autoplayTimer = 0;
+    };
+    const startAutoplay = () => {
+      stopAutoplay();
+      if (reduceMotion || paused || slides.length < 2) return;
+      autoplayTimer = window.setInterval(() => setActive(activeIndex + 1), 6500);
+    };
+    const restartAutoplay = () => startAutoplay();
+
+    controls.forEach((control, index) => {
+      control.addEventListener('click', () => setActive(index, true));
+      control.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const delta = event.key === 'ArrowRight' ? 1 : -1;
+        const next = ((index + delta) % controls.length + controls.length) % controls.length;
+        controls[next]?.focus();
+        setActive(next, true);
+      });
+    });
+
+    const setPaused = value => {
+      paused = Boolean(value);
+      if (paused) stopAutoplay(); else startAutoplay();
+    };
+    hero.addEventListener('mouseenter', () => setPaused(true));
+    hero.addEventListener('mouseleave', () => setPaused(false));
+    hero.addEventListener('focusin', () => setPaused(true));
+    hero.addEventListener('focusout', event => {
+      if (!hero.contains(event.relatedTarget)) setPaused(false);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopAutoplay(); else if (!paused) startAutoplay();
+    });
+
+    if (!reduceMotion && window.matchMedia?.('(hover:hover) and (pointer:fine)')?.matches) {
+      let raf = 0;
+      const updateTilt = event => {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const rect = stage.getBoundingClientRect();
+          const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left)) / Math.max(1, rect.width) - .5;
+          const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top)) / Math.max(1, rect.height) - .5;
+          stage.style.setProperty('--spatial-ry', `${(x * 3.2).toFixed(2)}deg`);
+          stage.style.setProperty('--spatial-rx', `${(-y * 2.6).toFixed(2)}deg`);
+        });
+      };
+      stage.addEventListener('pointermove', updateTilt, { passive: true });
+      stage.addEventListener('pointerleave', () => {
+        if (raf) cancelAnimationFrame(raf);
+        stage.style.setProperty('--spatial-ry', '0deg');
+        stage.style.setProperty('--spatial-rx', '0deg');
+      });
+    }
+
+    setActive(0);
+    startAutoplay();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSpatialHero, { once: true });
+  else initSpatialHero();
 })();
