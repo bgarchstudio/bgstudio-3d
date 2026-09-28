@@ -16,7 +16,7 @@
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
   const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.90';
+  const ASSET_VERSION = '3.1.92';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -1695,9 +1695,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.1.91: 21st-inspired Spatial Product Showcase adaptation.
-// Managed hero slots remain the data source. The UI mirrors the reference
-// composition with split visual/info panes, reactive tones and a floating dock.
+// V3.1.92: 21st-inspired Spatial Product Showcase interaction polish.
+// Keeps Product Manager hero slots as the source while adding thumbnail controls,
+// timed progress, previous/next navigation and touch swipe without framework churn.
 (() => {
   const initSpatialHero = () => {
     const hero = document.querySelector('[data-spatial-hero]');
@@ -1713,43 +1713,74 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     const price = hero.querySelector('[data-spatial-price]');
     const productLink = hero.querySelector('[data-spatial-link]');
     const productCopy = hero.querySelector('.home-spatial-product-copy');
+    const prevButton = hero.querySelector('[data-spatial-prev]');
+    const nextButton = hero.querySelector('[data-spatial-next]');
+    const liveRegion = hero.querySelector('[data-spatial-live]');
+    const dock = hero.querySelector('.home-spatial-dock');
     if (!stage || !slides.length || !controls.length) return;
 
     hero.dataset.spatialReady = '1';
+    const duration = 7200;
     let activeIndex = 0;
     let autoplayTimer = 0;
     let paused = false;
     let copyTimer = 0;
+    let suppressClickUntil = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
     const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+    const count = Math.min(slides.length, controls.length);
 
     const updateCopy = control => {
       if (!control) return;
       if (copyTimer) window.clearTimeout(copyTimer);
       if (productCopy && !reduceMotion) productCopy.classList.add('is-switching');
       const apply = () => {
+        const selectedName = control.dataset.spatialName || 'BG Studio 3D';
         if (category) category.textContent = control.dataset.spatialCategory || 'BG Studio 3D';
-        if (name) name.textContent = control.dataset.spatialName || 'BG Studio 3D';
+        if (name) name.textContent = selectedName;
         if (description) description.textContent = control.dataset.spatialDescription || '';
         if (price) price.textContent = control.dataset.spatialPrice || 'Teklif al';
         if (productLink) productLink.href = control.dataset.spatialHref || 'urunler/';
+        if (liveRegion) liveRegion.textContent = `Seçili ürün: ${selectedName}`;
         productCopy?.classList.remove('is-switching');
       };
-      if (reduceMotion) apply(); else copyTimer = window.setTimeout(apply, 135);
+      if (reduceMotion) apply();
+      else copyTimer = window.setTimeout(apply, 135);
     };
 
     const stopAutoplay = () => {
-      if (autoplayTimer) window.clearInterval(autoplayTimer);
+      if (autoplayTimer) window.clearTimeout(autoplayTimer);
       autoplayTimer = 0;
+      hero.classList.remove('is-spatial-running');
     };
-    const startAutoplay = () => {
-      stopAutoplay();
-      if (reduceMotion || paused || slides.length < 2) return;
-      autoplayTimer = window.setInterval(() => setActive(activeIndex + 1), 7200);
-    };
-    const restartAutoplay = () => startAutoplay();
 
-    const setActive = (nextIndex, userInitiated = false) => {
-      const count = Math.min(slides.length, controls.length);
+    const restartProgress = () => {
+      hero.classList.remove('is-spatial-running', 'is-spatial-paused');
+      if (reduceMotion || paused || count < 2) return;
+      // Force a fresh CSS animation timeline after every selection.
+      void hero.offsetWidth;
+      hero.classList.add('is-spatial-running');
+    };
+
+    const scheduleNext = () => {
+      stopAutoplay();
+      if (reduceMotion || paused || count < 2) return;
+      restartProgress();
+      autoplayTimer = window.setTimeout(() => {
+        setActive(activeIndex + 1, false, true);
+        scheduleNext();
+      }, duration);
+    };
+
+    const centerActiveControl = index => {
+      if (!dock || window.innerWidth > 760) return;
+      const control = controls[index];
+      if (!control) return;
+      control.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+    };
+
+    const setActive = (nextIndex, userInitiated = false, fromAutoplay = false) => {
       if (!count) return;
       const normalized = ((Number(nextIndex) || 0) % count + count) % count;
       activeIndex = normalized;
@@ -1769,7 +1800,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       if (status) status.textContent = label;
       if (counter) counter.textContent = label;
       updateCopy(controls[normalized]);
-      if (userInitiated) restartAutoplay();
+      centerActiveControl(normalized);
+      if (userInitiated) scheduleNext();
+      else if (!fromAutoplay) restartProgress();
     };
 
     controls.forEach((control, index) => {
@@ -1778,15 +1811,24 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
         if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
         event.preventDefault();
         const delta = event.key === 'ArrowRight' ? 1 : -1;
-        const next = ((index + delta) % controls.length + controls.length) % controls.length;
+        const next = ((index + delta) % count + count) % count;
         controls[next]?.focus();
         setActive(next, true);
       });
     });
 
+    prevButton?.addEventListener('click', () => setActive(activeIndex - 1, true));
+    nextButton?.addEventListener('click', () => setActive(activeIndex + 1, true));
+
     const setPaused = value => {
       paused = Boolean(value);
-      if (paused) stopAutoplay(); else startAutoplay();
+      if (paused) {
+        stopAutoplay();
+        hero.classList.add('is-spatial-paused');
+      } else {
+        hero.classList.remove('is-spatial-paused');
+        scheduleNext();
+      }
     };
     hero.addEventListener('mouseenter', () => setPaused(true));
     hero.addEventListener('mouseleave', () => setPaused(false));
@@ -1795,8 +1837,31 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       if (!hero.contains(event.relatedTarget)) setPaused(false);
     });
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopAutoplay(); else if (!paused) startAutoplay();
+      if (document.hidden) setPaused(true);
+      else setPaused(false);
     });
+
+    // Mobile swipe. Vertical page scrolling remains untouched.
+    stage.addEventListener('touchstart', event => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+    stage.addEventListener('touchend', event => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) < 52 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
+      suppressClickUntil = Date.now() + 450;
+      setActive(activeIndex + (dx < 0 ? 1 : -1), true);
+    }, { passive: true });
+    stage.addEventListener('click', event => {
+      if (Date.now() >= suppressClickUntil) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
 
     if (!reduceMotion && window.matchMedia?.('(hover:hover) and (pointer:fine)')?.matches) {
       let raf = 0;
@@ -1819,7 +1884,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     }
 
     setActive(0);
-    startAutoplay();
+    scheduleNext();
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSpatialHero, { once: true });

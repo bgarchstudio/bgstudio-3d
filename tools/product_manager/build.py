@@ -1017,13 +1017,18 @@ def render_home_spatial_product(product, index=0, eager=False):
 def render_home_spatial_control(product, index=0):
     copy = _home_spatial_product_copy(product, index)
     active_class = ' is-active' if index == 0 else ''
+    thumb_src = str((product or {}).get('main_image') or '').strip()
+    if thumb_src:
+        thumb = f'<span class="home-spatial-control-thumb"><img src="{esc(thumb_src)}" alt="" loading="lazy" decoding="async"/></span>'
+    else:
+        thumb = '<span class="home-spatial-control-thumb home-spatial-control-thumb-fallback">BG</span>'
     return (
         f'<button class="home-spatial-control{active_class}" type="button" data-spatial-control="{index}" '
         f'data-spatial-name="{esc(copy["name"])}" data-spatial-category="{esc(copy["category"])}" '
         f'data-spatial-price="{esc(copy["price"])}" data-spatial-description="{esc(copy["description"])}" '
         f'data-spatial-href="{esc(copy["href"])}" aria-pressed="{"true" if index == 0 else "false"}" '
         f'aria-label="{esc(copy["name"])} ürününü göster">'
-        f'<span>{index + 1:02d}</span><strong>{esc(copy["name"])}</strong>'
+        f'{thumb}<span class="home-spatial-control-copy"><small>{index + 1:02d}</small><strong>{esc(copy["name"])}</strong></span>'
         f'</button>'
     )
 
@@ -1053,6 +1058,10 @@ def render_homepage_v3163(active, featured, field_items):
         {render_home_spatial_product(hero_side_1, 1, eager=False)}
         {render_home_spatial_product(hero_side_2, 2, eager=False)}
       </div>
+      <div class="home-spatial-stage-controls" aria-label="Ürünler arasında geçiş">
+        <button type="button" data-spatial-prev aria-label="Önceki ürünü göster">←</button>
+        <button type="button" data-spatial-next aria-label="Sonraki ürünü göster">→</button>
+      </div>
       <div class="home-spatial-visual-status"><span class="home-spatial-dot"></span><b data-spatial-status-label>SEÇİLİ ÜRÜN</b><strong data-spatial-status>01 / 03</strong></div>
     </div>
 
@@ -1078,11 +1087,15 @@ def render_homepage_v3163(active, featured, field_items):
       <div class="hero-actions home-hero-actions-v3191"><a class="primary-cta" href="{esc(home_copy["hero_primary_url"])}">{esc(home_copy["hero_primary_label"])}</a><a class="secondary-cta" href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
     </div>
 
-    <div class="home-spatial-dock" role="group" aria-label="Öne çıkan ürün seçimi">
-      {render_home_spatial_control(hero_main, 0)}
-      {render_home_spatial_control(hero_side_1, 1)}
-      {render_home_spatial_control(hero_side_2, 2)}
+    <div class="home-spatial-dock-wrap">
+      <div class="home-spatial-progress" aria-hidden="true"><span data-spatial-progress></span></div>
+      <div class="home-spatial-dock" role="group" aria-label="Öne çıkan ürün seçimi">
+        {render_home_spatial_control(hero_main, 0)}
+        {render_home_spatial_control(hero_side_1, 1)}
+        {render_home_spatial_control(hero_side_2, 2)}
+      </div>
     </div>
+    <span class="sr-only" aria-live="polite" data-spatial-live>Seçili ürün: {esc(_home_spatial_product_copy(hero_main, 0)["name"])}</span>
   </div>
 </section>
 
@@ -1699,7 +1712,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.91'
+SITE_ASSET_VERSION = '3.1.92'
 
 
 def _relative_prefix_for_html(html_path):
