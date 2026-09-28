@@ -1943,8 +1943,8 @@ def render_product_page(p, related):
 
 
 
-# V3.3.02 · BG Assistant Knowledge Upgrade
-SITE_ASSET_VERSION = '3.3.02'
+# V3.3.03 · Premium AI Assistant UI
+SITE_ASSET_VERSION = '3.3.03'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2252,31 +2252,48 @@ def _bg_assistant_payload(prefix=''):
 
 def render_bg_assistant_widget(prefix=''):
     payload = json.dumps(_bg_assistant_payload(prefix), ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    logo_src = f'{prefix}assets/brand/bgstudio3d-monogram.webp'
     return f"""<!-- BGSTUDIO:ASSISTANT_START -->
-<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.02" aria-label="BG Assistant" aria-hidden="true" hidden>
+<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.03" aria-label="BG Studio 3D Assistant" aria-hidden="true" hidden>
   <header class="bg-assistant-head">
-    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>OpenAI destekli BG Studio danışmanı · Beta</small></div></div>
-    <button class="bg-assistant-close" data-bg-assistant-close type="button" aria-label="BG Assistant'ı kapat">×</button>
+    <div class="bg-assistant-identity">
+      <span class="bg-assistant-mark" aria-hidden="true"><img src="{logo_src}" alt="" decoding="async"></span>
+      <div class="bg-assistant-identity-copy">
+        <span class="bg-assistant-title-row"><strong>BG Studio 3D Assistant</strong><em>Beta</em></span>
+        <small><i aria-hidden="true"></i> OpenAI destekli ürün, üretim ve NFC danışmanı</small>
+      </div>
+    </div>
+    <button class="bg-assistant-close" data-bg-assistant-close type="button" aria-label="BG Assistant'ı kapat"><span aria-hidden="true">×</span></button>
   </header>
+
   <div class="bg-assistant-body">
     <div class="bg-assistant-messages" data-bg-assistant-messages aria-live="polite"></div>
+
     <div class="bg-assistant-quick" aria-label="Hızlı sorular">
-      <button type="button" data-bg-assistant-prompt="Bana uygun ürün bul">Ürün bul</button>
-      <button type="button" data-bg-assistant-prompt="NFC nedir, BG Studio sisteminde nasıl kullanılıyor?">NFC nedir?</button>
-      <button type="button" data-bg-assistant-prompt="Özel üretim nasıl çalışıyor">Özel üretim</button>
-      <button type="button" data-bg-assistant-prompt="Teklif almak istiyorum">Teklif</button>
+      <button type="button" data-bg-assistant-prompt="Bana uygun ürün bul"><span>Ürün bul</span></button>
+      <button type="button" data-bg-assistant-prompt="NFC nedir, BG Studio sisteminde nasıl kullanılıyor?"><span>NFC nedir?</span></button>
+      <button type="button" data-bg-assistant-prompt="Özel üretim nasıl çalışıyor"><span>Özel üretim</span></button>
+      <button type="button" data-bg-assistant-prompt="Teklif almak istiyorum"><span>Teklif</span></button>
     </div>
   </div>
+
   <footer class="bg-assistant-compose">
     <form data-bg-assistant-form>
       <label class="bg-assistant-input-wrap">
         <span class="bg-assistant-sr">BG Assistant'a mesaj yaz</span>
         <input data-bg-assistant-input type="text" maxlength="240" autocomplete="off" placeholder="Ürün, NFC, 3D baskı... her şeyi sor" />
       </label>
-      <button class="bg-assistant-send" type="submit" aria-label="Mesajı gönder">↑</button>
+      <button class="bg-assistant-send" type="submit" aria-label="Mesajı gönder">
+        <span aria-hidden="true">↑</span>
+      </button>
     </form>
-    <button class="bg-assistant-handoff" data-bg-assistant-whatsapp type="button">WhatsApp'a aktar <span aria-hidden="true">↗</span></button>
-    <small class="bg-assistant-note">BG Studio verilerini bilen OpenAI destekli danışman. Genel 3D baskı ve NFC sorularını da yanıtlar.</small>
+
+    <div class="bg-assistant-compose-meta">
+      <span>BG Studio verileri + OpenAI</span>
+      <button class="bg-assistant-handoff" data-bg-assistant-whatsapp type="button">
+        <span>WhatsApp'a aktar</span><b aria-hidden="true">↗</b>
+      </button>
+    </div>
   </footer>
 </aside>
 <script type="application/json" data-bg-assistant-data>{payload}</script>
@@ -2315,8 +2332,9 @@ def sync_bg_assistant_widget():
 
         trigger = (
             '<button class="bg-assistant-trigger" data-bg-assistant-trigger type="button" '
-            'aria-controls="bg-assistant-panel" aria-expanded="false" aria-label="BG Assistant aç">'
-            '<span aria-hidden="true">BG</span></button>'
+            'aria-controls="bg-assistant-panel" aria-expanded="false" aria-label="BG Studio 3D Assistant aç">'
+            f'<span class="bg-assistant-trigger-logo" aria-hidden="true"><img src="{prefix}assets/brand/bgstudio3d-monogram.webp" alt="" decoding="async"></span>'
+            '<span class="bg-assistant-trigger-glow" aria-hidden="true"></span></button>'
         )
         if floating_pattern.search(updated):
             updated = floating_pattern.sub(lambda m: m.group(1) + trigger, updated, count=1)
@@ -2408,7 +2426,7 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + quote_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', quote_tag + '</body>', 1)
-        if 'data-bg-assistant="v3.3.02"' in updated and 'assets/js/bg-assistant.js' not in updated:
+        if 'data-bg-assistant="v3.3.03"' in updated and 'assets/js/bg-assistant.js' not in updated:
             assistant_tag = f'<script defer="" src="{prefix}assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}"></script>'
             updated = updated.replace('</body>', assistant_tag + '</body>', 1)
         # V3.1.83: iOS safe-area viewport and non-blocking first-paint assets.
@@ -2842,7 +2860,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the current V3.3.02 public shell."""
+    """Fail loudly if a public page misses the current V3.3.03 public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -2864,7 +2882,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             '>Projeler</a>',
             '>BG Studio</button>',
             f'assets/js/navigation.js?v={SITE_ASSET_VERSION}',
-            'data-bg-assistant="v3.3.02"',
+            'data-bg-assistant="v3.3.03"',
             'data-bg-assistant-trigger',
             f'assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}',
         )
@@ -2901,7 +2919,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.3.02 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.03 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 

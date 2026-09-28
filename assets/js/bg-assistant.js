@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const panel = document.querySelector('[data-bg-assistant="v3.3.02"]');
+  const panel = document.querySelector('[data-bg-assistant="v3.3.03"]');
   const trigger = document.querySelector('[data-bg-assistant-trigger]');
   const dataNode = document.querySelector('[data-bg-assistant-data]');
   if (!panel || !trigger || !dataNode) return;
@@ -17,6 +17,7 @@
   const quickButtons = [...panel.querySelectorAll('[data-bg-assistant-prompt]')];
   const handoff = panel.querySelector('[data-bg-assistant-whatsapp]');
   const endpoint = window.BG_ASSISTANT_ENDPOINT || data.assistant_api?.endpoint || 'https://ai.bgstudio.com.tr/api/bg-assistant';
+  const brandLogo = document.querySelector('.bg-assistant-mark img')?.getAttribute('src') || 'assets/brand/bgstudio3d-monogram.webp';
   const state = { started: false, lastUser: '', busy: false, history: [] };
 
   const fold = value => String(value || '')
@@ -34,11 +35,32 @@
   const addMessage = (role, text, actions = [], extraClass = '') => {
     const row = document.createElement('div');
     row.className = `bg-assistant-message is-${role}${extraClass ? ` ${extraClass}` : ''}`;
+
+    if (role === 'assistant') {
+      const avatar = document.createElement('span');
+      avatar.className = 'bg-assistant-message-avatar';
+      const img = document.createElement('img');
+      img.src = brandLogo;
+      img.alt = '';
+      img.decoding = 'async';
+      avatar.appendChild(img);
+      row.appendChild(avatar);
+    }
+
     const bubble = document.createElement('div');
     bubble.className = 'bg-assistant-bubble';
-    const p = document.createElement('p');
-    p.textContent = text;
-    bubble.appendChild(p);
+
+    if (extraClass === 'is-pending') {
+      const dots = document.createElement('span');
+      dots.className = 'bg-assistant-typing';
+      dots.setAttribute('aria-label', text || 'Yanıt hazırlanıyor');
+      dots.innerHTML = '<i></i><i></i><i></i>';
+      bubble.appendChild(dots);
+    } else {
+      const p = document.createElement('p');
+      p.textContent = text;
+      bubble.appendChild(p);
+    }
 
     if (actions.length) {
       const actionWrap = document.createElement('div');
@@ -47,8 +69,16 @@
         if (!action?.href) return;
         const link = document.createElement('a');
         link.href = action.href;
-        link.textContent = action.label || 'İncele';
-        if (/^https?:\/\//i.test(action.href)) { link.target = '_blank'; link.rel = 'noopener'; }
+        const label = document.createElement('span');
+        label.textContent = action.label || 'İncele';
+        const arrow = document.createElement('b');
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '↗';
+        link.append(label, arrow);
+        if (/^https?:\/\//i.test(action.href)) {
+          link.target = '_blank';
+          link.rel = 'noopener';
+        }
         actionWrap.appendChild(link);
       });
       bubble.appendChild(actionWrap);
@@ -56,7 +86,7 @@
 
     row.appendChild(bubble);
     messages.appendChild(row);
-    messages.scrollTop = messages.scrollHeight;
+    messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
     return row;
   };
 
@@ -230,7 +260,7 @@
     const fallback = localResolve(clean);
     state.history.push({ role: 'user', content: clean });
     setBusy(true);
-    const pending = addMessage('assistant', 'Yanıt hazırlanıyor…', [], 'is-pending');
+    const pending = addMessage('assistant', 'Yanıt hazırlanıyor', [], 'is-pending');
     try {
       const aiText = await askOpenAI(clean);
       pending.remove();
