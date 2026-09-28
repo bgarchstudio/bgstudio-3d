@@ -2694,3 +2694,51 @@ body{min-height:100dvh;background:#fff}
     background:transparent;
   }
 }
+
+/* ==========================================================
+   V3.1.89 · MOBILE WHATSAPP TAP + LAYER HARDENING
+   ========================================================== */
+.floating-actions{
+  pointer-events:none;
+}
+.floating-actions > *{
+  pointer-events:auto;
+}
+.floating-whatsapp{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:pointer;
+}
+.wa-quick-panel{
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:1040px){
+  body:not(.nav-open) .floating-actions{
+    z-index:1105!important;
+  }
+  body:not(.nav-open) .wa-quick-panel{
+    z-index:1106!important;
+  }
+  body.nav-open .floating-actions{
+    opacity:0!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+  .floating-whatsapp{
+    pointer-events:auto!important;
+  }
+  .wa-quick-panel{
+    max-height:calc(100dvh - max(96px,calc(78px + env(safe-area-inset-top))) - max(18px,env(safe-area-inset-bottom)));
+    overflow:auto;
+  }
+}
+@supports(height:100svh){
+  @media(max-width:1040px){
+    .wa-quick-panel{
+      max-height:calc(100svh - max(96px,calc(78px + env(safe-area-inset-top))) - max(18px,env(safe-area-inset-bottom)));
+    }
+  }
+}

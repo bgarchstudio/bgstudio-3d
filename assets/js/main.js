@@ -15,8 +15,8 @@
 // their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
-  const HEADER_VERSION = 'v3.1.84';
-  const ASSET_VERSION = '3.1.84';
+  const HEADER_VERSION = 'v3.1.83';
+  const ASSET_VERSION = '3.1.83';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -468,81 +468,38 @@ document.addEventListener('click', (event) => {
 });
 
 // Mobile navigation
-// V3.1.84: the drawer is portalled to <body> while open. This keeps it tied to
-// the viewport instead of the sticky header's document position when the page
-// has already been scrolled. It also avoids iOS Safari losing the drawer above
-// the visible viewport after body scroll-lock is applied.
-let mobileNavPortalMarker = null;
-let mobileNavPortalParent = null;
-let mobileNavPortalNext = null;
-
-const mountMobileNavPortal = () => {
-  if (!nav || nav.parentElement === document.body) return;
-  mobileNavPortalParent = nav.parentNode;
-  mobileNavPortalNext = nav.nextSibling;
-  mobileNavPortalMarker = document.createComment('bgstudio-mobile-nav-home');
-  mobileNavPortalParent.insertBefore(mobileNavPortalMarker, nav);
-  document.body.appendChild(nav);
-  nav.classList.add('mobile-viewport-menu');
-};
-
-const restoreMobileNavPortal = () => {
-  if (!nav || !mobileNavPortalParent) return;
-  if (mobileNavPortalMarker?.parentNode) {
-    mobileNavPortalMarker.parentNode.insertBefore(nav, mobileNavPortalMarker);
-    mobileNavPortalMarker.remove();
-  } else if (mobileNavPortalNext?.parentNode === mobileNavPortalParent) {
-    mobileNavPortalParent.insertBefore(nav, mobileNavPortalNext);
-  } else {
-    mobileNavPortalParent.appendChild(nav);
-  }
-  nav.classList.remove('mobile-viewport-menu');
-  mobileNavPortalMarker = null;
-  mobileNavPortalParent = null;
-  mobileNavPortalNext = null;
-};
-
 const syncMobileNavGeometry = () => {
   const header = document.querySelector('.site-header');
   if (!header) return;
   const rect = header.getBoundingClientRect();
-  const viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 0;
-  const bottom = Math.max(0, Math.min(viewportHeight || rect.bottom, rect.bottom));
+  const bottom = Math.max(0, Math.min(window.innerHeight || rect.bottom, rect.bottom));
   document.documentElement.style.setProperty('--mobile-header-bottom', `${Math.round(bottom)}px`);
 };
 
 let mobileNavScrollY = 0;
 const setMenuState = (open) => {
   if (!nav || !menuButton) return;
-  const isMobile = window.matchMedia('(max-width: 1040px)').matches;
-  if (open && isMobile) {
-    mobileNavScrollY = window.scrollY || window.pageYOffset || 0;
+  if (open) {
     syncMobileNavGeometry();
-    mountMobileNavPortal();
+    mobileNavScrollY = window.scrollY || 0;
   }
-
   nav.classList.toggle('open', open);
   menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
   menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
   document.body.classList.toggle('nav-open', open);
-  document.documentElement.classList.toggle('nav-open', open);
-
-  if (open && isMobile) {
-    // Keep the page at its current position while the viewport-fixed drawer is open.
+  if (open && window.matchMedia('(max-width: 1040px)').matches) {
     document.body.style.position = 'fixed';
     document.body.style.top = `-${mobileNavScrollY}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
     document.body.style.width = '100%';
-  } else if (!open) {
-    const wasLocked = document.body.style.position === 'fixed';
+  } else if (!open && document.body.style.position === 'fixed') {
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
-    restoreMobileNavPortal();
-    if (wasLocked) window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
+    window.scrollTo({ top: mobileNavScrollY, left: 0, behavior: 'auto' });
   }
 };
 
@@ -567,9 +524,6 @@ window.addEventListener('resize', () => {
   if (nav?.classList.contains('open')) syncMobileNavGeometry();
 }, { passive: true });
 window.visualViewport?.addEventListener('resize', () => {
-  if (nav?.classList.contains('open')) syncMobileNavGeometry();
-}, { passive: true });
-window.visualViewport?.addEventListener('scroll', () => {
   if (nav?.classList.contains('open')) syncMobileNavGeometry();
 }, { passive: true });
 
@@ -1619,8 +1573,9 @@ if (floatingWhatsApp) {
   try { if (sessionStorage.getItem(seenKey)) floatingWhatsApp.classList.add('wa-seen'); } catch (_) {}
   floatingWhatsApp.title = 'WhatsApp ile hızlı iletişim';
   const setPanel = (open) => {
-    panel.hidden = !open;
-    panel.inert = !open;
+    panel.toggleAttribute('hidden', !open);
+    if ('inert' in panel) panel.inert = !open;
+    else panel.toggleAttribute('inert', !open);
     panel.classList.toggle('open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     floatingWhatsApp.classList.toggle('is-open', open);
@@ -1629,14 +1584,29 @@ if (floatingWhatsApp) {
       floatingWhatsApp.classList.add('wa-seen');
       try { sessionStorage.setItem(seenKey, '1'); } catch (_) {}
       trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
+      requestAnimationFrame(() => panel.scrollTo?.({ top: 0, behavior: 'auto' }));
     }
   };
   floatingWhatsApp.setAttribute('aria-haspopup', 'dialog');
   floatingWhatsApp.setAttribute('aria-expanded', 'false');
+
+  // V3.1.89: Mobile Safari/Chrome tap hardening. Some fixed-layer stacks can
+  // suppress or delay the synthetic click after touchend. Toggle on touchend
+  // and ignore the follow-up click so one tap always equals one action.
+  let lastTouchToggleAt = 0;
+  const toggleWhatsAppPanel = () => setPanel(!panel.classList.contains('open'));
+  floatingWhatsApp.addEventListener('touchend', event => {
+    if (event.changedTouches && event.changedTouches.length > 1) return;
+    lastTouchToggleAt = Date.now();
+    event.preventDefault();
+    event.stopPropagation();
+    toggleWhatsAppPanel();
+  }, { passive: false });
   floatingWhatsApp.addEventListener('click', event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey) return;
     event.preventDefault();
-    setPanel(!panel.classList.contains('open'));
+    if (Date.now() - lastTouchToggleAt < 700) return;
+    toggleWhatsAppPanel();
   });
   closeButton.addEventListener('click', () => { setPanel(false); floatingWhatsApp.focus(); });
   document.addEventListener('click', event => {
