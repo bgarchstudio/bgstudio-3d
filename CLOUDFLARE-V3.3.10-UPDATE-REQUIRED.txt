@@ -1,0 +1,3 @@
+V3.3.10 için Cloudflare Worker güncellemesi gereklidir.
+cloudflare/bg-assistant-worker.js dosyasının tamamını Worker editörüne yapıştırıp Deploy edin.
+OPENAI_API_KEY, OPENAI_MODEL ve ALLOWED_ORIGINS değişkenlerine dokunmayın.

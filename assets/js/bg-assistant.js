@@ -18,7 +18,7 @@
   const handoff = panel.querySelector('[data-bg-assistant-whatsapp]');
   const endpoint = window.BG_ASSISTANT_ENDPOINT || data.assistant_api?.endpoint || 'https://ai.bgstudio.com.tr/api/bg-assistant';
   const brandLogo = document.querySelector('.bg-assistant-mark img')?.getAttribute('src') || 'assets/brand/bgstudio3d-monogram.webp';
-  const state = { started: false, lastUser: '', busy: false, history: [] };
+  const state = { started: false, lastUser: '', lastAssistant: '', busy: false, history: [] };
 
   const fold = value => String(value || '')
     .toLocaleLowerCase('tr-TR')
@@ -118,6 +118,33 @@
     .filter(item => item.score >= 3).sort((a,b) => b.score - a.score).slice(0,3).map(item => item.product);
   const productActions = products => products.map(product => makeAction(`${product.name} · ${product.price}`, product.href));
 
+  const domainWords = [
+    'nfc','qr','restoran','masa','feedback','google yorum','dijital menü','dijital menu',
+    'ürün','urun','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor',
+    'özel üretim','ozel uretim','prototip','parça','parca','kurumsal','toptan','logolu',
+    'mimarlık','mimarlik','architecture','kargo','teslim','berkant','bg studio'
+  ];
+
+  const effectiveQuery = (query, history = []) => {
+    const clean = String(query || '').trim();
+    if (!clean) return '';
+    if (hasAny(clean, domainWords)) return clean;
+    const userTurns = (history || []).filter(item => item?.role === 'user').slice(-2);
+    if (!userTurns.length) return clean;
+    const prior = userTurns.map(item => item.content).filter(Boolean).join(' · ');
+    return `${prior} · ${clean}`;
+  };
+
+  const answerProductMatches = text => {
+    const normalized = fold(text);
+    return (data.products || [])
+      .filter(product => {
+        const name = fold(product?.name || '');
+        return name && normalized.includes(name);
+      })
+      .slice(0, 3);
+  };
+
   const formatTl = value => {
     const number = Number(value);
     if (!Number.isFinite(number)) return String(value || '').trim();
@@ -145,55 +172,64 @@
     }) || null;
   };
 
-  const contextualActions = query => {
+  const contextualActions = (query, intent = '', history = [], answerText = '') => {
     const links = data.links || {};
+    const effective = effectiveQuery(query, history);
     const current = currentProduct();
-    const matches = productMatches(query);
+    const currentIntent = String(intent || '').toLowerCase();
+    const asksTransaction = hasAny(effective, [
+      'fiyat','fiyatı','fiyati','kaç tl','kac tl','ne kadar','kaça','kaca','teklif','satın','satin',
+      'sipariş','siparis','paket','masa','adet'
+    ]);
 
-    if (hasAny(query, ['berkant gökbel','berkant gokbel','kurucu kim','sahibi kim','bg studio sahibi','bg studio kurucusu','bgstudio sahibi','bgstudio kurucusu'])) {
+    if (currentIntent === 'founder' || hasAny(effective, ['berkant gökbel','berkant gokbel','kurucu kim','sahibi kim','bg studio sahibi','bg studio kurucusu'])) {
       return [
-        makeAction('BG Studio Architecture', links.architecture),
-        makeAction('BG Studio 3D', links.products)
+        makeAction('BG Studio hakkında', links.about || links.contact),
+        makeAction('BG Studio Architecture', links.architecture)
       ];
     }
 
-    if (isNfcIntent(query)) {
-      return [
-        makeAction('NFC + QR sistemleri', links.nfc),
-        makeAction('NFC teklifi al', `${links.quote}?tur=nfc`)
-      ];
+    if (currentIntent === 'nfc' || isNfcIntent(effective)) {
+      const actions = [makeAction('NFC + QR sistemleri', links.nfc)];
+      if (asksTransaction) actions.push(makeAction('NFC teklifi al', `${links.quote}?tur=nfc`));
+      return actions;
     }
 
-    if (hasAny(query, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','bana özel','bana ozel','model yaptır','tasarım yaptır'])) {
+    if (currentIntent === 'custom' || hasAny(effective, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','model yaptır','tasarım yaptır'])) {
       return [
         makeAction('Özel üretim', links.custom),
         makeAction('Teklif oluştur', `${links.quote}?tur=ozel-uretim`)
       ];
     }
 
-    if (hasAny(query, ['prototip','parça','parca','yedek','ölçülü','olculu','teknik model'])) {
+    if (currentIntent === 'prototype' || hasAny(effective, ['prototip','parça','parca','yedek','ölçülü','olculu','teknik model'])) {
       return [
         makeAction('Prototip & Parça', links.prototype),
         makeAction('Teklif oluştur', `${links.quote}?tur=prototip`)
       ];
     }
 
-    if (hasAny(query, ['kurumsal','toptan','logolu','adetli üretim','adetli uretim'])) {
+    if (currentIntent === 'corporate' || hasAny(effective, ['kurumsal','toptan','logolu','adetli üretim','adetli uretim'])) {
       return [
         makeAction('Kurumsal üretim', links.corporate),
         makeAction('Sahadan projeler', links.projects)
       ];
     }
 
-    if (current && hasAny(query, ['bu ürün','bu urun','bunun','şu ürün','su urun','fiyat','kaç tl','kac tl'])) {
-      return [
-        makeAction('Ürün sayfası', current.href),
-        makeAction('WhatsApp', links.whatsapp)
-      ];
+    if (currentIntent === 'architecture' || hasAny(effective, ['mimarlık','mimarlik','architecture','render','mimari'])) {
+      return [makeAction('BG Studio Architecture', links.architecture)];
     }
 
-    if (hasAny(query, ['ürün','urun','bul','arıyorum','ariyorum','öner','oner','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor']) && matches.length) {
-      return productActions(matches);
+    if (currentIntent === 'delivery' || hasAny(effective, ['kargo','teslim','elden','kuşadası','kusadasi'])) {
+      return [makeAction('İletişim', links.contact)];
+    }
+
+    if (currentIntent === 'product' || hasAny(effective, ['ürün','urun','bul','arıyorum','ariyorum','öner','oner','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor'])) {
+      const mentioned = answerProductMatches(answerText);
+      const matches = mentioned.length ? mentioned : productMatches(effective);
+      if (matches.length) return productActions(matches);
+      if (current) return [makeAction('Ürün sayfası', current.href)];
+      return [makeAction('Ürünleri gör', links.products)];
     }
 
     return [];
@@ -202,16 +238,20 @@
   const cleanAssistantText = text => String(text || '')
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/__(.*?)__/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
     .replace(/^\s*[-*]\s+/gm, '• ')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 
   // Deterministic site links remain available even when OpenAI is unavailable.
-  const localResolve = query => {
+  const localResolve = (query, history = []) => {
     const links = data.links || {};
+    const effective = effectiveQuery(query, history);
     const current = currentProduct();
-    const matches = productMatches(query);
-    const asksPrice = hasAny(query, ['fiyat','kaç tl','kac tl','kaç para','kac para','ücret','ucret']);
-    const refersCurrent = hasAny(query, ['bu ürün','bu urun','bunun','şu ürün','su urun']);
+    const matches = productMatches(effective);
+    const asksPrice = hasAny(effective, ['fiyat','fiyatı','fiyati','kaç tl','kac tl','kaç para','kac para','ücret','ucret','ne kadar','kaça','kaca']);
+    const refersCurrent = hasAny(effective, ['bu ürün','bu urun','bunun','şu ürün','su urun']);
 
     if (hasAny(query, ['merhaba','selam','selamlar','hey','sa','günaydın','gunaydin','iyi akşamlar','iyi aksamlar','naber'])) {
       return { text: 'Merhaba 👋 Buradayım. Ürün, NFC + QR, 3D baskı, malzeme, özel üretim, prototip, kurumsal üretim veya teklif hakkında sorabilirsin.', actions: [] };
@@ -238,20 +278,20 @@
     if (hasAny(query, ['pla petg','petg pla','pla nedir','petg nedir','malzeme fark'])) {
       return { text: 'PLA genelde kolay baskı ve iyi yüzey kalitesiyle öne çıkar. PETG ise kullanım senaryosuna göre daha yüksek dayanım ve neme karşı avantaj sağlayabilir. Belirli ürün için ürün kaydındaki malzemeyi esas alırım.', actions: [makeAction('Ürünleri incele', links.products)] };
     }
-    if (isNfcIntent(query)) {
-      const pkg = nfcPackageMatch(query);
+    if (isNfcIntent(effective)) {
+      const pkg = nfcPackageMatch(effective);
       if (pkg && asksPrice) {
         const capacity = pkg.tables ? ` ${pkg.tables} masa` : '';
         const nfcCount = pkg.total_nfc ? ` ve ${pkg.total_nfc} NFC` : '';
         const renewal = pkg.renewal ? ` Yıllık yenileme ${formatTl(pkg.renewal)}.` : '';
         return {
           text: `${data.nfc?.year || '2026'} ${pkg.name} paketinin başlangıç fiyatı ${formatTl(pkg.price)}.${capacity ? ` Paket ${capacity}${nfcCount} kapasitesini kapsar.` : ''}${renewal}`,
-          actions: contextualActions(query)
+          actions: contextualActions(query, 'nfc', history)
         };
       }
       return {
         text: data.nfc?.system_summary || 'BG Studio NFC + QR sistemi menü, feedback, sosyal yönlendirmeler ve işletme analitiğini tek yapıda toplar.',
-        actions: contextualActions(query)
+        actions: contextualActions(query, 'nfc', history)
       };
     }
     if (current && (refersCurrent || (asksPrice && matches.length === 0))) {
@@ -312,10 +352,10 @@
     production_status: product.production_status || ''
   }));
 
-  const askOpenAI = async message => {
+  const askOpenAI = async (message, priorHistory = []) => {
     const payload = {
       message,
-      history: state.history.slice(-8),
+      history: priorHistory.slice(-12),
       page: { path: window.location.pathname, title: document.title },
       context: {
         business: data.business || {},
@@ -340,7 +380,7 @@
       });
       const json = await response.json().catch(() => ({}));
       if (!response.ok || !json?.text) throw new Error(json?.error || `HTTP ${response.status}`);
-      return String(json.text).trim();
+      return { text: String(json.text).trim(), intent: String(json.intent || '').trim() };
     } finally {
       window.clearTimeout(timer);
     }
@@ -365,25 +405,31 @@
   const submitQuery = async query => {
     const clean = String(query || '').trim().slice(0, 600);
     if (!clean || state.busy) return;
+
+    const priorHistory = state.history.slice(-12);
     state.lastUser = clean;
     addMessage('user', clean);
-    const fallback = localResolve(clean);
+    const fallback = localResolve(clean, priorHistory);
     state.history.push({ role: 'user', content: clean });
+
     setBusy(true);
     const pending = addMessage('assistant', 'Yanıt hazırlanıyor', [], 'is-pending');
     try {
-      const aiText = cleanAssistantText(await askOpenAI(clean));
-      const actions = contextualActions(clean);
+      const result = await askOpenAI(clean, priorHistory);
+      const aiText = cleanAssistantText(result.text);
+      const actions = contextualActions(clean, result.intent, priorHistory, aiText);
       pending.remove();
       addMessage('assistant', aiText, actions);
+      state.lastAssistant = aiText;
       state.history.push({ role: 'assistant', content: aiText });
     } catch (error) {
       console.warn('[BG Assistant] OpenAI endpoint unavailable, local fallback used.', error);
       pending.remove();
       addMessage('assistant', fallback.text, fallback.actions || []);
+      state.lastAssistant = fallback.text;
       state.history.push({ role: 'assistant', content: fallback.text });
     } finally {
-      state.history = state.history.slice(-10);
+      state.history = state.history.slice(-14);
       setBusy(false);
       window.setTimeout(() => input?.focus({ preventScroll: true }), 30);
     }
@@ -399,8 +445,15 @@
   });
   quickButtons.forEach(button => button.addEventListener('click', () => submitQuery(button.dataset.bgAssistantPrompt || button.textContent)));
   handoff?.addEventListener('click', () => {
-    const topic = state.lastUser || 'BG Studio 3D ürün ve hizmetleri hakkında bilgi almak istiyorum.';
-    const message = `Merhaba BG Studio 3D, sitedeki BG Assistant üzerinden şu konuda bilgi aldım: ${topic}`;
+    const recentUsers = state.history
+      .filter(item => item?.role === 'user')
+      .slice(-2)
+      .map(item => item.content)
+      .filter(Boolean);
+    const topic = recentUsers.join(' / ') || state.lastUser || 'BG Studio 3D ürün ve hizmetleri hakkında bilgi almak istiyorum.';
+    const answer = String(state.lastAssistant || '').replace(/\s+/g, ' ').slice(0, 260);
+    const summary = answer ? `\nBG Assistant son yanıtı: ${answer}` : '';
+    const message = `Merhaba BG Studio 3D, BG Assistant üzerinden şu konuyu görüşüyordum: ${topic}${summary}`;
     window.open(`https://wa.me/905302466903?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
   });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) closePanel(); });
