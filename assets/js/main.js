@@ -1695,9 +1695,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.2.02-R1: Spatial hero isolated autoplay and mobile scroll stability.
-// Autoplay only runs while the hero is actually visible. Dock centering is local
-// to the horizontal control strip, so a timed slide change can never move the page.
+// V3.3.09: Spatial hero autoplay follows viewport visibility only.
+// Hover/focus/dock interaction no longer freezes the countdown. Autoplay pauses
+// only when the hero fully leaves the viewport or the browser tab is hidden.
 (() => {
   const initSpatialHero = () => {
     const hero = document.querySelector('[data-spatial-hero]');
@@ -1725,8 +1725,6 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     let activeIndex = 0;
     let autoplayTimer = 0;
     let progressAnimation = null;
-    let pointerPaused = false;
-    let focusPaused = false;
     let dockInteracting = false;
     let dockInteractTimer = 0;
     let dockScrollFrame = 0;
@@ -1760,7 +1758,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       else copyTimer = window.setTimeout(apply, 110);
     };
 
-    const canAutoplay = () => !reduceMotion && !pointerPaused && !focusPaused && !dockInteracting && !pageHidden && heroVisible && count > 1;
+    const canAutoplay = () => !reduceMotion && !pageHidden && heroVisible && count > 1;
 
     const stopProgress = () => {
       if (progressAnimation) {
@@ -1816,13 +1814,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     const setDockInteracting = value => {
       dockInteracting = Boolean(value);
       if (dockInteractTimer) window.clearTimeout(dockInteractTimer);
-      if (dockInteracting) {
-        syncAutoplay();
-        return;
-      }
+      if (!dockInteracting) return;
       dockInteractTimer = window.setTimeout(() => {
         dockInteracting = false;
-        syncAutoplay();
       }, 160);
     };
 
@@ -1900,15 +1894,6 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     prevButton?.addEventListener('click', () => setActive(activeIndex - 1, true));
     nextButton?.addEventListener('click', () => setActive(activeIndex + 1, true));
 
-    hero.addEventListener('mouseenter', () => { pointerPaused = true; syncAutoplay(); });
-    hero.addEventListener('mouseleave', () => { pointerPaused = false; syncAutoplay(); });
-    hero.addEventListener('focusin', () => { focusPaused = true; syncAutoplay(); });
-    hero.addEventListener('focusout', event => {
-      if (!hero.contains(event.relatedTarget)) {
-        focusPaused = false;
-        syncAutoplay();
-      }
-    });
     document.addEventListener('visibilitychange', () => {
       pageHidden = document.hidden;
       syncAutoplay();
@@ -1917,11 +1902,11 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
         const entry = entries[0];
-        const nextVisible = Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.12);
+        const nextVisible = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0);
         if (nextVisible === heroVisible) return;
         heroVisible = nextVisible;
         syncAutoplay();
-      }, { threshold: [0, 0.12, 0.35] });
+      }, { threshold: [0, 0.001] });
       observer.observe(hero);
     }
 
