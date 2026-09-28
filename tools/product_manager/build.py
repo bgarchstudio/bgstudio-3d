@@ -1943,7 +1943,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.2.03'
+SITE_ASSET_VERSION = '3.2.03-R1'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2040,7 +2040,7 @@ def ensure_404_root_base():
 
 
 def sync_site_header_navigation():
-    """Give every public page one canonical V3.1.72 header without touching page data."""
+    """Give every public page one canonical V3.2.03 Rich Navigation header without touching page data."""
     header_pattern = re.compile(r'<header\b[^>]*class="[^"]*\bsite-header\b[^"]*"[^>]*>.*?</header>', flags=re.I | re.S)
     scanned = 0
     changed = 0
@@ -2573,7 +2573,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the V3.1.72 public shell."""
+    """Fail loudly if a public page misses the current V3.2.03 Rich Navigation public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -2589,7 +2589,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
         checked += 1
         rel = html_path.relative_to(ROOT).as_posix()
         required = (
-            'data-bg-nav="v3.1.72"',
+            'data-bg-nav="v3.2.03"',
             '>Üretim</button>',
             '>İşletmeler</button>',
             '>Projeler</a>',
@@ -2629,7 +2629,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.1.72 public shell doğrulaması başarısız. Eski navigasyon kalan sayfalar var: ' + sample)
+        raise RuntimeError('V3.2.03 public shell doğrulaması başarısız. Güncel Rich Navigation uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -3897,7 +3897,7 @@ def build_site(nfc_family_theme_overrides=None):
     # V3.1.78: 404 is served at the originally requested nested URL, so
     # relative assets need a root base before global header/footer rewrites.
     error_page_sync = ensure_404_root_base()
-    # V3.1.72: canonical navigation, footer, SEO, accessibility and performance pass.
+    # V3.2.03-R1: canonical Rich Navigation, footer, SEO, accessibility and performance pass.
     nav_sync = sync_site_header_navigation()
     footer_sync = sync_global_footer()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
