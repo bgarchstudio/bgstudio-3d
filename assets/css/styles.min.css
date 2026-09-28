@@ -3162,8 +3162,8 @@ body{min-height:100dvh;background:#fff}
 .home-client-marquee-group-v3199r1{display:flex;align-items:stretch;gap:12px;padding-right:12px;flex:0 0 auto}
 .home-client-card-v3199r1{display:grid;grid-template-columns:54px minmax(170px,1fr) 24px;align-items:center;gap:14px;width:clamp(270px,24vw,360px);min-height:88px;padding:13px 15px;border:1px solid #e2dfda;border-radius:20px;background:rgba(255,255,255,.9);color:#1d1916;text-decoration:none;box-shadow:0 14px 34px rgba(39,28,18,.035);transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}
 .home-client-card-v3199r1:hover{transform:translateY(-3px);border-color:#cfc8bf;box-shadow:0 18px 40px rgba(39,28,18,.07)}
-.home-client-mark-v3199r1{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;overflow:hidden;background:#efece6;color:#5f574e;font-size:.68rem;font-weight:800;letter-spacing:.04em}
-.home-client-mark-v3199r1 img{width:100%;height:100%;object-fit:cover}
+.home-client-mark-v3199r1{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;overflow:hidden;padding:4px;background:#fff;color:#5f574e;font-size:.68rem;font-weight:800;letter-spacing:.04em;border:1px solid rgba(31,23,17,.09);box-sizing:border-box}
+.home-client-mark-v3199r1 img{width:100%;height:100%;object-fit:contain;border-radius:50%;display:block}
 .home-client-mark-fallback-v3199r1{border:1px solid rgba(31,23,17,.08);font-family:"DM Sans",sans-serif}
 .home-client-copy-v3199r1{display:grid;gap:3px;min-width:0}
 .home-client-copy-v3199r1 small{font-size:.54rem;font-weight:800;letter-spacing:.12em;color:#9a6830}
@@ -3176,7 +3176,7 @@ body{min-height:100dvh;background:#fff}
 .home-client-marquee-v3199r1:hover .home-client-marquee-track-v3199r1,.home-client-marquee-v3199r1:focus-within .home-client-marquee-track-v3199r1{animation-play-state:paused}
 @keyframes home-client-marquee-v3199r1{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 @media(max-width:900px){.home-clients-head-v3199r1{grid-template-columns:1fr;align-items:start}.home-clients-head-v3199r1>p{max-width:620px}.home-client-card-v3199r1{width:min(72vw,340px)}}
-@media(max-width:640px){.home-clients-v3199r1{padding-left:0;padding-right:0}.home-clients-head-v3199r1{padding-left:20px;padding-right:20px}.home-clients-head-v3199r1 h2{font-size:clamp(2.35rem,12vw,3.8rem)}.home-client-marquee-group-v3199r1{gap:10px;padding-right:10px}.home-client-card-v3199r1{width:78vw;grid-template-columns:48px minmax(0,1fr) 22px;min-height:78px;padding:11px 12px;border-radius:17px}.home-client-mark-v3199r1{width:48px;height:48px;border-radius:14px}.home-client-fade-v3199r1{width:24px}}
+@media(max-width:640px){.home-clients-v3199r1{padding-left:0;padding-right:0}.home-clients-head-v3199r1{padding-left:20px;padding-right:20px}.home-clients-head-v3199r1 h2{font-size:clamp(2.35rem,12vw,3.8rem)}.home-client-marquee-group-v3199r1{gap:10px;padding-right:10px}.home-client-card-v3199r1{width:78vw;grid-template-columns:48px minmax(0,1fr) 22px;min-height:78px;padding:11px 12px;border-radius:17px}.home-client-mark-v3199r1{width:48px;height:48px;border-radius:50%;padding:4px}.home-client-fade-v3199r1{width:24px}}
 @media(prefers-reduced-motion:reduce){.home-client-marquee-v3199r1{overflow-x:auto;scrollbar-width:none}.home-client-marquee-v3199r1::-webkit-scrollbar{display:none}.home-client-marquee-track-v3199r1{animation:none}.home-client-marquee-group-v3199r1[aria-hidden="true"]{display:none}.home-client-card-v3199r1{transition:none}}
 
 /* V3.2.00 · page carousel + contextual reference rails + How It Works */
@@ -3575,3 +3575,71 @@ body{min-height:100dvh;background:#fff}
    ========================================================== */
 @media(max-width:900px){.footer-v3202-wordmark{grid-template-columns:minmax(0,1fr) auto;gap:12px}.footer-v3202-wordmark span{font-size:clamp(3.2rem,11vw,8rem)}.footer-v3202-wordmark strong{font-size:clamp(2rem,6.4vw,4.6rem)}}
 @media(max-width:480px){.footer-v3202-wordmark{grid-template-columns:1fr;gap:4px;white-space:normal}.footer-v3202-wordmark span{font-size:clamp(2.55rem,14vw,4.4rem)}.footer-v3202-wordmark strong{justify-self:start;font-size:clamp(1.6rem,8vw,2.5rem)}}
+
+
+/* ==========================================================
+   V3.2.02-R4 · Process scroll + circular logos + footer fit
+   ========================================================== */
+.home-client-mark-v3199r1{
+  flex:0 0 auto;
+  border-radius:50%!important;
+  overflow:hidden;
+  background:#fff;
+}
+.home-client-mark-v3199r1 img{
+  border-radius:50%!important;
+  object-fit:contain!important;
+}
+
+/* Large footer signature stays inside its box on desktop, tablet and mobile. */
+.footer-v3202-wordmark{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+  padding-right:clamp(10px,1.2vw,22px);
+}
+.footer-v3202-wordmark span{
+  min-width:0;
+  font-size:clamp(3.6rem,9.8vw,10rem);
+}
+.footer-v3202-wordmark strong{
+  min-width:0;
+  justify-self:end;
+  padding-right:.08em;
+  font-size:clamp(2.25rem,5.1vw,5.2rem);
+  letter-spacing:-.03em;
+}
+@media(max-width:900px){
+  .footer-v3202-wordmark span{font-size:clamp(3rem,9.8vw,6.8rem)}
+  .footer-v3202-wordmark strong{font-size:clamp(1.9rem,5vw,3.8rem)}
+}
+@media(max-width:680px){
+  .footer-v3202-wordmark{
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+  .footer-v3202-wordmark span{
+    font-size:clamp(2.25rem,11.8vw,4rem);
+    letter-spacing:-.05em;
+    line-height:.86;
+  }
+  .footer-v3202-wordmark strong{
+    font-size:clamp(1.45rem,6.8vw,2.3rem);
+    padding-right:.1em;
+    line-height:.9;
+  }
+}
+@media(max-width:390px){
+  .footer-v3202-wordmark{
+    grid-template-columns:1fr;
+    gap:4px;
+    white-space:normal;
+  }
+  .footer-v3202-wordmark span{font-size:clamp(2.15rem,12.6vw,3.3rem)}
+  .footer-v3202-wordmark strong{
+    justify-self:start;
+    font-size:clamp(1.4rem,7.2vw,1.95rem);
+  }
+}

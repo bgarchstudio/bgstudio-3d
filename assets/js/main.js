@@ -2141,19 +2141,58 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       step.addEventListener('focusin', () => setActive(index));
     });
 
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(entries => {
-        const visible = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!visible) return;
-        const index = steps.indexOf(visible.target);
-        if (index >= 0) setActive(index);
-      }, { root: null, rootMargin: '-28% 0px -46% 0px', threshold: [0.2, 0.45, 0.7] });
-      steps.forEach(step => observer.observe(step));
-    }
+    let activeStep = 0;
+    let scrollRaf = 0;
+    let walkTimer = 0;
+
+    const targetStepFromScroll = () => {
+      const triggerY = Math.max(150, window.innerHeight * 0.38);
+      let target = 0;
+      steps.forEach((step, index) => {
+        const rect = step.getBoundingClientRect();
+        if (rect.top <= triggerY) target = index;
+      });
+      return Math.max(0, Math.min(steps.length - 1, target));
+    };
+
+    const walkToStep = target => {
+      const normalized = Math.max(0, Math.min(steps.length - 1, target));
+      if (walkTimer) {
+        window.clearTimeout(walkTimer);
+        walkTimer = 0;
+      }
+      if (normalized === activeStep) {
+        setActive(activeStep);
+        return;
+      }
+      const direction = normalized > activeStep ? 1 : -1;
+      const tick = () => {
+        if (activeStep === normalized) return;
+        activeStep += direction;
+        setActive(activeStep);
+        if (activeStep !== normalized) {
+          walkTimer = window.setTimeout(tick, 105);
+        }
+      };
+      tick();
+    };
+
+    const syncFromScroll = () => {
+      scrollRaf = 0;
+      walkToStep(targetStepFromScroll());
+    };
+
+    const scheduleScrollSync = () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(syncFromScroll);
+    };
+
+    window.addEventListener('scroll', scheduleScrollSync, { passive: true });
+    window.addEventListener('resize', scheduleScrollSync, { passive: true });
 
     setActive(0);
+    activeStep = 0;
+    scheduleScrollSync();
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHowItWorks, { once: true });
