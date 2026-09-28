@@ -3705,3 +3705,9 @@ body{min-height:100dvh;background:#fff}
 @media(max-width:680px){.section-pad{padding-top:64px;padding-bottom:64px}.section-pad-sm{padding-bottom:64px}.split-title{gap:18px;margin-bottom:28px}.home-product-carousel-actions{align-items:center}.home-product-carousel-actions>a{min-height:44px}.home-product-carousel-nav button{width:44px;height:44px}.home-bento-card-v3196{border-radius:22px}.home-client-card-v3199r1{min-height:82px}.home-process-grid-v3200{gap:28px}.home-process-step-v3200{min-height:176px}.home-process-step-v3200.is-active{transform:translateX(3px)}.footer-v3202-primary,.footer-v3202-secondary,.footer-v3202-socials a,.footer-v3202-consent{min-height:44px}.floating-actions{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}}
 @media(hover:none),(pointer:coarse){.home-bento-card-v3196:hover,.home-client-card-v3199r1:hover,.home-stat-card-v3198:hover,.footer-v3202-primary:hover,.footer-v3202-secondary:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.home-bento-card-v3196,.home-bento-card-v3196::before,.home-stat-card-v3198,.home-client-card-v3199r1,.home-process-step-v3200,.home-process-step-v3200>span,.home-process-rail-v3200 span,.nav-rich-arrow,.footer-v3202-primary,.footer-v3202-secondary{transition:none!important}.home-client-marquee-track-v3199r1,.home-testimonial-marquee-track-v3199{animation:none!important}}
+
+/* ==========================================================
+   V3.2.05 STABLE
+   Frozen baseline after the V3.2.04 visual/performance polish.
+   No new visual behavior is introduced in this release.
+   ========================================================== */

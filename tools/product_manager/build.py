@@ -1943,7 +1943,8 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.2.04'
+# V3.2.05 STABLE · frozen public baseline after V3.2.04 final polish.
+SITE_ASSET_VERSION = '3.2.05'
 
 
 def _relative_prefix_for_html(html_path):
