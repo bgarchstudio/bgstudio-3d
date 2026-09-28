@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.10-R2'
+SITE_ASSET_VERSION = '3.3.11'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2139,11 +2139,16 @@ def _bg_assistant_payload(prefix=''):
 
     duo_rows = []
     for key, row in (pricing.get('feedback_duo_packages') or {}).items():
+        stands = int(row.get('stands') or key)
+        nfc = int(row.get('nfc') or stands * 2)
         duo_rows.append({
-            'stands': int(row.get('stands') or key),
-            'nfc': int(row.get('nfc') or 0),
+            'stands': stands,
+            'nfc': nfc,
             'price': row.get('price'),
             'renewal': row.get('renewal'),
+            'qr_optional': True,
+            'qr_per_stand_if_selected': 2,
+            'qr_count_if_selected': nfc,
         })
 
     restaurant_rows = []
@@ -2223,7 +2228,7 @@ def _bg_assistant_payload(prefix=''):
                 'qr': 'QR opsiyoneldir; seçilirse standart restoran kapsamlarında masa başına 3 QR hesabı kullanılabilir. Güncel birim QR bedelini nfc.qr_unit alanından kullan.',
                 'design': 'Menü ve logo tasarımı ayrı kalem olabilir; güncel bedelleri nfc.menu_design ve nfc.logo_design alanından kullan.',
                 'quick_stand': 'Hızlı Bağlantı Standı 1 stand / 3 NFC temel yapısındadır; QR seçilirse 3 QR eklenebilir.',
-                'feedback_duo': 'Feedback Duo kapasite ve fiyatı feedback_duo_packages tablosundan seçilir; her stand için 2 NFC hesabı kullanılır.',
+                'feedback_duo': 'Feedback Duo kapasite ve fiyatı feedback_duo_packages tablosundan seçilir; her stand için 2 NFC kullanılır. QR seçilirse stand başına 2 QR eklenir ve nfc.qr_unit üzerinden ayrıca hesaplanır.',
                 'special_restaurant': '25-120 masa özel restoran hazır paketleri special_restaurant_packages tablosundan seçilir; her masa için 3 NFC hesabı kullanılır.',
             },
         },

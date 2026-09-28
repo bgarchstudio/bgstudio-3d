@@ -20,6 +20,17 @@
   const brandLogo = document.querySelector('.bg-assistant-mark img')?.getAttribute('src') || 'assets/brand/bgstudio3d-monogram.webp';
   const state = { started: false, lastUser: '', lastAssistant: '', busy: false, history: [] };
 
+
+  const syncAssistantViewport = () => {
+    const viewport = window.visualViewport;
+    const height = Math.round(viewport?.height || window.innerHeight || 0);
+    const offsetTop = Math.round(viewport?.offsetTop || 0);
+    if (height > 0) document.documentElement.style.setProperty('--bg-assistant-vvh', `${height}px`);
+    document.documentElement.style.setProperty('--bg-assistant-vvo', `${offsetTop}px`);
+    const keyboardOpen = Boolean(viewport && height > 0 && height < window.innerHeight * .78 && !panel.hidden);
+    document.body.classList.toggle('bg-assistant-keyboard', keyboardOpen);
+  };
+
   const fold = value => String(value || '')
     .toLocaleLowerCase('tr-TR')
     .replaceAll('ı', 'i').replaceAll('ğ', 'g').replaceAll('ü', 'u')
@@ -119,7 +130,7 @@
   const productActions = products => products.map(product => makeAction(`${product.name} · ${product.price}`, product.href));
 
   const domainWords = [
-    'nfc','qr','restoran','masa','feedback','google yorum','dijital menü','dijital menu',
+    'nfc','qr','restoran','masa','stand','feedback','duo','trio','google yorum','dijital menü','dijital menu',
     'ürün','urun','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor',
     'özel üretim','ozel uretim','prototip','parça','parca','kurumsal','toptan','logolu',
     'mimarlık','mimarlik','architecture','kargo','teslim','berkant','bg studio'
@@ -143,6 +154,14 @@
         return name && normalized.includes(name);
       })
       .slice(0, 3);
+  };
+
+  const contextualCount = value => {
+    const normalized = fold(value);
+    const match = normalized.match(/(?:^|\s)(\d{1,3})\s*(?:['’]\s*)?(?:lu|li|lü|lı|lik|luk|lük|lık|adet)(?:\s|$)/i);
+    if (!match) return null;
+    const number = Number(match[1]);
+    return Number.isFinite(number) && number >= 1 && number <= 120 ? number : null;
   };
 
   const formatTl = value => {
@@ -289,10 +308,12 @@
       }
       if (currentFolded.includes('feedback duo') || /(^|\s)duo(?:\s|$)/i.test(currentFolded)) {
         const rows = (data.nfc?.feedback_duo_packages || []).slice().sort((a,b) => Number(a.stands || 0) - Number(b.stands || 0));
-        const row = rows[0];
+        const requested = contextualCount(query);
+        const row = requested ? rows.find(item => Number(item.stands || 0) >= requested) : rows[0];
         if (row && asksPrice) {
+          const capacityNote = requested && Number(row.stands) !== requested ? `${requested} stand isteği için bir üst hazır kapasite ${row.stands} stand. ` : '';
           return {
-            text: `Premium Feedback Duo ${row.stands} stand / ${row.nfc} NFC için ${formatTl(row.price)}'den başlar.${row.renewal ? ` Yıllık yenileme ${formatTl(row.renewal)}.` : ''} QR opsiyoneldir ve ayrı kalemdir.`,
+            text: `${capacityNote}Premium Feedback Duo ${row.stands} stand / ${row.nfc} NFC: ${formatTl(row.price)}.${row.renewal ? ` Yıllık yenileme ${formatTl(row.renewal)}.` : ''} QR opsiyoneldir ve ayrı kalemdir.`,
             actions: contextualActions(query, 'nfc', history)
           };
         }
@@ -373,7 +394,7 @@
   const askOpenAI = async (message, priorHistory = []) => {
     const payload = {
       message,
-      history: priorHistory.slice(-12),
+      history: priorHistory.slice(-14),
       page: { path: window.location.pathname, title: document.title },
       context: {
         business: data.business || {},
@@ -412,12 +433,12 @@
 
   const openPanel = () => {
     panel.hidden = false; panel.setAttribute('aria-hidden','false'); trigger.setAttribute('aria-expanded','true');
-    document.body.classList.add('bg-assistant-open'); start();
-    window.setTimeout(() => input?.focus({ preventScroll: true }), 60);
+    document.body.classList.add('bg-assistant-open'); start(); syncAssistantViewport();
+    window.setTimeout(() => { syncAssistantViewport(); input?.focus({ preventScroll: true }); }, 60);
   };
   const closePanel = () => {
     panel.hidden = true; panel.setAttribute('aria-hidden','true'); trigger.setAttribute('aria-expanded','false');
-    document.body.classList.remove('bg-assistant-open'); trigger.focus({ preventScroll: true });
+    document.body.classList.remove('bg-assistant-open','bg-assistant-keyboard'); trigger.focus({ preventScroll: true });
   };
 
   const submitQuery = async query => {
@@ -475,4 +496,8 @@
     window.open(`https://wa.me/905302466903?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
   });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) closePanel(); });
+  window.addEventListener('resize', syncAssistantViewport, { passive: true });
+  window.visualViewport?.addEventListener('resize', syncAssistantViewport, { passive: true });
+  window.visualViewport?.addEventListener('scroll', syncAssistantViewport, { passive: true });
+  syncAssistantViewport();
 })();
