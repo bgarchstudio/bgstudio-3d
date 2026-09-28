@@ -3044,3 +3044,45 @@ body{min-height:100dvh;background:#fff}
   .home-bento-quantity-v3196{margin-top:22px}.home-bento-route-v3196{margin-top:24px}
 }
 @media(prefers-reduced-motion:reduce){.home-bento-card-v3196,.home-bento-card-v3196::before,.home-architecture-branch-v3196{transition:none!important}}
+
+/* BGSTUDIO V3.1.97 - 21st-inspired Case Studies / Sahadan Isler */
+.home-projects-v3197{position:relative;overflow:hidden}
+.home-projects-v3197::before{content:"";position:absolute;inset:5% auto auto 72%;width:32vw;height:32vw;max-width:520px;max-height:520px;border-radius:50%;background:radial-gradient(circle,rgba(103,128,255,.08),rgba(103,128,255,0) 68%);pointer-events:none}
+.home-projects-v3197 .home-section-head{padding-bottom:26px;border-bottom:1px solid rgba(32,28,24,.1);margin-bottom:0}
+.home-case-studies-v3197{display:block!important;border-top:0!important}
+.home-case-study-v3197{display:grid!important;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;grid-template-rows:none!important;gap:clamp(30px,5vw,78px)!important;align-items:center;background:transparent!important;border:0!important;border-bottom:1px solid rgba(32,28,24,.11)!important;border-radius:0!important;padding:clamp(42px,5.5vw,82px) 0!important;overflow:visible!important;box-shadow:none!important}
+.home-case-study-v3197:nth-child(even){grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)!important}
+.home-case-study-v3197:nth-child(even) .home-case-study-media-link{order:2}
+.home-case-study-v3197:nth-child(even) .home-case-study-body-v3197{order:1}
+.home-case-study-media-link{display:block;text-decoration:none;min-width:0;position:relative}
+.home-case-study-v3197 .home-project-media{aspect-ratio:1.32/1;border-radius:24px;overflow:hidden;background:#e6ded3;box-shadow:0 18px 60px rgba(31,24,18,.08);position:relative}
+.home-case-study-v3197 .home-project-media::after{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.42);border-radius:inherit;pointer-events:none}
+.home-case-study-v3197 .home-project-media img{width:100%;height:100%;object-fit:cover;transition:transform 620ms cubic-bezier(.2,.7,.2,1),filter 420ms ease}
+.home-case-study-v3197:hover .home-project-media img{transform:scale(1.035);filter:saturate(1.03) contrast(1.01)}
+.home-case-study-body-v3197{padding:0!important;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.home-case-study-kicker-v3197{width:100%;justify-content:space-between;border-bottom:1px solid rgba(32,28,24,.1);padding-bottom:14px;color:#75614e!important}
+.home-case-study-kicker-v3197 span{font-family:inherit!important;font-size:.7rem!important;font-weight:800;letter-spacing:.12em}
+.home-case-study-kicker-v3197 small{font-size:.62rem!important;letter-spacing:.12em!important;max-width:68%;text-align:right}
+.home-case-study-client-v3197{margin:24px 0 0!important;color:#846e59!important;font-size:.68rem!important;font-weight:800;letter-spacing:.12em;text-transform:uppercase;line-height:1.3!important;-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
+.home-case-study-v3197 .home-project-body h3{font-size:clamp(2.35rem,4.6vw,5.2rem)!important;line-height:.91!important;letter-spacing:-.052em;margin:12px 0 18px!important;max-width:11ch!important}
+.home-case-study-v3197 .home-project-body>p:not(.home-case-study-client-v3197){font-size:clamp(.9rem,1.1vw,1.03rem)!important;line-height:1.65!important;max-width:52ch;color:var(--text-secondary);-webkit-line-clamp:4}
+.home-case-study-facts-v3197{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;width:100%;margin-top:28px;border-top:1px solid rgba(32,28,24,.1);border-bottom:1px solid rgba(32,28,24,.1)}
+.home-case-study-facts-v3197>div{padding:16px 16px 16px 0;min-width:0}
+.home-case-study-facts-v3197>div+div{border-left:1px solid rgba(32,28,24,.1);padding-left:18px}
+.home-case-study-facts-v3197 small{display:block;color:#887765;font-size:.56rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.home-case-study-facts-v3197 strong{display:block;color:var(--text-primary);font-size:.78rem;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.home-case-study-v3197 .home-project-tags{margin-top:18px}
+.home-case-study-v3197 .home-project-tags span{background:rgba(255,255,255,.48);padding:7px 10px}
+.home-case-study-v3197 .home-project-link{margin-top:22px;padding-top:0;display:inline-flex;align-items:center;gap:8px;font-size:.72rem}
+.home-projects-v3197 .home-project-actions{margin-top:28px;justify-content:flex-end}
+@media(max-width:760px){
+  .home-projects-v3197::before{display:none}
+  .home-case-study-v3197,.home-case-study-v3197:nth-child(even){grid-template-columns:1fr!important;gap:22px!important;padding:36px 0!important}
+  .home-case-study-v3197:nth-child(even) .home-case-study-media-link,.home-case-study-v3197:nth-child(even) .home-case-study-body-v3197{order:initial}
+  .home-case-study-v3197 .home-project-media{aspect-ratio:1.18/1;border-radius:20px}
+  .home-case-study-v3197 .home-project-body h3{font-size:clamp(2.35rem,12vw,3.5rem)!important;max-width:10ch!important}
+  .home-case-study-kicker-v3197 small{max-width:72%}
+  .home-case-study-facts-v3197>div{padding-top:14px;padding-bottom:14px}
+  .home-projects-v3197 .home-project-actions{justify-content:flex-start}
+}
+@media(prefers-reduced-motion:reduce){.home-case-study-v3197 .home-project-media img{transition:none!important}.home-case-study-v3197:hover .home-project-media img{transform:none!important}}

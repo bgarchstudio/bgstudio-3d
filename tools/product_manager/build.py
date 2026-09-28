@@ -938,19 +938,45 @@ def render_home_project_feature(item, index, prefix=''):
     name = esc(raw_name)
     headline = esc(item.get('headline') or raw_name)
     desc = esc(item.get('description') or '')
-    category = esc(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim'))
-    tags = ''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or [])[:3])
+    category_raw = str(item.get('category') or ('NFC / QR saha uygulaması' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim')).strip()
+    category = esc(category_raw)
+    raw_tags = [str(t).strip() for t in (item.get('tags') or []) if str(t).strip()][:3]
+    tags = ''.join(f'<span>{esc(t)}</span>' for t in raw_tags)
     link = esc(project_public_url(item, ''))
     media_path = str(item.get('image') or item.get('profile_image') or '').strip()
     if media_path:
         media = f'<div class="home-project-media"><img alt="{name}" decoding="async" loading="lazy" src="{esc(prefix + media_path)}"/></div>'
     else:
         media = f'<div class="home-project-media home-project-media-fallback"><span>{index:02d}</span><strong>{name or "BG Studio"}</strong></div>'
+
+    fact_candidates = [
+        ('Adet', item.get('quantity') or item.get('delivered_quantity') or item.get('produced_quantity') or item.get('stand_count')),
+        ('Sistem', item.get('system') or item.get('project_system')),
+        ('Teslim', item.get('delivery') or item.get('project_delivery')),
+    ]
+    facts = []
+    for label, value in fact_candidates:
+        value = str(value or '').strip()
+        if value:
+            facts.append(f'<div><small>{esc(label)}</small><strong>{esc(value)}</strong></div>')
+        if len(facts) >= 2:
+            break
+    if not facts:
+        facts = [
+            f'<div><small>Proje</small><strong>{index:02d}</strong></div>',
+            f'<div><small>Kategori</small><strong>{category}</strong></div>',
+        ]
+    facts_html = ''.join(facts)
+
     ref_id = reference_identity(item, item.get('source_slug') if item.get('source_kind') == 'nfc' else item.get('slug'))
     return (
-        f'<article class="home-project-card home-motion" data-home-motion data-reference-id="{esc(ref_id)}" data-reference-name="{name}">'
-        f'{media}<div class="home-project-body"><div class="home-project-kicker"><span>{index:02d}</span><small>{category}</small></div>'
-        f'<h3>{headline}</h3><p>{desc}</p><div class="home-project-tags">{tags}</div>'
+        f'<article class="home-project-card home-case-study-v3197 home-motion" data-home-motion data-reference-id="{esc(ref_id)}" data-reference-name="{name}">'
+        f'<a class="home-case-study-media-link" href="{link}" aria-label="{name} projesini incele">{media}</a>'
+        f'<div class="home-project-body home-case-study-body-v3197">'
+        f'<div class="home-project-kicker home-case-study-kicker-v3197"><span>{index:02d}</span><small>{category}</small></div>'
+        f'<p class="home-case-study-client-v3197">{name}</p><h3>{headline}</h3><p>{desc}</p>'
+        f'<div class="home-case-study-facts-v3197">{facts_html}</div>'
+        f'<div class="home-project-tags">{tags}</div>'
         f'<a class="home-project-link" href="{link}">Projeyi incele ↗</a></div></article>'
     )
 
@@ -1134,10 +1160,10 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
-<section class="home-projects-v3163 bg-section" id="sahadan-isler" aria-labelledby="home-projects-title">
+<section class="home-projects-v3163 home-projects-v3197 bg-section" id="sahadan-isler" aria-labelledby="home-projects-title">
   <div class="shell">
     <div class="home-section-head home-motion" data-home-motion><div><p class="eyebrow">SAHADAN İŞLER</p><h2 id="home-projects-title">Gerçek ihtiyaçlar. Gerçek teslimler.</h2></div><p>Tamamlanan işletme ve üretim projelerinden seçilen uygulamalar.</p></div>
-    <div class="home-project-grid">
+    <div class="home-project-grid home-case-studies-v3197">
 <!-- CONTENT_MANAGER:HOME_FIELD_START -->
 {project_cards}
 <!-- CONTENT_MANAGER:HOME_FIELD_END -->
@@ -1739,7 +1765,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.96'
+SITE_ASSET_VERSION = '3.1.97'
 
 
 def _relative_prefix_for_html(html_path):

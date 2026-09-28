@@ -16,7 +16,7 @@
 // the shell before the rest of the page logic captures nav/menu references.
 (() => {
   const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.96';
+  const ASSET_VERSION = '3.1.97';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
