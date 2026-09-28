@@ -1,3 +1,8 @@
-V3.3.10 için Cloudflare Worker güncellemesi gereklidir.
-cloudflare/bg-assistant-worker.js dosyasının tamamını Worker editörüne yapıştırıp Deploy edin.
-OPENAI_API_KEY, OPENAI_MODEL ve ALLOWED_ORIGINS değişkenlerine dokunmayın.
+HISTORICAL FILENAME - CURRENT STATUS
+
+Site release: V3.3.13
+Expected BG Assistant Worker baseline: V3.3.10-R4 Quantity Parser or newer.
+
+V3.3.13 does NOT change the Cloudflare Worker.
+If R4 Worker is already deployed, do not redeploy Cloudflare for this release.
+This file keeps its old filename only so cumulative repo-safe patching overwrites the previously misleading instruction.
