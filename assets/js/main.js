@@ -1892,14 +1892,14 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.1.95: 21st.dev Product Carousel-inspired homepage product rail.
-// Keeps Product Manager showcase slots as the source and adapts the horizontal
-// product-card navigation pattern to the existing vanilla site stack.
+// V3.1.99-R1: resilient homepage product carousel.
+// Uses the existing horizontal scroller but moves by one real card per click,
+// recalculates the last reachable start position responsively, and updates UI
+// immediately so controls never feel dead.
 (() => {
   const initHomeProductCarousel = () => {
-    const viewport = document.querySelector('[data-product-carousel-viewport]');
     const track = document.querySelector('[data-product-carousel-track]');
-    if (!viewport || !track || track.dataset.carouselReady === '1') return;
+    if (!track || track.dataset.carouselReady === '1') return;
     const cards = [...track.querySelectorAll('[data-product-carousel-card]')];
     const prev = document.querySelector('[data-product-carousel-prev]');
     const next = document.querySelector('[data-product-carousel-next]');
@@ -1911,64 +1911,94 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     let activeIndex = 0;
     let raf = 0;
 
-    const cardLeft = card => Math.max(0, card.offsetLeft - track.offsetLeft);
+    const gapSize = () => {
+      const styles = getComputedStyle(track);
+      const raw = parseFloat(styles.columnGap || styles.gap || '0');
+      return Number.isFinite(raw) ? raw : 0;
+    };
+    const cardStep = () => {
+      const card = cards[0];
+      if (!card) return Math.max(1, track.clientWidth);
+      return Math.max(1, card.getBoundingClientRect().width + gapSize());
+    };
+    const visibleCount = () => Math.max(1, Math.floor((track.clientWidth + gapSize() + 1) / cardStep()));
+    const maxStartIndex = () => Math.max(0, cards.length - visibleCount());
     const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
-    const closestIndex = () => {
+    const targetLeft = index => Math.min(maxScroll(), Math.max(0, cards[index]?.offsetLeft || 0));
+
+    const nearestIndex = () => {
       const x = track.scrollLeft;
       let winner = 0;
       let distance = Infinity;
       cards.forEach((card, index) => {
-        const delta = Math.abs(cardLeft(card) - x);
+        const delta = Math.abs((card.offsetLeft || 0) - x);
         if (delta < distance) {
           distance = delta;
           winner = index;
         }
       });
-      return winner;
+      return Math.min(maxStartIndex(), winner);
     };
 
-    const paint = () => {
-      raf = 0;
-      activeIndex = closestIndex();
+    const updateUi = index => {
+      activeIndex = Math.max(0, Math.min(maxStartIndex(), index));
       const total = cards.length;
       if (status) status.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
-      const start = track.scrollLeft <= 3;
-      const end = track.scrollLeft >= maxScroll() - 3;
+      const atStart = activeIndex <= 0 || track.scrollLeft <= 2;
+      const atEnd = activeIndex >= maxStartIndex() || track.scrollLeft >= maxScroll() - 2;
       if (prev) {
-        prev.disabled = start;
-        prev.setAttribute('aria-disabled', start ? 'true' : 'false');
+        prev.disabled = atStart;
+        prev.setAttribute('aria-disabled', atStart ? 'true' : 'false');
       }
       if (next) {
-        next.disabled = end;
-        next.setAttribute('aria-disabled', end ? 'true' : 'false');
+        next.disabled = atEnd;
+        next.setAttribute('aria-disabled', atEnd ? 'true' : 'false');
       }
-      cards.forEach((card, index) => card.classList.toggle('is-carousel-current', index === activeIndex));
+      cards.forEach((card, cardIndex) => card.classList.toggle('is-carousel-current', cardIndex === activeIndex));
     };
 
+    const paintFromScroll = () => {
+      raf = 0;
+      updateUi(nearestIndex());
+    };
     const schedulePaint = () => {
       if (raf) return;
-      raf = requestAnimationFrame(paint);
+      raf = requestAnimationFrame(paintFromScroll);
     };
 
     const goTo = index => {
-      const normalized = Math.max(0, Math.min(cards.length - 1, index));
-      const target = Math.min(maxScroll(), cardLeft(cards[normalized]));
-      track.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });
-      activeIndex = normalized;
-      window.setTimeout(paint, reduceMotion ? 0 : 260);
+      const normalized = Math.max(0, Math.min(maxStartIndex(), index));
+      updateUi(normalized);
+      const left = targetLeft(normalized);
+      if (typeof track.scrollTo === 'function') {
+        track.scrollTo({ left, behavior: reduceMotion ? 'auto' : 'smooth' });
+      } else {
+        track.scrollLeft = left;
+      }
+      window.setTimeout(schedulePaint, reduceMotion ? 0 : 80);
+      window.setTimeout(schedulePaint, reduceMotion ? 0 : 360);
     };
 
-    prev?.addEventListener('click', () => goTo(activeIndex - 1));
-    next?.addEventListener('click', () => goTo(activeIndex + 1));
+    prev?.addEventListener('click', event => {
+      event.preventDefault();
+      goTo(activeIndex - 1);
+    });
+    next?.addEventListener('click', event => {
+      event.preventDefault();
+      goTo(activeIndex + 1);
+    });
     track.addEventListener('scroll', schedulePaint, { passive: true });
     track.addEventListener('keydown', event => {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
       goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
     });
-    window.addEventListener('resize', schedulePaint, { passive: true });
+    window.addEventListener('resize', () => {
+      activeIndex = Math.min(activeIndex, maxStartIndex());
+      goTo(activeIndex);
+    }, { passive: true });
 
-    paint();
+    updateUi(0);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHomeProductCarousel, { once: true });

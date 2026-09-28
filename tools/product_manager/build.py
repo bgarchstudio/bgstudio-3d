@@ -981,6 +981,76 @@ def render_home_project_feature(item, index, prefix=''):
     )
 
 
+def render_home_business_marquee_card(item, index, prefix=''):
+    """Homepage client/reference logo card sourced from published field records.
+
+    This is intentionally not a testimonial. It only identifies businesses that
+    already exist in the managed Sahadan Isler / reference data.
+    """
+    raw_name = str(item.get('name') or '').strip()
+    name = esc(raw_name or 'BG Studio referansi')
+    category_raw = str(item.get('category') or ('NFC / QR' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim')).strip()
+    category = esc(category_raw)
+    href = esc(project_public_url(item, prefix))
+    media_path = str(item.get('profile_image') or item.get('logo') or item.get('business_logo') or item.get('image') or '').strip()
+    initials = ''.join(part[:1] for part in raw_name.split()[:2]).upper() or 'BG'
+    if media_path:
+        media = f'<span class="home-client-mark-v3199r1"><img src="{esc(prefix + media_path)}" alt="" loading="lazy" decoding="async"/></span>'
+    else:
+        media = f'<span class="home-client-mark-v3199r1 home-client-mark-fallback-v3199r1" aria-hidden="true">{esc(initials)}</span>'
+    return (
+        f'<a class="home-client-card-v3199r1" href="{href}">'
+        f'{media}<span class="home-client-copy-v3199r1"><small>SAHADAN REFERANS</small><strong>{name}</strong><em>{category}</em></span>'
+        f'<span class="home-client-arrow-v3199r1" aria-hidden="true">↗</span></a>'
+    )
+
+
+def _home_testimonial_text(item):
+    """Return a real customer quote when one exists, otherwise a project note.
+
+    We never synthesize customer praise. Managed records may opt into any of the
+    supported feedback fields. Existing records without a quote fall back to the
+    published project description and are explicitly labelled as a project note.
+    """
+    quote_keys = (
+        'testimonial', 'testimonial_text', 'review_text', 'review_quote',
+        'customer_quote', 'customer_feedback', 'feedback_text', 'quote',
+    )
+    for key in quote_keys:
+        value = str(item.get(key) or '').strip()
+        if value:
+            return value, 'MÜŞTERİ GERİ BİLDİRİMİ', True
+    value = str(item.get('description') or item.get('headline') or '').strip()
+    return value, 'SAHADAN PROJE NOTU', False
+
+
+def render_home_testimonial_card(item, index, prefix=''):
+    name_raw = str(item.get('name') or 'BG Studio müşterisi').strip()
+    name = esc(name_raw)
+    text_raw, label_raw, is_quote = _home_testimonial_text(item)
+    text_raw = re.sub(r'\s+', ' ', text_raw).strip()
+    if len(text_raw) > 240:
+        text_raw = text_raw[:237].rstrip() + '…'
+    text = esc(text_raw or 'Tamamlanan BG Studio saha uygulaması.')
+    label = esc(label_raw)
+    category = esc(str(item.get('category') or ('NFC / QR' if item.get('source_kind') == 'nfc' else 'Kurumsal üretim')).strip())
+    media_path = str(item.get('profile_image') or item.get('image') or '').strip()
+    if media_path:
+        avatar = f'<span class="home-testimonial-avatar-v3199"><img src="{esc(prefix + media_path)}" alt="" loading="lazy" decoding="async"/></span>'
+    else:
+        initials = ''.join(part[:1] for part in name_raw.split()[:2]).upper() or 'BG'
+        avatar = f'<span class="home-testimonial-avatar-v3199 home-testimonial-avatar-fallback-v3199" aria-hidden="true">{esc(initials)}</span>'
+    href = esc(project_public_url(item, ''))
+    quote_attr = ' data-testimonial-quote="true"' if is_quote else ''
+    return (
+        f'<a class="home-testimonial-card-v3199" href="{href}"{quote_attr}>'
+        f'<div class="home-testimonial-card-top-v3199"><span>{label}</span><small>{index:02d}</small></div>'
+        f'<p>{text}</p>'
+        f'<div class="home-testimonial-person-v3199">{avatar}<span><strong>{name}</strong><small>{category}</small></span></div>'
+        f'</a>'
+    )
+
+
 def _home_visual_product(product, position='main', eager=False):
     if not product:
         return f'<div class="home-hero-visual-fallback home-hero-visual-{esc(position)}"><span>BG</span><small>STUDIO 3D</small></div>'
@@ -1073,8 +1143,27 @@ def render_homepage_v3163(active, featured, field_items):
     # No marketing number is hardcoded here.
     home_active_product_count = len(active or [])
     home_personalizable_count = sum(1 for product in (active or []) if catalog_personalizable(product))
-    home_field_count = len(field_items or [])
+    home_field_items = [x for x in (field_items or []) if x.get('active', True)]
+    home_field_count = len(home_field_items)
     home_category_count = len({str(product.get('category') or '').strip() for product in (active or []) if str(product.get('category') or '').strip()})
+    # V3.1.99-R1: this rail shows real published client/reference names, not testimonials.
+    # Deduplicate businesses because an NFC-backed reference can also appear in corporate data.
+    client_items = []
+    client_seen = set()
+    for item in home_field_items:
+        client_name = str(item.get('name') or '').strip()
+        client_key = re.sub(r'\s+', ' ', client_name).casefold()
+        if not client_key or client_key in client_seen:
+            continue
+        client_seen.add(client_key)
+        client_items.append(item)
+        if len(client_items) >= 12:
+            break
+    client_cards = ''.join(render_home_business_marquee_card(item, index + 1, '') for index, item in enumerate(client_items))
+    client_loop = (
+        f'<div class="home-client-marquee-group-v3199r1">{client_cards}</div>'
+        f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true">{client_cards}</div>'
+    ) if client_cards else ''
 
     return f'''<main class="home-v3163" id="main-content">
 <section class="home-hero-v3191" aria-labelledby="home-hero-title" data-spatial-hero data-spatial-variant="0">
@@ -1191,6 +1280,20 @@ def render_homepage_v3163(active, featured, field_items):
       <article class="home-stat-card-v3198 home-motion" data-home-motion><span>04</span><strong>{home_category_count}</strong><div><b>Ürün kategorisi</b><small>Aktif katalogda temsil edilen gruplar</small></div></article>
     </div>
     <div class="home-stats-foot-v3198 home-motion" data-home-motion><span>KUŞADASI MERKEZLİ ÜRETİM</span><i></i><strong>TÜRKİYE GENELİ KARGO</strong></div>
+  </div>
+</section>
+
+<section class="home-clients-v3199r1 bg-section-compact" aria-labelledby="home-clients-title">
+  <div class="shell home-clients-head-v3199r1 home-motion" data-home-motion>
+    <div><p class="eyebrow">SAHADAN REFERANSLAR</p><h2 id="home-clients-title">BG Studio ile çalışan işletmeler.</h2></div>
+    <p>Yayındaki Sahadan İşler kayıtları burada otomatik listelenir. Yeni referans eklendiğinde marka şeridi de büyür.</p>
+  </div>
+  <div class="home-client-marquee-v3199r1" data-client-marquee>
+    <div class="home-client-fade-v3199r1 home-client-fade-left-v3199r1" aria-hidden="true"></div>
+    <div class="home-client-fade-v3199r1 home-client-fade-right-v3199r1" aria-hidden="true"></div>
+    <div class="home-client-marquee-track-v3199r1">
+      {client_loop}
+    </div>
   </div>
 </section>
 
@@ -1787,7 +1890,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.98'
+SITE_ASSET_VERSION = '3.1.99-r1'
 
 
 def _relative_prefix_for_html(html_path):
