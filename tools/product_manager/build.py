@@ -1005,6 +1005,47 @@ def render_home_business_marquee_card(item, index, prefix=''):
     )
 
 
+def render_contextual_business_marquee(items, eyebrow, title, description, prefix='../', context='general'):
+    """Render a page-specific client/reference marquee from real managed records.
+
+    No testimonial copy is invented. Items are deduplicated by business name and
+    keep their canonical project links. The caller decides the source list, so
+    NFC, Corporate and Homepage rails never leak records across contexts.
+    """
+    selected = []
+    seen = set()
+    for item in (items or []):
+        if not item or not item.get('active', True):
+            continue
+        raw_name = re.sub(r'\s+', ' ', str(item.get('name') or '').strip())
+        key = raw_name.casefold()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        selected.append(item)
+        if len(selected) >= 18:
+            break
+    if not selected:
+        return ''
+    cards = ''.join(render_home_business_marquee_card(item, index + 1, prefix) for index, item in enumerate(selected))
+    loop = (
+        f'<div class="home-client-marquee-group-v3199r1">{cards}</div>'
+        f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true">{cards}</div>'
+    )
+    safe_context = re.sub(r'[^a-z0-9-]+', '-', str(context or 'general').casefold()).strip('-') or 'general'
+    return (
+        f'<section class="context-clients-v3200 context-clients-{esc(safe_context)}-v3200 home-clients-v3199r1 section-pad" '
+        f'aria-labelledby="context-clients-{esc(safe_context)}-title">'
+        f'<div class="shell home-clients-head-v3199r1">'
+        f'<div><p class="eyebrow">{esc(eyebrow)}</p><h2 id="context-clients-{esc(safe_context)}-title">{esc(title)}</h2></div>'
+        f'<p>{esc(description)}</p></div>'
+        f'<div class="home-client-marquee-v3199r1" data-client-marquee data-client-context="{esc(safe_context)}">'
+        f'<div class="home-client-fade-v3199r1 home-client-fade-left-v3199r1" aria-hidden="true"></div>'
+        f'<div class="home-client-fade-v3199r1 home-client-fade-right-v3199r1" aria-hidden="true"></div>'
+        f'<div class="home-client-marquee-track-v3199r1">{loop}</div></div></section>'
+    )
+
+
 def _home_testimonial_text(item):
     """Return a real customer quote when one exists, otherwise a project note.
 
@@ -1225,7 +1266,7 @@ def render_homepage_v3163(active, featured, field_items):
       <div class="home-product-carousel-actions">
         <a class="text-cta" href="urunler/">Tüm ürünler ↗</a>
         <div class="home-product-carousel-nav" aria-label="Ürün vitrini kontrolleri">
-          <span data-product-carousel-status>01 / 06</span>
+          <span data-product-carousel-status>01 / 01</span>
           <button type="button" data-product-carousel-prev aria-label="Önceki ürün">←</button>
           <button type="button" data-product-carousel-next aria-label="Sonraki ürün">→</button>
         </div>
@@ -1241,10 +1282,20 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
-<section class="home-production-v3163 bg-section" aria-labelledby="home-production-title">
-  <div class="shell home-split-panel home-split-production">
-    <div class="home-split-copy home-motion" data-home-motion><p class="eyebrow">{esc(home_copy["production_eyebrow"])}</p><h2 id="home-production-title">{esc(home_copy["production_title"])}</h2><p>{esc(home_copy["production_lead"])}</p><a class="primary-cta" href="{esc(home_copy["production_cta_url"])}">{esc(home_copy["production_cta_label"])}</a></div>
-    <div class="home-production-stage home-motion" data-home-motion>{production_visual}<div class="home-production-steps"><span><b>01</b>Fikir</span><span><b>02</b>Model</span><span><b>03</b>Baskı</span></div></div>
+<section class="home-process-v3200 bg-section" aria-labelledby="home-process-title" data-how-it-works>
+  <div class="shell home-process-grid-v3200">
+    <div class="home-process-sticky-v3200 home-motion" data-home-motion>
+      <div class="home-process-copy-v3200"><p class="eyebrow">NASIL İLERLİYORUZ?</p><h2 id="home-process-title">Fikirden teslimata. Beş net adım.</h2><p>{esc(home_copy["production_lead"])}</p><a class="primary-cta" href="{esc(home_copy["production_cta_url"])}">{esc(home_copy["production_cta_label"])}</a></div>
+      <div class="home-process-visual-v3200">{production_visual}<div class="home-process-visual-badge-v3200"><span>BG STUDIO 3D</span><strong>Tasarım + üretim aynı akışta.</strong></div></div>
+    </div>
+    <div class="home-process-timeline-v3200">
+      <div class="home-process-rail-v3200" aria-hidden="true"><span data-how-progress></span></div>
+      <article class="home-process-step-v3200 is-active" data-how-step="0" tabindex="0"><span>01</span><div><small>FİKİR</small><h3>İhtiyacı tarif et.</h3><p>Fotoğraf, eskiz, ölçü, örnek ürün veya kısa bir fikirle başlayabiliriz. Kullanım senaryosunu birlikte netleştiririz.</p></div></article>
+      <article class="home-process-step-v3200" data-how-step="1" tabindex="0"><span>02</span><div><small>MODELLEME</small><h3>Üretilebilir geometri.</h3><p>Mevcut modeli kontrol eder veya gereken parçayı ölçü, detay ve baskı koşullarına göre modelleriz.</p></div></article>
+      <article class="home-process-step-v3200" data-how-step="2" tabindex="0"><span>03</span><div><small>TEST</small><h3>Ölçü, uyum ve malzeme.</h3><p>Gereken işlerde prototip veya baskı testiyle tolerans, renk, bağlantı ve kullanım davranışını kontrol ederiz.</p></div></article>
+      <article class="home-process-step-v3200" data-how-step="3" tabindex="0"><span>04</span><div><small>ÜRETİM</small><h3>Onaylanan işi bas.</h3><p>Malzeme, renk, baskı yönü ve üretim ayarları netleşir. Tek adetten toplu siparişe üretim akışına geçeriz.</p></div></article>
+      <article class="home-process-step-v3200" data-how-step="4" tabindex="0"><span>05</span><div><small>TESLİM</small><h3>Kontrol et. Paketle. Gönder.</h3><p>Son kontrol sonrası Kuşadası elden teslim veya uygun siparişlerde Türkiye geneli kargo ile işi tamamlarız.</p></div></article>
+    </div>
   </div>
 </section>
 
@@ -1890,7 +1941,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.99-r1'
+SITE_ASSET_VERSION = '3.2.00'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2684,8 +2735,17 @@ def render_nfc_platform_sections(theme_overrides=None):
     feedback_theme = family_theme('feedback_duo', 'dark')
     premium_plus_theme = family_theme('premium_plus', 'dark')
     capacity_preview = _nfc_v3167_capacity_calculator(pricing, offer_prefix='../')
+    nfc_marquee = render_contextual_business_marquee(
+        resolve_nfc_items(),
+        'NFC + QR REFERANSLARI',
+        'NFC + QR sistemimizi kullanan işletmeler.',
+        'Yalnızca NFC + QR sayfasında yayında olan gerçek saha kayıtları burada akar.',
+        prefix='../',
+        context='nfc',
+    )
     return f'''<!-- NFC_PLATFORM_V167_START -->
 <section class="page-hero nfc-platform-hero nfc-hub-hero" data-nfc-hub-v3167="main"><div class="shell nfc-hub-hero-grid"><div class="nfc-hub-hero-copy"><p class="eyebrow">BG STUDIO NFC + QR</p><h1>Fiziksel temas. Dijital deneyim. Tek sistem.</h1><p class="lead">İşletmeler için fiziksel + dijital müşteri etkileşim sistemi. Özel tasarım 3D standları NFC, QR, Akıllı Menü, feedback, analitik ve yönetim altyapısıyla birleştiriyoruz.</p><div class="hero-actions"><a class="primary-cta" href="#sistemler">Sistemleri İncele ↓</a><a class="secondary-cta" href="../teklif/?tur=nfc">Teklif Al ↗</a></div><div class="nfc-hub-proof"><span>İşletmeye özel 3D üretim</span><span>NFC + QR</span><span>Panel + analitik</span><span>Kuşadası merkezli</span></div></div><div class="nfc-hub-hero-visual"><img src="../assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC ve QR restoran stand sistemi" width="1254" height="1254" fetchpriority="high" decoding="async"><div class="nfc-hub-hero-badge"><strong>Fiziksel + Dijital</strong><span>Stand → Telefon → Sistem</span></div></div></div></section>
+{nfc_marquee}
 <section class="section-pad shell nfc-solution-hub" id="sistemler"><div class="split-title"><div><p class="eyebrow">ÇÖZÜM MERKEZİ</p><h2>İşletmene uygun sistemi seç.</h2></div><p>Ana sayfada kısa karşılaştır, ayrıntı için çözüm sayfasına geç. Fiyat ve paket motorları mevcut panel verilerinden beslenmeye devam eder.</p></div><div class="nfc-solution-grid"><article class="nfc-solution-card nfc-solution-card-large {'dark' if restaurant_theme=='dark' else ''}" id="restoran-sistemleri" data-family-key="restaurant_packages" data-family-theme="{restaurant_theme}">{restaurant_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>RESTORAN SİSTEMLERİ</span><b>{year} · {_nfc_money(restaurant.get('price'))}'den</b></div><h3>Masadan dijital deneyime.</h3><p>Akıllı Menü, çoklu dil, 14 alerjen, yaklaşık kalori, feedback, analitik ve Garson Çağır + Hesap İste altyapısı.</p><ul><li>Stand başına 3 NFC</li><li>QR opsiyonel</li><li>10–120 masa ölçeklenebilir</li></ul><a class="primary-cta" href="restoran/">Restoran Sistemlerini İncele ↗</a></div></article><article class="nfc-solution-card {'dark' if quick_theme=='dark' else ''}" data-family-key="quick_stand" data-family-theme="{quick_theme}">{quick_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>HIZLI BAĞLANTI</span><b>{_nfc_money(quick.get('price'))}</b></div><h3>Tek stand, üç bağlantı.</h3><p>Instagram, Google, WhatsApp, web veya işletmenin seçtiği farklı hedefleri tek fiziksel noktada birleştir.</p><ul><li>3 NFC / stand</li><li>QR opsiyonel</li><li>Uzaktan hedef yönetimi</li></ul><a class="secondary-cta" href="hizli-baglanti/">Hızlı Standı İncele ↗</a></div></article><article class="nfc-solution-card {'dark' if feedback_theme=='dark' else ''}" data-family-key="feedback_duo" data-family-theme="{feedback_theme}">{feedback_media}<div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>PREMIUM FEEDBACK</span><b>{_nfc_money(duo.get('price'))}'den</b></div><h3>Duo + Trio müşteri deneyimi.</h3><p>Feedback, Google devam akışı, sosyal / iletişim hedefleri ve raporlama odaklı gelişmiş işletme çözümü.</p><ul><li>Duo: 2 NFC / stand</li><li>Trio: 3 NFC / stand</li><li>QR paket dışında opsiyonel</li></ul><a class="secondary-cta" href="feedback/">Duo / Trio Detayları ↗</a></div></article><article class="nfc-solution-card nfc-solution-premium-plus {'dark' if premium_plus_theme=='dark' else 'light'}" data-family-key="premium_plus" data-family-theme="{premium_plus_theme}"><div class="nfc-premium-plus-visual"><span>YAKINDA</span><strong>Premium<br>Plus</strong><small>Geliştiriliyor</small></div><div class="nfc-solution-card-body"><div class="nfc-solution-meta"><span>ÜST KATMAN</span><b>Henüz satışta değil</b></div><h3>CRM, sadakat, rezervasyon ve AI.</h3><p>Doğrudan masa siparişi, misafir profili, sadakat, segmentasyon, rezervasyon ve AI araçları için geliştirilen ayrı üst katman.</p><ul><li>Doğrudan masa siparişi</li><li>Misafir CRM + sadakat</li><li>Rezervasyon + AI araçları</li></ul><a class="ghost-cta" href="premium-plus/">Premium Plus Yol Haritası ↗</a></div></article></div></section>
 {_nfc_v3167_software_showcase()}
 <section class="section-pad shell nfc-main-price-preview" id="fiyat-hesap"><div class="split-title"><div><p class="eyebrow">CANLI FİYAT HESABI</p><h2>25–120 masa için tek kontrol.</h2></div><p>Hazır kapasite listesini slider ve stepper ile sadeleştirdik. QR, Menü Tasarımı ve Logo Tasarımı seçimleri toplam satışa ayrı eklenir.</p></div>{capacity_preview}</section>
@@ -3064,7 +3124,16 @@ def render_corporate_page_v3169(items):
             sectors.append(sector)
     sector_html=''.join(f'<span>{esc(x)}</span>' for x in sectors[:8]) or '<span>Kurumsal üretim</span>'
     cards=''.join(render_corporate_case(item, '../') for item in items)
-    body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-sector-cloud"><small>ÇALIŞTIĞIMIZ İHTİYAÇ TİPLERİ</small>{sector_html}</div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">SÜREÇ</p><h2>İhtiyaçtan teslimata.</h2></div><p>Kurumsal işlerde ürün biçimi hazır kalıba göre değil, kullanım senaryosuna göre netleşir.</p></div><div class="v3169-process"><article><span>01</span><h3>İhtiyaç</h3><p>Adet, kullanım noktası, ölçü ve marka gereksinimini netleştiririz.</p></article><article><span>02</span><h3>Tasarım</h3><p>Ürünü marka kimliği ve üretim koşullarına göre geliştiririz.</p></article><article><span>03</span><h3>Üretim</h3><p>Onaylanan modeli 3D baskı üretim akışına alırız.</p></article><article><span>04</span><h3>Teslim</h3><p>Kontrol, paketleme ve teslim / kargo adımıyla işi tamamlarız.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">SAHADAN KURUMSAL İŞLER</p><h2>Farklı sektörler. Tek üretim disiplini.</h2></div><p>Yayınlanan kartlar panel ve saha kayıtlarından gelir. Ayrıntısı bulunan işler proje sayfasına bağlanır.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">TOPLU ÜRETİM</p><h2>Adedi ve ihtiyacı gönder.</h2><p>Kurumsal anahtarlık, masaüstü ürün, stand veya işletmeye özel parça için kapsamı birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=kurumsal">Toplu sipariş için teklif al ↗</a></div></section>'''
+    corporate_marquee_items = [item for item in items if item.get('source_kind') != 'nfc']
+    corporate_marquee = render_contextual_business_marquee(
+        corporate_marquee_items,
+        'KURUMSAL REFERANSLAR',
+        'Kurumsal üretim yaptığımız işletmeler.',
+        'Bu şerit yalnızca kurumsal üretim kayıtlarından beslenir; NFC + QR saha işleri ayrı sayfada kalır.',
+        prefix='../',
+        context='corporate',
+    )
+    body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-sector-cloud"><small>ÇALIŞTIĞIMIZ İHTİYAÇ TİPLERİ</small>{sector_html}</div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">SÜREÇ</p><h2>İhtiyaçtan teslimata.</h2></div><p>Kurumsal işlerde ürün biçimi hazır kalıba göre değil, kullanım senaryosuna göre netleşir.</p></div><div class="v3169-process"><article><span>01</span><h3>İhtiyaç</h3><p>Adet, kullanım noktası, ölçü ve marka gereksinimini netleştiririz.</p></article><article><span>02</span><h3>Tasarım</h3><p>Ürünü marka kimliği ve üretim koşullarına göre geliştiririz.</p></article><article><span>03</span><h3>Üretim</h3><p>Onaylanan modeli 3D baskı üretim akışına alırız.</p></article><article><span>04</span><h3>Teslim</h3><p>Kontrol, paketleme ve teslim / kargo adımıyla işi tamamlarız.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">SAHADAN KURUMSAL İŞLER</p><h2>Farklı sektörler. Tek üretim disiplini.</h2></div><p>Yayınlanan kartlar panel ve saha kayıtlarından gelir. Ayrıntısı bulunan işler proje sayfasına bağlanır.</p></div><div class="case-grid">{cards}</div></section>{corporate_marquee}<section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">TOPLU ÜRETİM</p><h2>Adedi ve ihtiyacı gönder.</h2><p>Kurumsal anahtarlık, masaüstü ürün, stand veya işletmeye özel parça için kapsamı birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=kurumsal">Toplu sipariş için teklif al ↗</a></div></section>'''
     return _editorial_page_shell('Kurumsal 3D Üretim | BG Studio 3D','İşletmelere özel kurumsal 3D baskı, promosyon, masaüstü ürün ve saha üretimleri. Kuşadası BG Studio 3D.','/kurumsal/',body,'corporate')
 
 

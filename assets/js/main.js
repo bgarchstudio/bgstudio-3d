@@ -1892,10 +1892,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.1.99-R1: resilient homepage product carousel.
-// Uses the existing horizontal scroller but moves by one real card per click,
-// recalculates the last reachable start position responsively, and updates UI
-// immediately so controls never feel dead.
+// V3.2.00: page-based homepage product carousel.
+// Arrows move by a full visible page, status reports PAGE / TOTAL PAGE,
+// and an end spacer keeps the last page aligned without half cards.
 (() => {
   const initHomeProductCarousel = () => {
     const track = document.querySelector('[data-product-carousel-track]');
@@ -1908,7 +1907,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 
     track.dataset.carouselReady = '1';
     const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
-    let activeIndex = 0;
+    let currentPage = 0;
     let raf = 0;
 
     const gapSize = () => {
@@ -1916,36 +1915,31 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       const raw = parseFloat(styles.columnGap || styles.gap || '0');
       return Number.isFinite(raw) ? raw : 0;
     };
-    const cardStep = () => {
-      const card = cards[0];
-      if (!card) return Math.max(1, track.clientWidth);
-      return Math.max(1, card.getBoundingClientRect().width + gapSize());
+    const cardsPerPage = () => {
+      const raw = parseInt(getComputedStyle(track).getPropertyValue('--carousel-columns'), 10);
+      return Number.isFinite(raw) && raw > 0 ? raw : 1;
     };
-    const visibleCount = () => Math.max(1, Math.floor((track.clientWidth + gapSize() + 1) / cardStep()));
-    const maxStartIndex = () => Math.max(0, cards.length - visibleCount());
-    const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
-    const targetLeft = index => Math.min(maxScroll(), Math.max(0, cards[index]?.offsetLeft || 0));
+    const pageCount = () => Math.max(1, Math.ceil(cards.length / cardsPerPage()));
+    const clampPage = page => Math.max(0, Math.min(pageCount() - 1, page));
 
-    const nearestIndex = () => {
-      const x = track.scrollLeft;
-      let winner = 0;
-      let distance = Infinity;
-      cards.forEach((card, index) => {
-        const delta = Math.abs((card.offsetLeft || 0) - x);
-        if (delta < distance) {
-          distance = delta;
-          winner = index;
-        }
-      });
-      return Math.min(maxStartIndex(), winner);
+    const syncEndSpacer = () => {
+      const perPage = cardsPerPage();
+      const remainder = cards.length % perPage;
+      const missing = remainder === 0 ? 0 : perPage - remainder;
+      const width = cards[0]?.getBoundingClientRect().width || 0;
+      const spacer = missing > 0 ? missing * (width + gapSize()) : 0;
+      track.style.setProperty('--carousel-end-spacer', `${Math.max(0, spacer)}px`);
     };
 
-    const updateUi = index => {
-      activeIndex = Math.max(0, Math.min(maxStartIndex(), index));
-      const total = cards.length;
-      if (status) status.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
-      const atStart = activeIndex <= 0 || track.scrollLeft <= 2;
-      const atEnd = activeIndex >= maxStartIndex() || track.scrollLeft >= maxScroll() - 2;
+    const pageStartIndex = page => Math.min(cards.length - 1, clampPage(page) * cardsPerPage());
+    const targetLeft = page => Math.max(0, cards[pageStartIndex(page)]?.offsetLeft || 0);
+
+    const updateUi = page => {
+      currentPage = clampPage(page);
+      const totalPages = pageCount();
+      if (status) status.textContent = `${String(currentPage + 1).padStart(2, '0')} / ${String(totalPages).padStart(2, '0')}`;
+      const atStart = currentPage === 0;
+      const atEnd = currentPage >= totalPages - 1;
       if (prev) {
         prev.disabled = atStart;
         prev.setAttribute('aria-disabled', atStart ? 'true' : 'false');
@@ -1954,20 +1948,38 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
         next.disabled = atEnd;
         next.setAttribute('aria-disabled', atEnd ? 'true' : 'false');
       }
-      cards.forEach((card, cardIndex) => card.classList.toggle('is-carousel-current', cardIndex === activeIndex));
+      const start = pageStartIndex(currentPage);
+      const end = start + cardsPerPage();
+      cards.forEach((card, index) => card.classList.toggle('is-carousel-current', index >= start && index < end));
+    };
+
+    const nearestPage = () => {
+      const perPage = cardsPerPage();
+      const x = track.scrollLeft;
+      let nearestCard = 0;
+      let distance = Infinity;
+      cards.forEach((card, index) => {
+        const delta = Math.abs((card.offsetLeft || 0) - x);
+        if (delta < distance) {
+          distance = delta;
+          nearestCard = index;
+        }
+      });
+      return clampPage(Math.floor(nearestCard / perPage));
     };
 
     const paintFromScroll = () => {
       raf = 0;
-      updateUi(nearestIndex());
+      updateUi(nearestPage());
     };
     const schedulePaint = () => {
       if (raf) return;
       raf = requestAnimationFrame(paintFromScroll);
     };
 
-    const goTo = index => {
-      const normalized = Math.max(0, Math.min(maxStartIndex(), index));
+    const goToPage = page => {
+      syncEndSpacer();
+      const normalized = clampPage(page);
       updateUi(normalized);
       const left = targetLeft(normalized);
       if (typeof track.scrollTo === 'function') {
@@ -1975,32 +1987,83 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       } else {
         track.scrollLeft = left;
       }
-      window.setTimeout(schedulePaint, reduceMotion ? 0 : 80);
-      window.setTimeout(schedulePaint, reduceMotion ? 0 : 360);
+      window.setTimeout(schedulePaint, reduceMotion ? 0 : 120);
+      window.setTimeout(schedulePaint, reduceMotion ? 0 : 420);
     };
 
     prev?.addEventListener('click', event => {
       event.preventDefault();
-      goTo(activeIndex - 1);
+      goToPage(currentPage - 1);
     });
     next?.addEventListener('click', event => {
       event.preventDefault();
-      goTo(activeIndex + 1);
+      goToPage(currentPage + 1);
     });
     track.addEventListener('scroll', schedulePaint, { passive: true });
     track.addEventListener('keydown', event => {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
-      goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1));
+      goToPage(currentPage + (event.key === 'ArrowRight' ? 1 : -1));
     });
     window.addEventListener('resize', () => {
-      activeIndex = Math.min(activeIndex, maxStartIndex());
-      goTo(activeIndex);
+      syncEndSpacer();
+      currentPage = Math.min(currentPage, pageCount() - 1);
+      goToPage(currentPage);
     }, { passive: true });
 
+    syncEndSpacer();
     updateUi(0);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHomeProductCarousel, { once: true });
   else initHomeProductCarousel();
+})();
+
+// V3.2.00: 21st-inspired How It Works interaction.
+// The active step follows scroll position and keyboard/pointer focus without
+// changing the actual production content or requiring an animation framework.
+(() => {
+  const initHowItWorks = () => {
+    const section = document.querySelector('[data-how-it-works]');
+    if (!section || section.dataset.howReady === '1') return;
+    const steps = [...section.querySelectorAll('[data-how-step]')];
+    const progress = section.querySelector('[data-how-progress]');
+    if (!steps.length) return;
+    section.dataset.howReady = '1';
+
+    const setActive = index => {
+      const normalized = Math.max(0, Math.min(steps.length - 1, Number(index) || 0));
+      steps.forEach((step, stepIndex) => {
+        const active = stepIndex === normalized;
+        step.classList.toggle('is-active', active);
+        step.setAttribute('aria-current', active ? 'step' : 'false');
+      });
+      if (progress) {
+        const pct = steps.length <= 1 ? 100 : (normalized / (steps.length - 1)) * 100;
+        progress.style.height = `${Math.max(8, pct)}%`;
+      }
+    };
+
+    steps.forEach((step, index) => {
+      step.addEventListener('mouseenter', () => setActive(index));
+      step.addEventListener('focusin', () => setActive(index));
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        const index = steps.indexOf(visible.target);
+        if (index >= 0) setActive(index);
+      }, { root: null, rootMargin: '-28% 0px -46% 0px', threshold: [0.2, 0.45, 0.7] });
+      steps.forEach(step => observer.observe(step));
+    }
+
+    setActive(0);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHowItWorks, { once: true });
+  else initHowItWorks();
 })();
