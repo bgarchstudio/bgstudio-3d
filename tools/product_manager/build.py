@@ -969,51 +969,63 @@ def _home_visual_product(product, position='main', eager=False):
     )
 
 
+def _home_spatial_product_copy(product, index=0):
+    if not product:
+        return {
+            'name': f'BG Studio 3D Seçimi {index + 1}',
+            'category': 'BG Studio 3D',
+            'price': 'Teklif al',
+            'description': 'Kişiye özel 3D üretim, prototip ve işletmelere yönelik fiziksel + dijital çözümler.',
+            'href': 'urunler/'
+        }
+    raw_desc = str(product.get('card_description') or product.get('description') or '').strip()
+    return {
+        'name': str(product.get('name') or 'BG Studio 3D ürünü'),
+        'category': str(category_label(product) or 'BG Studio 3D'),
+        'price': str(active_price_text(product) or 'Teklif al'),
+        'description': clip_seo_text(raw_desc, 190) if raw_desc else 'BG Studio 3D tarafından tasarlanan ve üretilen seçili ürün.',
+        'href': ('urunler/' + str(product.get('slug') or '').strip('/') + '/') if str(product.get('slug') or '').strip('/') else 'urunler/'
+    }
+
+
 def render_home_spatial_product(product, index=0, eager=False):
     active_class = ' is-active' if index == 0 else ''
     hidden = 'false' if index == 0 else 'true'
     tabindex = '0' if index == 0 else '-1'
+    copy = _home_spatial_product_copy(product, index)
     if not product:
         return (
-            f'<div class="home-spatial-product home-spatial-product-fallback{active_class}" data-spatial-slide data-spatial-index="{index}" aria-hidden="{hidden}">'
-            f'<div class="home-spatial-fallback-mark"><span>BG</span><small>STUDIO 3D</small></div></div>'
+            f'<a class="home-spatial-product home-spatial-product-fallback{active_class}" data-spatial-slide data-spatial-index="{index}" '
+            f'href="urunler/" aria-hidden="{hidden}" tabindex="{tabindex}">'
+            f'<div class="home-spatial-fallback-mark"><span>BG</span><small>STUDIO 3D</small></div></a>'
         )
-    slug = str(product.get('slug') or '').strip('/')
-    href = esc('urunler/' + slug + '/') if slug else 'urunler/'
-    name = esc(product.get('name') or 'BG Studio 3D ürünü')
-    label = esc(category_label(product))
-    price = esc(active_price_text(product))
     picture = render_home_product_picture(
         product,
         '',
         eager=eager,
         css_class='home-spatial-picture',
-        sizes='(max-width: 760px) calc(100vw - 46px), (max-width: 1100px) 76vw, 46vw'
+        sizes='(max-width: 760px) 78vw, (max-width: 1100px) 54vw, 44vw'
     )
     return (
         f'<a class="home-spatial-product{active_class}" data-spatial-slide data-spatial-index="{index}" '
-        f'href="{href}" aria-hidden="{hidden}" tabindex="{tabindex}">'
+        f'href="{esc(copy["href"])}" aria-label="{esc(copy["name"])} ürününü incele" aria-hidden="{hidden}" tabindex="{tabindex}">'
         f'<div class="home-spatial-media">{picture}</div>'
-        f'<div class="home-spatial-product-meta"><span>{label}</span><strong>{name}</strong><small>{price}</small></div>'
         f'</a>'
     )
 
 
 def render_home_spatial_control(product, index=0):
+    copy = _home_spatial_product_copy(product, index)
     active_class = ' is-active' if index == 0 else ''
-    if not product:
-        label = f'Seçim {index + 1}'
-        category = 'BG Studio 3D'
-    else:
-        label = esc(product.get('name') or f'Ürün {index + 1}')
-        category = esc(category_label(product))
     return (
         f'<button class="home-spatial-control{active_class}" type="button" data-spatial-control="{index}" '
-        f'aria-pressed="{"true" if index == 0 else "false"}" aria-label="{label} ürününü göster">'
-        f'<span>{index + 1:02d}</span><span class="home-spatial-control-copy"><small>{category}</small><strong>{label}</strong></span>'
+        f'data-spatial-name="{esc(copy["name"])}" data-spatial-category="{esc(copy["category"])}" '
+        f'data-spatial-price="{esc(copy["price"])}" data-spatial-description="{esc(copy["description"])}" '
+        f'data-spatial-href="{esc(copy["href"])}" aria-pressed="{"true" if index == 0 else "false"}" '
+        f'aria-label="{esc(copy["name"])} ürününü göster">'
+        f'<span>{index + 1:02d}</span><strong>{esc(copy["name"])}</strong>'
         f'</button>'
     )
-
 
 def render_homepage_v3163(active, featured, field_items):
     # V3.1.76: editorial copy and every homepage product placement can be managed without touching code.
@@ -1029,33 +1041,48 @@ def render_homepage_v3163(active, featured, field_items):
     production_visual = _home_visual_product(production_product, 'production', eager=False)
 
     return f'''<main class="home-v3163" id="main-content">
-<section class="home-hero-v3190 bg-section-compact" aria-labelledby="home-hero-title" data-spatial-hero>
-  <div class="shell home-hero-v3190-shell">
-    <div class="home-hero-copy-v3190 home-motion" data-home-motion>
-      <div class="home-hero-v3190-kicker"><p class="eyebrow">{esc(home_copy["hero_eyebrow"])}</p><span>Tasarım + Üretim</span></div>
-      <h1 id="home-hero-title">{esc(home_copy["hero_title"])}</h1>
-      <div class="home-hero-v3190-foot">
-        <p class="home-hero-lead">{esc(home_copy["hero_lead"])}</p>
-        <div class="hero-actions home-hero-actions-v3190"><a class="primary-cta" href="{esc(home_copy["hero_primary_url"])}">{esc(home_copy["hero_primary_label"])}</a><a class="secondary-cta" href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
-      </div>
-    </div>
-    <div class="home-spatial-stage home-motion" data-home-motion data-spatial-stage aria-label="Öne çıkan BG Studio 3D ürünleri">
-      <div class="home-spatial-backdrop" aria-hidden="true"><span>BG</span><strong>STUDIO 3D</strong></div>
+<section class="home-hero-v3191" aria-labelledby="home-hero-title" data-spatial-hero data-spatial-variant="0">
+  <div class="shell home-hero-v3191-shell">
+    <div class="home-spatial-visual home-motion" data-home-motion data-spatial-stage aria-label="Öne çıkan BG Studio 3D ürünleri">
+      <div class="home-spatial-reactive-glow" aria-hidden="true"></div>
       <div class="home-spatial-orbit home-spatial-orbit-one" aria-hidden="true"></div>
       <div class="home-spatial-orbit home-spatial-orbit-two" aria-hidden="true"></div>
+      <div class="home-spatial-orbit home-spatial-orbit-three" aria-hidden="true"></div>
       <div class="home-spatial-slides">
         {render_home_spatial_product(hero_main, 0, eager=True)}
         {render_home_spatial_product(hero_side_1, 1, eager=False)}
         {render_home_spatial_product(hero_side_2, 2, eager=False)}
       </div>
-      <div class="home-spatial-status"><span>SEÇİLİ ÜRÜN</span><strong data-spatial-status>01 / 03</strong></div>
+      <div class="home-spatial-visual-status"><span class="home-spatial-dot"></span><b data-spatial-status-label>SEÇİLİ ÜRÜN</b><strong data-spatial-status>01 / 03</strong></div>
     </div>
-    <div class="home-spatial-controls" role="group" aria-label="Öne çıkan ürün seçimi">
+
+    <div class="home-spatial-info home-motion" data-home-motion data-spatial-info>
+      <div class="home-spatial-info-topline">
+        <p class="eyebrow">{esc(home_copy["hero_eyebrow"])}</p>
+        <span>Tasarım + Üretim</span>
+      </div>
+      <h1 id="home-hero-title">{esc(home_copy["hero_title"])}</h1>
+      <p class="home-hero-lead">{esc(home_copy["hero_lead"])}</p>
+
+      <div class="home-spatial-product-copy">
+        <div class="home-spatial-product-kicker"><span data-spatial-category>{esc(_home_spatial_product_copy(hero_main, 0)["category"])}</span><small data-spatial-counter>01 / 03</small></div>
+        <h2 data-spatial-name>{esc(_home_spatial_product_copy(hero_main, 0)["name"])}</h2>
+        <p data-spatial-description>{esc(_home_spatial_product_copy(hero_main, 0)["description"])}</p>
+        <div class="home-spatial-spec-card">
+          <div><span>Aktif fiyat</span><strong data-spatial-price>{esc(_home_spatial_product_copy(hero_main, 0)["price"])}</strong></div>
+          <div><span>Üretim</span><strong>Kuşadası</strong></div>
+          <div class="home-spatial-spec-actions"><a class="home-spatial-product-link" data-spatial-link href="{esc(_home_spatial_product_copy(hero_main, 0)["href"])}">Ürünü incele ↗</a><a href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions home-hero-actions-v3191"><a class="primary-cta" href="{esc(home_copy["hero_primary_url"])}">{esc(home_copy["hero_primary_label"])}</a><a class="secondary-cta" href="{esc(home_copy["hero_secondary_url"])}">{esc(home_copy["hero_secondary_label"])}</a></div>
+    </div>
+
+    <div class="home-spatial-dock" role="group" aria-label="Öne çıkan ürün seçimi">
       {render_home_spatial_control(hero_main, 0)}
       {render_home_spatial_control(hero_side_1, 1)}
       {render_home_spatial_control(hero_side_2, 2)}
     </div>
-    <div class="home-hero-proof home-hero-proof-v3190"><span>Kuşadası merkezli üretim</span><span>Tek adet + toplu üretim</span><span>Türkiye geneli kargo</span></div>
   </div>
 </section>
 
@@ -1672,7 +1699,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.90'
+SITE_ASSET_VERSION = '3.1.91'
 
 
 def _relative_prefix_for_html(html_path):

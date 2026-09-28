@@ -1695,9 +1695,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.1.90: homepage spatial product showcase.
-// Keeps the managed homepage product slots as the source of truth and adds
-// lightweight product switching, pointer depth and keyboard controls.
+// V3.1.91: 21st-inspired Spatial Product Showcase adaptation.
+// Managed hero slots remain the data source. The UI mirrors the reference
+// composition with split visual/info panes, reactive tones and a floating dock.
 (() => {
   const initSpatialHero = () => {
     const hero = document.querySelector('[data-spatial-hero]');
@@ -1706,19 +1706,54 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     const slides = [...hero.querySelectorAll('[data-spatial-slide]')];
     const controls = [...hero.querySelectorAll('[data-spatial-control]')];
     const status = hero.querySelector('[data-spatial-status]');
+    const counter = hero.querySelector('[data-spatial-counter]');
+    const category = hero.querySelector('[data-spatial-category]');
+    const name = hero.querySelector('[data-spatial-name]');
+    const description = hero.querySelector('[data-spatial-description]');
+    const price = hero.querySelector('[data-spatial-price]');
+    const productLink = hero.querySelector('[data-spatial-link]');
+    const productCopy = hero.querySelector('.home-spatial-product-copy');
     if (!stage || !slides.length || !controls.length) return;
 
     hero.dataset.spatialReady = '1';
     let activeIndex = 0;
     let autoplayTimer = 0;
     let paused = false;
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    let copyTimer = 0;
+    const reduceMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+
+    const updateCopy = control => {
+      if (!control) return;
+      if (copyTimer) window.clearTimeout(copyTimer);
+      if (productCopy && !reduceMotion) productCopy.classList.add('is-switching');
+      const apply = () => {
+        if (category) category.textContent = control.dataset.spatialCategory || 'BG Studio 3D';
+        if (name) name.textContent = control.dataset.spatialName || 'BG Studio 3D';
+        if (description) description.textContent = control.dataset.spatialDescription || '';
+        if (price) price.textContent = control.dataset.spatialPrice || 'Teklif al';
+        if (productLink) productLink.href = control.dataset.spatialHref || 'urunler/';
+        productCopy?.classList.remove('is-switching');
+      };
+      if (reduceMotion) apply(); else copyTimer = window.setTimeout(apply, 135);
+    };
+
+    const stopAutoplay = () => {
+      if (autoplayTimer) window.clearInterval(autoplayTimer);
+      autoplayTimer = 0;
+    };
+    const startAutoplay = () => {
+      stopAutoplay();
+      if (reduceMotion || paused || slides.length < 2) return;
+      autoplayTimer = window.setInterval(() => setActive(activeIndex + 1), 7200);
+    };
+    const restartAutoplay = () => startAutoplay();
 
     const setActive = (nextIndex, userInitiated = false) => {
       const count = Math.min(slides.length, controls.length);
       if (!count) return;
       const normalized = ((Number(nextIndex) || 0) % count + count) % count;
       activeIndex = normalized;
+      hero.dataset.spatialVariant = String(normalized % 3);
       slides.forEach((slide, index) => {
         const active = index === normalized;
         slide.classList.toggle('is-active', active);
@@ -1730,20 +1765,12 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
         control.classList.toggle('is-active', active);
         control.setAttribute('aria-pressed', active ? 'true' : 'false');
       });
-      if (status) status.textContent = `${String(normalized + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
+      const label = `${String(normalized + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
+      if (status) status.textContent = label;
+      if (counter) counter.textContent = label;
+      updateCopy(controls[normalized]);
       if (userInitiated) restartAutoplay();
     };
-
-    const stopAutoplay = () => {
-      if (autoplayTimer) window.clearInterval(autoplayTimer);
-      autoplayTimer = 0;
-    };
-    const startAutoplay = () => {
-      stopAutoplay();
-      if (reduceMotion || paused || slides.length < 2) return;
-      autoplayTimer = window.setInterval(() => setActive(activeIndex + 1), 6500);
-    };
-    const restartAutoplay = () => startAutoplay();
 
     controls.forEach((control, index) => {
       control.addEventListener('click', () => setActive(index, true));
@@ -1779,8 +1806,8 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
           const rect = stage.getBoundingClientRect();
           const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left)) / Math.max(1, rect.width) - .5;
           const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top)) / Math.max(1, rect.height) - .5;
-          stage.style.setProperty('--spatial-ry', `${(x * 3.2).toFixed(2)}deg`);
-          stage.style.setProperty('--spatial-rx', `${(-y * 2.6).toFixed(2)}deg`);
+          stage.style.setProperty('--spatial-ry', `${(x * 4.2).toFixed(2)}deg`);
+          stage.style.setProperty('--spatial-rx', `${(-y * 3.4).toFixed(2)}deg`);
         });
       };
       stage.addEventListener('pointermove', updateTilt, { passive: true });
