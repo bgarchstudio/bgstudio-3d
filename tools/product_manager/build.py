@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.04'
+SITE_ASSET_VERSION = '3.3.05'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2185,8 +2185,18 @@ def _bg_assistant_payload(prefix=''):
         'version': SITE_ASSET_VERSION,
         'assistant_api': {'endpoint': 'https://ai.bgstudio.com.tr/api/bg-assistant'},
         'business': {
-            'brand': 'BG Studio 3D',
+            'brand': 'BG Studio',
+            'brand_3d': 'BG Studio 3D',
+            'brand_architecture': 'BG Studio Architecture',
             'location': 'Kuşadası, Aydın',
+            'founder': {
+                'name': 'Berkant Gökbel',
+                'role': 'BG Studio kurucusu ve mimar',
+                'ownership': 'BG Studio markası, BG Studio Architecture ve BG Studio 3D Berkant Gökbel’e aittir.',
+                'architecture': 'BG Studio Architecture, Berkant Gökbel’in mimarlık koludur; mimari tasarım ve mimari görselleştirme çalışmaları bu marka altında yürütülür.',
+                'studio_3d': 'BG Studio 3D, Berkant Gökbel’in 3D üretim koludur; 3D baskı ürünleri, kişiye özel üretim, prototip/parça, kurumsal üretim ve NFC + QR işletme çözümleri bu yapı altında geliştirilir.',
+                'summary': 'Berkant Gökbel, mimar ve BG Studio markasının kurucusudur. BG Studio çatısı altında BG Studio Architecture ile mimarlık ve mimari görselleştirme; BG Studio 3D ile 3D baskı, özel üretim, prototip, kurumsal üretim ve NFC + QR çözümlerini yürütür.',
+            },
             'scope': ['3D baskı ürünleri', 'kişiye özel üretim', 'prototip ve parça üretimi', 'kurumsal toplu üretim', 'NFC + QR işletme sistemleri'],
             'production_note': 'Ürünler ürün kaydında aksi belirtilmedikçe doğrudan baskı kalitesiyle sunulur; özel son işlem veya boya vaat edilmez.',
             'pricing_rule': 'Hazır ürünlerde sitedeki güncel fiyat geçerlidir. Özel üretim, prototip, kurumsal ve kapsamı değişen işlerde ölçü/adet/detaya göre teklif hazırlanır.',
@@ -2239,6 +2249,7 @@ def _bg_assistant_payload(prefix=''):
             'projects': f'{prefix}projeler/',
             'quote': f'{prefix}teklif/',
             'contact': f'{prefix}iletisim/',
+            'about': f'{prefix}hakkimizda/',
             'architecture': 'https://bgstudio.com.tr',
             'whatsapp': 'https://wa.me/905302466903',
         },

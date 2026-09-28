@@ -129,6 +129,16 @@
     if (hasAny(query, ['merhaba','selam','selamlar','hey','sa','günaydın','gunaydin','iyi akşamlar','iyi aksamlar','naber'])) {
       return { text: 'Merhaba 👋 Buradayım. Ürün, NFC + QR, 3D baskı, malzeme, özel üretim, prototip, kurumsal üretim veya teklif hakkında sorabilirsin.', actions: [] };
     }
+    if (hasAny(query, ['berkant gökbel','berkant gokbel','kurucu kim','sahibi kim','bg studio sahibi','bg studio kurucusu','bgstudio sahibi','bgstudio kurucusu'])) {
+      const founder = data.business?.founder || {};
+      return {
+        text: founder.summary || 'Berkant Gökbel, mimar ve BG Studio markasının kurucusudur. BG Studio Architecture ve BG Studio 3D kendisine aittir.',
+        actions: [
+          makeAction('BG Studio Architecture', links.architecture),
+          makeAction('BG Studio 3D', links.products)
+        ]
+      };
+    }
     if (hasAny(query, ['nfc nedir','nfc ne','nfc nasıl','nfc nasil','nfc ne işe','nfc ne ise'])) {
       return { text: data.nfc?.definition || 'NFC, uyumlu telefonu etikete veya standa yaklaştırınca bağlantı ya da dijital içeriği temassız açabilen kısa menzilli iletişim teknolojisidir.', actions: [makeAction('BG Studio NFC + QR', links.nfc)] };
     }
