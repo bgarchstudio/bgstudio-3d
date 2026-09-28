@@ -1712,7 +1712,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.1.92'
+SITE_ASSET_VERSION = '3.1.93'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1915,10 +1915,20 @@ def sync_site_asset_versions():
                      f'<link rel="stylesheet" href="{target_css}" media="print" onload="this.media=\'all\'">'
                      f'<noscript><link rel="stylesheet" href="{target_css}"></noscript>'
                      f'<!-- BGSTUDIO:ASYNC_CSS_V3183_END -->')
+        home_blocking_css = (f'<link rel="preload" as="style" href="{target_css}">'
+                             f'<link rel="stylesheet" href="{target_css}">')
 
-        # Keep only one critical first-paint block and inject canonical async assets.
+        # V3.1.93: the home page hero changed substantially after the V3.1.83
+        # critical CSS snapshot. Using that old snapshot while the full stylesheet
+        # loads asynchronously causes a visible first-paint flash of the raw hero
+        # image. On the flagship home page, load the canonical stylesheet before
+        # first paint and omit the obsolete critical block. Other pages keep the
+        # existing async/critical strategy.
         updated = re.sub(r'<style\s+data-critical-v3183[^>]*>.*?</style>', '', updated, flags=re.I | re.S)
-        updated = updated.replace('</head>', async_font + async_css + f'<style data-critical-v3183>{CRITICAL_CSS_V3183}</style></head>', 1)
+        if html_path == ROOT / 'index.html':
+            updated = updated.replace('</head>', async_font + home_blocking_css + '</head>', 1)
+        else:
+            updated = updated.replace('</head>', async_font + async_css + f'<style data-critical-v3183>{CRITICAL_CSS_V3183}</style></head>', 1)
 
         build_meta = f'<meta name="bgstudio-build" content="{SITE_ASSET_VERSION}"/>'
         if 'name="bgstudio-build"' in updated:
