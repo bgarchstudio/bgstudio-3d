@@ -1943,7 +1943,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.2.01-R1'
+SITE_ASSET_VERSION = '3.2.02'
 
 
 def _relative_prefix_for_html(html_path):
@@ -3261,7 +3261,43 @@ def render_contact_page_v3169():
 # ==============================================================
 
 def render_global_footer(prefix=''):
-    return f'''<footer class="footer footer-dark footer-v3171"><div class="shell footer-inner"><div class="footer-brand-row"><a class="brand footer-brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a><p>Fikirden fiziksel ürüne. Kuşadası merkezli 3D baskı, özel üretim ve işletme sistemleri.</p></div><div class="footer-mega" aria-label="Alt site haritası"><nav aria-label="Ürünler"><strong>ÜRÜNLER</strong><a href="{prefix}urunler/">Tüm Ürünler</a><a href="{prefix}urunler/?sirala=newest">Yeni Ürünler</a><a href="{prefix}urunler/?one-cikan=1">Öne Çıkanlar</a></nav><nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal</a></nav><nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC &amp; QR</a><a href="{prefix}nfc-qr/restoran/">Restoran</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Stand</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav><nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="{prefix}projeler/">Projeler</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav><nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a></nav></div><div class="footer-bottom"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><div class="footer-bottom-links"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram</a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><button class="footer-consent-button" type="button">Çerez tercihleri</button><span>Kuşadası, Aydın</span></div></div></div></footer>'''
+    return f'''<footer class="footer footer-dark footer-v3202">
+<div class="shell footer-v3202-shell">
+  <section class="footer-v3202-cta" aria-labelledby="footer-v3202-title">
+    <div>
+      <p class="eyebrow">BİR FİKRİN Mİ VAR?</p>
+      <h2 id="footer-v3202-title">Fikri konuşalım.<br>Üretime dönüştürelim.</h2>
+    </div>
+    <div class="footer-v3202-cta-actions">
+      <a class="footer-v3202-primary" href="{prefix}teklif/">Teklif Al <span aria-hidden="true">↗</span></a>
+      <a class="footer-v3202-secondary" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+  <div class="footer-v3202-divider"></div>
+  <section class="footer-v3202-brandline" aria-label="BG Studio 3D">
+    <div class="footer-v3202-brandcopy">
+      <a class="brand footer-brand" href="{prefix}" aria-label="BG Studio 3D ana sayfa">
+        <span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span>
+      </a>
+      <p>Kuşadası merkezli 3D baskı, özel üretim, prototip, kurumsal üretim ve NFC + QR işletme sistemleri.</p>
+    </div>
+    <div class="footer-v3202-location"><span class="footer-v3202-live-dot" aria-hidden="true"></span><div><small>ÜRETİM MERKEZİ</small><strong>Kuşadası, Aydın</strong></div></div>
+  </section>
+  <div class="footer-v3202-grid" aria-label="Alt site haritası">
+    <nav aria-label="Ürünler"><strong>ÜRÜNLER</strong><a href="{prefix}urunler/">Tüm Ürünler</a><a href="{prefix}urunler/?sirala=newest">Yeni Ürünler</a><a href="{prefix}urunler/?one-cikan=1">Öne Çıkanlar</a></nav>
+    <nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal Üretim</a></nav>
+    <nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC + QR Sistemleri</a><a href="{prefix}nfc-qr/restoran/">Restoran Sistemleri</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Bağlantı</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav>
+    <nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}projeler/">Projeler</a><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav>
+    <nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a></nav>
+  </div>
+  <div class="footer-v3202-socialrow">
+    <div class="footer-v3202-socials" aria-label="Sosyal medya bağlantıları"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram <span>↗</span></a><a href="https://www.facebook.com/bgstudio.3dtr" rel="me noopener" target="_blank">Facebook <span>↗</span></a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp <span>↗</span></a></div>
+    <button class="footer-consent-button footer-v3202-consent" type="button">Çerez tercihleri</button>
+  </div>
+  <div class="footer-v3202-wordmark" aria-hidden="true"><span>BG STUDIO</span><strong>3D</strong></div>
+  <div class="footer-v3202-bottom"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><p>Türkiye geneli kargo · Kuşadası elden teslim</p><p>BG Studio tarafından tasarlanmış ve geliştirilmiştir.</p></div>
+</div>
+</footer>'''
 
 
 def sync_global_footer():
