@@ -3643,3 +3643,40 @@ body{min-height:100dvh;background:#fff}
     font-size:clamp(1.4rem,7.2vw,1.95rem);
   }
 }
+
+
+/* ==========================================================
+   V3.2.03 · Rich navigation + NFC quote mobile select fix
+   ========================================================== */
+@media(min-width:1041px){
+  .main-nav .nav-submenu-rich{width:390px;min-width:390px;padding:10px!important;gap:5px!important;border-radius:22px!important;background:rgba(255,255,255,.97)!important;border:1px solid rgba(57,38,24,.11)!important;box-shadow:0 28px 70px rgba(35,23,15,.16)!important}
+  .main-nav .nav-submenu-studio{width:410px;min-width:410px}
+  .nav-rich-head{display:grid;gap:4px;padding:10px 12px 12px;margin-bottom:2px;border-bottom:1px solid rgba(57,38,24,.08)}
+  .nav-rich-head span{color:var(--accent);font-size:.58rem;font-weight:850;letter-spacing:.16em}
+  .nav-rich-head small{color:#8a7a6d;font-size:.66rem;line-height:1.35}
+  .main-nav .nav-submenu-rich>a{min-height:64px!important;padding:10px 12px!important;gap:14px;border:1px solid transparent}
+  .main-nav .nav-submenu-rich>a:hover,.main-nav .nav-submenu-rich>a:focus-visible,.main-nav .nav-submenu-rich>a.is-active,.main-nav .nav-submenu-rich>a[aria-current="page"]{background:#f5eee6!important;border-color:rgba(138,78,14,.09)}
+  .nav-rich-copy{min-width:0;display:grid;gap:3px;flex:1}
+  .nav-rich-copy strong{color:#2d2118;font-size:.78rem;font-weight:750;line-height:1.2}
+  .nav-rich-copy small{color:#8a7a6d;font-size:.62rem;font-weight:500;line-height:1.35;white-space:normal}
+  .nav-rich-arrow{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(57,38,24,.10);color:#7a695b;font-size:.66rem;transition:transform .18s ease,background .18s ease,color .18s ease}
+  .main-nav .nav-submenu-rich>a:hover .nav-rich-arrow,.main-nav .nav-submenu-rich>a:focus-visible .nav-rich-arrow{transform:translate(1px,-1px);background:#2d2118;color:#fff}
+}
+@media(max-width:1040px){
+  .nav-rich-head{display:none}
+  .nav-submenu-rich .nav-rich-copy{display:grid;gap:2px;min-width:0}
+  .nav-submenu-rich .nav-rich-copy strong{font-size:.82rem;line-height:1.2}
+  .nav-submenu-rich .nav-rich-copy small{display:block;color:#8a7a6d;font-size:.62rem;line-height:1.35;white-space:normal}
+  .nav-submenu-rich .nav-rich-arrow{display:none}
+  .nav-submenu-rich a{height:auto!important;min-height:58px!important;align-items:center!important}
+}
+
+/* Android / iOS: make selected NFC package text visible inside native select controls. */
+.quote-nfc-config .field select,.quote-nfc-config select{
+  appearance:auto;-webkit-appearance:menulist;min-height:58px;
+  background:#fffaf4!important;color:#1b1511!important;-webkit-text-fill-color:#1b1511!important;
+  border-color:#c99a68!important;color-scheme:light;font-weight:650;opacity:1!important
+}
+.quote-nfc-config .field select option,.quote-nfc-config select option{background:#fff!important;color:#1b1511!important;-webkit-text-fill-color:#1b1511!important}
+.quote-nfc-config .field select:focus,.quote-nfc-config select:focus{background:#fff!important;color:#1b1511!important;-webkit-text-fill-color:#1b1511!important;border-color:#d49a59!important;box-shadow:0 0 0 4px rgba(212,154,89,.14)!important}
+@media(max-width:680px){.quote-nfc-config .field select,.quote-nfc-config select{min-height:60px;padding:14px 16px;font-size:16px!important;line-height:1.25}}

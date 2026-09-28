@@ -1943,7 +1943,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.2.02-R4'
+SITE_ASSET_VERSION = '3.2.03'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1983,22 +1983,47 @@ def render_site_header(prefix='', active_key=''):
     def child_active(key):
         return ' aria-current="page" class="is-active"' if active_key == key else ''
 
-    # Keep route URLs relative so the static site works locally, on GitHub Pages
-    # and on the production custom domain without a router dependency.
+    def rich_item(href, title, description, active='', external=False):
+        attrs = ' rel="noopener" target="_blank"' if external else ''
+        return (
+            f'<a{active} href="{href}"{attrs}>'
+            f'<span class="nav-rich-copy"><strong>{title}</strong><small>{description}</small></span>'
+            f'<span class="nav-rich-arrow" aria-hidden="true">↗</span>'
+            f'</a>'
+        )
+
     return (
-        '<header class="site-header" id="top" data-bg-nav="v3.1.72"><div class="shell nav-shell">'
+        '<header class="site-header" id="top" data-bg-nav="v3.2.03"><div class="shell nav-shell">'
         f'<a aria-label="BG Studio 3D ana sayfa" class="brand" href="{prefix}"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3DTR</small></span></a>'
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
         f'<a{direct_active("products")} href="{prefix}urunler/">Ürünler</a>'
-        f'<div class="{group_class("custom-production", "prototype")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a{child_active("custom-production")} href="{prefix}ozel-uretim/">Özel Üretim</a><a{child_active("prototype")} href="{prefix}prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>'
-        f'<div class="{group_class("corporate", "nfc")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a{child_active("corporate")} href="{prefix}kurumsal/">Kurumsal</a><a{child_active("nfc")} href="{prefix}nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>'
+        f'<div class="{group_class("custom-production", "prototype")}">'
+        '<button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button>'
+        '<div class="nav-submenu nav-submenu-rich" id="nav-production">'
+        '<div class="nav-rich-head"><span>ÜRETİM</span><small>Fikirden çalışan fiziksel ürüne.</small></div>'
+        + rich_item(f'{prefix}ozel-uretim/','Özel Üretim','Fikir, görsel veya ölçüden kişiye özel ürün.',child_active('custom-production'))
+        + rich_item(f'{prefix}prototip-parca/','Prototip & Parça','Teknik model, uyum ve işlev odaklı üretim.',child_active('prototype'))
+        + '</div></div>'
+        f'<div class="{group_class("corporate", "nfc")}">'
+        '<button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button>'
+        '<div class="nav-submenu nav-submenu-rich" id="nav-business">'
+        '<div class="nav-rich-head"><span>İŞLETMELER</span><small>Markaya ve sahaya göre üretim.</small></div>'
+        + rich_item(f'{prefix}kurumsal/','Kurumsal Üretim','Toplu, markalı ve işletmeye özel fiziksel üretim.',child_active('corporate'))
+        + rich_item(f'{prefix}nfc-qr/','NFC + QR Sistemleri','Menü, feedback, yönlendirme ve işletme analitiği.',child_active('nfc'))
+        + '</div></div>'
         f'<a{direct_active("projects")} href="{prefix}projeler/">Projeler</a>'
-        f'<div class="{group_class("about", "contact")}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a{child_active("about")} href="{prefix}hakkimizda/">Hakkımızda</a><a{child_active("contact")} href="{prefix}iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>'
+        f'<div class="{group_class("about", "contact")}">'
+        '<button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button>'
+        '<div class="nav-submenu nav-submenu-rich nav-submenu-studio" id="nav-studio">'
+        '<div class="nav-rich-head"><span>BG STUDIO</span><small>Stüdyo, iletişim ve mimarlık.</small></div>'
+        + rich_item(f'{prefix}hakkimizda/','Hakkımızda','Üretim yaklaşımı, stüdyo ve çalışma biçimi.',child_active('about'))
+        + rich_item(f'{prefix}iletisim/','İletişim','Kuşadası, teklif ve iletişim kanalları.',child_active('contact'))
+        + rich_item('https://bgstudio.com.tr','Architecture','Mimarlık ve görselleştirme projeleri.',' class="arch-link"',True)
+        + '</div></div>'
         '<div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>'
         '</nav></div></header>'
     )
-
 
 def ensure_404_root_base():
     """Keep 404 assets/navigation valid when the browser URL is a nested missing route."""
