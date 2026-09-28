@@ -87,7 +87,7 @@ const userConversationText = (history, message) => [
 
 const classifyIntent = (text, context) => {
   if (includesAny(text, ['berkant gökbel','berkant gokbel','bg studio sahibi','bg studio kurucusu','kurucu kim','sahibi kim'])) return 'founder';
-  if (includesAny(text, ['nfc','qr','restoran','masa','feedback','google yorum','dijital menü','dijital menu','başlangıç paket','baslangic paket','profesyonel paket','premium paket','hızlı bağlantı','hizli baglanti'])) return 'nfc';
+  if (includesAny(text, ['nfc','qr','restoran','masa','feedback','duo','trio','google yorum','dijital menü','dijital menu','başlangıç paket','baslangic paket','profesyonel paket','premium paket','hızlı bağlantı','hizli baglanti'])) return 'nfc';
   if (includesAny(text, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','model yaptır','tasarım yaptır'])) return 'custom';
   if (includesAny(text, ['prototip','teknik parça','yedek parça','ölçülü parça','olculu parca'])) return 'prototype';
   if (includesAny(text, ['kurumsal','toptan','logolu','adetli üretim','adetli uretim'])) return 'corporate';
@@ -115,70 +115,138 @@ const formatTl = value => {
   return `${new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)} TL`;
 };
 
-const deriveNfcFacts = (text, context) => {
-  const nfc = context?.nfc || {};
+const resolveNfcTopic = text => {
   const normalized = fold(text);
-  if (!includesAny(normalized, ['nfc','qr','restoran','masa','paket','feedback','dijital menu'])) return null;
+  if (includesAny(normalized, ['feedback trio','premium feedback trio']) || /(^|\s)trio(?:\s|$)/i.test(normalized)) return 'feedback_trio';
+  if (includesAny(normalized, ['feedback duo','premium feedback duo']) || /(^|\s)duo(?:\s|$)/i.test(normalized)) return 'feedback_duo';
+  if (includesAny(normalized, ['başlangıç paket','baslangic paket','başlangıç','baslangic'])) return 'baslangic';
+  if (includesAny(normalized, ['profesyonel paket','profesyonel'])) return 'profesyonel';
+  if (includesAny(normalized, ['premium paket']) && !includesAny(normalized, ['feedback','duo','trio'])) return 'premium';
+  if (includesAny(normalized, ['hızlı bağlantı','hizli baglanti','hızlı stand','hizli stand'])) return 'hizli_stand';
+  return '';
+};
+
+const lastNfcTopicFromHistory = history => {
+  const users = Array.isArray(history) ? history.filter(item => item?.role === 'user').slice(-6).reverse() : [];
+  for (const item of users) {
+    const topic = resolveNfcTopic(item?.content || '');
+    if (topic) return topic;
+  }
+  return '';
+};
+
+const extractCount = (text, unitPattern) => {
+  const match = fold(text).match(new RegExp(`(\\d{1,3})\\s*(?:${unitPattern})`, 'i'));
+  return match ? Number(match[1]) : null;
+};
+
+const deriveNfcFacts = (message, history, context) => {
+  const nfc = context?.nfc || {};
+  const current = String(message || '');
+  const currentNormalized = fold(current);
+  const historyUsers = Array.isArray(history) ? history.filter(item => item?.role === 'user').slice(-6) : [];
+  const historyText = historyUsers.map(item => item.content).filter(Boolean).join(' · ');
+  const conversation = [historyText, current].filter(Boolean).join(' · ');
+
+  if (!includesAny(conversation, ['nfc','qr','restoran','masa','paket','feedback','duo','trio','dijital menu'])) return null;
+
+  const explicitTopic = resolveNfcTopic(current);
+  const topic = explicitTopic || lastNfcTopicFromHistory(history);
+  const continuation = !explicitTopic;
+  const optionScope = continuation ? conversation : current;
+  const quantityScope = continuation ? conversation : current;
 
   const packages = Array.isArray(nfc.packages) ? nfc.packages : [];
-  const special = Array.isArray(nfc.special_restaurant_packages) ? nfc.special_restaurant_packages : [];
-  const tableMatch = normalized.match(/(\d{1,3})\s*(?:masa|masalik|masalık)/i);
-  const tableCount = tableMatch ? Number(tableMatch[1]) : null;
+  const duoRows = Array.isArray(nfc.feedback_duo_packages) ? nfc.feedback_duo_packages : [];
+  const specialRows = Array.isArray(nfc.special_restaurant_packages) ? nfc.special_restaurant_packages : [];
 
-  let selected = packages.find(pkg => {
-    const name = fold(pkg?.name || '');
-    if (!name) return false;
-    if (normalized.includes(name)) return true;
-    if (name.includes('profesyonel') && normalized.includes('profesyonel')) return true;
-    if (name.includes('baslangic') && normalized.includes('baslangic')) return true;
-    if (name.includes('premium') && normalized.includes('premium') && !normalized.includes('feedback')) return true;
-    if (name.includes('hizli baglanti') && normalized.includes('hizli baglanti')) return true;
-    return false;
-  }) || null;
+  const currentTables = extractCount(quantityScope, 'masa|masalik|masalık');
+  const currentStands = extractCount(quantityScope, 'stand|standlik|standlık');
 
+  const qrMentioned = /\bqr\b/i.test(fold(optionScope));
+  const qrNegative = /(qr[^.]{0,18}(?:istemiyorum|olmasin|olmasın|haric|hariç|yok))|((?:istemiyorum|olmasin|olmasın|haric|hariç|yok)[^.]{0,18}qr)/i.test(fold(optionScope));
+  const qrRequested = qrMentioned && !qrNegative;
+  const menuRequested = includesAny(optionScope, ['menü tasarım','menu tasarim','menü tasarımı','menu tasarimi']);
+  const logoRequested = includesAny(optionScope, ['logo tasarım','logo tasarim','logo tasarımı','logo tasarimi']);
+  const qrUnit = numeric(nfc.qr_unit);
+  const menuCost = menuRequested ? (numeric(nfc.menu_design) || 0) : 0;
+  const logoCost = logoRequested ? (numeric(nfc.logo_design) || 0) : 0;
+
+  if (topic === 'feedback_trio') {
+    return {
+      topic,
+      year: nfc.year || '',
+      selected_package: nfc.feedback_trio?.name || 'Premium Feedback Trio',
+      pricing_mode: 'quote_only',
+      requested_stands: currentStands,
+      nfc_per_stand: numeric(nfc.feedback_trio?.nfc_per_stand) || 3,
+      qr_optional: nfc.feedback_trio?.qr_optional !== false,
+      pricing_note: nfc.feedback_trio?.pricing_note || 'Premium Feedback Trio için sabit hazır tarife yayınlanmıyor; fiyat teklif kapsamında belirlenir.'
+    };
+  }
+
+  if (topic === 'feedback_duo') {
+    const requested = currentStands;
+    const ordered = duoRows.slice().sort((a,b) => Number(a.stands || 0) - Number(b.stands || 0));
+    const chosen = requested
+      ? ordered.find(row => numeric(row.stands) !== null && Number(row.stands) >= requested)
+      : ordered[0];
+    if (!chosen) return { topic, year: nfc.year || '', selected_package: 'Premium Feedback Duo', note: 'Duo hazır kapasite tablosu bulunamadı.' };
+    return {
+      topic,
+      year: nfc.year || '',
+      selected_package: 'Premium Feedback Duo',
+      pricing_mode: 'fixed_capacity',
+      requested_stands: requested,
+      package_stands: numeric(chosen.stands),
+      total_nfc: numeric(chosen.nfc),
+      base_price: numeric(chosen.price),
+      base_price_text: formatTl(chosen.price),
+      renewal: numeric(chosen.renewal),
+      qr_optional: true,
+      note: 'Duo hazır kapasitesi feedback_duo_packages tablosundan seçildi. QR ayrı kalemdir; stand başına QR adedi için veri yoksa miktar uydurma.'
+    };
+  }
+
+  const standardByKey = key => packages.find(pkg => String(pkg?.key || '') === key) || null;
+  let chosen = topic ? standardByKey(topic) : null;
   let selectedSpecial = null;
-  if (!selected && tableCount) {
-    selected = packages
-      .filter(pkg => numeric(pkg?.tables) !== null && numeric(pkg.tables) >= tableCount)
-      .sort((a, b) => Number(a.tables) - Number(b.tables))[0] || null;
 
-    if (!selected) {
-      selectedSpecial = special
-        .filter(pkg => numeric(pkg?.tables) !== null && numeric(pkg.tables) >= tableCount)
-        .sort((a, b) => Number(a.tables) - Number(b.tables))[0] || null;
+  if (!chosen && currentTables) {
+    chosen = packages
+      .filter(pkg => numeric(pkg?.tables) !== null && numeric(pkg.tables) >= currentTables)
+      .sort((a,b) => Number(a.tables) - Number(b.tables))[0] || null;
+    if (!chosen) {
+      selectedSpecial = specialRows
+        .filter(pkg => numeric(pkg?.tables) !== null && numeric(pkg.tables) >= currentTables)
+        .sort((a,b) => Number(a.tables) - Number(b.tables))[0] || null;
     }
   }
 
-  const chosen = selected || selectedSpecial;
-  if (!chosen) return {
+  const selected = chosen || selectedSpecial;
+  if (!selected) return {
+    topic: topic || '',
     year: nfc.year || '',
-    requested_tables: tableCount,
+    requested_tables: currentTables,
     note: 'Net paket seçimi için mevcut paket tablolarını kullan.'
   };
 
-  const qrMentioned = /\bqr\b/i.test(normalized);
-  const qrNegative = /(qr[^.]{0,18}(?:istemiyorum|olmasin|olmasın|haric|hariç|yok))|((?:istemiyorum|olmasin|olmasın|haric|hariç|yok)[^.]{0,18}qr)/i.test(normalized);
-  const qrRequested = qrMentioned && !qrNegative;
-  const packageTables = numeric(chosen.tables) || tableCount;
-  const basePrice = numeric(chosen.price);
-  const qrUnit = numeric(nfc.qr_unit);
+  const packageTables = numeric(selected.tables) || currentTables;
+  const basePrice = numeric(selected.price);
   const qrCount = qrRequested && packageTables ? packageTables * 3 : 0;
   const qrCost = qrRequested && qrUnit !== null ? qrCount * qrUnit : 0;
-
-  const menuRequested = includesAny(normalized, ['menü tasarım','menu tasarim','menü tasarımı','menu tasarimi']);
-  const logoRequested = includesAny(normalized, ['logo tasarım','logo tasarim','logo tasarımı','logo tasarimi']);
-  const menuCost = menuRequested ? (numeric(nfc.menu_design) || 0) : 0;
-  const logoCost = logoRequested ? (numeric(nfc.logo_design) || 0) : 0;
   const total = basePrice === null ? null : basePrice + qrCost + menuCost + logoCost;
 
   return {
+    topic: topic || String(selected.key || ''),
     year: nfc.year || '',
-    selected_package: chosen.name || `${chosen.tables || ''} masa paket`,
-    requested_tables: tableCount,
+    selected_package: selected.name || `${selected.tables || ''} masa paket`,
+    pricing_mode: 'fixed_capacity',
+    requested_tables: currentTables,
     package_tables: packageTables,
     base_price: basePrice,
     base_price_text: basePrice === null ? '' : formatTl(basePrice),
-    renewal: numeric(chosen.renewal),
+    renewal: numeric(selected.renewal),
     qr_requested: qrRequested,
     qr_count: qrCount,
     qr_unit: qrUnit,
@@ -189,14 +257,30 @@ const deriveNfcFacts = (text, context) => {
     logo_design_cost: logoCost,
     calculated_scope_total: total,
     calculated_scope_total_text: total === null ? '' : formatTl(total),
-    note: 'Toplam yalnızca kullanıcının açıkça istediği QR / menü tasarımı / logo tasarımı ek kalemlerini içerir.'
+    note: 'Açıkça yeni bir paket/ürün adı yazılırsa önceki paket ve opsiyonlar sıfırlanır. Kısa devam sorularında önceki kapsam korunur.'
   };
 };
 
-const deterministicNfcPriceReply = (conversationText, facts) => {
-  if (!facts || !facts.selected_package || facts.base_price === null || facts.base_price === undefined) return '';
-  if (!includesAny(conversationText, ['fiyat','fiyatı','fiyati','kaç tl','kac tl','kaç para','kac para','ne kadar','kaça','kaca','ücret','ucret','toplam'])) return '';
+const deterministicNfcPriceReply = (currentMessage, facts) => {
+  if (!facts) return '';
+  if (!includesAny(currentMessage, ['fiyat','fiyatı','fiyati','kaç tl','kac tl','kaç para','kac para','ne kadar','kaça','kaca','ücret','ucret','toplam'])) return '';
 
+  if (facts.pricing_mode === 'quote_only' || facts.topic === 'feedback_trio') {
+    const standText = facts.requested_stands ? `${facts.requested_stands} stand için ` : '';
+    return `${facts.selected_package || 'Premium Feedback Trio'} için sabit hazır tarife yayınlanmıyor. ${standText}güncel fiyat stand adedi ve kapsam netleştikten sonra teklif kapsamında belirlenir.`;
+  }
+
+  if (facts.topic === 'feedback_duo') {
+    if (facts.base_price === null || facts.base_price === undefined) return '';
+    const requestedNote = facts.requested_stands && facts.package_stands && facts.package_stands !== facts.requested_stands
+      ? `${facts.requested_stands} stand isteği için bir üst hazır kapasite olan ${facts.package_stands} stand seçilir. `
+      : '';
+    const nfcText = facts.total_nfc ? `, ${facts.total_nfc} NFC` : '';
+    const renewalText = facts.renewal ? ` Yıllık yenileme ${formatTl(facts.renewal)}.` : '';
+    return `${requestedNote}Premium Feedback Duo ${facts.package_stands} stand${nfcText}: ${formatTl(facts.base_price)}.${renewalText} QR opsiyoneldir ve ayrı kalemdir.`;
+  }
+
+  if (!facts.selected_package || facts.base_price === null || facts.base_price === undefined) return '';
   const lines = [];
   const tableLabel = facts.package_tables ? `${facts.package_tables} masalık ` : '';
   lines.push(`${tableLabel}${facts.selected_package}: ${formatTl(facts.base_price)}.`);
@@ -204,16 +288,9 @@ const deterministicNfcPriceReply = (conversationText, facts) => {
   if (facts.qr_requested) {
     lines.push(`QR ek maliyeti: ${facts.package_tables} masa × 3 QR × ${formatTl(facts.qr_unit)} = ${formatTl(facts.qr_cost)}.`);
   }
-  if (facts.menu_design_requested && facts.menu_design_cost) {
-    lines.push(`Menü tasarımı: ${formatTl(facts.menu_design_cost)}.`);
-  }
-  if (facts.logo_design_requested && facts.logo_design_cost) {
-    lines.push(`Logo tasarımı: ${formatTl(facts.logo_design_cost)}.`);
-  }
-
-  if (facts.calculated_scope_total !== null && facts.calculated_scope_total !== undefined) {
-    lines.push(`Toplam: ${formatTl(facts.calculated_scope_total)}.`);
-  }
+  if (facts.menu_design_requested && facts.menu_design_cost) lines.push(`Menü tasarımı: ${formatTl(facts.menu_design_cost)}.`);
+  if (facts.logo_design_requested && facts.logo_design_cost) lines.push(`Logo tasarımı: ${formatTl(facts.logo_design_cost)}.`);
+  if (facts.calculated_scope_total !== null && facts.calculated_scope_total !== undefined) lines.push(`Toplam: ${formatTl(facts.calculated_scope_total)}.`);
   return lines.join(' ');
 };
 
@@ -261,12 +338,13 @@ export default {
     };
     const conversationText = userConversationText(history, message);
     const intent = classifyIntent(conversationText, context);
-    const derivedNfc = intent === 'nfc' ? deriveNfcFacts(conversationText, context) : null;
+    const derivedNfc = intent === 'nfc' ? deriveNfcFacts(message, history, context) : null;
 
     const instructions = [
       'Sen BG Assistant’sın. BG Studio 3D web sitesinin OpenAI destekli müşteri, ürün ve çözüm danışmanısın.',
       'Kullanıcı hangi dilde yazarsa o dilde yanıt ver; varsayılan dil Türkçe.',
       'ÖNCE kullanıcının son mesajını, sonra önceki konuşmayı birlikte yorumla. “Peki ne kadar?”, “QR da olsun”, “hangisi bana uygun?” gibi kısa devam sorularını önceki konuya bağla.',
+      'Kullanıcı son mesajında açıkça yeni bir paket veya ürün adı yazarsa eski paket bağlamını taşıma. Örneğin Başlangıç konuşmasından sonra “Feedback Duo kaç TL?” denirse yalnızca Feedback Duo cevaplanır.',
       'Aynı kullanıcı mesajını iki kez yanıtlıyormuş gibi davranma. Konuşmada tekrar varsa doğal biçimde tek cevap ver.',
       'Doğrudan sorulan şeyi ilk cümlede cevapla. Fiyat sorusuysa ilk cümlede fiyat; tanım sorusuysa ilk cümlede tanım; seçim sorusuysa önce öneriyi ver.',
       'Basit sorularda 2-5 kısa cümle hedefle. Gereksiz giriş, tekrar, uzun satış konuşması ve kullanıcı istemeden aşırı detay verme.',
@@ -299,7 +377,7 @@ export default {
     ];
 
     const deterministicNfcText = intent === 'nfc'
-      ? deterministicNfcPriceReply(conversationText, derivedNfc)
+      ? deterministicNfcPriceReply(message, derivedNfc)
       : '';
 
     if (deterministicNfcText) {

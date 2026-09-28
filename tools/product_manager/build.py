@@ -1944,7 +1944,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.10-R1'
+SITE_ASSET_VERSION = '3.3.10-R2'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2208,6 +2208,7 @@ def _bg_assistant_payload(prefix=''):
             'qr_definition': 'QR kod, telefon kamerasıyla taranan görsel koddur. NFC ile aynı hedefe alternatif erişim sunabilir; NFC dokundur/yaklaştır, QR ise kamerayla tara mantığıyla çalışır.',
             'system_summary': 'BG Studio NFC + QR sistemi yalnızca dijital menü değildir; masa/stand bazlı erişim, dijital menü, sosyal yönlendirmeler, işletme içi feedback akışı, Google yorumuna devam adımı, müşteri paneli ve etkileşim analitiği gibi modülleri işletmeye göre bir araya getirir.',
             'feedback_rule': 'Değerlendirme akışında kullanıcı önce BG Studio işletme içi feedback/değerlendirme ekranına yönlenebilir; uygun akışta ardından Google yorum adımı gösterilir. Sistemi doğrudan Google linki olarak tanımlama.',
+            'feedback_trio': {'name': 'Premium Feedback Trio', 'pricing_mode': 'quote_only', 'nfc_per_stand': 3, 'qr_optional': True, 'pricing_note': 'Premium Feedback Trio için sabit hazır tarife yayınlanmıyor; güncel fiyat stand adedi ve kapsam netleştikten sonra teklif kapsamında belirlenir.'},
             'menu': 'Menüler işletmeye göre TR/EN görsel içerik, ek dillerde metin içerik, ürün içeriği, alerjen ve kalori bilgileri barındırabilir.',
             'analytics': 'İşletmeye göre masa, NFC tarama, menü tıklaması, değerlendirme/yorum ve sosyal medya gibi etkileşimler panelde izlenebilir.',
             'premium_plus': 'Premium Plus geliştiriliyor/yakında. Aktif olmayan özellikleri varmış gibi vaat etme; garson çağır veya hesap iste gibi özellikleri güncel paketin parçası diye söyleme.',

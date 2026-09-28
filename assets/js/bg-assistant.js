@@ -168,6 +168,7 @@
       if (name.includes('başlangıç') && (folded.includes('başlangıç') || folded.includes('baslangic'))) return true;
       if (name.includes('premium') && folded.includes('premium') && !folded.includes('feedback')) return true;
       if (name.includes('hızlı bağlantı') && (folded.includes('hızlı bağlantı') || folded.includes('hizli baglanti'))) return true;
+      if (name.includes('feedback duo') && folded.includes('feedback duo')) return true;
       return false;
     }) || null;
   };
@@ -279,6 +280,23 @@
       return { text: 'PLA genelde kolay baskı ve iyi yüzey kalitesiyle öne çıkar. PETG ise kullanım senaryosuna göre daha yüksek dayanım ve neme karşı avantaj sağlayabilir. Belirli ürün için ürün kaydındaki malzemeyi esas alırım.', actions: [makeAction('Ürünleri incele', links.products)] };
     }
     if (isNfcIntent(effective)) {
+      const currentFolded = fold(query);
+      if (currentFolded.includes('feedback trio') || /(^|\s)trio(?:\s|$)/i.test(currentFolded)) {
+        return {
+          text: data.nfc?.feedback_trio?.pricing_note || 'Premium Feedback Trio için sabit hazır tarife yayınlanmıyor; güncel fiyat stand adedi ve kapsam netleştikten sonra teklif kapsamında belirlenir.',
+          actions: contextualActions(query, 'nfc', history)
+        };
+      }
+      if (currentFolded.includes('feedback duo') || /(^|\s)duo(?:\s|$)/i.test(currentFolded)) {
+        const rows = (data.nfc?.feedback_duo_packages || []).slice().sort((a,b) => Number(a.stands || 0) - Number(b.stands || 0));
+        const row = rows[0];
+        if (row && asksPrice) {
+          return {
+            text: `Premium Feedback Duo ${row.stands} stand / ${row.nfc} NFC için ${formatTl(row.price)}'den başlar.${row.renewal ? ` Yıllık yenileme ${formatTl(row.renewal)}.` : ''} QR opsiyoneldir ve ayrı kalemdir.`,
+            actions: contextualActions(query, 'nfc', history)
+          };
+        }
+      }
       const pkg = nfcPackageMatch(effective);
       if (pkg && asksPrice) {
         const capacity = pkg.tables ? ` ${pkg.tables} masa` : '';
