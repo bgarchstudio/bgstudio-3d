@@ -31,6 +31,17 @@
     document.body.classList.toggle('bg-assistant-keyboard', keyboardOpen);
   };
 
+  const positionAssistantPanel = () => {
+    if (panel.hidden || document.body.classList.contains('bg-assistant-keyboard')) return;
+    const viewport = window.visualViewport;
+    const viewportHeight = viewport?.height || window.innerHeight;
+    const viewportOffsetTop = viewport?.offsetTop || 0;
+    const rect = trigger.getBoundingClientRect();
+    const triggerTop = rect.top - viewportOffsetTop;
+    const bottom = Math.max(10, Math.round(viewportHeight - triggerTop + 8));
+    panel.style.setProperty('--bg-assistant-panel-bottom', `${bottom}px`);
+  };
+
   const fold = value => String(value || '')
     .toLocaleLowerCase('tr-TR')
     .replaceAll('ı', 'i').replaceAll('ğ', 'g').replaceAll('ü', 'u')
@@ -432,14 +443,33 @@
   };
 
   const openPanel = () => {
-    panel.hidden = false; panel.setAttribute('aria-hidden','false'); trigger.setAttribute('aria-expanded','true');
-    document.body.classList.add('bg-assistant-open'); start(); syncAssistantViewport();
-    window.setTimeout(() => { syncAssistantViewport(); input?.focus({ preventScroll: true }); }, 60);
+    window.dispatchEvent(new CustomEvent('bgstudio:floating-panel-opening', { detail: { panel: 'assistant' } }));
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden','false');
+    trigger.setAttribute('aria-expanded','true');
+    document.body.classList.add('bg-assistant-open');
+    start();
+    syncAssistantViewport();
+    positionAssistantPanel();
+    window.setTimeout(() => {
+      syncAssistantViewport();
+      positionAssistantPanel();
+      input?.focus({ preventScroll: true });
+    }, 60);
   };
-  const closePanel = () => {
-    panel.hidden = true; panel.setAttribute('aria-hidden','true'); trigger.setAttribute('aria-expanded','false');
-    document.body.classList.remove('bg-assistant-open','bg-assistant-keyboard'); trigger.focus({ preventScroll: true });
+  const closePanel = ({ focusTrigger = true } = {}) => {
+    panel.hidden = true;
+    panel.setAttribute('aria-hidden','true');
+    trigger.setAttribute('aria-expanded','false');
+    panel.style.removeProperty('--bg-assistant-panel-bottom');
+    document.body.classList.remove('bg-assistant-open','bg-assistant-keyboard');
+    if (focusTrigger) trigger.focus({ preventScroll: true });
   };
+
+  window.addEventListener('bgstudio:floating-panel-opening', event => {
+    if (event.detail?.panel === 'assistant') return;
+    if (!panel.hidden) closePanel({ focusTrigger: false });
+  });
 
   const submitQuery = async query => {
     const clean = String(query || '').trim().slice(0, 600);
@@ -475,7 +505,7 @@
   };
 
   trigger.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
-  closeButton?.addEventListener('click', closePanel);
+  closeButton?.addEventListener('click', () => closePanel());
   form?.addEventListener('submit', event => {
     event.preventDefault();
     const value = input?.value || '';
@@ -496,8 +526,8 @@
     window.open(`https://wa.me/905302466903?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
   });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) closePanel(); });
-  window.addEventListener('resize', syncAssistantViewport, { passive: true });
-  window.visualViewport?.addEventListener('resize', syncAssistantViewport, { passive: true });
-  window.visualViewport?.addEventListener('scroll', syncAssistantViewport, { passive: true });
+  window.addEventListener('resize', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
+  window.visualViewport?.addEventListener('resize', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
+  window.visualViewport?.addEventListener('scroll', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
   syncAssistantViewport();
 })();

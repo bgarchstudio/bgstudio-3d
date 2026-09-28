@@ -4676,3 +4676,108 @@ img,video,svg,canvas{max-width:100%}
 @supports not (overflow:clip){
   html,body{overflow-x:hidden}
 }
+
+
+/* ==========================================================
+   V3.3.16 · FLOATING PANEL COORDINATION
+   WhatsApp + BG Assistant act as one mutually-exclusive dock.
+   ========================================================== */
+
+/* Keep launcher rail visible while either panel is open. */
+body.bg-assistant-open:not(.bg-assistant-keyboard) .floating-actions,
+body.wa-quick-open .floating-actions{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+}
+body.bg-assistant-open:not(.bg-assistant-keyboard) .floating-actions>*,
+body.wa-quick-open .floating-actions>*{
+  pointer-events:auto!important;
+}
+
+/* Active launchers keep their brand mark. They never morph into an X. */
+.floating-whatsapp.is-open.has-brand-icon::before,
+.floating-whatsapp.is-open:hover.has-brand-icon::before{
+  content:""!important;
+  width:27px!important;
+  height:27px!important;
+  left:50%!important;
+  top:50%!important;
+  margin:0!important;
+  display:block!important;
+  background:#fff!important;
+  color:transparent!important;
+  font-size:0!important;
+  mask-image:url("../icons/whatsapp.svg")!important;
+  -webkit-mask-image:url("../icons/whatsapp.svg")!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-position:center!important;
+  -webkit-mask-position:center!important;
+  mask-size:contain!important;
+  -webkit-mask-size:contain!important;
+  transform:translate(-50%,-50%)!important;
+}
+
+/* Panels live to the left of the launcher rail so both launchers remain clickable. */
+.wa-quick-panel.open{
+  right:max(88px,calc(72px + env(safe-area-inset-right)))!important;
+  bottom:var(--bg-wa-panel-bottom,max(88px,calc(70px + env(safe-area-inset-bottom))))!important;
+}
+.bg-assistant-panel:not([hidden]){
+  right:max(88px,calc(72px + env(safe-area-inset-right)))!important;
+  bottom:var(--bg-assistant-panel-bottom,max(88px,calc(76px + env(safe-area-inset-bottom))))!important;
+  transform-origin:bottom right;
+}
+
+/* Keep the active launcher visually obvious without replacing its logo. */
+.floating-whatsapp.is-open{
+  box-shadow:0 13px 34px rgba(17,111,54,.34),0 0 0 4px rgba(37,211,102,.14)!important;
+}
+body.bg-assistant-open .bg-assistant-trigger{
+  box-shadow:0 16px 42px rgba(35,22,12,.34),0 0 0 4px rgba(215,154,80,.14)!important;
+}
+
+/* The assistant keyboard mode still owns the full visual viewport. */
+body.bg-assistant-keyboard .bg-assistant-panel{
+  right:max(6px,env(safe-area-inset-right))!important;
+  bottom:auto!important;
+}
+
+@media(max-width:680px){
+  /* Leave a permanent launcher rail on the right on phones. */
+  .wa-quick-panel.open,
+  .bg-assistant-panel:not([hidden]){
+    left:max(8px,env(safe-area-inset-left))!important;
+    right:max(74px,calc(66px + env(safe-area-inset-right)))!important;
+    width:auto!important;
+  }
+
+  .wa-quick-panel.open{
+    bottom:var(--bg-wa-panel-bottom,max(76px,calc(66px + env(safe-area-inset-bottom))))!important;
+  }
+  .bg-assistant-panel:not([hidden]){
+    bottom:var(--bg-assistant-panel-bottom,max(76px,calc(66px + env(safe-area-inset-bottom))))!important;
+  }
+
+  body.has-mobile-product-cta .wa-quick-panel.open,
+  body.has-mobile-product-cta .bg-assistant-panel:not([hidden]){
+    /* Dynamic JS anchor already accounts for the elevated launcher stack. */
+    bottom:var(--bg-wa-panel-bottom,var(--bg-assistant-panel-bottom,max(146px,calc(134px + env(safe-area-inset-bottom)))))!important;
+  }
+
+  body.bg-assistant-keyboard .bg-assistant-panel{
+    left:max(6px,env(safe-area-inset-left))!important;
+    right:max(6px,env(safe-area-inset-right))!important;
+    width:auto!important;
+    bottom:auto!important;
+  }
+}
+
+@media(max-width:390px){
+  .wa-quick-panel.open,
+  .bg-assistant-panel:not([hidden]){
+    left:max(6px,env(safe-area-inset-left))!important;
+    right:max(70px,calc(62px + env(safe-area-inset-right)))!important;
+  }
+}

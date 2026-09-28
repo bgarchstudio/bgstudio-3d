@@ -1572,6 +1572,17 @@ if (floatingWhatsApp) {
   const seenKey = 'bgstudio-wa-seen-v1';
   try { if (sessionStorage.getItem(seenKey)) floatingWhatsApp.classList.add('wa-seen'); } catch (_) {}
   floatingWhatsApp.title = 'WhatsApp ile hızlı iletişim';
+  const positionWhatsAppPanel = () => {
+    if (!panel.classList.contains('open')) return;
+    const viewport = window.visualViewport;
+    const viewportHeight = viewport?.height || window.innerHeight;
+    const viewportOffsetTop = viewport?.offsetTop || 0;
+    const rect = floatingWhatsApp.getBoundingClientRect();
+    const triggerTop = rect.top - viewportOffsetTop;
+    const bottom = Math.max(10, Math.round(viewportHeight - triggerTop + 8));
+    panel.style.setProperty('--bg-wa-panel-bottom', `${bottom}px`);
+  };
+
   const setPanel = (open) => {
     panel.toggleAttribute('hidden', !open);
     if ('inert' in panel) panel.inert = !open;
@@ -1580,11 +1591,18 @@ if (floatingWhatsApp) {
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     floatingWhatsApp.classList.toggle('is-open', open);
     floatingWhatsApp.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('wa-quick-open', open);
     if (open) {
+      positionWhatsAppPanel();
       floatingWhatsApp.classList.add('wa-seen');
       try { sessionStorage.setItem(seenKey, '1'); } catch (_) {}
       trackEvent('whatsapp_panel_open', { page_location: canonicalUrl });
-      requestAnimationFrame(() => panel.scrollTo?.({ top: 0, behavior: 'auto' }));
+      requestAnimationFrame(() => {
+        positionWhatsAppPanel();
+        panel.scrollTo?.({ top: 0, behavior: 'auto' });
+      });
+    } else {
+      panel.style.removeProperty('--bg-wa-panel-bottom');
     }
   };
   floatingWhatsApp.setAttribute('aria-haspopup', 'dialog');
@@ -1594,7 +1612,22 @@ if (floatingWhatsApp) {
   // suppress or delay the synthetic click after touchend. Toggle on touchend
   // and ignore the follow-up click so one tap always equals one action.
   let lastTouchToggleAt = 0;
-  const toggleWhatsAppPanel = () => setPanel(!panel.classList.contains('open'));
+  const toggleWhatsAppPanel = () => {
+    const opening = !panel.classList.contains('open');
+    if (opening) {
+      window.dispatchEvent(new CustomEvent('bgstudio:floating-panel-opening', { detail: { panel: 'whatsapp' } }));
+    }
+    setPanel(opening);
+  };
+
+  window.addEventListener('bgstudio:floating-panel-opening', event => {
+    if (event.detail?.panel === 'whatsapp') return;
+    if (panel.classList.contains('open')) setPanel(false);
+  });
+
+  window.addEventListener('resize', positionWhatsAppPanel, { passive: true });
+  window.visualViewport?.addEventListener('resize', positionWhatsAppPanel, { passive: true });
+  window.visualViewport?.addEventListener('scroll', positionWhatsAppPanel, { passive: true });
   floatingWhatsApp.addEventListener('touchend', event => {
     if (event.changedTouches && event.changedTouches.length > 1) return;
     lastTouchToggleAt = Date.now();
