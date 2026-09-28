@@ -1943,8 +1943,8 @@ def render_product_page(p, related):
 
 
 
-# V3.2.05 STABLE · frozen public baseline after V3.2.04 final polish.
-SITE_ASSET_VERSION = '3.2.05'
+# V3.3.00 · BG Assistant Foundation
+SITE_ASSET_VERSION = '3.3.00'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2070,6 +2070,133 @@ def sync_site_header_navigation():
     return {'scanned': scanned, 'changed': changed, 'missing_header': missing_header}
 
 
+def _bg_assistant_payload(prefix=''):
+    products = [p for p in load_products() if p.get('active', True)]
+    product_rows = []
+    for product in products:
+        description = str(product.get('card_description') or product.get('description') or '').strip()
+        product_rows.append({
+            'slug': str(product.get('slug') or '').strip(),
+            'name': str(product.get('name') or 'Ürün').strip(),
+            'category': str(category_label(product) or '').strip(),
+            'price': str(active_price_text(product) or 'Fiyat için iletişim').strip(),
+            'description': clip_seo_text(description, 180),
+            'href': f"{prefix}urunler/{str(product.get('slug') or '').strip()}/",
+            'featured': bool(product.get('featured')),
+            'personalizable': bool(catalog_personalizable(product)),
+        })
+
+    pricing = active_nfc_pricing()
+    return {
+        'version': SITE_ASSET_VERSION,
+        'products': product_rows,
+        'nfc': {
+            'year': str(pricing.get('year') or '2026'),
+            'package_names': ['Başlangıç', 'Profesyonel', 'Premium', 'Hızlı Bağlantı Standı', 'Premium Feedback Duo / Trio'],
+        },
+        'links': {
+            'products': f'{prefix}urunler/',
+            'nfc': f'{prefix}nfc-qr/',
+            'custom': f'{prefix}ozel-uretim/',
+            'prototype': f'{prefix}prototip-parca/',
+            'corporate': f'{prefix}kurumsal/',
+            'projects': f'{prefix}projeler/',
+            'quote': f'{prefix}teklif/',
+            'contact': f'{prefix}iletisim/',
+            'architecture': 'https://bgstudio.com.tr',
+            'whatsapp': 'https://wa.me/905302466903',
+        },
+        'delivery': {
+            'local': 'Kuşadası elden teslim',
+            'shipping': 'Türkiye geneli kargo',
+        },
+    }
+
+
+def render_bg_assistant_widget(prefix=''):
+    payload = json.dumps(_bg_assistant_payload(prefix), ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    return f"""<!-- BGSTUDIO:ASSISTANT_START -->
+<aside class="bg-assistant-panel" id="bg-assistant-panel" data-bg-assistant="v3.3.00" aria-label="BG Assistant" aria-hidden="true" hidden>
+  <header class="bg-assistant-head">
+    <div class="bg-assistant-identity"><span class="bg-assistant-mark" aria-hidden="true">BG</span><div><strong>BG Assistant</strong><small>Ürün &amp; çözüm danışmanı · Beta</small></div></div>
+    <button class="bg-assistant-close" data-bg-assistant-close type="button" aria-label="BG Assistant'ı kapat">×</button>
+  </header>
+  <div class="bg-assistant-body">
+    <div class="bg-assistant-messages" data-bg-assistant-messages aria-live="polite"></div>
+    <div class="bg-assistant-quick" aria-label="Hızlı sorular">
+      <button type="button" data-bg-assistant-prompt="Bana uygun ürün bul">Ürün bul</button>
+      <button type="button" data-bg-assistant-prompt="NFC ve QR sistemlerini anlat">NFC + QR</button>
+      <button type="button" data-bg-assistant-prompt="Özel üretim nasıl çalışıyor">Özel üretim</button>
+      <button type="button" data-bg-assistant-prompt="Teklif almak istiyorum">Teklif</button>
+    </div>
+  </div>
+  <footer class="bg-assistant-compose">
+    <form data-bg-assistant-form>
+      <label class="bg-assistant-input-wrap">
+        <span class="bg-assistant-sr">BG Assistant'a mesaj yaz</span>
+        <input data-bg-assistant-input type="text" maxlength="240" autocomplete="off" placeholder="Ürün, NFC, özel üretim..." />
+      </label>
+      <button class="bg-assistant-send" type="submit" aria-label="Mesajı gönder">↑</button>
+    </form>
+    <button class="bg-assistant-handoff" data-bg-assistant-whatsapp type="button">WhatsApp'a aktar <span aria-hidden="true">↗</span></button>
+    <small class="bg-assistant-note">Yanıtlar BG Studio 3D katalog ve hizmet verilerinden hazırlanır.</small>
+  </footer>
+</aside>
+<script type="application/json" data-bg-assistant-data>{payload}</script>
+<script defer="" src="{prefix}assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}"></script>
+<!-- BGSTUDIO:ASSISTANT_END -->"""
+
+
+def sync_bg_assistant_widget():
+    """Install the data-driven BG Assistant foundation on every public page."""
+    scanned = changed = 0
+    marker_pattern = re.compile(
+        r'<!-- BGSTUDIO:ASSISTANT_START -->.*?<!-- BGSTUDIO:ASSISTANT_END -->',
+        flags=re.I | re.S
+    )
+    trigger_pattern = re.compile(
+        r'<button\b[^>]*data-bg-assistant-trigger[^>]*>.*?</button>',
+        flags=re.I | re.S
+    )
+    floating_pattern = re.compile(
+        r'(<div\b[^>]*class="[^"]*\bfloating-actions\b[^"]*"[^>]*>)',
+        flags=re.I
+    )
+    for html_path in ROOT.rglob('*.html'):
+        if 'tools' in html_path.relative_to(ROOT).parts:
+            continue
+        try:
+            source = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        if '<body' not in source.lower() or 'site-header' not in source:
+            continue
+        scanned += 1
+        prefix = _relative_prefix_for_html(html_path)
+        updated = marker_pattern.sub('', source)
+        updated = trigger_pattern.sub('', updated)
+
+        trigger = (
+            '<button class="bg-assistant-trigger" data-bg-assistant-trigger type="button" '
+            'aria-controls="bg-assistant-panel" aria-expanded="false" aria-label="BG Assistant aç">'
+            '<span aria-hidden="true">BG</span></button>'
+        )
+        if floating_pattern.search(updated):
+            updated = floating_pattern.sub(lambda m: m.group(1) + trigger, updated, count=1)
+        else:
+            fallback = f'<div aria-label="Hızlı işlemler" class="floating-actions">{trigger}</div>'
+            updated = updated.replace('</body>', fallback + '</body>', 1)
+
+        widget = render_bg_assistant_widget(prefix)
+        updated = updated.replace('</body>', widget + '</body>', 1)
+
+        if updated != source:
+            html_path.write_text(updated, encoding='utf-8')
+            changed += 1
+    return {'scanned': scanned, 'changed': changed}
+
+
+
 CRITICAL_CSS_V3183 = ':root{--paper:#f4ede3;--paper-2:#fbf7f1;--ink:#2d1f14;--ink-soft:#6d5b4b;--brown:#8a4e0e;--line:rgba(72,46,25,.15);--border:var(--line);--accent:var(--brown);--text-secondary:var(--ink-soft);--dark:#16120f}*{box-sizing:border-box}html{background:#fff;scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}a{color:inherit}img{display:block;width:100%;height:auto}.shell{width:min(1360px,calc(100% - 48px));margin-inline:auto}.site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}.nav-shell{height:82px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:max-content}.brand-monogram{display:inline-block;width:38px;height:38px;flex:0 0 38px;font-size:0;background:url("/assets/brand/bgstudio3d-monogram.webp") center/contain no-repeat}.brand-text{display:grid;line-height:1}.brand-text strong{font-size:.95rem;letter-spacing:.24em;font-weight:600}.brand-text small{font-size:.63rem;letter-spacing:.35em;margin-top:5px;color:var(--ink-soft)}.main-nav{display:flex;align-items:center;gap:15px}.main-nav a,.nav-group-toggle{text-decoration:none;font-size:.82rem;font-weight:600;color:#514235}.nav-group{position:relative;display:flex;align-items:center}.nav-group-toggle{border:0;background:transparent;min-height:44px;padding:0 9px}.nav-submenu{display:grid;opacity:0;visibility:hidden;pointer-events:none}.nav-whatsapp{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff!important;text-decoration:none}.menu-toggle{display:none;width:44px;height:44px;border:1px solid var(--line);background:transparent;border-radius:50%;position:relative}.menu-toggle span{position:absolute;left:12px;right:12px;height:1px;background:var(--ink)}.menu-toggle span:first-child{top:16px}.menu-toggle span:last-child{top:25px}.primary-cta,.secondary-cta,.ghost-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:999px;text-decoration:none;font-size:.82rem;font-weight:700}.primary-cta{background:var(--ink);color:#fff}.secondary-cta{border:1px solid var(--line);background:rgba(255,255,255,.36)}.home-v3163{overflow:clip}.home-v3163 .eyebrow{margin:0 0 14px;color:var(--accent);font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.home-v3163 h1,.home-v3163 h2,.home-v3163 h3{font-family:Georgia,serif;font-weight:500}.home-hero-v3163{position:relative;padding-top:clamp(54px,6vw,92px);padding-bottom:clamp(74px,8vw,128px)}.home-hero-grid-v3163{display:grid;grid-template-columns:minmax(0,.82fr) minmax(520px,1.18fr);gap:clamp(38px,6vw,92px);align-items:center}.home-hero-copy-v3163{position:relative;z-index:2;max-width:680px}.home-hero-copy-v3163 h1{font-size:clamp(4.6rem,8.2vw,9.1rem);line-height:.84;letter-spacing:-.06em;margin:0 0 28px;max-width:8.4ch}.home-hero-lead{margin:0;max-width:620px;color:var(--text-secondary);font-size:clamp(1.06rem,1.35vw,1.28rem);line-height:1.68}.home-hero-actions-v3163{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}.home-hero-proof{display:flex;gap:9px;flex-wrap:wrap;margin-top:30px}.home-hero-proof span{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.26);font-size:.66rem;font-weight:700}.home-hero-stage-v3163{position:relative;min-height:clamp(560px,62vw,780px);border-radius:clamp(26px,3vw,42px);overflow:hidden;background:linear-gradient(145deg,#15110e,#201711 62%,#2b1c11);border:1px solid rgba(255,255,255,.06)}.home-hero-visual{position:absolute;margin:0;overflow:hidden;background:#17120f}.home-hero-visual-main{left:7%;top:9%;width:64%;height:78%;border-radius:28px;z-index:2}.home-hero-visual-side-one{right:5%;top:8%;width:28%;height:33%;border-radius:22px;z-index:3}.home-hero-visual-side-two{right:5%;bottom:13%;width:31%;height:35%;border-radius:22px;z-index:3}.home-hero-picture,.home-hero-picture img{width:100%;height:100%;display:block}.home-hero-picture img{object-fit:cover}.home-hero-visual figcaption{position:absolute;left:0;right:0;bottom:0;padding:46px 18px 16px;background:linear-gradient(transparent,rgba(17,13,10,.84));color:#fff;display:grid;gap:3px}.home-hero-stage-label{position:absolute;left:7%;bottom:4%;z-index:4;color:#fff}.page-hero{padding:clamp(64px,8vw,112px) 0}.page-hero h1{font-family:Georgia,serif;font-size:clamp(3.2rem,7vw,7rem);line-height:.9;margin:0}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:12px;top:12px;z-index:999;background:#fff;padding:10px}@media(max-width:1040px){.nav-shell{height:72px}.menu-toggle{display:block}.main-nav{position:absolute;left:24px;right:24px;top:calc(100% + 8px);display:none;flex-direction:column;align-items:stretch;gap:5px;padding:12px;border-radius:22px;background:#fff;border:1px solid var(--border);max-height:calc(100dvh - 100px);overflow:auto}.main-nav.open{display:flex}.main-nav>a,.nav-link,.nav-group-toggle{width:100%;min-height:48px;justify-content:space-between;padding:0 14px}.nav-group{display:grid}.nav-group.is-open>.nav-submenu{display:grid}.nav-submenu{position:static;padding-left:10px}.nav-actions{display:grid}.nav-whatsapp{width:100%;min-height:50px}.home-hero-grid-v3163{grid-template-columns:1fr}.home-hero-stage-v3163{min-height:680px}}@media(max-width:760px){.shell{width:min(100% - 24px,1360px)}.nav-shell{height:68px}.brand-monogram{width:34px;height:34px;flex-basis:34px}.home-hero-v3163{padding-top:32px;padding-bottom:58px}.home-hero-grid-v3163{gap:24px}.home-hero-copy-v3163 h1{font-size:clamp(3.55rem,18vw,5.6rem);line-height:.88;margin-bottom:20px}.home-hero-lead{font-size:.96rem}.home-hero-proof{gap:6px;margin-top:20px}.home-hero-proof span{font-size:.58rem}.home-hero-stage-v3163{min-height:390px;border-radius:24px}.home-hero-visual-main{left:4%;top:5%;width:92%;height:88%;border-radius:20px}.home-hero-visual-desktop-extra{display:none!important}.home-hero-stage-label{left:6%;bottom:3%}.home-hero-actions-v3163{display:grid;grid-template-columns:1fr}.home-hero-actions-v3163 a{width:100%}}'
 
 def sync_site_asset_versions():
@@ -2093,6 +2220,7 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/js/nfc-hub\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/projects\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/quote-center\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        updated = re.sub(r'((?:\.\./)*assets/js/bg-assistant\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         # Every page receiving the global footer must be able to reopen cookie preferences.
         if 'footer-consent-button' in updated and 'assets/js/consent.js' not in updated:
             consent_tag = f'<script defer="" src="{prefix}assets/js/consent.js"></script>'
@@ -2143,6 +2271,9 @@ def sync_site_asset_versions():
                 updated = updated[:main_match.end()] + quote_tag + updated[main_match.end():]
             else:
                 updated = updated.replace('</body>', quote_tag + '</body>', 1)
+        if 'data-bg-assistant="v3.3.00"' in updated and 'assets/js/bg-assistant.js' not in updated:
+            assistant_tag = f'<script defer="" src="{prefix}assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}"></script>'
+            updated = updated.replace('</body>', assistant_tag + '</body>', 1)
         # V3.1.83: iOS safe-area viewport and non-blocking first-paint assets.
         updated = re.sub(
             r'<meta\s+[^>]*name=["\']viewport["\'][^>]*>',
@@ -2574,7 +2705,7 @@ def sync_nfc_offer_schema(html_text, pricing):
 
 
 def verify_v3164_public_shell(include_home=True, include_catalog=True):
-    """Fail loudly if a public page misses the current V3.2.03 Rich Navigation public shell."""
+    """Fail loudly if a public page misses the current V3.3.00 public shell."""
     failures = []
     checked = 0
     for html_path in ROOT.rglob('*.html'):
@@ -2596,6 +2727,9 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             '>Projeler</a>',
             '>BG Studio</button>',
             f'assets/js/navigation.js?v={SITE_ASSET_VERSION}',
+            'data-bg-assistant="v3.3.00"',
+            'data-bg-assistant-trigger',
+            f'assets/js/bg-assistant.js?v={SITE_ASSET_VERSION}',
         )
         missing = [token for token in required if token not in text]
         if include_home and html_path == ROOT / 'index.html':
@@ -2630,7 +2764,7 @@ def verify_v3164_public_shell(include_home=True, include_catalog=True):
             failures.append({'page': rel, 'missing': missing})
     if failures:
         sample = '; '.join(f"{item['page']}: {', '.join(item['missing'])}" for item in failures[:8])
-        raise RuntimeError('V3.2.03 public shell doğrulaması başarısız. Güncel Rich Navigation uygulanmamış sayfalar var: ' + sample)
+        raise RuntimeError('V3.3.00 public shell doğrulaması başarısız. Rich Navigation veya BG Assistant uygulanmamış sayfalar var: ' + sample)
     return {'checked': checked, 'ok': True}
 
 
@@ -3901,6 +4035,7 @@ def build_site(nfc_family_theme_overrides=None):
     # V3.2.03-R1: canonical Rich Navigation, footer, SEO, accessibility and performance pass.
     nav_sync = sync_site_header_navigation()
     footer_sync = sync_global_footer()
+    assistant_sync = sync_bg_assistant_widget()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
     site_content_state = read_site_content_v3175()
 
@@ -3918,7 +4053,7 @@ def build_site(nfc_family_theme_overrides=None):
     (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'seo_a11y_sync': seo_a11y_sync, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': audit_v3171_public_pages(), 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
