@@ -1943,7 +1943,7 @@ def render_product_page(p, related):
 
 
 
-SITE_ASSET_VERSION = '3.2.02-R2'
+SITE_ASSET_VERSION = '3.2.02-R3'
 
 
 def _relative_prefix_for_html(html_path):
