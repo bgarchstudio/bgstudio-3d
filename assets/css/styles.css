@@ -4294,3 +4294,25 @@ body{min-height:100dvh;background:#fff}
 .floating-actions .back-to-top{order:1}
 .floating-actions .bg-assistant-trigger{order:2}
 .floating-actions .floating-whatsapp{order:3}
+
+
+/* ==========================================================
+   V3.3.07 · SPATIAL HERO CLEANUP
+   Remove stray decorative orbit dot and crosshair cursor.
+   ========================================================== */
+
+/* The small brown "satellite" point belonged to the decorative orbit.
+   It can read like a stain beside the product, so it is intentionally hidden. */
+.home-spatial-orbit-three::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* The hero background is decorative, not a precision/canvas interaction area.
+   Keep a normal pointer outside actual links/buttons. */
+@media(hover:hover) and (pointer:fine){
+  .home-spatial-visual{cursor:default!important}
+  .home-spatial-product.is-active{cursor:pointer}
+  .home-spatial-stage-controls button,
+  .home-spatial-control{cursor:pointer}
+}
