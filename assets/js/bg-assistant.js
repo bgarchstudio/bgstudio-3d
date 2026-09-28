@@ -118,6 +118,93 @@
     .filter(item => item.score >= 3).sort((a,b) => b.score - a.score).slice(0,3).map(item => item.product);
   const productActions = products => products.map(product => makeAction(`${product.name} · ${product.price}`, product.href));
 
+  const formatTl = value => {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return String(value || '').trim();
+    return `${new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(number)} TL`;
+  };
+
+  const isNfcIntent = query => hasAny(query, [
+    'nfc','qr','restoran','dijital menü','dijital menu','feedback',
+    'google yorum','yorum sistemi','masa','başlangıç paket','baslangic paket',
+    'profesyonel paket','premium paket','hızlı bağlantı','hizli baglanti',
+    'feedback duo','feedback trio'
+  ]);
+
+  const nfcPackageMatch = query => {
+    const folded = fold(query);
+    return (data.nfc?.packages || []).find(pkg => {
+      const name = fold(pkg?.name || '');
+      if (!name) return false;
+      if (folded.includes(name)) return true;
+      if (name.includes('profesyonel') && folded.includes('profesyonel')) return true;
+      if (name.includes('başlangıç') && (folded.includes('başlangıç') || folded.includes('baslangic'))) return true;
+      if (name.includes('premium') && folded.includes('premium') && !folded.includes('feedback')) return true;
+      if (name.includes('hızlı bağlantı') && (folded.includes('hızlı bağlantı') || folded.includes('hizli baglanti'))) return true;
+      return false;
+    }) || null;
+  };
+
+  const contextualActions = query => {
+    const links = data.links || {};
+    const current = currentProduct();
+    const matches = productMatches(query);
+
+    if (hasAny(query, ['berkant gökbel','berkant gokbel','kurucu kim','sahibi kim','bg studio sahibi','bg studio kurucusu','bgstudio sahibi','bgstudio kurucusu'])) {
+      return [
+        makeAction('BG Studio Architecture', links.architecture),
+        makeAction('BG Studio 3D', links.products)
+      ];
+    }
+
+    if (isNfcIntent(query)) {
+      return [
+        makeAction('NFC + QR sistemleri', links.nfc),
+        makeAction('NFC teklifi al', `${links.quote}?tur=nfc`)
+      ];
+    }
+
+    if (hasAny(query, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','bana özel','bana ozel','model yaptır','tasarım yaptır'])) {
+      return [
+        makeAction('Özel üretim', links.custom),
+        makeAction('Teklif oluştur', `${links.quote}?tur=ozel-uretim`)
+      ];
+    }
+
+    if (hasAny(query, ['prototip','parça','parca','yedek','ölçülü','olculu','teknik model'])) {
+      return [
+        makeAction('Prototip & Parça', links.prototype),
+        makeAction('Teklif oluştur', `${links.quote}?tur=prototip`)
+      ];
+    }
+
+    if (hasAny(query, ['kurumsal','toptan','logolu','adetli üretim','adetli uretim'])) {
+      return [
+        makeAction('Kurumsal üretim', links.corporate),
+        makeAction('Sahadan projeler', links.projects)
+      ];
+    }
+
+    if (current && hasAny(query, ['bu ürün','bu urun','bunun','şu ürün','su urun','fiyat','kaç tl','kac tl'])) {
+      return [
+        makeAction('Ürün sayfası', current.href),
+        makeAction('WhatsApp', links.whatsapp)
+      ];
+    }
+
+    if (hasAny(query, ['ürün','urun','bul','arıyorum','ariyorum','öner','oner','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor']) && matches.length) {
+      return productActions(matches);
+    }
+
+    return [];
+  };
+
+  const cleanAssistantText = text => String(text || '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__(.*?)__/g, '$1')
+    .replace(/^\s*[-*]\s+/gm, '• ')
+    .trim();
+
   // Deterministic site links remain available even when OpenAI is unavailable.
   const localResolve = query => {
     const links = data.links || {};
@@ -151,15 +238,28 @@
     if (hasAny(query, ['pla petg','petg pla','pla nedir','petg nedir','malzeme fark'])) {
       return { text: 'PLA genelde kolay baskı ve iyi yüzey kalitesiyle öne çıkar. PETG ise kullanım senaryosuna göre daha yüksek dayanım ve neme karşı avantaj sağlayabilir. Belirli ürün için ürün kaydındaki malzemeyi esas alırım.', actions: [makeAction('Ürünleri incele', links.products)] };
     }
+    if (isNfcIntent(query)) {
+      const pkg = nfcPackageMatch(query);
+      if (pkg && asksPrice) {
+        const capacity = pkg.tables ? ` ${pkg.tables} masa` : '';
+        const nfcCount = pkg.total_nfc ? ` ve ${pkg.total_nfc} NFC` : '';
+        const renewal = pkg.renewal ? ` Yıllık yenileme ${formatTl(pkg.renewal)}.` : '';
+        return {
+          text: `${data.nfc?.year || '2026'} ${pkg.name} paketinin başlangıç fiyatı ${formatTl(pkg.price)}.${capacity ? ` Paket ${capacity}${nfcCount} kapasitesini kapsar.` : ''}${renewal}`,
+          actions: contextualActions(query)
+        };
+      }
+      return {
+        text: data.nfc?.system_summary || 'BG Studio NFC + QR sistemi menü, feedback, sosyal yönlendirmeler ve işletme analitiğini tek yapıda toplar.',
+        actions: contextualActions(query)
+      };
+    }
     if (current && (refersCurrent || (asksPrice && matches.length === 0))) {
       return { text: `${current.name} için sitedeki güncel fiyat ${current.price}.`, actions: [makeAction('Ürün sayfası', current.href), makeAction('WhatsApp', links.whatsapp)] };
     }
     if (matches.length && (asksPrice || hasAny(query, ['ürün','urun','bul','arıyorum','ariyorum','lamba','stand','anahtarlık','anahtarlik','tutucu','kask','dekor']))) {
       const first = matches[0];
       return { text: matches.length === 1 ? `${first.name} eşleşiyor. Güncel site fiyatı ${first.price}.` : `Katalogda soruna yakın ${matches.length} seçenek buldum.`, actions: productActions(matches) };
-    }
-    if (hasAny(query, ['nfc','qr','restoran','dijital menü','dijital menu','feedback','google yorum','yorum sistemi'])) {
-      return { text: data.nfc?.system_summary || 'BG Studio NFC + QR sistemi menü, feedback, sosyal yönlendirmeler ve işletme analitiğini tek yapıda toplar.', actions: [makeAction('NFC + QR sistemleri', links.nfc), makeAction('NFC teklifi al', `${links.quote}?tur=nfc`)] };
     }
     if (hasAny(query, ['özel üretim','ozel uretim','kişiye özel','kisiye ozel','bana özel','bana ozel','model yaptır','tasarım yaptır'])) {
       return { text: data.services?.custom_production || 'Özel üretimde fikir, görsel, ölçü veya mevcut parçadan ilerleyebiliriz.', actions: [makeAction('Özel üretimi incele', links.custom), makeAction('Teklif oluştur', `${links.quote}?tur=ozel-uretim`)] };
@@ -272,9 +372,10 @@
     setBusy(true);
     const pending = addMessage('assistant', 'Yanıt hazırlanıyor', [], 'is-pending');
     try {
-      const aiText = await askOpenAI(clean);
+      const aiText = cleanAssistantText(await askOpenAI(clean));
+      const actions = contextualActions(clean);
       pending.remove();
-      addMessage('assistant', aiText, fallback.actions || []);
+      addMessage('assistant', aiText, actions);
       state.history.push({ role: 'assistant', content: aiText });
     } catch (error) {
       console.warn('[BG Assistant] OpenAI endpoint unavailable, local fallback used.', error);
