@@ -1943,8 +1943,8 @@ def render_product_page(p, related):
 
 
 
-# V3.3.03 · Premium AI Assistant UI
-SITE_ASSET_VERSION = '3.3.03'
+# V3.3.04 · Floating Back-To-Top Polish
+SITE_ASSET_VERSION = '3.3.04'
 
 
 def _relative_prefix_for_html(html_path):
