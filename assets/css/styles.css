@@ -4284,3 +4284,13 @@ body{min-height:100dvh;background:#fff}
     font-size:28px;
   }
 }
+
+
+/* ==========================================================
+   V3.3.06 · FLOATING STACK ORDER FIX
+   Hedef sıra: Back-to-top üstte, BG Assistant ortada,
+   WhatsApp altta.
+   ========================================================== */
+.floating-actions .back-to-top{order:1}
+.floating-actions .bg-assistant-trigger{order:2}
+.floating-actions .floating-whatsapp{order:3}
