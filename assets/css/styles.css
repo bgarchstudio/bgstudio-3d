@@ -3495,3 +3495,32 @@ body{min-height:100dvh;background:#fff}
 .footer-v3202-bottom p{margin:0}.footer-v3202-bottom p:nth-child(2){text-align:center}.footer-v3202-bottom p:last-child{text-align:right}
 @media(max-width:980px){.footer-v3202-cta{grid-template-columns:1fr;align-items:start}.footer-v3202-cta-actions{justify-content:flex-start}.footer-v3202-brandline{flex-direction:column}.footer-v3202-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 22px}}
 @media(max-width:680px){.footer-v3202-shell{padding-bottom:88px}.footer-v3202-cta{gap:28px}.footer-v3202-cta h2{font-size:clamp(2.55rem,13vw,4.5rem)}.footer-v3202-cta-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}.footer-v3202-primary,.footer-v3202-secondary{gap:10px}.footer-v3202-brandcopy{flex-direction:column;gap:18px}.footer-v3202-grid{grid-template-columns:1fr 1fr;gap:30px 18px}.footer-v3202-socialrow{align-items:flex-start;flex-direction:column}.footer-v3202-wordmark{align-items:flex-end}.footer-v3202-wordmark span{font-size:clamp(3.3rem,18vw,6rem)}.footer-v3202-wordmark strong{font-size:clamp(2.2rem,11vw,4rem)}.footer-v3202-bottom{grid-template-columns:1fr;gap:7px}.footer-v3202-bottom p:nth-child(2),.footer-v3202-bottom p:last-child{text-align:left}}
+
+
+/* ==========================================================
+   V3.2.02-R1 · Spatial hero performance and scroll isolation
+   ========================================================== */
+.home-hero-v3191[data-spatial-hero]{
+  contain:layout paint style;
+  isolation:isolate;
+}
+.home-hero-v3191[data-spatial-hero] .home-spatial-visual,
+.home-hero-v3191[data-spatial-hero] .home-spatial-slides{
+  contain:paint;
+}
+@media(max-width:760px){
+  /* Avoid full-screen gradient repaints on every automatic product switch. */
+  .home-hero-v3191[data-spatial-variant="0"],
+  .home-hero-v3191[data-spatial-variant="1"],
+  .home-hero-v3191[data-spatial-variant="2"]{
+    --spatial-glow-a:rgba(70,112,255,.22);
+    --spatial-glow-b:rgba(176,116,67,.12);
+  }
+  .home-hero-v3191[data-spatial-hero]:before,
+  .home-hero-v3191[data-spatial-hero] .home-spatial-reactive-glow{
+    transition:none!important;
+  }
+  .home-hero-v3191[data-spatial-hero] .home-spatial-product{
+    transition:opacity 260ms ease,transform 300ms cubic-bezier(.2,.75,.2,1),filter 260ms ease;
+  }
+}

@@ -1695,9 +1695,9 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
 })();
 
 
-// V3.1.92: 21st-inspired Spatial Product Showcase interaction polish.
-// Keeps Product Manager hero slots as the source while adding thumbnail controls,
-// timed progress, previous/next navigation and touch swipe without framework churn.
+// V3.2.02-R1: Spatial hero isolated autoplay and mobile scroll stability.
+// Autoplay only runs while the hero is actually visible. Dock centering is local
+// to the horizontal control strip, so a timed slide change can never move the page.
 (() => {
   const initSpatialHero = () => {
     const hero = document.querySelector('[data-spatial-hero]');
@@ -1717,13 +1717,21 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     const nextButton = hero.querySelector('[data-spatial-next]');
     const liveRegion = hero.querySelector('[data-spatial-live]');
     const dock = hero.querySelector('.home-spatial-dock');
+    const progressEl = hero.querySelector('[data-spatial-progress]');
     if (!stage || !slides.length || !controls.length) return;
 
     hero.dataset.spatialReady = '1';
     const duration = 7200;
     let activeIndex = 0;
     let autoplayTimer = 0;
-    let paused = false;
+    let progressAnimation = null;
+    let pointerPaused = false;
+    let focusPaused = false;
+    let pageHidden = document.hidden;
+    let heroVisible = (() => {
+      const rect = hero.getBoundingClientRect();
+      return rect.bottom > 0 && rect.top < window.innerHeight;
+    })();
     let copyTimer = 0;
     let suppressClickUntil = 0;
     let touchStartX = 0;
@@ -1746,30 +1754,59 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
         productCopy?.classList.remove('is-switching');
       };
       if (reduceMotion) apply();
-      else copyTimer = window.setTimeout(apply, 135);
+      else copyTimer = window.setTimeout(apply, 110);
+    };
+
+    const canAutoplay = () => !reduceMotion && !pointerPaused && !focusPaused && !pageHidden && heroVisible && count > 1;
+
+    const stopProgress = () => {
+      if (progressAnimation) {
+        try { progressAnimation.cancel(); } catch (_) {}
+        progressAnimation = null;
+      }
+      if (progressEl) {
+        progressEl.style.transition = 'none';
+        progressEl.style.transform = 'scaleX(0)';
+      }
+      hero.classList.remove('is-spatial-running', 'is-spatial-paused');
     };
 
     const stopAutoplay = () => {
       if (autoplayTimer) window.clearTimeout(autoplayTimer);
       autoplayTimer = 0;
-      hero.classList.remove('is-spatial-running');
+      stopProgress();
     };
 
-    const restartProgress = () => {
-      hero.classList.remove('is-spatial-running', 'is-spatial-paused');
-      if (reduceMotion || paused || count < 2) return;
-      // Force a fresh CSS animation timeline after every selection.
-      void hero.offsetWidth;
-      hero.classList.add('is-spatial-running');
+    const startProgress = () => {
+      if (!progressEl || !canAutoplay()) return;
+      if (typeof progressEl.animate === 'function') {
+        progressAnimation = progressEl.animate(
+          [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+          { duration, easing: 'linear', fill: 'forwards' }
+        );
+        return;
+      }
+      // Fallback without a synchronous layout read.
+      progressEl.style.transition = 'none';
+      progressEl.style.transform = 'scaleX(0)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!canAutoplay()) return;
+        progressEl.style.transition = `transform ${duration}ms linear`;
+        progressEl.style.transform = 'scaleX(1)';
+      }));
     };
 
-    const scheduleNext = () => {
-      stopAutoplay();
-      if (reduceMotion || paused || count < 2) return;
-      restartProgress();
+    const syncAutoplay = () => {
+      if (autoplayTimer) window.clearTimeout(autoplayTimer);
+      autoplayTimer = 0;
+      stopProgress();
+      if (!canAutoplay()) return;
+      startProgress();
       autoplayTimer = window.setTimeout(() => {
+        autoplayTimer = 0;
+        if (!canAutoplay()) return;
         setActive(activeIndex + 1, false, true);
-        scheduleNext();
+        syncAutoplay();
       }, duration);
     };
 
@@ -1777,7 +1814,13 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       if (!dock || window.innerWidth > 760) return;
       const control = controls[index];
       if (!control) return;
-      control.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+      const maxLeft = Math.max(0, dock.scrollWidth - dock.clientWidth);
+      const targetLeft = Math.max(0, Math.min(maxLeft, control.offsetLeft - (dock.clientWidth - control.offsetWidth) / 2));
+      if (typeof dock.scrollTo === 'function') {
+        dock.scrollTo({ left: targetLeft, top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      } else {
+        dock.scrollLeft = targetLeft;
+      }
     };
 
     const setActive = (nextIndex, userInitiated = false, fromAutoplay = false) => {
@@ -1801,8 +1844,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       if (counter) counter.textContent = label;
       updateCopy(controls[normalized]);
       centerActiveControl(normalized);
-      if (userInitiated) scheduleNext();
-      else if (!fromAutoplay) restartProgress();
+      if (userInitiated && !fromAutoplay) syncAutoplay();
     };
 
     controls.forEach((control, index) => {
@@ -1812,7 +1854,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
         event.preventDefault();
         const delta = event.key === 'ArrowRight' ? 1 : -1;
         const next = ((index + delta) % count + count) % count;
-        controls[next]?.focus();
+        controls[next]?.focus({ preventScroll: true });
         setActive(next, true);
       });
     });
@@ -1820,26 +1862,30 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     prevButton?.addEventListener('click', () => setActive(activeIndex - 1, true));
     nextButton?.addEventListener('click', () => setActive(activeIndex + 1, true));
 
-    const setPaused = value => {
-      paused = Boolean(value);
-      if (paused) {
-        stopAutoplay();
-        hero.classList.add('is-spatial-paused');
-      } else {
-        hero.classList.remove('is-spatial-paused');
-        scheduleNext();
-      }
-    };
-    hero.addEventListener('mouseenter', () => setPaused(true));
-    hero.addEventListener('mouseleave', () => setPaused(false));
-    hero.addEventListener('focusin', () => setPaused(true));
+    hero.addEventListener('mouseenter', () => { pointerPaused = true; syncAutoplay(); });
+    hero.addEventListener('mouseleave', () => { pointerPaused = false; syncAutoplay(); });
+    hero.addEventListener('focusin', () => { focusPaused = true; syncAutoplay(); });
     hero.addEventListener('focusout', event => {
-      if (!hero.contains(event.relatedTarget)) setPaused(false);
+      if (!hero.contains(event.relatedTarget)) {
+        focusPaused = false;
+        syncAutoplay();
+      }
     });
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) setPaused(true);
-      else setPaused(false);
+      pageHidden = document.hidden;
+      syncAutoplay();
     });
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        const nextVisible = Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.12);
+        if (nextVisible === heroVisible) return;
+        heroVisible = nextVisible;
+        syncAutoplay();
+      }, { threshold: [0, 0.12, 0.35] });
+      observer.observe(hero);
+    }
 
     // Mobile swipe. Vertical page scrolling remains untouched.
     stage.addEventListener('touchstart', event => {
@@ -1884,7 +1930,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     }
 
     setActive(0);
-    scheduleNext();
+    syncAutoplay();
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSpatialHero, { once: true });
