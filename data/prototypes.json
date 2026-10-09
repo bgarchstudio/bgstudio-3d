@@ -59,5 +59,32 @@
     "category": "Özel Tasarım • Seri Üretim",
     "theme": "dark",
     "image": "assets/images/prototypes/finnsauna-izmir.webp"
+  },
+  {
+    "slug": "el-testeresi-bicak-kilavuz-parcasi",
+    "name": "El Testeresi Bıçak Kılavuz Parçası",
+    "headline": "Elektrikli El Testeresi İçin Dişli Taşıyıcı Parçanın 3D Yeniden Üretimi",
+    "description": "Elektrikli el testeresine ait, yedek parça temini zorlaşan dişli taşıyıcı parça mevcut numune üzerinden hassas biçimde ölçülerek yeniden modellendi. Gövde geometrisi, bağlantı noktaları, dişli konumu ve montaj ölçüleri dijital modele aktarıldı.\nÖlçü kontrollerinin ardından parçanın cihazla uyumlu yeni modeli 3D baskı ile üretildi. Böylece mevcut makinenin özgün parçasına göre ölçülendirilmiş, montaja uygun bir yedek parça çözümü elde edildi.\nProje; temini zorlaşan, üretimi sona ermiş veya özel geometrili mekanik parçaların ölçülendirme, 3D modelleme ve fiziksel üretim süreçleriyle yeniden üretilebildiğini gösteren BG Studio 3D referans çalışmalarından biridir.",
+    "tags": [
+      "BG Studio 3D",
+      "Elektrikli El Testeresi",
+      "Yedek Parça",
+      "Dişli Taşıyıcı",
+      "Mekanik Parça",
+      "Hassas Ölçü",
+      "3D Modelleme",
+      "3D Baskı",
+      "Tersine Mühendislik",
+      "Özel Parça",
+      "Prototip",
+      "Parça Yeniden Üretim",
+      "Teknik Üretim",
+      "Uyumlu Yedek Parça"
+    ],
+    "active": true,
+    "sort_order": 4,
+    "category": "Yedek Parça • Hassas Ölçüyle Yeniden Üretim",
+    "theme": "dark",
+    "image": "assets/images/prototypes/el-testeresi-bicak-kilavuz-parcasi.webp"
   }
 ]
