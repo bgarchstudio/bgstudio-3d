@@ -30,5 +30,34 @@
     "category": "Yedek parça / makine aksamı",
     "image": "assets/images/prototypes/cikolata-selalesi-spiral-aksami.webp",
     "theme": "light"
+  },
+  {
+    "slug": "finnsauna-izmir",
+    "name": "Finnsauna İzmir",
+    "headline": "Finnmax Isı Kontrol Cihazına Özel Koruyucu Kılıf • 20 Adet Üretim",
+    "description": "Finnsauna İzmir için kullanılan Finnmax ısı kontrol cihazına özel koruyucu kılıf tasarlandı ve üretildi. Cihazın ekranı, kontrol düğmesi ve gövde ölçüleri dikkate alınarak hazırlanan tasarım; prototip baskılar ve saha geri bildirimleriyle revize edilerek final forma getirildi.\n\nSauna girişlerinde kullanılan kontrol cihazını çevresel temaslara karşı daha düzenli ve korunaklı biçimde konumlandıran kılıf, cihazın ekran ve kontrol bölümüne erişimi koruyacak şekilde tasarlandı. Ürün, kullanım ortamı dikkate alınarak PETG malzemeden üretildi.\n\nPrototip sürecinin ardından final tasarım Finnsauna İzmir için 20 adet seri üretime alındı. Böylece tek bir özel parçadan, tekrarlanabilir ve sahada uygulanabilir kurumsal üretim çözümüne geçildi.",
+    "tags": [
+      "Finnsauna İzmir",
+      "Finnmax",
+      "Isı Kontrol Cihazı",
+      "Koruyucu Kılıf",
+      "Özel Tasarım",
+      "Prototip",
+      "20 Adet",
+      "Seri Üretim",
+      "PETG",
+      "3D Baskı",
+      "Cihaza Özel",
+      "Teknik Parça",
+      "Ürün Geliştirme",
+      "Kurumsal Üretim",
+      "İzmir",
+      "BG Studio 3D"
+    ],
+    "active": true,
+    "sort_order": 3,
+    "category": "Özel Tasarım • Seri Üretim",
+    "theme": "dark",
+    "image": "assets/images/prototypes/finnsauna-izmir.webp"
   }
 ]
