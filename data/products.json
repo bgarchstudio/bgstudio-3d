@@ -2031,5 +2031,83 @@
     "main_image": "assets/images/products/kemal-ataturk-imzali-anahtarlik.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "print_method": "FDM 3D baskı • 0.4 mm nozzle • çok renkli üretim",
+    "options": [
+      "İsimli tasarım",
+      "Logolu tasarım",
+      "İşletme adına özel tasarım"
+    ],
+    "name": "Kişiye Özel Telefon Standı Anahtarlık",
+    "personalizable": true,
+    "card_description": "Anahtarlık olarak taşınan, açıldığında masaüstü telefon standına dönüşen kişiselleştirilebilir 3D baskı aksesuar.",
+    "usage_info": "Ürünü açarak düz ve dengeli bir yüzey üzerinde telefon standı olarak konumlandırın.\nKullanım sonrasında katlayarak anahtarlık formuna getirebilirsiniz.\nYüksek sıcaklığa ve uzun süre doğrudan güneş altında bırakılmaması önerilir.",
+    "production_status": "active",
+    "tags": [
+      "Kişiye Özel",
+      "Kurumsal",
+      "Logolu",
+      "Hediye",
+      "Masaüstü",
+      "Anahtarlık",
+      "Telefon Standı",
+      "Katlanabilir",
+      "Promosyon Ürünü",
+      "Kurumsal Hediye",
+      "Logolu Ürün",
+      "Telefon Tutucu",
+      "Kişiselleştirilebilir",
+      "3D Baskı"
+    ],
+    "price_value": "249",
+    "category": "anahtarlik-aksesuar",
+    "price_text": "249 TL",
+    "seo_description": "İsim veya logoya özel katlanabilir telefon standı anahtarlık. Masaüstü telefon tutucu ve anahtarlık işlevini bir arada sunan 3D baskı ürün.",
+    "material_ids": [
+      "pla",
+      "pla-plus",
+      "pla-hd"
+    ],
+    "pricing_tiers": [],
+    "active": true,
+    "sort_order": 40,
+    "seo_title": "Kişiye Özel Telefon Standı Anahtarlık | BG Studio 3D",
+    "og_image_source": "main",
+    "featured": false,
+    "production_time": "",
+    "personalization_info": "Ön yüz isim, logo, işletme adı veya kısa yazıyla kişiselleştirilebilir.\nKurumsal toplu siparişlerde işletmeye özel renk ve logo uygulaması yapılabilir.",
+    "description": "Kompakt yapısıyla anahtarlık olarak taşınabilen ürün, açıldığında telefonunuzu yatay veya dik kullanım için destekleyen masaüstü standa dönüşür. Katlanabilir mekanizması sayesinde kullanılmadığında düz forma gelir ve anahtarlık halkasıyla kolayca taşınabilir.\nÖn yüz; isim, logo, işletme adı veya kısa yazıyla kişiselleştirilebilir. Kurumsal promosyon, etkinlik hediyesi ve kişisel kullanım için hazırlanabilir. Telefon standı ve anahtarlık işlevini tek üründe bir araya getirir.",
+    "dimensions": "",
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo, isim, yazı ve renk tercihleri sipariş öncesinde belirlenir. Katlanabilir mekanizmanın rahat çalışması için hareketli bölgelerde üretime bağlı küçük tolerans boşlukları bulunabilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "technical_info": "Katlanabilir mekanizma\nTelefon standı ve anahtarlık işlevi\nÇok renkli 3D baskı\nMetal anahtarlık halkası\nLogo ve yazı kişiselleştirme",
+    "color_ids": [
+      "pastel-cloud-blue",
+      "bone-white",
+      "glitter-galaxy-black",
+      "lavender",
+      "avocado-green",
+      "siyah",
+      "beyaz"
+    ],
+    "sale_price_value": null,
+    "features": [
+      "Katlanabilir telefon standı",
+      "Anahtarlık olarak taşınabilir",
+      "İsim veya logo kişiselleştirme",
+      "Masaüstü telefon tutucu",
+      "Kompakt yapı",
+      "Metal anahtarlık halkası dahil",
+      "Kurumsal toplu üretime uygun",
+      "Çok renkli 3D baskı"
+    ],
+    "weight": "",
+    "slug": "kisiye-ozel-telefon-standi-anahtarlik",
+    "estimated_production_time": "1–3 iş günü",
+    "box_contents": "1 adet kişiselleştirilmiş telefon standı anahtarlık\n1 adet metal anahtarlık halkası",
+    "gallery_images": [],
+    "main_image": "assets/images/products/kisiye-ozel-telefon-standi-anahtarlik.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
