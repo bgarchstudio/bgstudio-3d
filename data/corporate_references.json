@@ -108,6 +108,7 @@
     "active": true,
     "sort_order": 9,
     "theme": "light",
-    "image": "assets/images/references/luckyland-kusadasi.webp"
+    "image": "assets/images/references/luckyland-kusadasi.webp",
+    "profile_image": "assets/images/references/luckyland-kusadasi-profile.webp"
   }
 ]
