@@ -1961,5 +1961,75 @@
     "poster_image": null,
     "poster_image_width": null,
     "poster_image_height": null
+  },
+  {
+    "print_method": "FDM 3D baskı • 0.4 mm nozzle • çift renk üretim",
+    "options": [
+      "Renkler sabittir.",
+      "Siyah yazı / çizgi detayı + beyaz zemin olarak üretilir.",
+      "Farklı renk talepleri için ayrıca iletişime geçilebilir."
+    ],
+    "name": "Kemal Atatürk İmzalı Anahtarlık",
+    "personalizable": false,
+    "card_description": "Atatürk imzası formunda hazırlanan, şık ve anlamlı 3D baskı anahtarlık.",
+    "usage_info": "Anahtarlık, çanta süsü veya aksesuar olarak kullanılabilir.\nYüksek ısıya ve uzun süreli güneş altında bırakılmaması önerilir.\nTemizlik için hafif nemli bez kullanılabilir.",
+    "production_status": "active",
+    "tags": [
+      "Anahtarlık",
+      "Atatürk",
+      "Kemal Atatürk",
+      "İmzalı Anahtarlık",
+      "3D Baskı",
+      "Hediye",
+      "Anlamlı Hediye",
+      "Masaüstü Aksesuar",
+      "Çanta Aksesuarı",
+      "BG Studio 3D",
+      "Minimal Tasarım",
+      "İki Renkli Baskı",
+      "Türk Temalı Hediye",
+      "Özel Tasarım"
+    ],
+    "price_value": "199",
+    "category": "anahtarlik-aksesuar",
+    "price_text": "199 TL",
+    "seo_description": "Kemal Atatürk imzası formunda hazırlanan 3D baskı anahtarlık. Şık, hafif ve günlük kullanıma uygun özel tasarım hediye seçeneği.",
+    "material_ids": [
+      "pla",
+      "pla-plus"
+    ],
+    "pricing_tiers": [],
+    "active": true,
+    "sort_order": 39,
+    "seo_title": "Kemal Atatürk İmzalı Anahtarlık | 3D Baskı Özel Tasarım",
+    "og_image_source": "main",
+    "featured": true,
+    "production_time": "Yaklaşık 1–2 saat",
+    "personalization_info": "Bu ürün standart tasarım olarak sunulur.\nKişiye özel isim, yazı veya farklı form talepleri özel sipariş kapsamında ayrıca değerlendirilebilir.",
+    "description": "Kemal Atatürk’ün imzasından ilham alınarak hazırlanan bu özel anahtarlık, sade ve şık görünümüyle günlük kullanım ve hediye için ideal bir üründür. İki renkli 3D baskı tekniğiyle üretilen model, anahtarlık halkasıyla birlikte kullanıma hazır şekilde sunulur.\nMinimal formu sayesinde çanta, anahtar ve kişisel aksesuarlarda rahatlıkla kullanılabilir. Hem anlam taşıyan hem de estetik duran bu tasarım, Atatürk temalı özel bir hediye alternatifi olarak da öne çıkar.\nKatmanlı üretim tekniğiyle hazırlanan ürün, hafif yapısı ve dikkat çekici görünümüyle günlük kullanıma uygundur.",
+    "dimensions": "Yaklaşık 11 x 3 cm",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk tonunda ve yüzeyde üretime bağlı küçük farklılıklar olabilir.",
+    "technical_info": "Çift renkli 3D baskı üretim\nHafif ve dayanıklı yapı\nGünlük kullanıma uygun\nMetal halka dahil\nİç mekân kullanımına uygundur",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "sale_price_value": null,
+    "features": [
+      "Atatürk imzası formunda özel tasarım",
+      "İki renkli 3D baskı üretim",
+      "Hafif ve kullanışlı yapı",
+      "Anahtarlık halkasıyla birlikte gönderim",
+      "Hediye için uygun şık tasarım",
+      "Günlük kullanıma uygun"
+    ],
+    "weight": "Yaklaşık 15–20 g",
+    "slug": "kemal-ataturk-imzali-anahtarlik",
+    "estimated_production_time": "1–3 iş günü",
+    "box_contents": "1 adet Kemal Atatürk imzalı anahtarlık\n1 adet metal anahtarlık halkası",
+    "gallery_images": [],
+    "main_image": "assets/images/products/kemal-ataturk-imzali-anahtarlik.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
