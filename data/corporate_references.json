@@ -110,5 +110,34 @@
     "theme": "light",
     "image": "assets/images/references/luckyland-kusadasi.webp",
     "profile_image": "assets/images/references/luckyland-kusadasi-profile.webp"
+  },
+  {
+    "slug": "kabalci-hukuk-burosu",
+    "name": "Kabalcı Hukuk Bürosu",
+    "headline": "30 Adet Logolu Kurumsal Anahtarlık Üretimi",
+    "description": "Kabalcı Hukuk Bürosu için kurumsal kimliğe uygun 30 adet logolu promosyon anahtarlık üretildi. Büro logosu, 3D baskı üretimine uygun şekilde yeniden hazırlanarak siyah-beyaz çok renkli baskı yapısına aktarıldı.\n\nKompakt kare formdaki anahtarlıklar, marka logosunu net ve okunabilir biçimde taşıyacak şekilde tasarlanarak metal halka ve zincirlerle tamamlandı. Ürünler kurumsal hediye, müşteri ilişkileri ve promosyon kullanımı için seri olarak üretildi.\n\nProje, kurumsal marka kimliğinin günlük kullanımda taşınabilen fiziksel bir ürüne dönüştürüldüğü BG Studio 3D kurumsal üretim çalışmalarından biridir.",
+    "tags": [
+      "BG Studio 3D",
+      "Kabalcı Hukuk Bürosu",
+      "30 Adet",
+      "Kurumsal Üretim",
+      "Promosyon Ürünü",
+      "Logolu Anahtarlık",
+      "Anahtarlık",
+      "Çok Renkli Baskı",
+      "Siyah Beyaz",
+      "3D Baskı",
+      "Seri Üretim",
+      "Kurumsal Hediye",
+      "Logolu Ürün",
+      "Hukuk Bürosu",
+      "Kuşadası",
+      "Aydın"
+    ],
+    "active": true,
+    "sort_order": 10,
+    "theme": "dark",
+    "image": "assets/images/references/kabalci-hukuk-burosu.webp",
+    "profile_image": "assets/images/references/kabalci-hukuk-burosu-profile.webp"
   }
 ]
