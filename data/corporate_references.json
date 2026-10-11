@@ -81,5 +81,33 @@
     "image": "assets/images/references/kusadasi-asansor.webp",
     "profile_image": "assets/images/references/kusadasi-asansor-profile.webp",
     "category": "Kurumsal üretim"
+  },
+  {
+    "slug": "luckyland-kusadasi",
+    "name": "LuckyLand Kuşadası",
+    "headline": "50 Adet Logolu Telefon Tutucu Anahtarlık Üretimi",
+    "description": "LuckyLand Kuşadası için işletmenin logosu ve kurumsal renklerine özel 50 adet katlanabilir telefon tutucu anahtarlık üretildi.\n\nLuckyLand logosu çok renkli 3D baskıya uygun şekilde hazırlanarak ürün yüzeyine uygulandı. Kompakt ürün, anahtarlık olarak taşınırken açıldığında masaüstü telefon standına dönüşen işlevsel yapısıyla kurumsal promosyon ürünü olarak tasarlandı.\n\nTasarım ve üretim sürecinin ardından 50 adet ürün seri şekilde hazırlanarak işletmeye teslim edildi. Proje; marka kimliğini günlük hayatta işe yarayan fiziksel bir ürüne taşıyan BG Studio 3D kurumsal üretim çalışmalarından biridir.",
+    "tags": [
+      "BG Studio 3D",
+      "LuckyLand",
+      "50 Adet",
+      "Kurumsal Üretim",
+      "Promosyon Ürünü",
+      "Telefon Standı",
+      "Anahtarlık",
+      "Katlanabilir Stand",
+      "Logolu Ürün",
+      "Çok Renkli Baskı",
+      "3D Baskı",
+      "Seri Üretim",
+      "Kişiye Özel",
+      "Kurumsal Hediye",
+      "Kuşadası",
+      "Aydın"
+    ],
+    "active": true,
+    "sort_order": 9,
+    "theme": "light",
+    "image": "assets/images/references/luckyland-kusadasi.webp"
   }
 ]
