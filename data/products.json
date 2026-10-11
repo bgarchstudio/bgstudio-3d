@@ -2109,5 +2109,70 @@
     "main_image": "assets/images/products/kisiye-ozel-telefon-standi-anahtarlik.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "description": "Doldurulabilir Ice Roller, haznesine su eklenip kapatılarak dondurucuya yerleştirilir. Su tamamen donduktan sonra üst kapak çıkarılır ve oluşan buz yüzeyi yüz, boyun veya tercih edilen cilt bölgesinde gezdirilir.\nErgonomik gövdesi buzun doğrudan elde tutulmasını gerektirmez. Yeniden doldurulabilen yapısı sayesinde yeni bir buz kalıbı hazırlamak için hazne tekrar suyla doldurulabilir. Sabah bakım rutininde veya gün içinde serinletici bir uygulama için pratik bir üründür.\nKozmetik veya tıbbi tedavi amacı taşımaz. Hassas ciltlerde buzun aynı noktada uzun süre tutulmaması önerilir.",
+    "sort_order": 41,
+    "estimated_production_time": "1–3 iş günü",
+    "og_image_source": "main",
+    "dimensions": "",
+    "seo_description": "Su doldurulup dondurucuda hazırlanan tekrar doldurulabilir Ice Roller. Yüz ve boyun bakım rutinleri için PETG malzemeden 3D baskı ile üretilir.",
+    "price_value": "349",
+    "category": "taki-makyaj",
+    "options": [],
+    "production_note": "Ürün PETG malzeme ile 3D baskı yöntemiyle üretilir. Su ile temas eden ürünlerde düzenli temizlik ve tam kurutma önerilir. Yüzeyde çatlak veya deformasyon oluşması halinde ürünün yenilenmesi gerekir. 3D baskıya özgü ince katman izleri görülebilir.",
+    "price_text": "349 TL",
+    "print_method": "FDM 3D baskı • 0.4 mm nozzle",
+    "production_time": "",
+    "personalization_info": "",
+    "active": true,
+    "personalizable": false,
+    "weight": "",
+    "features": [
+      "Su doldurulabilir hazne",
+      "Dondurucuda hazırlanabilir",
+      "Tekrar doldurulabilir yapı",
+      "Ergonomik tutma gövdesi",
+      "Yüz ve boyun bölgesine uygun",
+      "Kapaklı tasarım",
+      "Suya dayanıklı PETG üretim",
+      "3D baskı"
+    ],
+    "slug": "doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "name": "Doldurulabilir Ice Roller • Buzlu Yüz Masaj Aparatı",
+    "usage_info": "Hazneyi suyla doldurun ve kapağını kapatın.\nÜrünü dondurucuya dik biçimde yerleştirin.\nSu tamamen donduktan sonra kapağı çıkarın.\nBuz yüzeyini cilt üzerinde kısa ve hareketli geçişlerle uygulayın.\nHer uygulama sonrasında ürünü temizleyip tamamen kurutun.",
+    "seo_title": "Doldurulabilir Ice Roller | Buzlu Yüz Masaj Aparatı | BG Studio 3D",
+    "technical_info": "Doldurulabilir su haznesi\nÇıkarılabilir kapak\nTekrar dondurulabilir yapı\nPETG malzeme\nSuya ve neme uygun gövde",
+    "tags": [
+      "Kişiye Özel",
+      "Hediye",
+      "Ice Roller",
+      "Buzlu Yüz Masajı",
+      "Cilt Bakımı",
+      "Yüz Bakımı",
+      "Kişisel Bakım",
+      "Doldurulabilir",
+      "Soğuk Bakım",
+      "Buz Aparatı",
+      "PETG",
+      "3D Baskı"
+    ],
+    "card_description": "İçine su doldurulup dondurulan, buz yüzeyiyle yüz ve cilt bakım rutinine serinletici dokunuş katan tekrar doldurulabilir Ice Roller.",
+    "pricing_tiers": [],
+    "material_ids": [
+      "petg"
+    ],
+    "production_status": "",
+    "sale_price_value": null,
+    "featured": true,
+    "box_contents": "1 adet doldurulabilir Ice Roller gövdesi\n1 adet kapak",
+    "gallery_images": [],
+    "main_image": "assets/images/products/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
