@@ -1,22 +1,29 @@
 BG Studio 3D
 STABLE BASELINE
 
-Version: V3.3.15
-Asset version: 3.3.15
+Version: V3.3.17
+Asset version: 3.3.17
 Channel: stable
-Based on: V3.3.14-R1 / RC2
+Based on: V3.3.16 STABLE
 
 Validated before promotion:
+- Product Manager build => completed
 - release_check.py --strict => READY
+- Public pages checked: 76
 - Critical: 0
-- Public pages checked: 69
-- Quote Center asset hotfix included
-- Launch Audit 2.0 included
-- Mobile Final Polish included
-- BG Assistant Conversational State Engine included
+- Launch Audit ready: true
+- Entity identity issues: 0
+- Local SEO sync: 3 real Kuşadası project records
 - Cloudflare Worker baseline: V3.3.10-R4 or newer
 
-Rule:
-Future site development should branch from V3.3.15 unless a newer STABLE baseline supersedes it.
+Included in this baseline:
+- V3.3.16 floating WhatsApp / BG Assistant panel coordination
+- Canonical BG Studio 3D #organization entity identity
+- Homepage -> Kuşadası 3D Baskı contextual internal link
+- Kuşadası 3D Baskı real local production proof section
+- Canonical entity links from Product / Service / Project schemas
 
-Cloudflare redeploy for V3.3.15: NO
+Rule:
+Future site development should branch from V3.3.17 unless a newer STABLE baseline supersedes it.
+
+Cloudflare redeploy for V3.3.17: NO

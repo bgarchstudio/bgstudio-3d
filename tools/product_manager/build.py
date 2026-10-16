@@ -1371,7 +1371,7 @@ def render_homepage_v3163(active, featured, field_items):
       </article>
       <article class="home-bento-card-v3196 home-bento-local-v3196 home-motion" data-home-motion>
         <div class="home-bento-card-head-v3196"><span class="home-bento-index-v3196">04</span><span class="home-bento-label-v3196">KUŞADASI MERKEZLİ</span></div>
-        <div class="home-bento-copy-v3196"><h3>Yakında üret, Türkiye'ye gönder.</h3><p>Kuşadası'nda üretim ve elden teslim. Uygun siparişlerde Türkiye geneli kargo.</p></div>
+        <div class="home-bento-copy-v3196"><h3>Yakında üret, Türkiye'ye gönder.</h3><p>Kuşadası'nda üretim ve elden teslim. Uygun siparişlerde Türkiye geneli kargo.</p><a class="text-cta local-seo-link" href="kusadasi-3d-baski/">Kuşadası 3D baskı hizmetini incele ↗</a></div>
         <div class="home-bento-route-v3196" aria-hidden="true"><span class="home-bento-route-origin-v3196">KUŞADASI</span><i></i><span>TÜRKİYE</span></div>
       </article>
     </div>
@@ -1747,7 +1747,7 @@ def render_schema(p):
                 'price': str(price_value),
                 'availability': product_schema_availability(p),
                 'url': canonical,
-                'seller': {'@type': 'Organization', 'name': 'BG Studio 3D'},
+                'seller': {'@id': BASE_URL + '/#organization'},
                 'eligibleQuantity': {'@type': 'QuantitativeValue', 'value': int(t.get('quantity') or 1), 'unitText': 'adet'},
             })
         if offers:
@@ -1759,7 +1759,7 @@ def render_schema(p):
             'price': str(fallback_price),
             'availability': product_schema_availability(p),
             'url': canonical,
-            'seller': {'@type': 'Organization', 'name': 'BG Studio 3D'},
+            'seller': {'@id': BASE_URL + '/#organization'},
         }
 
     return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
@@ -1944,9 +1944,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.16'
+SITE_ASSET_VERSION = '3.3.17'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.16-STABLE'
+RELEASE_CANDIDATE = 'V3.3.17-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -2867,7 +2867,7 @@ def sync_nfc_offer_schema(html_text, pricing):
         '@context': 'https://schema.org',
         '@type': 'Service',
         'name': 'BG Studio NFC & QR İşletme Sistemleri',
-        'provider': {'@type': 'LocalBusiness', 'name': 'BG Studio 3D', 'url': 'https://3d.bgstudio.com.tr/'},
+        'provider': {'@id': BASE_URL + '/#organization'},
         'areaServed': 'Türkiye',
         'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': f'{year} NFC & QR İşletme Çözümleri', 'itemListElement': offers},
     }
@@ -3481,7 +3481,7 @@ def render_project_detail(item, project_items):
     offer={'nfc':'../../teklif/?tur=nfc','prototype':'../../teklif/?tur=prototip','corporate':'../../teklif/?tur=kurumsal'}.get(kind,'../../teklif/')
     related=[x for x in project_items if _project_slug(x)!=slug][:3]
     related_html=''.join(f'<a class="project-related-card" href="../{esc(_project_slug(x))}/">{_project_media(x,"../../","project-related-media")}<span>{esc(_project_kind_label(x))}</span><strong>{esc(x.get("name") or x.get("headline") or "Proje")}</strong></a>' for x in related)
-    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@type':'Organization','name':'BG Studio 3D','url':BASE_URL},'url':BASE_URL+'/projeler/'+slug+'/'}
+    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@id':BASE_URL + '/#organization'},'url':BASE_URL+'/projeler/'+slug+'/'}
     if item.get('image'): schema['image']=BASE_URL+'/'+str(item.get('image')).lstrip('/')
     schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json">{schema_json}</script><section class="project-detail-hero"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">DİĞER PROJELER</p><h2>Sahadan başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" href="{offer}">Teklif Al ↗</a></div></section>'''
@@ -3694,7 +3694,7 @@ def render_quote_center_v3170():
     quote_pricing_json = json.dumps(quote_pricing_payload, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     canonical = BASE_URL + '/teklif/'
     body = f'''<section class="quote-hero"><div class="shell quote-hero-grid"><div><p class="eyebrow">TEKLİF MERKEZİ</p><h1>İhtiyacını seç.<br>Doğru detayları gönder.</h1><p class="lead">Form, seçtiğin çalışma tipine göre yalnız gereken alanları gösterir. Gönderim sonunda düzenli bir WhatsApp özeti hazırlanır.</p></div><div class="quote-hero-note"><strong>Hızlı başlangıç</strong><span>01 · Çalışma tipini seç</span><span>02 · Detayları doldur</span><span>03 · Özeti WhatsApp'tan gönder</span></div></div></section><section class="section-pad shell quote-center" aria-labelledby="quote-type-title"><div class="quote-section-head"><p class="eyebrow">01 · ÇALIŞMA TİPİ</p><h2 id="quote-type-title">Ne için teklif istiyorsunuz?</h2></div><form class="quote-form quote-form-v3170" data-quote-form novalidate><select class="sr-only" name="talep_turu" aria-label="Talep türü" required><option value="kisiye-ozel">Özel Üretim</option><option value="kurumsal">Kurumsal</option><option value="prototip">Prototip / Parça</option><option value="nfc">NFC &amp; QR</option><option value="diger">Diğer</option></select><div class="quote-type-grid" role="group" aria-label="Teklif türü"><button class="quote-type-card" type="button" data-quote-type="kisiye-ozel" aria-pressed="false"><span>01</span><strong>Özel Üretim</strong><small>Fikir, görsel, ölçü veya mevcut üründen üretim.</small></button><button class="quote-type-card" type="button" data-quote-type="kurumsal" aria-pressed="false"><span>02</span><strong>Kurumsal</strong><small>Toplu üretim, markalama ve işletmeye özel ürün.</small></button><button class="quote-type-card" type="button" data-quote-type="prototip" aria-pressed="false"><span>03</span><strong>Prototip / Parça</strong><small>STL, 3MF, STEP, PDF veya ölçüyle teknik üretim.</small></button><button class="quote-type-card" type="button" data-quote-type="nfc" aria-pressed="false"><span>04</span><strong>NFC &amp; QR</strong><small>Restoran, hızlı stand ve feedback çözümleri.</small></button><button class="quote-type-card" type="button" data-quote-type="diger" aria-pressed="false"><span>05</span><strong>Diğer</strong><small>Kapsamı farklı olan talepler.</small></button></div><div class="quote-dynamic" data-quote-dynamic><div class="quote-section-head compact"><p class="eyebrow">02 · DETAYLAR</p><h2>Teklif için gereken bilgiler.</h2></div><div class="quote-form-grid"><div class="field"><label for="quote-name">Ad / Soyad</label><input id="quote-name" name="ad" autocomplete="name" required maxlength="100" placeholder="Adınız"></div><div class="field"><label for="quote-business">İşletme / Marka</label><input id="quote-business" name="isletme" autocomplete="organization" maxlength="120" placeholder="Varsa işletme veya marka adı"></div><div class="field"><label for="quote-city">Şehir</label><input id="quote-city" name="sehir" autocomplete="address-level2" maxlength="80" placeholder="Örn. Kuşadası"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip nfc"><label for="quote-qty">Adet</label><input id="quote-qty" name="adet" inputmode="numeric" min="1" type="number" placeholder="Örn. 50"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip"><label for="quote-size">Yaklaşık ölçü / ebat</label><input id="quote-size" name="olcu" maxlength="100" placeholder="Örn. 120 × 80 × 30 mm"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip nfc"><label for="quote-color">Renk / malzeme tercihi</label><input id="quote-color" name="renk" maxlength="120" placeholder="Örn. Siyah PETG / fark etmez"></div><div class="field field-wide" data-quote-scope="kisiye-ozel"><label for="quote-product-type">Ürün tipi</label><input id="quote-product-type" name="urun_tipi" maxlength="140" placeholder="Örn. masaüstü stand, dekor, aparat, kişiye özel ürün"></div><div class="field" data-quote-scope="kurumsal"><label for="quote-corporate-use">Kullanım / sektör</label><input id="quote-corporate-use" name="kurumsal_kullanim" maxlength="140" placeholder="Örn. promosyon, mağaza, restoran, teknik kullanım"></div><div class="field" data-quote-scope="kurumsal"><label for="quote-branding">Logo / markalama</label><input id="quote-branding" name="kurumsal_markalama" maxlength="140" placeholder="Logo, isim, renk veya ambalaj talebi"></div><div class="field" data-quote-scope="prototip"><label for="quote-prototype-job">Parçanın görevi</label><input id="quote-prototype-job" name="prototip_gorev" maxlength="180" placeholder="Nereye bağlanıyor, ne işe yarıyor?"></div><div class="field" data-quote-scope="prototip"><label for="quote-prototype-material">Tercih edilen malzeme</label><input id="quote-prototype-material" name="prototip_malzeme" maxlength="120" placeholder="PETG, PLA, TPU veya kararsızım"></div></div><section class="quote-nfc-config" data-nfc-quote-config hidden data-quote-scope="nfc"><div class="quote-nfc-head"><div><p class="eyebrow">NFC + QR SİSTEMİ</p><h3>Paket ve kapsam seçimi</h3></div><small>{year} web fiyat yapısı</small></div><div class="quote-form-grid"><div class="field field-wide"><label for="quote-nfc-package">Sistem / paket</label><select id="quote-nfc-package" name="nfc_paket" required>{package_options}</select></div><div class="field" data-feedback-capacity-wrap hidden><label for="quote-feedback-capacity">Feedback Duo kapasitesi</label><select id="quote-feedback-capacity" name="feedback_duo_capacity">{duo_options}</select></div></div><div class="quote-package-summary" data-nfc-package-summary hidden><div><small>SEÇİLİ ÇÖZÜM</small><strong data-nfc-package-title>Çözüm seç</strong><span data-nfc-package-capacity></span></div><div><small data-nfc-price-year>{year} BAŞLANGIÇ</small><strong data-nfc-package-price>Özel teklif</strong><span data-nfc-package-renewal></span></div></div><div class="quote-options"><label><input type="checkbox" name="nfc_qr" data-nfc-option><span><strong>QR sistemi</strong><small data-nfc-qr-copy>{qr} / QR</small></span></label><label><input type="checkbox" name="nfc_menu_design" data-nfc-option><span><strong>Menü Tasarımı</strong><small data-nfc-menu-price-copy>+{menu}</small></span></label><label><input type="checkbox" name="nfc_logo_design" data-nfc-option><span><strong>Logo Tasarımı</strong><small data-nfc-logo-price-copy>+{logo}</small></span></label></div><div class="quote-total" data-nfc-quote-total hidden><span>Seçili toplam</span><strong data-nfc-total-value></strong></div></section><section class="quote-files" data-quote-scope="kisiye-ozel kurumsal"><div><p class="eyebrow">DOSYA / GÖRSEL</p><h3>Referans ekle</h3><p>PNG, JPG, WEBP veya PDF. Her dosya en fazla 15 MB.</p></div><label class="quote-file-drop"><input type="file" data-quote-files accept=".png,.jpg,.jpeg,.webp,.pdf" multiple><span>Görsel veya PDF seç</span><small>Dosya adları teklife eklenir.</small></label></section><section class="quote-files" data-quote-scope="prototip"><div><p class="eyebrow">TEKNİK DOSYA</p><h3>Dosyan varsa ekle</h3><p>STL, 3MF, STEP, STP, PDF veya görsel. Her dosya en fazla 15 MB.</p></div><label class="quote-file-drop"><input type="file" data-quote-files accept=".stl,.3mf,.step,.stp,.pdf,.png,.jpg,.jpeg,.webp" multiple><span>Teknik dosya seç</span><small>Dosyalar web sunucusuna yüklenmez.</small></label></section><input type="hidden" name="dosya_ozeti"><ul class="quote-file-list" data-quote-file-list hidden></ul><p class="quote-security-note">🔒 Dosyalar bu sayfadan sunucuya gönderilmez. WhatsApp açıldığında seçtiğin dosyaları sohbete ayrıca ekle.</p><div class="field field-wide quote-detail-field"><label for="quote-detail">Talebini anlat</label><textarea id="quote-detail" name="detay" rows="6" required maxlength="1800" placeholder="Kullanım amacı, ölçü, adet ve önemli detayları yazın…"></textarea></div><div class="quote-status" role="status" aria-live="polite" data-quote-status></div><button class="primary-cta quote-submit" type="submit" data-quote-submit>Teklif özetini WhatsApp'ta aç ↗</button></div></form></section><section class="quote-trust"><div class="shell"><article><strong>Kuşadası</strong><span>Elden teslim</span></article><article><strong>Türkiye geneli</strong><span>Kargo</span></article><article><strong>Özel üretim</strong><span>İhtiyaca göre teklif</span></article><article><strong>NFC + QR</strong><span>Paket seçimine bağlı canlı hesap</span></article></div></section>'''
-    org = {'@context':'https://schema.org','@type':'Service','name':'BG Studio 3D Teklif Merkezi','provider':{'@type':'Organization','name':'BG Studio 3D','url':BASE_URL},'areaServed':'Türkiye','url':canonical}
+    org = {'@context':'https://schema.org','@type':'Service','name':'BG Studio 3D Teklif Merkezi','provider':{'@id':BASE_URL + '/#organization'},'areaServed':'Türkiye','url':canonical}
     schema = json.dumps(org,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teklif Al | BG Studio 3D</title><meta name="description" content="{esc(desc)}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="Teklif Al | BG Studio 3D"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="index,follow"><meta name="theme-color" content="#ffffff"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"><script type="application/ld+json">{schema}</script></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="quote-page-v3170">{body}</main><script type="application/json" id="quote-pricing-data">{quote_pricing_json}</script>{render_global_footer('../')}<script defer src="../assets/js/consent.js"></script><script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/quote-center.js?v={SITE_ASSET_VERSION}"></script><div aria-label="Hızlı işlemler" class="floating-actions"><a aria-label="WhatsApp üzerinden iletişime geç" class="floating-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><button aria-label="Sayfanın başına dön" class="back-to-top" type="button">↑</button></div></body></html>'''
 
@@ -3745,6 +3745,80 @@ def _route_from_html_path(html_path):
     if rel.endswith('/index.html'):
         return '/' + rel[:-10]
     return '/' + rel
+
+
+
+def _bg_entity_schema_v3317():
+    """Canonical BG Studio 3D identity. Never infer ratings, reviews, street address or third-party category."""
+    return {
+        '@context': 'https://schema.org',
+        '@type': ['Organization', 'LocalBusiness'],
+        '@id': BASE_URL + '/#organization',
+        'name': 'BG Studio 3D',
+        'url': BASE_URL + '/',
+        'description': 'Kuşadası merkezli 3D baskı, özel üretim, prototip ve parça üretimi, kurumsal toplu üretim ve NFC + QR işletme çözümleri.',
+        'logo': BASE_URL + '/assets/brand/bgstudio3d-logo.png',
+        'image': BASE_URL + '/assets/brand/og-bgstudio3d-share-v2.jpg',
+        'telephone': '+90 530 246 69 03',
+        'address': {
+            '@type': 'PostalAddress',
+            'addressLocality': 'Kuşadası',
+            'addressRegion': 'Aydın',
+            'addressCountry': 'TR',
+        },
+        'areaServed': [
+            {'@type': 'City', 'name': 'Kuşadası'},
+            {'@type': 'AdministrativeArea', 'name': 'Aydın'},
+            {'@type': 'Country', 'name': 'Türkiye'},
+        ],
+        'sameAs': [
+            'https://instagram.com/bgstudio.3dtr',
+            'https://www.facebook.com/bgstudio.3dtr',
+        ],
+        'founder': {'@type': 'Person', 'name': 'Berkant Gökbel'},
+        'contactPoint': {
+            '@type': 'ContactPoint',
+            'contactType': 'customer service',
+            'telephone': '+90 530 246 69 03',
+            'availableLanguage': ['Turkish'],
+        },
+    }
+
+
+def _bg_website_schema_v3317():
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        '@id': BASE_URL + '/#website',
+        'name': 'BG Studio 3D',
+        'url': BASE_URL + '/',
+        'inLanguage': 'tr-TR',
+        'publisher': {'@id': BASE_URL + '/#organization'},
+        'potentialAction': {
+            '@type': 'SearchAction',
+            'target': BASE_URL + '/urunler/?q={search_term_string}',
+            'query-input': 'required name=search_term_string',
+        },
+    }
+
+
+def _strip_legacy_identity_schema_v3317(text, is_home=False):
+    # Remove prior auto-generated entity scripts while preserving page-specific Product/FAQ/Service data.
+    text = re.sub(
+        r'<script\b[^>]*data-schema=["\'](?:organization|website|local-business|entity)["\'][^>]*>.*?</script>',
+        '', text, flags=re.I | re.S
+    )
+    if is_home:
+        # Remove the two historical unmarked homepage identity blocks only.
+        text = re.sub(
+            r'<script\s+type=["\']application/ld\+json["\']>\s*\{(?:(?!</script>).)*?"@type"\s*:\s*"LocalBusiness"(?:(?!</script>).)*?"name"\s*:\s*"BG Studio 3D"(?:(?!</script>).)*?</script>',
+            '', text, count=1, flags=re.I | re.S
+        )
+        text = re.sub(
+            r'<script\s+type=["\']application/ld\+json["\']>\s*\{(?:(?!</script>).)*?"@type"\s*:\s*"WebSite"(?:(?!</script>).)*?"name"\s*:\s*"BG Studio 3D"(?:(?!</script>).)*?</script>',
+            '', text, count=1, flags=re.I | re.S
+        )
+    return text
 
 
 def _schema_script(data, marker):
@@ -3882,6 +3956,7 @@ def audit_v3312_launch_readiness():
         'images_missing_dimensions': [],
         'mixed_content': [],
         'duplicate_ids': [],
+        'entity_identity_issues': [],
         'broken_internal_links': [],
         'missing_local_assets': [],
         'unsafe_blank_targets': [],
@@ -3980,6 +4055,16 @@ def audit_v3312_launch_readiness():
         if duplicates:
             result['duplicate_ids'].append({'page': rel, 'ids': duplicates[:8]})
 
+        if rel == 'index.html':
+            entity_count = len(re.findall(r'data-schema=["\']entity["\']', text, flags=re.I))
+            website_count = len(re.findall(r'data-schema=["\']website["\']', text, flags=re.I))
+            if entity_count != 1:
+                result['entity_identity_issues'].append(f'index.html: canonical entity schema count {entity_count}, expected 1')
+            if website_count != 1:
+                result['entity_identity_issues'].append(f'index.html: canonical website schema count {website_count}, expected 1')
+            if BASE_URL + '/#organization' not in text:
+                result['entity_identity_issues'].append('index.html: canonical #organization @id missing')
+
         for href in re.findall(r'<a\b[^>]*\bhref=["\']([^"\']+)["\']', text, flags=re.I):
             target = resolve_local(html_path, href)
             if target is not None and not link_exists(target):
@@ -4011,13 +4096,13 @@ def audit_v3312_launch_readiness():
     for key in (
         'blocking_local_scripts','images_missing_alt','images_missing_dimensions','mixed_content',
         'broken_internal_links','missing_local_assets','unsafe_blank_targets','stale_asset_versions',
-        'forbidden_public_claims'
+        'forbidden_public_claims','entity_identity_issues'
     ):
         result[key] = list(dict.fromkeys(result[key]))[:30]
     result['duplicate_ids'] = result['duplicate_ids'][:20]
     result['ready'] = not any(result[key] for key in (
         'blocking_local_scripts','images_missing_alt','broken_internal_links','missing_local_assets',
-        'mixed_content','unsafe_blank_targets','stale_asset_versions','forbidden_public_claims'
+        'mixed_content','unsafe_blank_targets','stale_asset_versions','forbidden_public_claims','entity_identity_issues'
     ))
     return result
 
@@ -4055,13 +4140,11 @@ def sync_seo_accessibility_performance_v3171():
             if og_image_match:
                 twitter += f'<meta name="twitter:image" content="{esc(og_image_match.group(1))}">'
             updated=updated.replace('</head>',twitter+'</head>',1)
-        if 'data-schema="organization"' not in updated:
-            org={'@context':'https://schema.org','@type':'Organization','name':'BG Studio 3D','url':BASE_URL,'sameAs':['https://instagram.com/bgstudio.3dtr','https://www.facebook.com/bgstudio.3dtr']}
-            updated=updated.replace('</head>',_schema_script(org,'organization')+'</head>',1)
-        if html_path == ROOT/'index.html' and 'data-schema="website"' not in updated:
-            website={'@context':'https://schema.org','@type':'WebSite','name':'BG Studio 3D','url':BASE_URL}
-            local={'@context':'https://schema.org','@type':'LocalBusiness','name':'BG Studio 3D','url':BASE_URL,'telephone':'+90 530 246 69 03','address':{'@type':'PostalAddress','addressLocality':'Kuşadası','addressRegion':'Aydın','addressCountry':'TR'}}
-            updated=updated.replace('</head>',_schema_script(website,'website')+_schema_script(local,'local-business')+'</head>',1)
+        is_home = html_path == ROOT/'index.html'
+        updated = _strip_legacy_identity_schema_v3317(updated, is_home=is_home)
+        updated=updated.replace('</head>',_schema_script(_bg_entity_schema_v3317(),'entity')+'</head>',1)
+        if is_home:
+            updated=updated.replace('</head>',_schema_script(_bg_website_schema_v3317(),'website')+'</head>',1)
         if route != '/' and 'data-schema="breadcrumb"' not in updated:
             label_map={'urunler':'Ürünler','ozel-uretim':'Özel Üretim','kurumsal':'Kurumsal','nfc-qr':'NFC & QR','restoran':'Restoran Sistemleri','hizli-baglanti':'Hızlı Bağlantı','feedback':'Premium Feedback','premium-plus':'Premium Plus','prototip-parca':'Prototip & Parça','projeler':'Projeler','hakkimizda':'Hakkımızda','iletisim':'İletişim','teklif':'Teklif','gizlilik':'Gizlilik','kvkk':'KVKK','teslimat-iade':'Teslimat / İade','kisiye-ozel-urun-kosullari':'Kişiye Özel Ürün Koşulları'}
             parts=[part for part in route.strip('/').split('/') if part]
@@ -4312,7 +4395,7 @@ def render_project_detail(item, project_items):
     offer={'nfc':'../../teklif/?tur=nfc','prototype':'../../teklif/?tur=prototip','corporate':'../../teklif/?tur=kurumsal'}.get(kind,'../../teklif/')
     related=[x for x in project_items if _project_slug(x)!=slug][:3]
     related_html=''.join(f'<a class="project-related-card" href="../{esc(_project_slug(x))}/">{_project_media(x,"../../","project-related-media")}<span>{esc(_project_kind_label(x))}</span><strong>{esc(x.get("project_client") or x.get("name") or x.get("project_title") or x.get("headline") or "Proje")}</strong></a>' for x in related)
-    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@type':'Organization','name':'BG Studio 3D','url':BASE_URL},'url':BASE_URL+'/projeler/'+slug+'/'}
+    schema={'@context':'https://schema.org','@type':'CreativeWork','name':headline,'description':description,'creator':{'@id':BASE_URL + '/#organization'},'url':BASE_URL+'/projeler/'+slug+'/'}
     cover=str(item.get('project_cover_image') or item.get('image') or '').strip()
     if cover:
         schema['image']=BASE_URL+'/'+cover.lstrip('/')
@@ -4364,6 +4447,66 @@ def enforce_strict_release_v3314(release_summary):
             'Build JSON içindeki release_candidate ve launch_audit alanlarını kontrol et.'
         )
     return {'strict': strict, 'passed': (not strict) or bool((release_summary or {}).get('ready'))}
+
+
+def sync_kusadasi_local_seo_v3317(project_items):
+    """Populate local proof from real Product Manager project records and keep Service schema tied to canonical entity."""
+    path = ROOT / 'kusadasi-3d-baski' / 'index.html'
+    if not path.exists():
+        return {'ok': False, 'changed': False, 'reason': 'page missing', 'projects': 0}
+    text = path.read_text(encoding='utf-8')
+    original = text
+    preferred = ['kusadasi-asansor', 'luckyland-kusadasi', 'kabalci-hukuk-burosu']
+    by_slug = {_project_slug(item): item for item in (project_items or [])}
+    selected = [by_slug[slug] for slug in preferred if slug in by_slug]
+
+    cards = []
+    for item in selected:
+        slug = _project_slug(item)
+        client = str(item.get('project_client') or item.get('name') or 'BG Studio 3D').strip()
+        headline = str(item.get('project_title') or item.get('headline') or client).strip()
+        sector = _project_sector(item) or '3D baskı üretimi'
+        media = _project_media(item, '../', 'project-related-media')
+        cards.append(
+            f'<a class="project-related-card" href="../projeler/{esc(slug)}/" aria-label="{esc(client)} projesini incele">'
+            f'{media}<span>{esc(sector)}</span><strong>{esc(headline)}</strong></a>'
+        )
+
+    proof = (
+        '<section class="section-pad shell reveal" aria-labelledby="kusadasi-real-work-title">'
+        '<div class="split-title"><div><p class="eyebrow">KUŞADASI’NDAN GERÇEK ÜRETİMLER</p>'
+        '<h2 id="kusadasi-real-work-title">Yerelde ürettiğimiz gerçek işler.</h2></div>'
+        '<p>Kuşadası merkezli üretim altyapısıyla Aydın çevresindeki özel ve kurumsal talepleri değerlendiriyor; '
+        'uygun ürünleri Türkiye geneline gönderiyoruz. Aşağıdaki çalışmalar doğrudan BG Studio 3D proje kayıtlarından gelir.</p></div>'
+        f'<div class="project-related-grid">{"".join(cards)}</div>'
+        '<div class="hero-actions local-seo-link">'
+        '<a class="text-cta" href="../kurumsal/">Kurumsal üretimi incele ↗</a>'
+        '<a class="text-cta" href="../prototip-parca/">Prototip &amp; parça üretimini incele ↗</a>'
+        '<a class="text-cta" href="../ozel-uretim/">Kişiye özel üretimi incele ↗</a>'
+        '</div></section>'
+    )
+    start='<!-- BGSTUDIO:LOCAL_PROOF_START -->'
+    end='<!-- BGSTUDIO:LOCAL_PROOF_END -->'
+    if start in text and end in text:
+        text = replace_between(text, start, end, proof)
+    else:
+        faq_marker='<section class="section-pad-sm shell reveal"><div class="split-title"><h2>Kuşadası 3D baskı hakkında sık sorulanlar.</h2>'
+        if faq_marker not in text:
+            return {'ok': False, 'changed': False, 'reason': 'FAQ insertion point missing', 'projects': len(selected)}
+        text = text.replace(faq_marker, start + '\n' + proof + '\n' + end + '\n' + faq_marker, 1)
+
+    text = re.sub(
+        r'"provider":\{"@type":"LocalBusiness","name":"BG Studio 3D","url":"https://3d\.bgstudio\.com\.tr/","address":\{"@type":"PostalAddress","addressLocality":"Kuşadası","addressRegion":"Aydın","addressCountry":"TR"\}\}',
+        '"provider":{"@id":"https://3d.bgstudio.com.tr/#organization"}', text, count=1
+    )
+    text = text.replace(
+        '"areaServed":{"@type":"City","name":"Kuşadası"}',
+        '"areaServed":[{"@type":"City","name":"Kuşadası"},{"@type":"AdministrativeArea","name":"Aydın"}]', 1
+    )
+    if text != original:
+        path.write_text(text, encoding='utf-8')
+    return {'ok': True, 'changed': text != original, 'projects': len(selected), 'slugs': [_project_slug(x) for x in selected]}
+
 
 def build_site(nfc_family_theme_overrides=None):
     # V3.1.38: every reference page uses the same explicit card-tone source.
@@ -4529,6 +4672,7 @@ def build_site(nfc_family_theme_overrides=None):
 
     project_items = collect_project_items(corporate_all_active, prototype_items)
     project_build = build_project_pages(project_items)
+    local_seo_sync = sync_kusadasi_local_seo_v3317(project_items)
 
     for p in products:
         folder = ROOT / 'urunler' / p['slug']
@@ -4564,7 +4708,7 @@ def build_site(nfc_family_theme_overrides=None):
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
