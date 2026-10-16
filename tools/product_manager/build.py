@@ -1944,9 +1944,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.17'
+SITE_ASSET_VERSION = '3.3.18'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.17-STABLE'
+RELEASE_CANDIDATE = 'V3.3.18-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -1963,6 +1963,8 @@ def _nav_active_key(html_path):
         return 'custom-production'
     if rel.startswith('prototip-parca/'):
         return 'prototype'
+    if rel.startswith('kusadasi-3d-baski/'):
+        return 'local-production'
     if rel.startswith('kurumsal/'):
         return 'corporate'
     if rel.startswith('nfc-qr/'):
@@ -2001,12 +2003,13 @@ def render_site_header(prefix='', active_key=''):
         '<button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>'
         '<nav aria-label="Ana menü" class="main-nav" id="primary-navigation">'
         f'<a{direct_active("products")} href="{prefix}urunler/">Ürünler</a>'
-        f'<div class="{group_class("custom-production", "prototype")}">'
+        f'<div class="{group_class("custom-production", "prototype", "local-production")}">'
         '<button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button>'
         '<div class="nav-submenu nav-submenu-rich" id="nav-production">'
         '<div class="nav-rich-head"><span>ÜRETİM</span><small>Fikirden çalışan fiziksel ürüne.</small></div>'
         + rich_item(f'{prefix}ozel-uretim/','Özel Üretim','Fikir, görsel veya ölçüden kişiye özel ürün.',child_active('custom-production'))
         + rich_item(f'{prefix}prototip-parca/','Prototip & Parça','Teknik model, uyum ve işlev odaklı üretim.',child_active('prototype'))
+        + rich_item(f'{prefix}kusadasi-3d-baski/','Kuşadası 3D Baskı','Kuşadası ve Aydın için yerel 3D baskı hizmeti.',child_active('local-production'))
         + '</div></div>'
         f'<div class="{group_class("corporate", "nfc")}">'
         '<button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button>'
@@ -3619,7 +3622,7 @@ def render_global_footer(prefix=''):
   </section>
   <div class="footer-v3202-grid" aria-label="Alt site haritası">
     <nav aria-label="Ürünler"><strong>ÜRÜNLER</strong><a href="{prefix}urunler/">Tüm Ürünler</a><a href="{prefix}urunler/?sirala=newest">Yeni Ürünler</a><a href="{prefix}urunler/?one-cikan=1">Öne Çıkanlar</a></nav>
-    <nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal Üretim</a></nav>
+    <nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal Üretim</a><a href="{prefix}kusadasi-3d-baski/">Kuşadası 3D Baskı</a></nav>
     <nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC + QR Sistemleri</a><a href="{prefix}nfc-qr/restoran/">Restoran Sistemleri</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Bağlantı</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav>
     <nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}projeler/">Projeler</a><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav>
     <nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a></nav>
