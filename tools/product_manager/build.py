@@ -331,6 +331,41 @@ def clip_seo_text(text, max_len=160):
     return clipped + '.'
 
 
+def _clip_title_part(text, max_len):
+    value = re.sub(r'\s+', ' ', str(text or '')).strip()
+    if len(value) <= max_len:
+        return value
+    clipped = value[:max_len + 1]
+    if ' ' in clipped:
+        clipped = clipped.rsplit(' ', 1)[0]
+    return clipped.rstrip(' |,.;:-–—')
+
+
+def compact_serp_title(primary, context='', brand='BG Studio 3D', max_len=62):
+    """Build a compact title for narrow/mobile SERPs without touching visible H1 copy.
+
+    The contextual phrase is kept only when the full title fits. Otherwise the
+    primary entity/product name is retained with the BG Studio 3D brand. Custom
+    SEO titles entered in Product Manager remain authoritative elsewhere.
+    """
+    primary = re.sub(r'\s+', ' ', str(primary or '')).strip()
+    context = re.sub(r'\s+', ' ', str(context or '')).strip()
+    brand = re.sub(r'\s+', ' ', str(brand or '')).strip()
+    candidates = []
+    if primary and context and brand:
+        candidates.append(f'{primary} | {context} | {brand}')
+    if primary and brand:
+        candidates.append(f'{primary} | {brand}')
+    if primary:
+        candidates.append(primary)
+    for candidate in candidates:
+        if len(candidate) <= max_len:
+            return candidate
+    suffix = f' | {brand}' if brand else ''
+    room = max(18, max_len - len(suffix))
+    return _clip_title_part(primary, room) + suffix
+
+
 def make_seo(p):
     name = str(p.get('name') or '').strip()
     source = str(p.get('card_description') or p.get('description') or '').strip()
@@ -338,7 +373,7 @@ def make_seo(p):
         source = re.sub(r'^' + re.escape(name) + r'\s*[-—–:,.]*\s*', '', source, flags=re.I)
         source = re.sub(r'\s+', ' ', source).strip()
         source = re.sub(r'[.!?]+$', '', source).strip()
-    title = f"{name} | Kuşadası 3D Baskı | BG Studio 3D" if name else ''
+    title = compact_serp_title(name, 'Kuşadası 3D Baskı') if name else ''
     suffix = '3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.'
     description = f"{name}, {source}. {suffix}" if source else f"{name}, {suffix}"
     return title, clip_seo_text(description, 160)
@@ -1880,7 +1915,22 @@ def render_product_page(p, related):
     desc = esc(p.get('description') or '')
     card_desc = esc(p.get('card_description') or p.get('description') or '')
     default_title, default_description = make_seo(p)
-    title = esc(p.get('seo_title') or default_title)
+    stored_title = str(p.get('seo_title') or '').strip()
+    legacy_auto_title = f"{str(p.get('name') or '').strip()} | Kuşadası 3D Baskı | BG Studio 3D"
+    serp_known_overrides = {
+        '3-lu-dis-fircasi-dis-macunu-standi': ('Diş Fırçası & Diş Macunu Standı | Kuşadası 3D Baskı | BG Studio 3D', 'Diş Fırçası & Macun Standı | BG Studio 3D'),
+        'batman-katmanli-yuz-dekor': ('Batman Katmanlı Duvar Dekoru | Kuşadası 3D Baskı | BG Studio 3D', 'Batman Katmanlı Duvar Dekoru | BG Studio 3D'),
+        'doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati': ('Doldurulabilir Ice Roller | Buzlu Yüz Masaj Aparatı | BG Studio 3D', 'Doldurulabilir Ice Roller | BG Studio 3D'),
+        'heykel-bust-masa-lambasi': ('3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D', 'Heykel Büst Masa Lambası | BG Studio 3D'),
+    }
+    known_old, known_new = serp_known_overrides.get(str(p.get('slug') or ''), ('', ''))
+    if stored_title and known_old and stored_title == known_old:
+        effective_title = known_new
+    elif not stored_title or stored_title == legacy_auto_title:
+        effective_title = default_title
+    else:
+        effective_title = stored_title
+    title = esc(effective_title)
     seo_desc = esc(clip_seo_text(p.get('seo_description') or default_description, 160))
     canonical = f"{BASE_URL}/urunler/{esc(p['slug'])}/"
     main_rel = '../../' + p['main_image']
@@ -2044,9 +2094,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.24'
+SITE_ASSET_VERSION = '3.3.25'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.24-STABLE'
+RELEASE_CANDIDATE = 'V3.3.25-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -3296,7 +3346,7 @@ def rebuild_nfc_platform_sections(html_text, theme_overrides=None):
         if not start or not ref:
             raise RuntimeError('NFC ana ürün merkezi güvenli biçimde bulunamadı; saha referanslarına dokunulmadı.')
         html_text = html_text[:start.start()] + rendered + '\n' + html_text[ref.start():]
-    desc = 'BG Studio NFC + QR; restoran sistemleri, Hızlı Bağlantı, Premium Feedback Duo / Trio ve geliştirilen Premium Plus ile fiziksel ve dijital işletme deneyimini birleştirir.'
+    desc = 'BG Studio NFC + QR; restoran sistemleri, Hızlı Bağlantı ve Premium Feedback çözümleriyle fiziksel stand, dijital erişim ve işletme deneyimini birleştirir.'
     html_text = re.sub(r'(<meta\s+content=")[^"]*("\s+name="description"\s*/?>)', lambda m: m.group(1)+desc+m.group(2), html_text, count=1, flags=re.I)
     html_text = re.sub(r'(<title>).*?(</title>)', lambda m: m.group(1)+'BG Studio NFC + QR | İşletme Sistemleri'+m.group(2), html_text, count=1, flags=re.I|re.S)
     return html_text
@@ -5040,7 +5090,8 @@ def render_project_detail(item, project_items):
     schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     breadcrumb_json=json.dumps(breadcrumb_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project">{schema_json}</script><script type="application/ld+json" data-schema="breadcrumb">{breadcrumb_json}</script><section class="project-detail-hero" data-project-detail data-project-slug="{esc(slug)}" data-project-kind="{esc(kind)}" data-project-name="{esc(name)}"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb" aria-label="İçerik yolu"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" data-project-quote href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" data-project-service href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{gallery_html}{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">BENZER PROJELER</p><h2>Aynı üretim alanından başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" data-project-quote href="{offer}">Teklif Al ↗</a></div></section>'''
-    seo_title=str(item.get('project_seo_title') or f'{headline} | BG Studio 3D Proje').strip()
+    project_title_context={'nfc':'NFC + QR Projesi','prototype':'Prototip + Parça','corporate':'Kurumsal Üretim'}.get(kind,'Proje')
+    seo_title=str(item.get('project_seo_title') or compact_serp_title(name, project_title_context)).strip()
     seo_description=clip_seo_text(item.get('project_seo_description') or description,160)
     return _project_page_shell(seo_title,seo_description,f'/projeler/{slug}/',body,'../../')
 

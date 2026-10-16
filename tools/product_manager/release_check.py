@@ -175,6 +175,20 @@ def check():
         if rel == '404.html' and 'noindex' not in robots_value:
             report['critical'].append('404.html noindex olmalı')
 
+
+        # V3.3.25 mobile SERP hygiene. Google may rewrite titles, but excessively
+        # long defaults are avoidable and especially weak on narrow result cards.
+        title_match = re.search(r'<title>(.*?)</title>', text, flags=re.I|re.S)
+        page_title = html.unescape(re.sub(r'\s+', ' ', title_match.group(1)).strip()) if title_match else ''
+        if 'noindex' not in robots_value:
+            if len(page_title) > 70:
+                report['critical'].append(f'{rel}: title çok uzun ({len(page_title)} karakter)')
+            elif len(page_title) > 62:
+                report['warnings'].append(f'{rel}: title mobil SERP için uzun olabilir ({len(page_title)} karakter)')
+        description_value = meta_value(text, 'name', 'description')
+        if 'noindex' not in robots_value and len(description_value) > 160:
+            report['critical'].append(f'{rel}: meta description 160 karakteri aşıyor ({len(description_value)})')
+
         # Structural IDs.
         ids = re.findall(r'\bid=["\']([^"\']+)["\']', text, flags=re.I)
         seen = set(); dup = []
