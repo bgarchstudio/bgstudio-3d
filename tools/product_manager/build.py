@@ -1944,9 +1944,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.18'
+SITE_ASSET_VERSION = '3.3.19'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.18-STABLE'
+RELEASE_CANDIDATE = 'V3.3.19-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -3517,6 +3517,152 @@ def build_project_pages(project_items):
     return {'projects':len(project_items),'detail_pages':len(project_items)}
 
 
+
+# ==============================================================
+# V3.3.19 · SERVICE SEO FOUNDATION
+# ==============================================================
+
+def _service_schema_v3319(name, service_type, path, description):
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        '@id': f'{BASE_URL}{path}#service',
+        'name': name,
+        'serviceType': service_type,
+        'description': description,
+        'url': f'{BASE_URL}{path}',
+        'provider': {'@id': BASE_URL + '/#organization'},
+        'areaServed': [
+            {'@type': 'City', 'name': 'Kuşadası'},
+            {'@type': 'AdministrativeArea', 'name': 'Aydın'},
+            {'@type': 'Country', 'name': 'Türkiye'},
+        ],
+    }
+    return '<script type="application/ld+json" data-schema="service">' + json.dumps(
+        data, ensure_ascii=False, separators=(',', ':')
+    ).replace('</', '<\\/') + '</script>'
+
+
+def _faq_schema_v3319(items):
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+            {
+                '@type': 'Question',
+                'name': question,
+                'acceptedAnswer': {'@type': 'Answer', 'text': answer},
+            }
+            for question, answer in items
+        ],
+    }
+    return '<script type="application/ld+json" data-schema="faq">' + json.dumps(
+        data, ensure_ascii=False, separators=(',', ':')
+    ).replace('</', '<\\/') + '</script>'
+
+
+def _service_pathways_v3319(current):
+    rows = [
+        ('custom', 'Kişiye Özel Üretim', 'Fotoğraf, ölçü, fikir veya kişiselleştirme üzerinden üretim.', '../ozel-uretim/'),
+        ('prototype', 'Prototip & Parça', 'Yedek parça, teknik uyum ve işlev odaklı 3D parça üretimi.', '../prototip-parca/'),
+        ('corporate', 'Kurumsal Üretim', 'Markalı, adetli ve işletmeye özel fiziksel üretim.', '../kurumsal/'),
+        ('local', 'Kuşadası 3D Baskı', 'Kuşadası ve Aydın için yerel 3D baskı hizmeti.', '../kusadasi-3d-baski/'),
+    ]
+    cards = []
+    for key, title, desc, href in rows:
+        if key == current:
+            continue
+        cards.append(
+            f'<article><span>{len(cards)+1:02d}</span><h3>{esc(title)}</h3>'
+            f'<p>{esc(desc)}</p><a class="text-cta" href="{esc(href)}">İncele ↗</a></article>'
+        )
+    return (
+        '<section class="section-pad shell"><div class="split-title"><div>'
+        '<p class="eyebrow">İLGİLİ ÜRETİM YOLLARI</p><h2>İhtiyaca göre doğru üretim sayfasına geç.</h2>'
+        '</div><p>Özel üretim, teknik parça ve kurumsal üretim birbirinden farklı ihtiyaçlara göre ele alınır.</p>'
+        f'</div><div class="v3169-about-grid">{"".join(cards)}</div></section>'
+    )
+
+
+def _personalized_examples_v3319(products):
+    candidates = [p for p in (products or []) if p.get('active', True) and catalog_personalizable(p)]
+    cards = []
+    for product in candidates[:3]:
+        slug = str(product.get('slug') or '').strip('/')
+        name = str(product.get('name') or 'Kişiye özel ürün').strip()
+        if not slug:
+            continue
+        media = (
+            '<div class="project-related-media">'
+            + render_home_product_picture(product, '../', eager=False, sizes='(max-width:700px) 100vw, 33vw')
+            + '</div>'
+        )
+        cards.append(
+            f'<a class="project-related-card" href="../urunler/{esc(slug)}/">{media}'
+            f'<span>Kişiselleştirilebilir ürün</span><strong>{esc(name)}</strong></a>'
+        )
+    if not cards:
+        return ''
+    return (
+        '<section class="section-pad-sm shell" data-service-seo-v3319="examples">'
+        '<div class="split-title"><div><p class="eyebrow">GERÇEK ÜRÜN ÖRNEKLERİ</p>'
+        '<h2>Kişiselleştirmeye açık ürünlerden örnekler.</h2></div>'
+        '<p>Bu bölüm yalnızca Ürün Yöneticisinde kişiselleştirilebilir olarak işaretlenen gerçek ürünlerden beslenir.</p>'
+        '</div><div class="project-related-grid">'
+        + ''.join(cards)
+        + '</div></section>'
+    )
+
+
+def sync_custom_service_seo_v3319(products):
+    path = ROOT / 'ozel-uretim/index.html'
+    if not path.exists():
+        return {'updated': False, 'reason': 'ozel-uretim missing'}
+    text = path.read_text(encoding='utf-8')
+
+    service_schema = _service_schema_v3319(
+        'Kişiye Özel 3D Baskı Üretimi',
+        'Kişiye özel 3D baskı ve özel üretim',
+        '/ozel-uretim/',
+        'Fotoğraf, ölçü, eskiz, mevcut ürün veya fikir üzerinden kişiye özel 3D baskı ve özel üretim değerlendirmesi.'
+    )
+    text = re.sub(
+        r"<script[^>]*type=[\"']application/ld\+json[\"'][^>]*>\s*\{.*?\"@type\"\s*:\s*\"Service\".*?</script>",
+        service_schema,
+        text,
+        count=1,
+        flags=re.I | re.S,
+    )
+
+    wrong = 'Ölçü değişikliği, isim, renk veya uygun tasarımlarda logo gibi kişiselleştirmeler üretim öncesinde birlikte netleştirilir.'
+    correct = 'Uygun parçalarda mevcut örnek, fotoğraf ve ölçüler üzerinden yeniden modelleme ve 3D baskı üretilebilirliği değerlendirilebilir. Uyum, yük, sıcaklık ve kullanım koşulları üretim kararını etkiler.'
+    text = text.replace(wrong, correct)
+
+    text = re.sub(
+        r'<!-- BGSTUDIO:SERVICE_SEO_V3319_START -->.*?<!-- BGSTUDIO:SERVICE_SEO_V3319_END -->',
+        '',
+        text,
+        flags=re.I | re.S,
+    )
+    insertion = (
+        '<!-- BGSTUDIO:SERVICE_SEO_V3319_START -->'
+        + _personalized_examples_v3319(products)
+        + _service_pathways_v3319('custom')
+        + '<!-- BGSTUDIO:SERVICE_SEO_V3319_END -->'
+    )
+    faq_marker = '<section class="section-pad-sm shell reveal"><div class="split-title"><h2>Sık sorulanlar.</h2>'
+    if faq_marker in text:
+        text = text.replace(faq_marker, insertion + faq_marker, 1)
+    else:
+        text = text.replace('</main>', insertion + '</main>', 1)
+
+    path.write_text(text, encoding='utf-8')
+    return {
+        'updated': True,
+        'personalizable_examples': len([p for p in (products or []) if p.get('active', True) and catalog_personalizable(p)][:3]),
+    }
+
+
 # ==============================================================
 # V3.1.69 · CORPORATE / PROTOTYPE / ABOUT / CONTACT
 # ==============================================================
@@ -3566,6 +3712,26 @@ def render_corporate_page_v3169(items):
         context='corporate',
     )
     body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-sector-cloud"><small>ÇALIŞTIĞIMIZ İHTİYAÇ TİPLERİ</small>{sector_html}</div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">SÜREÇ</p><h2>İhtiyaçtan teslimata.</h2></div><p>Kurumsal işlerde ürün biçimi hazır kalıba göre değil, kullanım senaryosuna göre netleşir.</p></div><div class="v3169-process"><article><span>01</span><h3>İhtiyaç</h3><p>Adet, kullanım noktası, ölçü ve marka gereksinimini netleştiririz.</p></article><article><span>02</span><h3>Tasarım</h3><p>Ürünü marka kimliği ve üretim koşullarına göre geliştiririz.</p></article><article><span>03</span><h3>Üretim</h3><p>Onaylanan modeli 3D baskı üretim akışına alırız.</p></article><article><span>04</span><h3>Teslim</h3><p>Kontrol, paketleme ve teslim / kargo adımıyla işi tamamlarız.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">SAHADAN KURUMSAL İŞLER</p><h2>Farklı sektörler. Tek üretim disiplini.</h2></div><p>Yayınlanan kartlar panel ve saha kayıtlarından gelir. Ayrıntısı bulunan işler proje sayfasına bağlanır.</p></div><div class="case-grid">{cards}</div></section>{corporate_marquee}<section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">TOPLU ÜRETİM</p><h2>Adedi ve ihtiyacı gönder.</h2><p>Kurumsal anahtarlık, masaüstü ürün, stand veya işletmeye özel parça için kapsamı birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=kurumsal">Toplu sipariş için teklif al ↗</a></div></section>'''
+    corp_faq = [
+        ('Kurumsal 3D baskıda kaç adet üretim yapılabilir?', 'Adet, ürün geometrisi ve üretim süresine göre değerlendirilir. Tek numuneden küçük ve daha yüksek adetli serilere kadar uygun üretim planı proje kapsamında netleştirilir.'),
+        ('Logo veya marka bilgisi ürüne eklenebilir mi?', 'Uygun tasarımlarda logo, marka adı, renk ve benzeri kurumsal detaylar üretim öncesinde tasarıma dahil edilebilir.'),
+        ('Toplu üretim öncesi numune yapılabilir mi?', 'Uygun projelerde seri üretim öncesinde tasarım ve kullanım kontrolü için numune veya prototip üretim değerlendirilebilir.'),
+    ]
+    body = (
+        _service_schema_v3319(
+            'Kurumsal 3D Baskı ve Toplu Üretim',
+            'Kurumsal 3D baskı, markalı ürün ve toplu üretim',
+            '/kurumsal/',
+            'İşletmelere özel markalı ürün, promosyon, masaüstü çözüm, küçük seri ve toplu 3D baskı üretimi.'
+        )
+        + _faq_schema_v3319(corp_faq)
+        + body
+        + '<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">KURUMSAL 3D BASKI</p><h2>Numuneden adetli üretime.</h2></div><p>Kurumsal üretimde adet, marka uygulaması, kullanım noktası ve tekrar üretilebilirlik birlikte değerlendirilir. Kuşadası merkezli üretim altyapısıyla Aydın çevresi ve Türkiye geneli talepler ele alınır.</p></div></section>'
+        + '<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">SIK SORULANLAR</p><h2>Kurumsal üretim hakkında.</h2></div></div><div class="faq">'
+        + ''.join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q,a in corp_faq)
+        + '</div></section>'
+        + _service_pathways_v3319('corporate')
+    )
     return _editorial_page_shell('Kurumsal 3D Üretim | BG Studio 3D','İşletmelere özel kurumsal 3D baskı, promosyon, masaüstü ürün ve saha üretimleri. Kuşadası BG Studio 3D.','/kurumsal/',body,'corporate')
 
 
@@ -3578,6 +3744,26 @@ def render_prototype_page_v3169(items):
     prototype_cards = [{**item, '_project_kind': 'prototype'} for item in items]
     cards=''.join(render_managed_case(item, '../') for item in prototype_cards)
     body=f'''<section class="v3169-hero v3169-tech-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-tech-flow"><span>SORUN</span><i>↓</i><span>MODEL / CAD</span><i>↓</i><span>3D BASKI</span><i>↓</i><span>ÇALIŞAN PARÇA</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">TEKNİK AKIŞ</p><h2>Ölçü. Model. Test. Üretim.</h2></div><p>Parçanın görevi, temas ettiği yüzeyler ve tolerans ihtiyacı üretim kararını belirler.</p></div><div class="v3169-process"><article><span>01</span><h3>İnceleme</h3><p>Mevcut parça, ölçü, fotoğraf veya teknik dosya üzerinden ihtiyaç belirlenir.</p></article><article><span>02</span><h3>Model</h3><p>Gerekirse model revize edilir veya üretime uygun geometri hazırlanır.</p></article><article><span>03</span><h3>3D Baskı</h3><p>Parçanın kullanımına uygun baskı yönü, malzeme ve üretim ayarları seçilir.</p></article><article><span>04</span><h3>Kontrol</h3><p>Uyum ve kullanım amacı kontrol edilerek teslim edilir.</p></article></div></section><section class="section-pad shell v3169-reference-section"><div class="split-title"><div><p class="eyebrow">TEKNİK ÖRNEKLER</p><h2>Çalışan çözümler.</h2></div><p>Panelde yayınlanan prototip ve parça işleri burada otomatik listelenir.</p></div><div class="case-grid">{cards}</div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">DOSYAN HAZIR MI?</p><h2>STL, 3MF, STEP, PDF veya görselle başlayabiliriz.</h2><p>Ölçü ve kullanım bilgisini ekle. Üretim yolunu birlikte netleştirelim.</p></div><a class="primary-cta" href="../teklif/?tur=prototip">Teknik üretim teklifi al ↗</a></div></section>'''
+    proto_faq = [
+        ('3D model olmadan parça üretimi yapılabilir mi?', 'Uygun parçalarda fotoğraf, mevcut örnek, ölçü veya teknik çizim üzerinden modelleme ve üretilebilirlik değerlendirmesi yapılabilir.'),
+        ('Kırık veya bulunamayan yedek parça yeniden üretilebilir mi?', 'Geometri ölçülebiliyor ve kullanım koşulları 3D baskıya uygunsa yeniden üretim değerlendirilebilir. Yük, sıcaklık, tolerans ve bağlantı biçimi ayrıca kontrol edilir.'),
+        ('STL, 3MF veya STEP dosyam varsa kullanabilir misiniz?', 'Dosya üretime uygunluk açısından kontrol edilir. Gerekirse baskı yönü, tolerans veya geometri için revizyon ihtiyacı değerlendirilir.'),
+    ]
+    body = (
+        _service_schema_v3319(
+            'Prototip ve 3D Parça Üretimi',
+            'Prototip, yedek parça ve teknik 3D parça üretimi',
+            '/prototip-parca/',
+            'Kırık, bulunamayan veya geliştirilmesi gereken parçalar için prototip, yedek parça ve teknik 3D baskı üretimi.'
+        )
+        + _faq_schema_v3319(proto_faq)
+        + body
+        + '<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">3D PARÇA ÜRETİMİ</p><h2>Yedek parça, prototip ve teknik uyum.</h2></div><p>Buradaki odak dekoratif görünümden önce işlevdir. Ölçü, bağlantı noktaları, tolerans, kullanım yükü ve ortam koşulları parçanın üretilebilirliğini belirler.</p></div></section>'
+        + '<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">SIK SORULANLAR</p><h2>Prototip ve parça üretimi hakkında.</h2></div></div><div class="faq">'
+        + ''.join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q,a in proto_faq)
+        + '</div></section>'
+        + _service_pathways_v3319('prototype')
+    )
     return _editorial_page_shell('Prototip ve Parça Üretimi | BG Studio 3D','Prototip, yedek parça ve teknik 3D baskı üretimi. Model, ölçü ve kullanım ihtiyacına göre Kuşadası BG Studio 3D.','/prototip-parca/',body,'prototype')
 
 
@@ -4676,6 +4862,7 @@ def build_site(nfc_family_theme_overrides=None):
     project_items = collect_project_items(corporate_all_active, prototype_items)
     project_build = build_project_pages(project_items)
     local_seo_sync = sync_kusadasi_local_seo_v3317(project_items)
+    service_seo_sync = sync_custom_service_seo_v3319(active)
 
     for p in products:
         folder = ROOT / 'urunler' / p['slug']
@@ -4711,7 +4898,7 @@ def build_site(nfc_family_theme_overrides=None):
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
 
 
 if __name__ == '__main__':
