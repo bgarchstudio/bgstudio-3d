@@ -2010,9 +2010,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.20-R1'
+SITE_ASSET_VERSION = '3.3.21'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.20-R1-STABLE'
+RELEASE_CANDIDATE = 'V3.3.21-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -4445,9 +4445,178 @@ def sync_seo_accessibility_performance_v3171():
             heading_warnings.append({'page':html_path.relative_to(ROOT).as_posix(),'h1':h1_count})
         if updated != text:
             html_path.write_text(updated,encoding='utf-8'); changed += 1
-    robots='User-agent: *\nAllow: /\nSitemap: '+BASE_URL+'/sitemap.xml\n'
+    robots=('User-agent: *\nAllow: /\nDisallow: /tools/\nDisallow: /data/\nDisallow: /cloudflare/\nDisallow: /launcher/\nSitemap: '+BASE_URL+'/sitemap.xml\n')
     (ROOT/'robots.txt').write_text(robots,encoding='utf-8')
     return {'scanned':scanned,'changed':changed,'heading_warnings':heading_warnings[:20]}
+
+
+
+# ============================================================
+# V3.3.21 · TECHNICAL SEO FOUNDATION
+# ============================================================
+
+def _expected_canonical_v3321(html_path):
+    rel = html_path.relative_to(ROOT).as_posix()
+    if rel == 'index.html':
+        return BASE_URL + '/'
+    if rel == '404.html':
+        return BASE_URL + '/404.html'
+    if rel.endswith('/index.html'):
+        return BASE_URL + '/' + rel[:-len('index.html')]
+    return BASE_URL + '/' + rel
+
+
+def _meta_content_v3321(text, key, value):
+    pattern = re.compile(r'<meta\b[^>]*>', flags=re.I)
+    key = key.casefold(); value = value.casefold()
+    for match in pattern.finditer(text):
+        tag = match.group(0)
+        attr = re.search(rf'\b{re.escape(key)}=["\']([^"\']+)["\']', tag, flags=re.I)
+        if not attr or attr.group(1).casefold() != value:
+            continue
+        content = re.search(r'\bcontent=["\']([^"\']*)["\']', tag, flags=re.I)
+        return html.unescape(content.group(1)).strip() if content else ''
+    return ''
+
+
+def _canonical_href_v3321(text):
+    for match in re.finditer(r'<link\b[^>]*>', text, flags=re.I):
+        tag = match.group(0)
+        rel = re.search(r'\brel=["\']([^"\']+)["\']', tag, flags=re.I)
+        if not rel or 'canonical' not in rel.group(1).casefold().split():
+            continue
+        href = re.search(r'\bhref=["\']([^"\']+)["\']', tag, flags=re.I)
+        return html.unescape(href.group(1)).strip() if href else ''
+    return ''
+
+
+def sync_canonical_integrity_v3321():
+    """Enforce one clean self-canonical and matching og:url per generated page."""
+    scanned = changed = 0
+    quote_ok = False
+    for html_path in ROOT.rglob('*.html'):
+        if 'tools' in html_path.relative_to(ROOT).parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        if '<head' not in text.lower():
+            continue
+        scanned += 1
+        expected = _expected_canonical_v3321(html_path)
+        updated = text
+
+        # Remove all canonical tags first. Reinsert exactly one standardized tag.
+        updated = re.sub(
+            r'<link\b(?=[^>]*\brel=["\'][^"\']*\bcanonical\b[^"\']*["\'])[^>]*>',
+            '', updated, flags=re.I
+        )
+        updated = updated.replace('</head>', f'<link rel="canonical" href="{esc(expected)}"></head>', 1)
+
+        # Keep Open Graph URL aligned with the canonical URL when present.
+        og_pattern = r'<meta\b(?=[^>]*\bproperty=["\']og:url["\'])[^>]*>'
+        if re.search(og_pattern, updated, flags=re.I):
+            updated = re.sub(og_pattern, f'<meta property="og:url" content="{esc(expected)}">', updated, count=1, flags=re.I)
+
+        # 404 is never an index target. Its canonical is clean, but robots stays noindex.
+        if html_path == ROOT/'404.html':
+            robots_pattern = r'<meta\b(?=[^>]*\bname=["\']robots["\'])[^>]*>'
+            if re.search(robots_pattern, updated, flags=re.I):
+                updated = re.sub(robots_pattern, '<meta name="robots" content="noindex,follow">', updated, count=1, flags=re.I)
+            else:
+                updated = updated.replace('</head>', '<meta name="robots" content="noindex,follow"></head>', 1)
+
+        if html_path == ROOT/'teklif'/'index.html':
+            quote_ok = expected == BASE_URL + '/teklif/'
+
+        if updated != text:
+            html_path.write_text(updated, encoding='utf-8')
+            changed += 1
+    return {'scanned': scanned, 'changed': changed, 'quote_canonical_ok': quote_ok}
+
+
+def _sitemap_priority_v3321(url):
+    path = url[len(BASE_URL):] if url.startswith(BASE_URL) else '/'
+    exact = {
+        '/': 1.0,
+        '/kusadasi-3d-baski/': .95,
+        '/nfc-qr/': .95,
+        '/projeler/': .92,
+        '/nfc-qr/restoran/': .92,
+        '/kurumsal/': .90,
+        '/prototip-parca/': .90,
+        '/ozel-uretim/': .90,
+        '/urunler/': .90,
+        '/nfc-qr/feedback/': .90,
+        '/nfc-qr/hizli-baglanti/': .88,
+        '/teklif/': .85,
+        '/iletisim/': .80,
+        '/nfc-qr/premium-plus/': .72,
+    }
+    if path in exact:
+        return exact[path]
+    if path.startswith('/projeler/'):
+        return .72
+    if path.startswith('/urunler/'):
+        return .70
+    if path in ('/gizlilik/','/hakkimizda/','/siparis-bilgilendirme/'):
+        return .60
+    if path in ('/kvkk/','/teslimat-iade/'):
+        return .50
+    if path == '/kisiye-ozel-urun-kosullari/':
+        return .45
+    return .60
+
+
+def build_canonical_sitemap_v3321():
+    """Build sitemap from generated indexable self-canonical pages, not a hand-maintained list."""
+    canonical_to_page = {}
+    excluded_noindex = []
+    duplicate_canonicals = []
+    invalid_canonicals = []
+
+    for html_path in ROOT.rglob('*.html'):
+        if 'tools' in html_path.relative_to(ROOT).parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        rel = html_path.relative_to(ROOT).as_posix()
+        robots = _meta_content_v3321(text, 'name', 'robots').casefold()
+        canonical = _canonical_href_v3321(text)
+        if 'noindex' in robots:
+            excluded_noindex.append(rel)
+            continue
+        if not canonical.startswith(BASE_URL + '/'):
+            invalid_canonicals.append(rel)
+            continue
+        if '/index.html' in canonical or '?' in canonical or '#' in canonical:
+            invalid_canonicals.append(rel)
+            continue
+        if canonical in canonical_to_page:
+            duplicate_canonicals.append({'canonical': canonical, 'pages': [canonical_to_page[canonical], rel]})
+            continue
+        canonical_to_page[canonical] = rel
+
+    urls = sorted(canonical_to_page, key=lambda u: (u != BASE_URL+'/', u))
+    today = date.today().isoformat()
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        priority = _sitemap_priority_v3321(url)
+        lines.append(
+            f'  <url><loc>{url}</loc><lastmod>{today}</lastmod>'
+            f'<changefreq>monthly</changefreq><priority>{priority}</priority></url>'
+        )
+    lines.append('</urlset>')
+    (ROOT/'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    return {
+        'urls': len(urls),
+        'excluded_noindex': excluded_noindex,
+        'duplicate_canonicals': duplicate_canonicals,
+        'invalid_canonicals': invalid_canonicals,
+    }
 
 
 def audit_v3171_public_pages():
@@ -4944,27 +5113,16 @@ def build_site(nfc_family_theme_overrides=None):
     assistant_sync = sync_bg_assistant_widget()
     css_minify = write_minified_css_v3312()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
+    canonical_sync = sync_canonical_integrity_v3321()
     site_content_state = read_site_content_v3175()
-
-    today = date.today().isoformat()
-    static = [
-        ('/', 1.0), ('/gizlilik/', .6), ('/hakkimizda/', .6), ('/iletisim/', .8),
-        ('/kurumsal/', .9), ('/projeler/', .92), ('/kusadasi-3d-baski/', .95), ('/nfc-qr/', .95), ('/nfc-qr/restoran/', .92), ('/nfc-qr/hizli-baglanti/', .88), ('/nfc-qr/feedback/', .9), ('/nfc-qr/premium-plus/', .72), ('/prototip-parca/', .9), ('/ozel-uretim/', .9),
-        ('/siparis-bilgilendirme/', .6), ('/kvkk/', .5), ('/teslimat-iade/', .5), ('/kisiye-ozel-urun-kosullari/', .45), ('/teklif/', .85), ('/urunler/', .9),
-    ]
-    urls = [(BASE_URL + path, prio) for path, prio in static] + [(f"{BASE_URL}/urunler/{p['slug']}/", .7) for p in active] + [(f"{BASE_URL}/projeler/{_project_slug(item)}/", .72) for item in project_items]
-    lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for url, prio in urls:
-        lines.append(f'  <url><loc>{url}</loc><lastmod>{today}</lastmod><changefreq>monthly</changefreq><priority>{prio}</priority></url>')
-    lines.append('</urlset>')
-    (ROOT / 'sitemap.xml').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    sitemap_sync = build_canonical_sitemap_v3321()
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
     seo_audit = audit_v3171_public_pages()
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': len(urls)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
 
 
 if __name__ == '__main__':

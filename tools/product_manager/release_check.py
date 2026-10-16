@@ -82,6 +82,38 @@ def html_route(path):
     return '/' + rel
 
 
+def expected_canonical_for_page(path):
+    rel = path.relative_to(ROOT).as_posix()
+    if rel == 'index.html':
+        return BASE_URL + '/'
+    if rel == '404.html':
+        return BASE_URL + '/404.html'
+    if rel.endswith('/index.html'):
+        return BASE_URL + '/' + rel[:-len('index.html')]
+    return BASE_URL + '/' + rel
+
+
+def tag_attr(tag, name):
+    match = re.search(rf'\b{re.escape(name)}=["\']([^"\']*)["\']', tag, flags=re.I)
+    return html.unescape(match.group(1)).strip() if match else ''
+
+
+def canonical_values(text):
+    values = []
+    for tag in re.findall(r'<link\b[^>]*>', text, flags=re.I):
+        rel = tag_attr(tag, 'rel').casefold().split()
+        if 'canonical' in rel:
+            values.append(tag_attr(tag, 'href'))
+    return values
+
+
+def meta_value(text, key, expected):
+    for tag in re.findall(r'<meta\b[^>]*>', text, flags=re.I):
+        if tag_attr(tag, key).casefold() == expected.casefold():
+            return tag_attr(tag, 'content')
+    return ''
+
+
 def check():
     version = expected_version()
     pages = public_html_files()
@@ -101,6 +133,8 @@ def check():
     generated_routes = {html_route(path) for path in pages}
     local_asset_refs = 0
     checked_links = 0
+    indexable_canonicals = set()
+    noindex_canonicals = set()
 
     for path in pages:
         rel = path.relative_to(ROOT).as_posix()
@@ -116,6 +150,30 @@ def check():
                 report['critical'].append(f'{rel}: {label} eksik')
         if version and f'name="bgstudio-build" content="{version}"' not in text:
             report['critical'].append(f'{rel}: bgstudio-build {version} meta değeri yok/eski')
+
+        # V3.3.21 canonical integrity.
+        expected_canonical = expected_canonical_for_page(path)
+        canonicals = canonical_values(text)
+        if len(canonicals) != 1:
+            report['critical'].append(f'{rel}: canonical sayısı {len(canonicals)}, beklenen 1')
+        canonical = canonicals[0] if canonicals else ''
+        if canonical != expected_canonical:
+            report['critical'].append(f'{rel}: canonical yanlış: {canonical or "eksik"} | beklenen {expected_canonical}')
+        if '/index.html' in canonical or '?' in canonical or '#' in canonical:
+            report['critical'].append(f'{rel}: canonical temiz URL değil: {canonical}')
+        robots_value = meta_value(text, 'name', 'robots').casefold()
+        if canonical:
+            if 'noindex' in robots_value:
+                noindex_canonicals.add(canonical)
+            else:
+                indexable_canonicals.add(canonical)
+        og_url = meta_value(text, 'property', 'og:url')
+        if og_url and og_url != canonical:
+            report['critical'].append(f'{rel}: og:url canonical ile eşleşmiyor')
+        if rel == 'teklif/index.html' and canonical != BASE_URL + '/teklif/':
+            report['critical'].append('teklif/index.html canonical /teklif/ olmalı')
+        if rel == '404.html' and 'noindex' not in robots_value:
+            report['critical'].append('404.html noindex olmalı')
 
         # Structural IDs.
         ids = re.findall(r'\bid=["\']([^"\']+)["\']', text, flags=re.I)
@@ -229,8 +287,11 @@ def check():
         rt = robots.read_text(encoding='utf-8', errors='replace')
         if f'Sitemap: {BASE_URL}/sitemap.xml' not in rt:
             report['critical'].append('robots.txt sitemap satırı eksik/yanlış')
+        for blocked in ('/tools/','/data/','/cloudflare/','/launcher/'):
+            if f'Disallow: {blocked}' not in rt:
+                report['critical'].append(f'robots.txt crawl guard eksik: {blocked}')
 
-    # sitemap.xml paths should have a generated route.
+    # sitemap.xml must be an exact set of indexable canonical URLs.
     sitemap = ROOT/'sitemap.xml'
     sitemap_count = 0
     if not sitemap.is_file():
@@ -241,14 +302,22 @@ def check():
             tree = ET.parse(sitemap)
             locs = [node.text.strip() for node in tree.findall('.//sm:loc', ns) if node.text]
             sitemap_count = len(locs)
+            sitemap_set = set(locs)
+            if len(sitemap_set) != len(locs):
+                report['critical'].append('sitemap.xml duplicate URL içeriyor')
             for url in locs:
-                if not url.startswith(BASE_URL):
+                if not url.startswith(BASE_URL + '/'):
                     report['critical'].append(f'sitemap external/yanlış origin: {url}')
-                    continue
-                route = url[len(BASE_URL):] or '/'
-                if not route.endswith('/') and '.' not in route.rsplit('/',1)[-1]: route += '/'
-                if route not in generated_routes and route != '/':
-                    report['critical'].append(f'sitemap route üretilmemiş: {route}')
+                if '/index.html' in url or '?' in url or '#' in url:
+                    report['critical'].append(f'sitemap temiz canonical URL değil: {url}')
+                if url in noindex_canonicals:
+                    report['critical'].append(f'sitemap noindex URL içeriyor: {url}')
+            missing = sorted(indexable_canonicals - sitemap_set)
+            extra = sorted(sitemap_set - indexable_canonicals)
+            for url in missing[:30]:
+                report['critical'].append(f'sitemap indexable canonical eksik: {url}')
+            for url in extra[:30]:
+                report['critical'].append(f'sitemap canonical olmayan/ekstra URL: {url}')
         except Exception as exc:
             report['critical'].append(f'sitemap parse hatası: {exc}')
 
@@ -274,6 +343,8 @@ def check():
     report['stats']['internal_links_checked'] = checked_links
     report['stats']['local_assets_checked'] = local_asset_refs
     report['stats']['sitemap_urls'] = sitemap_count
+    report['stats']['indexable_canonicals'] = len(indexable_canonicals)
+    report['stats']['noindex_canonicals'] = len(noindex_canonicals)
     report['critical'] = list(dict.fromkeys(report['critical']))
     report['warnings'] = list(dict.fromkeys(report['warnings']))
     report['ready'] = len(report['critical']) == 0

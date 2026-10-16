@@ -1,3 +1,16 @@
+// V3.3.21 · CANONICAL INDEX.HTML URL NORMALIZER
+(() => {
+  try {
+    const pathname = String(window.location.pathname || '/');
+    let clean = pathname;
+    if (pathname === '/index.html') clean = '/';
+    else if (pathname.endsWith('/index.html')) clean = pathname.slice(0, -'index.html'.length);
+    if (clean !== pathname && window.history?.replaceState) {
+      window.history.replaceState(null, document.title, `${clean}${window.location.search || ''}${window.location.hash || ''}`);
+    }
+  } catch (_) {}
+})();
+
 
 // v2.4.1 — direct/search-engine landings should start at the top, not at a restored footer position.
 (() => {

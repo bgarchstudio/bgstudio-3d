@@ -4783,18 +4783,14 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 }
 
 
-/* V3.3.20-R1 · KUSADASI LOCAL METRIC READABILITY */
+/* ==========================================================
+   V3.3.20-R1 · KUŞADASI LOCAL METRIC READABILITY
+   ========================================================== */
 .local-landing .info-panel-dark .metric{
   background:#f4ede4;
   border-color:rgba(60,40,24,.10);
   box-shadow:0 10px 24px rgba(0,0,0,.06);
 }
-.local-landing .info-panel-dark .metric strong{
-  color:#2f2117;
-}
-.local-landing .info-panel-dark .metric span{
-  color:#746356;
-}
-.local-landing .info-panel-dark .eyebrow{
-  color:#d8a46c;
-}
+.local-landing .info-panel-dark .metric strong{color:#2f2117}
+.local-landing .info-panel-dark .metric span{color:#746356}
+.local-landing .info-panel-dark .eyebrow{color:#d8a46c}
