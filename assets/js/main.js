@@ -10,13 +10,11 @@
   window.addEventListener('pageshow', event => { if (!event.persisted) goTop(); });
 })();
 
-// V3.1.63 - public header runtime compatibility layer.
-// Some already-published static pages may still carry the pre-V3.1.63 header until
-// their HTML is rebuilt/deployed. main.js is shared by every public page, so repair
-// the shell before the rest of the page logic captures nav/menu references.
+// V3.3.19-R1 - public header runtime compatibility layer.
+// Keep the shared runtime synchronized with Product Manager V3.2.03 Rich Navigation.
 (() => {
-  const HEADER_VERSION = 'v3.1.83';
-  const ASSET_VERSION = '3.1.97';
+  const HEADER_VERSION = 'v3.2.03';
+  const ASSET_VERSION = '3.3.19-R1';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -25,6 +23,7 @@
   const activeKey = isRoute('/urunler/') ? 'products'
     : isRoute('/ozel-uretim/') ? 'custom-production'
     : isRoute('/prototip-parca/') ? 'prototype'
+    : isRoute('/kusadasi-3d-baski/') ? 'local-production'
     : isRoute('/kurumsal/') ? 'corporate'
     : isRoute('/nfc-qr/') ? 'nfc'
     : isRoute('/projeler/') ? 'projects'
@@ -35,6 +34,10 @@
   const directActive = key => activeKey === key ? ' aria-current="page" class="nav-link is-active"' : ' class="nav-link"';
   const groupClass = (...keys) => keys.includes(activeKey) ? 'nav-group is-active' : 'nav-group';
   const childActive = key => activeKey === key ? ' aria-current="page" class="is-active"' : '';
+  const richItem = (href,title,description,active='',external=false) => {
+    const attrs = external ? ' rel="noopener" target="_blank"' : '';
+    return `<a${active} href="${href}"${attrs}><span class="nav-rich-copy"><strong>${title}</strong><small>${description}</small></span><span class="nav-rich-arrow" aria-hidden="true">↗</span></a>`;
+  };
 
   const canonicalHeader = () => `
     <header class="site-header" id="top" data-bg-nav="${HEADER_VERSION}">
@@ -43,16 +46,18 @@
         <button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>
         <nav aria-label="Ana menü" class="main-nav" id="primary-navigation">
           <a${directActive('products')} href="/urunler/">Ürünler</a>
-          <div class="${groupClass('custom-production','prototype')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu" id="nav-production"><a${childActive('custom-production')} href="/ozel-uretim/">Özel Üretim</a><a${childActive('prototype')} href="/prototip-parca/">Prototip &amp; Parça Üretim</a></div></div>
-          <div class="${groupClass('corporate','nfc')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu" id="nav-business"><a${childActive('corporate')} href="/kurumsal/">Kurumsal</a><a${childActive('nfc')} href="/nfc-qr/">NFC &amp; QR Sistemleri</a></div></div>
+          <div class="${groupClass('custom-production','prototype','local-production')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-production">Üretim</button><div class="nav-submenu nav-submenu-rich" id="nav-production"><div class="nav-rich-head"><span>ÜRETİM</span><small>Fikirden çalışan fiziksel ürüne.</small></div>${richItem('/ozel-uretim/','Özel Üretim','Fikir, görsel veya ölçüden kişiye özel ürün.',childActive('custom-production'))}${richItem('/prototip-parca/','Prototip & Parça','Teknik model, uyum ve işlev odaklı üretim.',childActive('prototype'))}${richItem('/kusadasi-3d-baski/','Kuşadası 3D Baskı','Kuşadası ve Aydın için yerel 3D baskı hizmeti.',childActive('local-production'))}</div></div>
+          <div class="${groupClass('corporate','nfc')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-business">İşletmeler</button><div class="nav-submenu nav-submenu-rich" id="nav-business"><div class="nav-rich-head"><span>İŞLETMELER</span><small>Markaya ve sahaya göre üretim.</small></div>${richItem('/kurumsal/','Kurumsal Üretim','Toplu, markalı ve işletmeye özel fiziksel üretim.',childActive('corporate'))}${richItem('/nfc-qr/','NFC + QR Sistemleri','Menü, feedback, yönlendirme ve işletme analitiği.',childActive('nfc'))}</div></div>
           <a${directActive('projects')} href="/projeler/">Projeler</a>
-          <div class="${groupClass('about','contact')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu" id="nav-studio"><a${childActive('about')} href="/hakkimizda/">Hakkımızda</a><a${childActive('contact')} href="/iletisim/">İletişim</a><a class="arch-link" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a></div></div>
+          <div class="${groupClass('about','contact')}"><button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="nav-studio">BG Studio</button><div class="nav-submenu nav-submenu-rich nav-submenu-studio" id="nav-studio"><div class="nav-rich-head"><span>BG STUDIO</span><small>Stüdyo, iletişim ve mimarlık.</small></div>${richItem('/hakkimizda/','Hakkımızda','Üretim yaklaşımı, stüdyo ve çalışma biçimi.',childActive('about'))}${richItem('/iletisim/','İletişim','Kuşadası, teklif ve iletişim kanalları.',childActive('contact'))}${richItem('https://bgstudio.com.tr','Architecture','Mimarlık ve görselleştirme projeleri.',' class="arch-link"',true)}</div></div>
           <div class="nav-actions"><a class="nav-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank">WhatsApp</a></div>
         </nav>
       </div>
     </header>`;
 
-  const alreadyCurrent = header.dataset.bgNav === HEADER_VERSION && header.querySelector('.nav-group-toggle');
+  const productionMenu = header.querySelector('#nav-production');
+  const hasCurrentProductionNav = Boolean(productionMenu?.classList.contains('nav-submenu-rich') && productionMenu.querySelector('a[href*="kusadasi-3d-baski"]'));
+  const alreadyCurrent = header.dataset.bgNav === HEADER_VERSION && hasCurrentProductionNav;
   if (!alreadyCurrent) {
     const holder = document.createElement('div');
     holder.innerHTML = canonicalHeader().trim();
@@ -61,10 +66,7 @@
   }
 
   const ensureNavigationRuntime = () => {
-    if (typeof window.BGStudioNavigationInit === 'function') {
-      window.BGStudioNavigationInit();
-      return;
-    }
+    if (typeof window.BGStudioNavigationInit === 'function') { window.BGStudioNavigationInit(); return; }
     if (document.querySelector(`script[data-bg-nav-runtime="${ASSET_VERSION}"]`)) return;
     const script = document.createElement('script');
     script.src = `/assets/js/navigation.js?v=${ASSET_VERSION}`;

@@ -183,6 +183,20 @@ def check():
         if h1 != 1:
             report['warnings'].append(f'{rel}: h1 sayısı {h1}')
 
+    # Rich Navigation runtime regression guard.
+    runtime_js = ROOT/'assets/js/main.js'
+    if not runtime_js.is_file():
+        report['critical'].append('assets/js/main.js eksik')
+    else:
+        runtime_text = runtime_js.read_text(encoding='utf-8', errors='replace')
+        for token, label in (
+            ('Kuşadası 3D Baskı', 'runtime Kuşadası üretim linki'),
+            ('nav-submenu-rich', 'runtime rich navigation'),
+            ("HEADER_VERSION = 'v3.2.03'", 'runtime header version senkronu'),
+        ):
+            if token not in runtime_text:
+                report['critical'].append(f'main.js: {label} eksik')
+
     # robots.txt
     robots = ROOT/'robots.txt'
     if not robots.is_file():
