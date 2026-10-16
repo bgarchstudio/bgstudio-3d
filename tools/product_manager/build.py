@@ -2010,9 +2010,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.20'
+SITE_ASSET_VERSION = '3.3.20-R1'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.20-STABLE'
+RELEASE_CANDIDATE = 'V3.3.20-R1-STABLE'
 
 
 def _relative_prefix_for_html(html_path):

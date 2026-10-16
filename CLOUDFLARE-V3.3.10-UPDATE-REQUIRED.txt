@@ -1,7 +1,7 @@
 HISTORICAL FILENAME - CURRENT STATUS
 
-Site release: V3.3.20
+Site release: V3.3.20-R1
 Expected BG Assistant Worker baseline: V3.3.10-R4 Quantity Parser or newer.
 
-V3.3.20 changes product SEO, structured data, Product Manager storage migration and internal links only.
+V3.3.20-R1 changes only frontend CSS/readability on the Kuşadası 3D Baskı local landing page.
 Cloudflare Worker redeploy is NOT required.
