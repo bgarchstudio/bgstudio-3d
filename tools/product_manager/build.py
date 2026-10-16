@@ -884,6 +884,40 @@ def _responsive_srcset_for_product(product, prefix=''):
     return ', '.join(entries)
 
 
+def _asset_dimensions_v3324(raw):
+    raw = str(raw or '').strip().replace('\\','/').lstrip('/')
+    if not raw or raw.startswith(('http://','https://','//','data:','blob:')):
+        return None
+    path = ROOT / raw
+    if not path.is_file() or PILImage is None:
+        return None
+    try:
+        with PILImage.open(path) as image:
+            width, height = image.size
+        return (int(width), int(height)) if width and height else None
+    except Exception:
+        return None
+
+
+def _responsive_srcset_for_asset_v3324(raw, prefix='', widths=(640, 1200)):
+    raw = str(raw or '').strip().replace('\\','/').lstrip('/')
+    if not raw or raw.startswith(('http://','https://','//','data:','blob:')):
+        return ''
+    dims = _asset_dimensions_v3324(raw)
+    if not dims:
+        return ''
+    original_width = int(dims[0])
+    entries = []
+    for width in widths:
+        if int(width) >= original_width:
+            continue
+        variant = _ensure_responsive_variant(raw, int(width))
+        if variant:
+            entries.append(f'{prefix}{variant} {int(width)}w')
+    entries.append(f'{prefix}{raw} {original_width}w')
+    return ', '.join(entries)
+
+
 def _picture_sources_for_product(product, prefix=''):
     # Use AVIF/WebP only when the matching optimized file really exists.
     raw = str(product.get('main_image') or '').strip()
@@ -2010,9 +2044,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.23'
+SITE_ASSET_VERSION = '3.3.24'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.23-STABLE'
+RELEASE_CANDIDATE = 'V3.3.24-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -3037,10 +3071,14 @@ def _nfc_v3167_page(title, description, route, body_html):
 def _nfc_v3167_media(key, alt, prefix='../../'):
     row = nfc_media_settings().get(key) or {}
     image = str(row.get('image') or '').replace('\\', '/').lstrip('/')
+    if not image and key == 'restaurant_packages':
+        image = 'assets/images/nfc-stand-semasi.webp'
     if image:
-        return f'<div class="nfc-v3167-media zoomable-media" role="button" tabindex="0" aria-label="{esc(alt)} görselini büyüt"><img src="{prefix}{esc(image)}" alt="{esc(alt)}" loading="lazy" decoding="async"></div>'
-    if key == 'restaurant_packages':
-        return f'<div class="nfc-v3167-media nfc-v3167-media-fallback"><img src="{prefix}assets/images/nfc-stand-semasi.webp" alt="BG Studio NFC restoran stand şeması" loading="lazy" decoding="async"></div>'
+        dims = _asset_dimensions_v3324(image) or (1600, 900)
+        srcset = _responsive_srcset_for_asset_v3324(image, prefix, widths=(640, 1000))
+        srcset_attr = f' srcset="{esc(srcset)}" sizes="(max-width:760px) calc(100vw - 24px), (max-width:1100px) 48vw, 42vw"' if srcset else ''
+        fallback = ' nfc-v3167-media-fallback' if key == 'restaurant_packages' and not row.get('image') else ''
+        return f'<div class="nfc-v3167-media{fallback} zoomable-media" role="button" tabindex="0" aria-label="{esc(alt)} görselini büyüt"><img src="{prefix}{esc(image)}" alt="{esc(alt)}" width="{dims[0]}" height="{dims[1]}" loading="eager" fetchpriority="high" decoding="async"{srcset_attr}></div>'
     return '<div class="nfc-v3167-media nfc-v3167-media-fallback"><span>BG Studio NFC + QR</span><small>İşletmeye özel fiziksel + dijital sistem</small></div>'
 
 
@@ -3519,7 +3557,7 @@ def render_project_index(project_items):
             for pos,row in enumerate(project_items,1)
         ]}
     }
-    collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
+    collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project-collection">{collection_json}</script><section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Panel ve veri tabanlı saha kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/" data-project-index-quote>Teklif Al ↗</a></div></section>'''
     return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
 
@@ -3554,7 +3592,7 @@ def render_project_detail(item, project_items):
     metrics_html=''
     if metrics:
         metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">GERÇEK SİSTEM VERİSİ</p><h2>Kayıtlı proje metrikleri.</h2><p>Yalnızca veri kaydında bulunan değerler gösterilir.</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
-    media=_project_media(item,'../../','project-detail-media')
+    media=_project_media(item,'../../','project-detail-media',eager=True)
     kind=_project_kind(item)
     service={'nfc':'../../nfc-qr/','prototype':'../../prototip-parca/','corporate':'../../kurumsal/'}.get(kind,'../../kurumsal/')
     offer={'nfc':'../../teklif/?tur=nfc','prototype':'../../teklif/?tur=prototip','corporate':'../../teklif/?tur=kurumsal'}.get(kind,'../../teklif/')
@@ -3568,8 +3606,8 @@ def render_project_detail(item, project_items):
     if sector: schema['keywords']=', '.join([sector]+[str(x) for x in (item.get('tags') or [])[:6]])
     if item.get('image'): schema['image']=BASE_URL+'/'+str(item.get('image')).lstrip('/')
     breadcrumb_schema={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'Ana Sayfa','item':BASE_URL+'/'},{'@type':'ListItem','position':2,'name':'Projeler','item':BASE_URL+'/projeler/'},{'@type':'ListItem','position':3,'name':name,'item':project_url}]}
-    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
-    breadcrumb_json=json.dumps(breadcrumb_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
+    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
+    breadcrumb_json=json.dumps(breadcrumb_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project">{schema_json}</script><script type="application/ld+json" data-schema="breadcrumb">{breadcrumb_json}</script><section class="project-detail-hero" data-project-detail data-project-slug="{esc(slug)}" data-project-kind="{esc(kind)}" data-project-name="{esc(name)}"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb" aria-label="İçerik yolu"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" data-project-quote href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" data-project-service href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">BENZER PROJELER</p><h2>Aynı üretim alanından başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" data-project-quote href="{offer}">Teklif Al ↗</a></div></section>'''
     return _project_page_shell(f'{headline} | BG Studio 3D Proje',description,f'/projeler/{slug}/',body,'../../')
 
@@ -4854,12 +4892,21 @@ def collect_project_items(corporate_items, prototype_items):
     return rows
 
 
-def _project_media(item, prefix='../', css_class=''):
-    image = str(item.get('project_cover_image') or item.get('image') or '').strip()
+def _project_media(item, prefix='../', css_class='', eager=False):
+    image = str(item.get('project_cover_image') or item.get('image') or '').strip().replace('\\','/').lstrip('/')
     name = esc(item.get('project_client') or item.get('name') or item.get('project_title') or item.get('headline') or 'BG Studio projesi')
     klass = f' {css_class}' if css_class else ''
     if image:
-        return f'<div class="project-media{klass}"><img src="{esc(prefix + image)}" alt="{name}" loading="lazy" decoding="async"></div>'
+        dims = _asset_dimensions_v3324(image) or (1600, 900)
+        srcset = _responsive_srcset_for_asset_v3324(image, prefix, widths=(640, 1200))
+        if css_class == 'project-detail-media':
+            sizes = '(max-width:760px) calc(100vw - 24px), (max-width:1100px) 52vw, 48vw'
+        else:
+            sizes = '(max-width:760px) calc(100vw - 24px), (max-width:1100px) 50vw, 33vw'
+        srcset_attr = f' srcset="{esc(srcset)}" sizes="{sizes}"' if srcset else ''
+        loading = 'eager' if eager else 'lazy'
+        priority = ' fetchpriority="high"' if eager else ''
+        return f'<div class="project-media{klass}"><img src="{esc(prefix + image)}" alt="{name}" width="{dims[0]}" height="{dims[1]}" loading="{loading}" decoding="async"{priority}{srcset_attr}></div>'
     return f'<div class="project-media project-media-fallback{klass}"><span>BG</span><strong>{name}</strong></div>'
 
 
@@ -4934,7 +4981,7 @@ def render_project_index(project_items):
         active=' is-active' if key=='all' else ''
         filters.append(f'<button class="project-filter{active}" type="button" data-project-filter="{key}" aria-pressed="{str(key=="all").lower()}">{label}<span>{counts.get(key,0)}</span></button>')
     collection_schema={'@context':'https://schema.org','@type':'CollectionPage','@id':BASE_URL+'/projeler/#collection','name':'BG Studio 3D Projeler','description':'BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','url':BASE_URL+'/projeler/','isPartOf':{'@id':BASE_URL+'/#website'},'publisher':{'@id':BASE_URL+'/#organization'},'mainEntity':{'@type':'ItemList','itemListElement':[{'@type':'ListItem','position':pos,'name':str(row.get('project_title') or row.get('headline') or row.get('project_client') or row.get('name') or 'BG Studio 3D Projesi'),'url':BASE_URL+'/projeler/'+_project_slug(row)+'/'} for pos,row in enumerate(project_items,1)]}}
-    collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
+    collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project-collection">{collection_json}</script><section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Ürün Yöneticisindeki proje kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/" data-project-index-quote>Teklif Al ↗</a></div></section>'''
     return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
 
@@ -4969,7 +5016,7 @@ def render_project_detail(item, project_items):
     metrics_html=''
     if metrics:
         metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">GERÇEK SİSTEM VERİSİ</p><h2>Kayıtlı proje metrikleri.</h2><p>Yalnızca Ürün Yöneticisinde girilen değerler gösterilir.</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
-    media=_project_media(item,'../../','project-detail-media')
+    media=_project_media(item,'../../','project-detail-media',eager=True)
     gallery=_project_gallery(item)
     gallery_html=''
     if gallery:
@@ -4990,8 +5037,8 @@ def render_project_detail(item, project_items):
     if cover:
         schema['image']=BASE_URL+'/'+cover.lstrip('/')
     breadcrumb_schema={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'Ana Sayfa','item':BASE_URL+'/'},{'@type':'ListItem','position':2,'name':'Projeler','item':BASE_URL+'/projeler/'},{'@type':'ListItem','position':3,'name':name,'item':project_url}]}
-    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
-    breadcrumb_json=json.dumps(breadcrumb_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\/')
+    schema_json=json.dumps(schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
+    breadcrumb_json=json.dumps(breadcrumb_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project">{schema_json}</script><script type="application/ld+json" data-schema="breadcrumb">{breadcrumb_json}</script><section class="project-detail-hero" data-project-detail data-project-slug="{esc(slug)}" data-project-kind="{esc(kind)}" data-project-name="{esc(name)}"><div class="shell project-detail-grid"><div class="project-detail-copy"><nav class="project-breadcrumb" aria-label="İçerik yolu"><a href="../../projeler/">Projeler</a><span>/</span><b>{esc(name)}</b></nav><p class="eyebrow">{esc(kind_label)} · {esc(sector)}</p><h1>{esc(headline)}</h1><p class="lead">{esc(description)}</p><div class="hero-actions"><a class="primary-cta" data-project-quote href="{offer}">Benzer proje için teklif al ↗</a><a class="secondary-cta" data-project-service href="{service}">İlgili hizmeti incele ↗</a></div></div>{media}</div></section><section class="project-facts-wrap"><div class="shell project-facts">{facts_html}</div></section><section class="section-pad shell"><div class="project-story-grid">{story_html}</div>{('<div class="project-scope"><p class="eyebrow">UYGULAMA KAPSAMI</p><div class="project-scope-tags">'+tags+'</div></div>') if tags else ''}</section>{gallery_html}{metrics_html}<section class="section-pad-sm shell"><div class="split-title"><div><p class="eyebrow">BENZER PROJELER</p><h2>Aynı üretim alanından başka işler.</h2></div><a class="ghost-cta" href="../../projeler/">Tüm projeler ↗</a></div><div class="project-related-grid">{related_html}</div></section><section class="project-detail-cta"><div class="shell"><div><p class="eyebrow">BENZER BİR İHTİYAÇ MI VAR?</p><h2>Kapsamı gönder, üretim yolunu netleştirelim.</h2></div><a class="primary-cta" data-project-quote href="{offer}">Teklif Al ↗</a></div></section>'''
     seo_title=str(item.get('project_seo_title') or f'{headline} | BG Studio 3D Proje').strip()
     seo_description=clip_seo_text(item.get('project_seo_description') or description,160)

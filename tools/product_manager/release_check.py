@@ -235,8 +235,25 @@ def check():
         # Accessibility / layout warnings.
         if re.search(r'<img\b(?![^>]*\balt=)[^>]*>', text, flags=re.I):
             report['critical'].append(f'{rel}: alt eksik img')
-        if re.search(r'<img\b(?!(?:[^>]*\bwidth=)(?=[^>]*\bheight=))[^>]*>', text, flags=re.I):
-            report['warnings'].append(f'{rel}: width/height eksik img olabilir')
+        missing_dimensions = False
+        for img_tag in re.findall(r'<img\b[^>]*>', text, flags=re.I):
+            if not tag_attr(img_tag, 'width') or not tag_attr(img_tag, 'height'):
+                missing_dimensions = True
+                break
+        if missing_dimensions:
+            report['warnings'].append(f'{rel}: width/height eksik img')
+
+        # V3.3.24 known above-the-fold media must not be lazy-loaded.
+        if rel.startswith('projeler/') and rel != 'projeler/index.html' and 'project-detail-media' in text:
+            hero = re.search(r'<div class="project-media project-detail-media">\s*(<img\b[^>]*>)', text, flags=re.I)
+            if not hero or tag_attr(hero.group(1), 'loading').casefold() != 'eager' or tag_attr(hero.group(1), 'fetchpriority').casefold() != 'high':
+                report['critical'].append(f'{rel}: proje hero görseli eager/high değil')
+            elif not tag_attr(hero.group(1), 'srcset'):
+                report['warnings'].append(f'{rel}: proje hero responsive srcset eksik')
+        if rel in ('nfc-qr/restoran/index.html','nfc-qr/hizli-baglanti/index.html','nfc-qr/feedback/index.html'):
+            hero = re.search(r'<div class="nfc-v3167-media[^>]*>\s*(<img\b[^>]*>)', text, flags=re.I)
+            if hero and (tag_attr(hero.group(1), 'loading').casefold() != 'eager' or tag_attr(hero.group(1), 'fetchpriority').casefold() != 'high'):
+                report['critical'].append(f'{rel}: NFC hero görseli eager/high değil')
         h1 = len(re.findall(r'<h1\b', text, flags=re.I))
         if h1 != 1:
             report['warnings'].append(f'{rel}: h1 sayısı {h1}')
