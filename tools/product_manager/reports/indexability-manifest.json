@@ -1,13 +1,13 @@
 {
   "site": "https://3d.bgstudio.com.tr/",
   "asset_version": "3.3.23",
-  "generated_at": "2026-10-16",
+  "generated_at": "2026-10-17",
   "summary": {
-    "physical_html_pages": 76,
-    "canonical_indexable_pages": 73,
+    "physical_html_pages": 77,
+    "canonical_indexable_pages": 74,
     "noindex_pages": 3,
-    "index_html_aliases": 75,
-    "sitemap_urls": 73,
+    "index_html_aliases": 76,
+    "sitemap_urls": 74,
     "indexable_not_in_sitemap": 0,
     "duplicate_canonicals": 0
   },
@@ -368,6 +368,16 @@
       "url": "https://3d.bgstudio.com.tr/teslimat-iade/",
       "canonical": "https://3d.bgstudio.com.tr/teslimat-iade/",
       "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/3-bolmeli-gunluk-ilac-kutusu/index.html",
+      "route": "/urunler/3-bolmeli-gunluk-ilac-kutusu/",
+      "url": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-gunluk-ilac-kutusu/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-gunluk-ilac-kutusu/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
       "indexable": true,
       "in_sitemap": true,
       "expected_treatment": "canonical-indexable"
@@ -982,6 +992,12 @@
       "url": "https://3d.bgstudio.com.tr/teslimat-iade/index.html",
       "canonical": "https://3d.bgstudio.com.tr/teslimat-iade/",
       "source_file": "teslimat-iade/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-gunluk-ilac-kutusu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-gunluk-ilac-kutusu/",
+      "source_file": "urunler/3-bolmeli-gunluk-ilac-kutusu/index.html",
       "expected_google_treatment": "alternate-canonical-or-redirect"
     },
     {
