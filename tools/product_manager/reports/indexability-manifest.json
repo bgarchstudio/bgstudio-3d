@@ -1,0 +1,1262 @@
+{
+  "site": "https://3d.bgstudio.com.tr/",
+  "asset_version": "3.3.22",
+  "generated_at": "2026-10-16",
+  "summary": {
+    "physical_html_pages": 76,
+    "canonical_indexable_pages": 73,
+    "noindex_pages": 3,
+    "index_html_aliases": 75,
+    "sitemap_urls": 73,
+    "indexable_not_in_sitemap": 0,
+    "duplicate_canonicals": 0
+  },
+  "pages": [
+    {
+      "file": "404.html",
+      "route": "/404.html",
+      "url": "https://3d.bgstudio.com.tr/404.html",
+      "canonical": "https://3d.bgstudio.com.tr/404.html",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    },
+    {
+      "file": "gizlilik/index.html",
+      "route": "/gizlilik/",
+      "url": "https://3d.bgstudio.com.tr/gizlilik/",
+      "canonical": "https://3d.bgstudio.com.tr/gizlilik/",
+      "robots": "index,follow,max-image-preview:large",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "hakkimizda/index.html",
+      "route": "/hakkimizda/",
+      "url": "https://3d.bgstudio.com.tr/hakkimizda/",
+      "canonical": "https://3d.bgstudio.com.tr/hakkimizda/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "iletisim/index.html",
+      "route": "/iletisim/",
+      "url": "https://3d.bgstudio.com.tr/iletisim/",
+      "canonical": "https://3d.bgstudio.com.tr/iletisim/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "index.html",
+      "route": "/",
+      "url": "https://3d.bgstudio.com.tr/",
+      "canonical": "https://3d.bgstudio.com.tr/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "kisiye-ozel-urun-kosullari/index.html",
+      "route": "/kisiye-ozel-urun-kosullari/",
+      "url": "https://3d.bgstudio.com.tr/kisiye-ozel-urun-kosullari/",
+      "canonical": "https://3d.bgstudio.com.tr/kisiye-ozel-urun-kosullari/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "kurumsal/index.html",
+      "route": "/kurumsal/",
+      "url": "https://3d.bgstudio.com.tr/kurumsal/",
+      "canonical": "https://3d.bgstudio.com.tr/kurumsal/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "kusadasi-3d-baski/index.html",
+      "route": "/kusadasi-3d-baski/",
+      "url": "https://3d.bgstudio.com.tr/kusadasi-3d-baski/",
+      "canonical": "https://3d.bgstudio.com.tr/kusadasi-3d-baski/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "kvkk/index.html",
+      "route": "/kvkk/",
+      "url": "https://3d.bgstudio.com.tr/kvkk/",
+      "canonical": "https://3d.bgstudio.com.tr/kvkk/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "mesafeli-satis/index.html",
+      "route": "/mesafeli-satis/",
+      "url": "https://3d.bgstudio.com.tr/mesafeli-satis/",
+      "canonical": "https://3d.bgstudio.com.tr/mesafeli-satis/",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    },
+    {
+      "file": "nfc-qr/feedback/index.html",
+      "route": "/nfc-qr/feedback/",
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/feedback/",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/feedback/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "nfc-qr/hizli-baglanti/index.html",
+      "route": "/nfc-qr/hizli-baglanti/",
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/hizli-baglanti/",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/hizli-baglanti/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "nfc-qr/index.html",
+      "route": "/nfc-qr/",
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "nfc-qr/premium-plus/index.html",
+      "route": "/nfc-qr/premium-plus/",
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/premium-plus/",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/premium-plus/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "nfc-qr/restoran/index.html",
+      "route": "/nfc-qr/restoran/",
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/restoran/",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/restoran/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "on-bilgilendirme/index.html",
+      "route": "/on-bilgilendirme/",
+      "url": "https://3d.bgstudio.com.tr/on-bilgilendirme/",
+      "canonical": "https://3d.bgstudio.com.tr/on-bilgilendirme/",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    },
+    {
+      "file": "ozel-uretim/index.html",
+      "route": "/ozel-uretim/",
+      "url": "https://3d.bgstudio.com.tr/ozel-uretim/",
+      "canonical": "https://3d.bgstudio.com.tr/ozel-uretim/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/circolo-kusadasi/index.html",
+      "route": "/projeler/circolo-kusadasi/",
+      "url": "https://3d.bgstudio.com.tr/projeler/circolo-kusadasi/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/circolo-kusadasi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/index.html",
+      "route": "/projeler/",
+      "url": "https://3d.bgstudio.com.tr/projeler/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/istavrit-restaurant/index.html",
+      "route": "/projeler/istavrit-restaurant/",
+      "url": "https://3d.bgstudio.com.tr/projeler/istavrit-restaurant/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/istavrit-restaurant/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/kabalci-hukuk-burosu/index.html",
+      "route": "/projeler/kabalci-hukuk-burosu/",
+      "url": "https://3d.bgstudio.com.tr/projeler/kabalci-hukuk-burosu/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/kabalci-hukuk-burosu/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/koala-petshop/index.html",
+      "route": "/projeler/koala-petshop/",
+      "url": "https://3d.bgstudio.com.tr/projeler/koala-petshop/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/koala-petshop/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/kusadasi-asansor/index.html",
+      "route": "/projeler/kusadasi-asansor/",
+      "url": "https://3d.bgstudio.com.tr/projeler/kusadasi-asansor/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/kusadasi-asansor/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/luckyland-kusadasi/index.html",
+      "route": "/projeler/luckyland-kusadasi/",
+      "url": "https://3d.bgstudio.com.tr/projeler/luckyland-kusadasi/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/luckyland-kusadasi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/naz-balik-restaurant/index.html",
+      "route": "/projeler/naz-balik-restaurant/",
+      "url": "https://3d.bgstudio.com.tr/projeler/naz-balik-restaurant/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/naz-balik-restaurant/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/planet-yucca/index.html",
+      "route": "/projeler/planet-yucca/",
+      "url": "https://3d.bgstudio.com.tr/projeler/planet-yucca/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/planet-yucca/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/prototip-bot-sisirme-pompasi-ara-parcasi/index.html",
+      "route": "/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/",
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/prototip-cikolata-selalesi-spiral-aksami/index.html",
+      "route": "/projeler/prototip-cikolata-selalesi-spiral-aksami/",
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-cikolata-selalesi-spiral-aksami/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-cikolata-selalesi-spiral-aksami/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/index.html",
+      "route": "/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/",
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/prototip-finnsauna-izmir/index.html",
+      "route": "/projeler/prototip-finnsauna-izmir/",
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/yenipazar-pidecisi/index.html",
+      "route": "/projeler/yenipazar-pidecisi/",
+      "url": "https://3d.bgstudio.com.tr/projeler/yenipazar-pidecisi/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/yenipazar-pidecisi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/yusuf-sef/index.html",
+      "route": "/projeler/yusuf-sef/",
+      "url": "https://3d.bgstudio.com.tr/projeler/yusuf-sef/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/yusuf-sef/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "prototip-parca/index.html",
+      "route": "/prototip-parca/",
+      "url": "https://3d.bgstudio.com.tr/prototip-parca/",
+      "canonical": "https://3d.bgstudio.com.tr/prototip-parca/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "siparis-bilgilendirme/index.html",
+      "route": "/siparis-bilgilendirme/",
+      "url": "https://3d.bgstudio.com.tr/siparis-bilgilendirme/",
+      "canonical": "https://3d.bgstudio.com.tr/siparis-bilgilendirme/",
+      "robots": "index,follow,max-image-preview:large",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "teklif/index.html",
+      "route": "/teklif/",
+      "url": "https://3d.bgstudio.com.tr/teklif/",
+      "canonical": "https://3d.bgstudio.com.tr/teklif/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "teslimat-iade/index.html",
+      "route": "/teslimat-iade/",
+      "url": "https://3d.bgstudio.com.tr/teslimat-iade/",
+      "canonical": "https://3d.bgstudio.com.tr/teslimat-iade/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/3-bolmeli-kumanda-duzenleyici/index.html",
+      "route": "/urunler/3-bolmeli-kumanda-duzenleyici/",
+      "url": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-kumanda-duzenleyici/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-kumanda-duzenleyici/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/3-lu-dis-fircasi-dis-macunu-standi/index.html",
+      "route": "/urunler/3-lu-dis-fircasi-dis-macunu-standi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/3-lu-dis-fircasi-dis-macunu-standi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-lu-dis-fircasi-dis-macunu-standi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/arac-guneslik-gozluk-tutucu/index.html",
+      "route": "/urunler/arac-guneslik-gozluk-tutucu/",
+      "url": "https://3d.bgstudio.com.tr/urunler/arac-guneslik-gozluk-tutucu/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/arac-guneslik-gozluk-tutucu/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/arac-koku-difuzoru/index.html",
+      "route": "/urunler/arac-koku-difuzoru/",
+      "url": "https://3d.bgstudio.com.tr/urunler/arac-koku-difuzoru/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/arac-koku-difuzoru/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/ataturk-imzasi/index.html",
+      "route": "/urunler/ataturk-imzasi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/ataturk-imzasi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/ataturk-imzasi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/batman-katmanli-yuz-dekor/index.html",
+      "route": "/urunler/batman-katmanli-yuz-dekor/",
+      "url": "https://3d.bgstudio.com.tr/urunler/batman-katmanli-yuz-dekor/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/batman-katmanli-yuz-dekor/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/cerceveli-dalga-lamba/index.html",
+      "route": "/urunler/cerceveli-dalga-lamba/",
+      "url": "https://3d.bgstudio.com.tr/urunler/cerceveli-dalga-lamba/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/cerceveli-dalga-lamba/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/cok-bolmeli-masaustu-organizer/index.html",
+      "route": "/urunler/cok-bolmeli-masaustu-organizer/",
+      "url": "https://3d.bgstudio.com.tr/urunler/cok-bolmeli-masaustu-organizer/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/cok-bolmeli-masaustu-organizer/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dekoratif-kus-obje/index.html",
+      "route": "/urunler/dekoratif-kus-obje/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-kus-obje/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-kus-obje/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dekoratif-lale/index.html",
+      "route": "/urunler/dekoratif-lale/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-lale/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-lale/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dekoratif-mirket-obje/index.html",
+      "route": "/urunler/dekoratif-mirket-obje/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-mirket-obje/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-mirket-obje/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dekoratif-mumluk/index.html",
+      "route": "/urunler/dekoratif-mumluk/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-mumluk/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-mumluk/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dekoratif-tavsan-obje/index.html",
+      "route": "/urunler/dekoratif-tavsan-obje/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-tavsan-obje/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-tavsan-obje/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/dis-macunu-tup-sikacagi/index.html",
+      "route": "/urunler/dis-macunu-tup-sikacagi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/dis-macunu-tup-sikacagi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dis-macunu-tup-sikacagi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/index.html",
+      "route": "/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/",
+      "url": "https://3d.bgstudio.com.tr/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/drenajli-lavabo-duzenleyici/index.html",
+      "route": "/urunler/drenajli-lavabo-duzenleyici/",
+      "url": "https://3d.bgstudio.com.tr/urunler/drenajli-lavabo-duzenleyici/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/drenajli-lavabo-duzenleyici/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/flexi-kopekbaligi-anahtarlik/index.html",
+      "route": "/urunler/flexi-kopekbaligi-anahtarlik/",
+      "url": "https://3d.bgstudio.com.tr/urunler/flexi-kopekbaligi-anahtarlik/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/flexi-kopekbaligi-anahtarlik/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/futbol-takimi-logolu-anahtarlik/index.html",
+      "route": "/urunler/futbol-takimi-logolu-anahtarlik/",
+      "url": "https://3d.bgstudio.com.tr/urunler/futbol-takimi-logolu-anahtarlik/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/futbol-takimi-logolu-anahtarlik/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/havuz-icecek-tutucu/index.html",
+      "route": "/urunler/havuz-icecek-tutucu/",
+      "url": "https://3d.bgstudio.com.tr/urunler/havuz-icecek-tutucu/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/havuz-icecek-tutucu/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/hayvaninizin-ismine-ozel-mama-kuregi/index.html",
+      "route": "/urunler/hayvaninizin-ismine-ozel-mama-kuregi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/hayvaninizin-ismine-ozel-mama-kuregi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/hayvaninizin-ismine-ozel-mama-kuregi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/heykel-bust-masa-lambasi/index.html",
+      "route": "/urunler/heykel-bust-masa-lambasi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/heykel-bust-masa-lambasi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/heykel-bust-masa-lambasi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/index.html",
+      "route": "/urunler/",
+      "url": "https://3d.bgstudio.com.tr/urunler/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/iplerle-asili-insan-figuru-dekor/index.html",
+      "route": "/urunler/iplerle-asili-insan-figuru-dekor/",
+      "url": "https://3d.bgstudio.com.tr/urunler/iplerle-asili-insan-figuru-dekor/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/iplerle-asili-insan-figuru-dekor/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/iron-man-eli-masa-lambasi/index.html",
+      "route": "/urunler/iron-man-eli-masa-lambasi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/iron-man-eli-masa-lambasi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/iron-man-eli-masa-lambasi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kaktus-kulaklik-saat-standi/index.html",
+      "route": "/urunler/kaktus-kulaklik-saat-standi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kaktus-kulaklik-saat-standi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kaktus-kulaklik-saat-standi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kask-askiligi/index.html",
+      "route": "/urunler/kask-askiligi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kask-askiligi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kask-askiligi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kedili-kitap-ayraci/index.html",
+      "route": "/urunler/kedili-kitap-ayraci/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kedili-kitap-ayraci/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kedili-kitap-ayraci/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kemal-ataturk-imzali-anahtarlik/index.html",
+      "route": "/urunler/kemal-ataturk-imzali-anahtarlik/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kemal-ataturk-imzali-anahtarlik/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kemal-ataturk-imzali-anahtarlik/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kisiye-ozel-gaming-stand/index.html",
+      "route": "/urunler/kisiye-ozel-gaming-stand/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-gaming-stand/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-gaming-stand/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kisiye-ozel-miknatisli-acacak/index.html",
+      "route": "/urunler/kisiye-ozel-miknatisli-acacak/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-miknatisli-acacak/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-miknatisli-acacak/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kisiye-ozel-plaka-anahtarlik/index.html",
+      "route": "/urunler/kisiye-ozel-plaka-anahtarlik/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-plaka-anahtarlik/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-plaka-anahtarlik/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/kisiye-ozel-telefon-standi-anahtarlik/index.html",
+      "route": "/urunler/kisiye-ozel-telefon-standi-anahtarlik/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/makyaj-pamugu-pamuklu-cubuk-organizer/index.html",
+      "route": "/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
+      "url": "https://3d.bgstudio.com.tr/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/masa-alti-bardak-tutucu/index.html",
+      "route": "/urunler/masa-alti-bardak-tutucu/",
+      "url": "https://3d.bgstudio.com.tr/urunler/masa-alti-bardak-tutucu/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/masa-alti-bardak-tutucu/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/masaustu-telefon-tutucu-stand/index.html",
+      "route": "/urunler/masaustu-telefon-tutucu-stand/",
+      "url": "https://3d.bgstudio.com.tr/urunler/masaustu-telefon-tutucu-stand/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/masaustu-telefon-tutucu-stand/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/renkli-masa-lambasi/index.html",
+      "route": "/urunler/renkli-masa-lambasi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/renkli-masa-lambasi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/renkli-masa-lambasi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/sonsuzluk-kupu-fidget-oyuncak/index.html",
+      "route": "/urunler/sonsuzluk-kupu-fidget-oyuncak/",
+      "url": "https://3d.bgstudio.com.tr/urunler/sonsuzluk-kupu-fidget-oyuncak/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/sonsuzluk-kupu-fidget-oyuncak/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/spiral-masa-lambasi/index.html",
+      "route": "/urunler/spiral-masa-lambasi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/spiral-masa-lambasi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/spiral-masa-lambasi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/taki-aksesuar-tepsisi/index.html",
+      "route": "/urunler/taki-aksesuar-tepsisi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/taki-aksesuar-tepsisi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/taki-aksesuar-tepsisi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/index.html",
+      "route": "/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/",
+      "url": "https://3d.bgstudio.com.tr/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    }
+  ],
+  "aliases": [
+    {
+      "url": "https://3d.bgstudio.com.tr/gizlilik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/gizlilik/",
+      "source_file": "gizlilik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/hakkimizda/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/hakkimizda/",
+      "source_file": "hakkimizda/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/iletisim/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/iletisim/",
+      "source_file": "iletisim/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/",
+      "source_file": "index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/kisiye-ozel-urun-kosullari/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/kisiye-ozel-urun-kosullari/",
+      "source_file": "kisiye-ozel-urun-kosullari/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/kurumsal/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/kurumsal/",
+      "source_file": "kurumsal/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/kusadasi-3d-baski/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/kusadasi-3d-baski/",
+      "source_file": "kusadasi-3d-baski/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/kvkk/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/kvkk/",
+      "source_file": "kvkk/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/mesafeli-satis/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/mesafeli-satis/",
+      "source_file": "mesafeli-satis/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/feedback/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/feedback/",
+      "source_file": "nfc-qr/feedback/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/hizli-baglanti/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/hizli-baglanti/",
+      "source_file": "nfc-qr/hizli-baglanti/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/",
+      "source_file": "nfc-qr/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/premium-plus/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/premium-plus/",
+      "source_file": "nfc-qr/premium-plus/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/nfc-qr/restoran/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/nfc-qr/restoran/",
+      "source_file": "nfc-qr/restoran/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/on-bilgilendirme/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/on-bilgilendirme/",
+      "source_file": "on-bilgilendirme/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/ozel-uretim/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/ozel-uretim/",
+      "source_file": "ozel-uretim/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/circolo-kusadasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/circolo-kusadasi/",
+      "source_file": "projeler/circolo-kusadasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/",
+      "source_file": "projeler/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/istavrit-restaurant/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/istavrit-restaurant/",
+      "source_file": "projeler/istavrit-restaurant/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/kabalci-hukuk-burosu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/kabalci-hukuk-burosu/",
+      "source_file": "projeler/kabalci-hukuk-burosu/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/koala-petshop/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/koala-petshop/",
+      "source_file": "projeler/koala-petshop/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/kusadasi-asansor/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/kusadasi-asansor/",
+      "source_file": "projeler/kusadasi-asansor/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/luckyland-kusadasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/luckyland-kusadasi/",
+      "source_file": "projeler/luckyland-kusadasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/naz-balik-restaurant/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/naz-balik-restaurant/",
+      "source_file": "projeler/naz-balik-restaurant/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/planet-yucca/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/planet-yucca/",
+      "source_file": "projeler/planet-yucca/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/",
+      "source_file": "projeler/prototip-bot-sisirme-pompasi-ara-parcasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-cikolata-selalesi-spiral-aksami/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-cikolata-selalesi-spiral-aksami/",
+      "source_file": "projeler/prototip-cikolata-selalesi-spiral-aksami/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/",
+      "source_file": "projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
+      "source_file": "projeler/prototip-finnsauna-izmir/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/yenipazar-pidecisi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/yenipazar-pidecisi/",
+      "source_file": "projeler/yenipazar-pidecisi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/yusuf-sef/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/yusuf-sef/",
+      "source_file": "projeler/yusuf-sef/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/prototip-parca/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/prototip-parca/",
+      "source_file": "prototip-parca/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/siparis-bilgilendirme/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/siparis-bilgilendirme/",
+      "source_file": "siparis-bilgilendirme/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/teklif/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/teklif/",
+      "source_file": "teklif/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/teslimat-iade/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/teslimat-iade/",
+      "source_file": "teslimat-iade/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-kumanda-duzenleyici/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-bolmeli-kumanda-duzenleyici/",
+      "source_file": "urunler/3-bolmeli-kumanda-duzenleyici/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/3-lu-dis-fircasi-dis-macunu-standi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/3-lu-dis-fircasi-dis-macunu-standi/",
+      "source_file": "urunler/3-lu-dis-fircasi-dis-macunu-standi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/arac-guneslik-gozluk-tutucu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/arac-guneslik-gozluk-tutucu/",
+      "source_file": "urunler/arac-guneslik-gozluk-tutucu/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/arac-koku-difuzoru/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/arac-koku-difuzoru/",
+      "source_file": "urunler/arac-koku-difuzoru/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/ataturk-imzasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/ataturk-imzasi/",
+      "source_file": "urunler/ataturk-imzasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/batman-katmanli-yuz-dekor/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/batman-katmanli-yuz-dekor/",
+      "source_file": "urunler/batman-katmanli-yuz-dekor/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/cerceveli-dalga-lamba/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/cerceveli-dalga-lamba/",
+      "source_file": "urunler/cerceveli-dalga-lamba/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/cok-bolmeli-masaustu-organizer/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/cok-bolmeli-masaustu-organizer/",
+      "source_file": "urunler/cok-bolmeli-masaustu-organizer/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-kus-obje/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-kus-obje/",
+      "source_file": "urunler/dekoratif-kus-obje/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-lale/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-lale/",
+      "source_file": "urunler/dekoratif-lale/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-mirket-obje/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-mirket-obje/",
+      "source_file": "urunler/dekoratif-mirket-obje/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-mumluk/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-mumluk/",
+      "source_file": "urunler/dekoratif-mumluk/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dekoratif-tavsan-obje/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dekoratif-tavsan-obje/",
+      "source_file": "urunler/dekoratif-tavsan-obje/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/dis-macunu-tup-sikacagi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/dis-macunu-tup-sikacagi/",
+      "source_file": "urunler/dis-macunu-tup-sikacagi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/",
+      "source_file": "urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/drenajli-lavabo-duzenleyici/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/drenajli-lavabo-duzenleyici/",
+      "source_file": "urunler/drenajli-lavabo-duzenleyici/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/flexi-kopekbaligi-anahtarlik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/flexi-kopekbaligi-anahtarlik/",
+      "source_file": "urunler/flexi-kopekbaligi-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/futbol-takimi-logolu-anahtarlik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/futbol-takimi-logolu-anahtarlik/",
+      "source_file": "urunler/futbol-takimi-logolu-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/havuz-icecek-tutucu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/havuz-icecek-tutucu/",
+      "source_file": "urunler/havuz-icecek-tutucu/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/hayvaninizin-ismine-ozel-mama-kuregi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/hayvaninizin-ismine-ozel-mama-kuregi/",
+      "source_file": "urunler/hayvaninizin-ismine-ozel-mama-kuregi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/heykel-bust-masa-lambasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/heykel-bust-masa-lambasi/",
+      "source_file": "urunler/heykel-bust-masa-lambasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/",
+      "source_file": "urunler/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/iplerle-asili-insan-figuru-dekor/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/iplerle-asili-insan-figuru-dekor/",
+      "source_file": "urunler/iplerle-asili-insan-figuru-dekor/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/iron-man-eli-masa-lambasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/iron-man-eli-masa-lambasi/",
+      "source_file": "urunler/iron-man-eli-masa-lambasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kaktus-kulaklik-saat-standi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kaktus-kulaklik-saat-standi/",
+      "source_file": "urunler/kaktus-kulaklik-saat-standi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kask-askiligi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kask-askiligi/",
+      "source_file": "urunler/kask-askiligi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kedili-kitap-ayraci/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kedili-kitap-ayraci/",
+      "source_file": "urunler/kedili-kitap-ayraci/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kemal-ataturk-imzali-anahtarlik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kemal-ataturk-imzali-anahtarlik/",
+      "source_file": "urunler/kemal-ataturk-imzali-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-gaming-stand/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-gaming-stand/",
+      "source_file": "urunler/kisiye-ozel-gaming-stand/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-miknatisli-acacak/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-miknatisli-acacak/",
+      "source_file": "urunler/kisiye-ozel-miknatisli-acacak/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-plaka-anahtarlik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-plaka-anahtarlik/",
+      "source_file": "urunler/kisiye-ozel-plaka-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/",
+      "source_file": "urunler/kisiye-ozel-telefon-standi-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
+      "source_file": "urunler/makyaj-pamugu-pamuklu-cubuk-organizer/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/masa-alti-bardak-tutucu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/masa-alti-bardak-tutucu/",
+      "source_file": "urunler/masa-alti-bardak-tutucu/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/masaustu-telefon-tutucu-stand/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/masaustu-telefon-tutucu-stand/",
+      "source_file": "urunler/masaustu-telefon-tutucu-stand/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/renkli-masa-lambasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/renkli-masa-lambasi/",
+      "source_file": "urunler/renkli-masa-lambasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/sonsuzluk-kupu-fidget-oyuncak/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/sonsuzluk-kupu-fidget-oyuncak/",
+      "source_file": "urunler/sonsuzluk-kupu-fidget-oyuncak/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/spiral-masa-lambasi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/spiral-masa-lambasi/",
+      "source_file": "urunler/spiral-masa-lambasi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/taki-aksesuar-tepsisi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/taki-aksesuar-tepsisi/",
+      "source_file": "urunler/taki-aksesuar-tepsisi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/",
+      "source_file": "urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    }
+  ],
+  "noindex_pages": [
+    {
+      "file": "404.html",
+      "route": "/404.html",
+      "url": "https://3d.bgstudio.com.tr/404.html",
+      "canonical": "https://3d.bgstudio.com.tr/404.html",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    },
+    {
+      "file": "mesafeli-satis/index.html",
+      "route": "/mesafeli-satis/",
+      "url": "https://3d.bgstudio.com.tr/mesafeli-satis/",
+      "canonical": "https://3d.bgstudio.com.tr/mesafeli-satis/",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    },
+    {
+      "file": "on-bilgilendirme/index.html",
+      "route": "/on-bilgilendirme/",
+      "url": "https://3d.bgstudio.com.tr/on-bilgilendirme/",
+      "canonical": "https://3d.bgstudio.com.tr/on-bilgilendirme/",
+      "robots": "noindex,follow",
+      "indexable": false,
+      "in_sitemap": false,
+      "expected_treatment": "noindex"
+    }
+  ],
+  "indexable_not_in_sitemap": [],
+  "duplicate_canonicals": []
+}

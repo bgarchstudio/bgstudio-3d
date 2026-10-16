@@ -279,6 +279,23 @@ def check():
         if 'aggregateRating' in product_text or '"review"' in product_text:
             report['critical'].append(f'{slug}: doğrulanmamış rating/review schema bulundu')
 
+    # V3.3.22 indexability manifest must agree with the generated sitemap.
+    manifest_path = ROOT/'tools/product_manager/reports/indexability-manifest.json'
+    if not manifest_path.is_file():
+        report['critical'].append('indexability-manifest.json eksik; Product Manager build tamamlanmamış olabilir')
+    else:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            summary = manifest.get('summary') or {}
+            if int(summary.get('indexable_not_in_sitemap') or 0) != 0:
+                report['critical'].append('indexability manifest: indexlenebilir ama sitemap dışında sayfa var')
+            if int(summary.get('duplicate_canonicals') or 0) != 0:
+                report['critical'].append('indexability manifest: duplicate canonical var')
+            if int(summary.get('canonical_indexable_pages') or 0) != int(summary.get('sitemap_urls') or 0):
+                report['critical'].append('indexability manifest: canonical indexable sayısı sitemap ile eşleşmiyor')
+        except Exception as exc:
+            report['critical'].append(f'indexability manifest parse hatası: {exc}')
+
     # robots.txt
     robots = ROOT/'robots.txt'
     if not robots.is_file():

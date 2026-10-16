@@ -2010,9 +2010,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.21'
+SITE_ASSET_VERSION = '3.3.22'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.21-STABLE'
+RELEASE_CANDIDATE = 'V3.3.22-STABLE'
 
 
 def _relative_prefix_for_html(html_path):
@@ -4619,6 +4619,148 @@ def build_canonical_sitemap_v3321():
     }
 
 
+# ============================================================
+# V3.3.22 · SEARCH CONSOLE / INDEXABILITY DIAGNOSTIC
+# ============================================================
+
+def _route_from_html_v3322(html_path):
+    rel = html_path.relative_to(ROOT).as_posix()
+    if rel == 'index.html':
+        return '/'
+    if rel.endswith('/index.html'):
+        return '/' + rel[:-len('index.html')]
+    return '/' + rel
+
+
+def build_indexability_manifest_v3322():
+    """Create a deterministic local mirror of the indexability signals we control.
+
+    This cannot replace Google's URL Inspection data. It answers the site-side part:
+    canonical, robots, sitemap membership, physical index.html aliases and expected
+    treatment of those aliases. Search Console example URLs can then be compared to
+    this manifest instead of guessing from a page count.
+    """
+    reports_dir = ROOT / 'tools' / 'product_manager' / 'reports'
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    sitemap_text = (ROOT/'sitemap.xml').read_text(encoding='utf-8', errors='ignore') if (ROOT/'sitemap.xml').exists() else ''
+    sitemap_urls = set(re.findall(r'<loc>(.*?)</loc>', sitemap_text, flags=re.I | re.S))
+    pages = []
+    aliases = []
+    canonical_seen = {}
+
+    for html_path in sorted(ROOT.rglob('*.html')):
+        rel_parts = html_path.relative_to(ROOT).parts
+        if 'tools' in rel_parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        rel = html_path.relative_to(ROOT).as_posix()
+        route = _route_from_html_v3322(html_path)
+        canonical = _canonical_href_v3321(text)
+        robots = _meta_content_v3321(text, 'name', 'robots').strip() or 'index,follow'
+        noindex = 'noindex' in robots.casefold()
+        in_sitemap = canonical in sitemap_urls
+        expected = 'noindex' if noindex else ('canonical-indexable' if in_sitemap else 'indexable-not-in-sitemap')
+        pages.append({
+            'file': rel,
+            'route': route,
+            'url': BASE_URL + route,
+            'canonical': canonical,
+            'robots': robots,
+            'indexable': not noindex,
+            'in_sitemap': in_sitemap,
+            'expected_treatment': expected,
+        })
+        canonical_seen.setdefault(canonical, []).append(rel)
+
+        # Every directory index has a technically reachable /index.html variant on
+        # static hosting. That URL is not a second content target; it points to the
+        # slash canonical and may legitimately appear in GSC as an alternate page.
+        if rel == 'index.html':
+            alias_url = BASE_URL + '/index.html'
+        elif rel.endswith('/index.html'):
+            alias_url = BASE_URL + '/' + rel
+        else:
+            alias_url = ''
+        if alias_url and canonical and alias_url != canonical:
+            aliases.append({
+                'url': alias_url,
+                'canonical': canonical,
+                'source_file': rel,
+                'expected_google_treatment': 'alternate-canonical-or-redirect',
+            })
+
+    duplicate_canonicals = [
+        {'canonical': key, 'files': value}
+        for key, value in sorted(canonical_seen.items())
+        if key and len(value) > 1
+    ]
+    noindex_pages = [row for row in pages if not row['indexable']]
+    orphan_indexable = [row for row in pages if row['indexable'] and not row['in_sitemap']]
+    canonical_indexable = [row for row in pages if row['indexable'] and row['in_sitemap']]
+
+    payload = {
+        'site': BASE_URL + '/',
+        'asset_version': SITE_ASSET_VERSION,
+        'generated_at': date.today().isoformat(),
+        'summary': {
+            'physical_html_pages': len(pages),
+            'canonical_indexable_pages': len(canonical_indexable),
+            'noindex_pages': len(noindex_pages),
+            'index_html_aliases': len(aliases),
+            'sitemap_urls': len(sitemap_urls),
+            'indexable_not_in_sitemap': len(orphan_indexable),
+            'duplicate_canonicals': len(duplicate_canonicals),
+        },
+        'pages': pages,
+        'aliases': aliases,
+        'noindex_pages': noindex_pages,
+        'indexable_not_in_sitemap': orphan_indexable,
+        'duplicate_canonicals': duplicate_canonicals,
+    }
+    json_path = reports_dir / 'indexability-manifest.json'
+    json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+    md = [
+        '# BG Studio 3D · Indexability Manifest',
+        '',
+        f'- Asset version: **{SITE_ASSET_VERSION}**',
+        f'- Physical HTML: **{len(pages)}**',
+        f'- Canonical + indexable + sitemap: **{len(canonical_indexable)}**',
+        f'- Noindex: **{len(noindex_pages)}**',
+        f'- `/index.html` aliases: **{len(aliases)}**',
+        f'- Indexable but sitemap dışında: **{len(orphan_indexable)}**',
+        f'- Duplicate canonical: **{len(duplicate_canonicals)}**',
+        '',
+        '## Noindex sayfalar',
+    ]
+    if noindex_pages:
+        md.extend(f"- `{row['url']}` → `{row['canonical']}` ({row['robots']})" for row in noindex_pages)
+    else:
+        md.append('- Yok')
+    md += [
+        '',
+        '## Nasıl yorumlanır?',
+        '',
+        '- `alternate-canonical-or-redirect`: `/index.html` gibi ikinci bir URL keşfedilmiş olabilir. Doğru canonical slash URL ise bunun Google dizinine ayrıca girmemesi normaldir.',
+        '- `canonical-indexable`: bizim tarafta indexlenebilir, sitemapte ve temiz canonical ile yayınlanır.',
+        '- `noindex`: bilinçli olarak Google dizini dışında tutulur.',
+        '- `indexable-not-in-sitemap`: teknik hata adayıdır ve release öncesi incelenmelidir.',
+        '',
+        '> Bu rapor Search Console kararını tahmin etmez. “Keşfedildi” veya “Tarandı ama dizine eklenmedi” nedeninin kesin URL örneği GSC’den alınmalı ve bu manifestle karşılaştırılmalıdır.',
+    ]
+    md_path = reports_dir / 'indexability-manifest.md'
+    md_path.write_text('\n'.join(md) + '\n', encoding='utf-8')
+    return {
+        'json': json_path.relative_to(ROOT).as_posix(),
+        'markdown': md_path.relative_to(ROOT).as_posix(),
+        **payload['summary'],
+    }
+
+
 def audit_v3171_public_pages():
     result={'pages':0,'missing_title':[],'missing_description':[],'missing_canonical':[],'missing_main':[],'missing_alt':[]}
     for html_path in ROOT.rglob('*.html'):
@@ -5116,13 +5258,14 @@ def build_site(nfc_family_theme_overrides=None):
     canonical_sync = sync_canonical_integrity_v3321()
     site_content_state = read_site_content_v3175()
     sitemap_sync = build_canonical_sitemap_v3321()
+    indexability_sync = build_indexability_manifest_v3322()
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
     seo_audit = audit_v3171_public_pages()
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'indexability_sync': indexability_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
 
 
 if __name__ == '__main__':
