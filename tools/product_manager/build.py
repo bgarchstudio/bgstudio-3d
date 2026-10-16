@@ -1691,9 +1691,69 @@ def schema_price_value(p):
     return canonical_price_value(p.get('price_text'))
 
 
+def product_schema_images_v3320(p):
+    """Return the product's real public images without inventing media."""
+    values = []
+    for raw in [p.get('main_image'), p.get('poster_image')]:
+        if raw:
+            values.append(str(raw))
+    for item in (p.get('gallery_images') or []):
+        if isinstance(item, str) and item:
+            values.append(item)
+        elif isinstance(item, dict) and item.get('path'):
+            values.append(str(item.get('path')))
+    out = []
+    seen = set()
+    for rel in values:
+        rel = str(rel or '').strip().lstrip('/')
+        if not rel or rel in seen:
+            continue
+        seen.add(rel)
+        out.append(f'{BASE_URL}/{rel}')
+    return out
+
+
+def product_schema_properties_v3320(p):
+    rows = []
+    materials = [label for _key, label in catalog_materials(p)]
+    if materials:
+        rows.append({'@type':'PropertyValue','name':'Malzeme','value':', '.join(materials)})
+    for label, key in (
+        ('Ölçüler','dimensions'),
+        ('Ağırlık','weight'),
+        ('Baskı yöntemi','print_method'),
+    ):
+        value = str(p.get(key) or '').strip()
+        if value:
+            rows.append({'@type':'PropertyValue','name':label,'value':value})
+    return rows
+
+
+def product_service_links_v3320(p):
+    """Contextual links between product intent and service/local landing pages."""
+    personalizable = catalog_personalizable(p)
+    primary_href = '../../ozel-uretim/' if personalizable else '../../prototip-parca/'
+    primary_label = 'Kişiye özel üretim' if personalizable else 'Prototip & Parça'
+    primary_copy = (
+        'Bu ürünü farklı isim, renk veya uygun bir kişiselleştirmeyle düşünüyorsan özel üretim sürecini inceleyebilirsin.'
+        if personalizable else
+        'Elinde benzer bir ürün, ölçü veya parça ihtiyacı varsa teknik üretim sürecini inceleyebilirsin.'
+    )
+    return (
+        '<div class="detail-section product-discovery-links">'
+        '<h2>Benzer bir üretim mi arıyorsun?</h2>'
+        f'<p>{esc(primary_copy)}</p>'
+        '<div class="product-action-row">'
+        f'<a class="secondary-cta" href="{primary_href}">{esc(primary_label)}</a>'
+        '<a class="secondary-cta" href="../../kusadasi-3d-baski/">Kuşadası 3D Baskı</a>'
+        '</div></div>'
+    )
+
+
 def render_schema(p):
     canonical = f"{BASE_URL}/urunler/{p['slug']}/"
-    image = f"{BASE_URL}/{p['main_image']}"
+    images = product_schema_images_v3320(p)
+    image = images[0] if images else f"{BASE_URL}/{p['main_image']}"
     tiers = effective_pricing_tiers(p)
     fallback_price = schema_price_value(p)
 
@@ -1705,6 +1765,7 @@ def render_schema(p):
         obj = {
             '@context': 'https://schema.org',
             '@type': 'ItemPage',
+            '@id': canonical + '#itempage',
             'name': p['name'],
             'description': p.get('description', ''),
             'url': canonical,
@@ -1712,10 +1773,12 @@ def render_schema(p):
                 '@type': 'ImageObject',
                 'url': image,
             },
+            'image': images or [image],
             'about': {
                 '@type': 'Thing',
                 'name': p['name'],
             },
+            'isPartOf': {'@id': BASE_URL + '/#website'},
         }
         if p.get('tags'):
             obj['keywords'] = ', '.join(str(x) for x in p.get('tags') or [])
@@ -1724,15 +1787,19 @@ def render_schema(p):
     obj = {
         '@context': 'https://schema.org',
         '@type': 'Product',
+        '@id': canonical + '#product',
         'name': p['name'],
         'description': p.get('description', ''),
-        'brand': {'@type': 'Brand', 'name': 'BG Studio 3D'},
+        'brand': {'@type': 'Brand', 'name': 'BG Studio 3D', 'url': BASE_URL},
         'url': canonical,
-        'image': image,
+        'image': images or [image],
         'category': category_label(p),
     }
     if p.get('tags'):
         obj['keywords'] = ', '.join(str(x) for x in p.get('tags') or [])
+    additional = product_schema_properties_v3320(p)
+    if additional:
+        obj['additionalProperty'] = additional
 
     if tiers:
         offers = []
@@ -1763,7 +1830,6 @@ def render_schema(p):
         }
 
     return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
-
 
 def choose_related(products, p):
     active = [x for x in products if x.get('active', True) and x['slug'] != p['slug']]
@@ -1934,7 +2000,7 @@ def render_product_page(p, related):
 {render_site_header('../../', 'products')}
 {notice}
 <main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" fetchpriority="high" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
-<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p>{status_badge_html}<div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div>{technical_html}<div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
+<div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p>{status_badge_html}<div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div><div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div>{technical_html}<div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}{product_service_links_v3320(p)}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
 <section class="order-process shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ SÜRECİ</p><h2>Nasıl ilerliyoruz?</h2></div></div><div class="order-steps"><article class="order-step"><span>01</span><h3>Ürünü seç</h3><p>Renk, adet ve varsa kişiselleştirme isteğini bize ilet.</p></article><article class="order-step"><span>02</span><h3>Detayları netleştir</h3><p>Üretim seçeneği ve teslim/kargo detaylarını sipariş öncesi netleştir.</p></article><article class="order-step"><span>03</span><h3>Üretim</h3><p>Ürün atölyede 3D baskı ile hazırlanır ve kontrol edilir.</p></article><article class="order-step"><span>04</span><h3>Teslim</h3><p>Kuşadası elden teslim veya uygun kargo seçeneğiyle gönderim.</p></article></div></section>
 <section class="product-faq shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ ÖNCESİ</p><h2>Bilmen gerekenler.</h2></div></div><div class="faq">{faq_html}</div></section>
 <section class="related-products shell"><div class="section-title"><div><p class="eyebrow">BUNLAR DA İLGİNİ ÇEKEBİLİR</p><h2>Atölyeden başka seçenekler.</h2></div></div><div class="related-grid">{related_html}</div></section><section class="detail-back shell"><a class="text-cta" href="../">← Tüm ürünlere dön</a></section></main>
@@ -1944,9 +2010,9 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.19-R1'
+SITE_ASSET_VERSION = '3.3.20'
 RELEASE_CHANNEL = 'stable'
-RELEASE_CANDIDATE = 'V3.3.19-R1-STABLE'
+RELEASE_CANDIDATE = 'V3.3.20-STABLE'
 
 
 def _relative_prefix_for_html(html_path):

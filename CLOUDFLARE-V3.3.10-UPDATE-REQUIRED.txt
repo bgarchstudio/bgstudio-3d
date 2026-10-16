@@ -1,4 +1,7 @@
 HISTORICAL FILENAME - CURRENT STATUS
 
-Site release: V3.3.19-R1
+Site release: V3.3.20
+Expected BG Assistant Worker baseline: V3.3.10-R4 Quantity Parser or newer.
+
+V3.3.20 changes product SEO, structured data, Product Manager storage migration and internal links only.
 Cloudflare Worker redeploy is NOT required.

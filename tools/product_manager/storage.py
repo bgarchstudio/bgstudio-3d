@@ -22,7 +22,7 @@ DB_FILE = APP_HOME / 'bgstudio3d.db'
 MEDIA_ROOT = APP_HOME / 'media'
 BACKUPS_ROOT = APP_HOME / 'backups'
 META_FILE = APP_HOME / 'storage-info.json'
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 
 COLLECTIONS = {
     'products': ROOT / 'data' / 'products.json',
@@ -467,6 +467,62 @@ def _upgrade_products_v2(con):
             (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
         )
 
+PRODUCT_SEO_V7 = {
+    'iron-man-eli-masa-lambasi': {
+        'old_title': 'Iron Man El Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D',
+        'title': 'Iron Man Eli Masa Lambası | 3D Baskı Dekor | BG Studio 3D',
+        'old_description': 'Iron Man El Masa Lambası, ışıklı avuç içi ve detaylı 3D baskı tasarımıyla gaming setup ve masaüstü dekoru için üretilir. Kuşadası 3D baskı.',
+        'description': 'Iron Man Eli Masa Lambası; ışıklı avuç içi ve 3D baskı zırh detaylarıyla gaming setup, çalışma masası ve dekor için üretilir.',
+    },
+    'masa-alti-bardak-tutucu': {
+        'old_title': 'Masa Altı Bardak Tutucu | Kuşadası 3D Baskı | BG Studio 3D',
+        'title': 'Masa Altı Bardak Tutucu | Gaming Masa Aksesuarı | BG Studio 3D',
+        'old_description': 'Gaming ve çalışma masaları için masa altı bardak tutucu. 2 vida ile sabitlenir, masa üstünü boş tutar. Kuşadası 3D baskı.',
+        'description': 'Masa altı bardak tutucu; 2 vida ile sabitlenen gaming ve çalışma masası aksesuarıdır. Montaj vidaları dahil, 3D baskı üretim.',
+    },
+    'futbol-takimi-logolu-anahtarlik': {
+        'old_title': 'Takım Logolu Anahtarlık | Kuşadası 3D Baskı | BG Studio 3D',
+        'title': 'Futbol Takımı Logolu Anahtarlık | 3D Baskı | BG Studio 3D',
+        'old_description': 'Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor logolu 3D baskı anahtarlıklar. Canlı renkli tasarım, Kuşadası elden teslim ve Türkiye geneli kargo.',
+        'description': 'Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekli futbol takımı logolu anahtarlık. Çok renkli 3D baskı, Türkiye geneli kargo.',
+    },
+}
+
+
+def _upgrade_product_seo_v7(con):
+    row = con.execute('SELECT json_text FROM collections WHERE name=?', ('products',)).fetchone()
+    if not row:
+        return
+    try:
+        products = json.loads(row[0])
+    except Exception:
+        return
+    if not isinstance(products, list):
+        return
+    changed = False
+    for product in products:
+        if not isinstance(product, dict):
+            continue
+        patch = PRODUCT_SEO_V7.get(str(product.get('slug') or ''))
+        if not patch:
+            continue
+        current_title = str(product.get('seo_title') or '').strip()
+        current_desc = str(product.get('seo_description') or '').strip()
+        if not current_title or current_title == patch['old_title']:
+            if current_title != patch['title']:
+                product['seo_title'] = patch['title']
+                changed = True
+        if not current_desc or current_desc == patch['old_description']:
+            if current_desc != patch['description']:
+                product['seo_description'] = patch['description']
+                changed = True
+    if changed:
+        con.execute(
+            'UPDATE collections SET json_text=?, updated_at=? WHERE name=?',
+            (json.dumps(products, ensure_ascii=False, indent=2), _now(), 'products')
+        )
+
+
 def _sync_smaller_repo_media():
     """Keep V3.1 optimized repo images in the persistent media vault.
 
@@ -507,6 +563,8 @@ def _upgrade_schema(con, old_version):
         _repair_nfc_corporate_visibility(con)
     if old_version < 6:
         _ensure_site_settings(con)
+    if old_version < 7:
+        _upgrade_product_seo_v7(con)
 
 _lock = threading.RLock()
 
@@ -598,6 +656,7 @@ def _initial_import(con):
     _upgrade_references_v4(con)
     _repair_nfc_corporate_visibility(con)
     _ensure_site_settings(con)
+    _upgrade_product_seo_v7(con)
     _meta_set(con, 'initialized', '1')
     _meta_set(con, 'schema_version', SCHEMA_VERSION)
     _meta_set(con, 'initialized_at', _now())

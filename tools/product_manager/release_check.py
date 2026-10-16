@@ -197,6 +197,30 @@ def check():
             if token not in runtime_text:
                 report['critical'].append(f'main.js: {label} eksik')
 
+    # V3.3.20 priority product SEO regression checks.
+    product_expectations = {
+        'iron-man-eli-masa-lambasi': ('Iron Man Eli Masa Lambası', '3D Baskı'),
+        'masa-alti-bardak-tutucu': ('Masa Altı Bardak Tutucu', 'Gaming'),
+        'futbol-takimi-logolu-anahtarlik': ('Futbol Takımı Logolu Anahtarlık', '3D Baskı'),
+    }
+    for slug, expected in product_expectations.items():
+        product_page = ROOT/'urunler'/slug/'index.html'
+        if not product_page.is_file():
+            report['critical'].append(f'ürün SEO hedefi eksik: {slug}')
+            continue
+        product_text = product_page.read_text(encoding='utf-8', errors='replace')
+        title_match = re.search(r'<title>(.*?)</title>', product_text, flags=re.I|re.S)
+        title_text = html.unescape(title_match.group(1)).strip() if title_match else ''
+        if not all(token.casefold() in title_text.casefold() for token in expected):
+            report['critical'].append(f'{slug}: SEO title hedefi eksik')
+        if f'{BASE_URL if False else "https://3d.bgstudio.com.tr"}/urunler/{slug}/' not in product_text:
+            report['critical'].append(f'{slug}: canonical ürün URL sinyali eksik')
+        for token in ('#product', 'https://3d.bgstudio.com.tr/#organization', '../../kusadasi-3d-baski/'):
+            if token not in product_text:
+                report['critical'].append(f'{slug}: ürün SEO sinyali eksik: {token}')
+        if 'aggregateRating' in product_text or '"review"' in product_text:
+            report['critical'].append(f'{slug}: doğrulanmamış rating/review schema bulundu')
+
     # robots.txt
     robots = ROOT/'robots.txt'
     if not robots.is_file():
