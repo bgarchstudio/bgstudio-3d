@@ -446,6 +446,15 @@ const trackInitialAnalyticsContext = () => {
     if (product.price) payload.value = product.price;
     trackEvent('view_item', payload);
   }
+  const project = document.querySelector('[data-project-detail]');
+  if (project) {
+    trackEvent('view_project', {
+      project_id: project.dataset.projectSlug || undefined,
+      project_name: project.dataset.projectName || undefined,
+      project_type: project.dataset.projectKind || undefined,
+      page_location: canonicalUrl
+    });
+  }
   initialAnalyticsTracked = true;
 };
 trackInitialAnalyticsContext();
@@ -479,7 +488,17 @@ document.addEventListener('click', (event) => {
       link_text: (link.textContent || '').trim().slice(0, 100),
       page_location: canonicalUrl
     });
+  } else if (href.startsWith('tel:')) {
+    const payload = { method:'phone', link_text:(link.textContent || '').trim().slice(0,100), page_location:canonicalUrl };
+    trackEvent('phone_click', payload);
+    trackEvent('generate_lead', payload);
   }
+  const projectRoot=document.querySelector('[data-project-detail]');
+  const projectContext=projectRoot ? { project_id:projectRoot.dataset.projectSlug||undefined, project_name:projectRoot.dataset.projectName||undefined, project_type:projectRoot.dataset.projectKind||undefined, page_location:canonicalUrl } : null;
+  if (projectContext && link.matches('[data-project-quote]')) trackEvent('project_quote_click', projectContext);
+  else if (projectContext && link.matches('[data-project-service]')) trackEvent('project_service_click', projectContext);
+  else if (projectContext && link.matches('[data-project-related]')) trackEvent('project_related_click', { ...projectContext, destination:link.getAttribute('href')||undefined });
+  else if (link.matches('[data-project-index-quote]')) trackEvent('project_index_quote_click', { page_location:canonicalUrl });
 });
 
 // Mobile navigation

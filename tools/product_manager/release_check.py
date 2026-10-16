@@ -296,6 +296,28 @@ def check():
         except Exception as exc:
             report['critical'].append(f'indexability manifest parse hatası: {exc}')
 
+    # V3.3.23 project SEO + attribution guards.
+    project_index = ROOT/'projeler/index.html'
+    if not project_index.is_file():
+        report['critical'].append('projeler/index.html eksik')
+    else:
+        project_index_text = project_index.read_text(encoding='utf-8', errors='replace')
+        for token in ('data-schema="project-collection"','CollectionPage','ItemList','data-project-index-quote'):
+            if token not in project_index_text:
+                report['critical'].append(f'projeler/index.html: V3.3.23 proje SEO işareti eksik: {token}')
+    for project_page in sorted((ROOT/'projeler').glob('*/index.html')):
+        rel_project = project_page.relative_to(ROOT).as_posix()
+        project_text = project_page.read_text(encoding='utf-8', errors='replace')
+        for token in ('data-schema="project"','data-schema="breadcrumb"','data-project-detail','data-project-quote','data-project-service'):
+            if token not in project_text:
+                report['critical'].append(f'{rel_project}: V3.3.23 proje detay işareti eksik: {token}')
+    runtime_js = ROOT/'assets/js/main.js'
+    if runtime_js.is_file():
+        runtime_text = runtime_js.read_text(encoding='utf-8', errors='replace')
+        for token in ('view_project','project_quote_click','project_service_click','project_related_click','project_index_quote_click','phone_click'):
+            if token not in runtime_text:
+                report['critical'].append(f'main.js: V3.3.23 analytics olayı eksik: {token}')
+
     # robots.txt
     robots = ROOT/'robots.txt'
     if not robots.is_file():

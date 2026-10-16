@@ -1,7 +1,4 @@
 HISTORICAL FILENAME - CURRENT STATUS
 
-Site release: V3.3.22
-Expected BG Assistant Worker baseline: V3.3.10-R4 Quantity Parser or newer.
-
-V3.3.22 adds Search Console/indexability diagnostics and does not change the AI Worker.
+Site release: V3.3.23
 Cloudflare Worker redeploy is NOT required.

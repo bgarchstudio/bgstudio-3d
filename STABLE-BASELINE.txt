@@ -1,8 +1,8 @@
 BG Studio 3D
 STABLE BASELINE
 
-Version: V3.3.21
-Asset version: 3.3.21
+Version: V3.3.23
+Asset version: 3.3.23
 Channel: stable
 Based on: V3.3.17 Entity + Local SEO Foundation
 
