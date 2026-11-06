@@ -1,6 +1,6 @@
 HISTORICAL FILENAME - CURRENT STATUS
 
-Site release: V3.3.32
+Site release: V3.3.33
 Expected BG Assistant Worker baseline: V3.3.26 (Origin check + rate limit) or newer.
 
 V3.3.26 updated the worker; it is already deployed (version 183c4f51).

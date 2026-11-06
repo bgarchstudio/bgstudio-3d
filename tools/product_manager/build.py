@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, re, html, sys, os
+import json, re, html, sys, os, posixpath
 from datetime import date
 
 try:
@@ -2122,7 +2122,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.32'
+SITE_ASSET_VERSION = '3.3.33'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
@@ -2561,6 +2561,148 @@ def sync_bg_assistant_widget():
 
 CRITICAL_CSS_V3183 = ':root{--paper:#f4ede3;--paper-2:#fbf7f1;--ink:#2d1f14;--ink-soft:#6d5b4b;--brown:#8a4e0e;--line:rgba(72,46,25,.15);--border:var(--line);--accent:var(--brown);--text-secondary:var(--ink-soft);--dark:#16120f}*{box-sizing:border-box}html{background:#fff;scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}a{color:inherit}img{display:block;width:100%;height:auto}.shell{width:min(1360px,calc(100% - 48px));margin-inline:auto}.site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}.nav-shell{height:82px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:max-content}.brand-monogram{display:inline-block;width:38px;height:38px;flex:0 0 38px;font-size:0;background:url("/assets/brand/bgstudio3d-monogram.webp") center/contain no-repeat}.brand-text{display:grid;line-height:1}.brand-text strong{font-size:.95rem;letter-spacing:.24em;font-weight:600}.brand-text small{font-size:.63rem;letter-spacing:.35em;margin-top:5px;color:var(--ink-soft)}.main-nav{display:flex;align-items:center;gap:15px}.main-nav a,.nav-group-toggle{text-decoration:none;font-size:.82rem;font-weight:600;color:#514235}.nav-group{position:relative;display:flex;align-items:center}.nav-group-toggle{border:0;background:transparent;min-height:44px;padding:0 9px}.nav-submenu{display:grid;opacity:0;visibility:hidden;pointer-events:none}.nav-whatsapp{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff!important;text-decoration:none}.menu-toggle{display:none;width:44px;height:44px;border:1px solid var(--line);background:transparent;border-radius:50%;position:relative}.menu-toggle span{position:absolute;left:12px;right:12px;height:1px;background:var(--ink)}.menu-toggle span:first-child{top:16px}.menu-toggle span:last-child{top:25px}.primary-cta,.secondary-cta,.ghost-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:999px;text-decoration:none;font-size:.82rem;font-weight:700}.primary-cta{background:var(--ink);color:#fff}.secondary-cta{border:1px solid var(--line);background:rgba(255,255,255,.36)}.home-v3163{overflow:clip}.home-v3163 .eyebrow{margin:0 0 14px;color:var(--accent);font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.home-v3163 h1,.home-v3163 h2,.home-v3163 h3{font-family:Georgia,serif;font-weight:500}.home-hero-v3163{position:relative;padding-top:clamp(54px,6vw,92px);padding-bottom:clamp(74px,8vw,128px)}.home-hero-grid-v3163{display:grid;grid-template-columns:minmax(0,.82fr) minmax(520px,1.18fr);gap:clamp(38px,6vw,92px);align-items:center}.home-hero-copy-v3163{position:relative;z-index:2;max-width:680px}.home-hero-copy-v3163 h1{font-size:clamp(4.6rem,8.2vw,9.1rem);line-height:.84;letter-spacing:-.06em;margin:0 0 28px;max-width:8.4ch}.home-hero-lead{margin:0;max-width:620px;color:var(--text-secondary);font-size:clamp(1.06rem,1.35vw,1.28rem);line-height:1.68}.home-hero-actions-v3163{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}.home-hero-proof{display:flex;gap:9px;flex-wrap:wrap;margin-top:30px}.home-hero-proof span{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.26);font-size:.66rem;font-weight:700}.home-hero-stage-v3163{position:relative;min-height:clamp(560px,62vw,780px);border-radius:clamp(26px,3vw,42px);overflow:hidden;background:linear-gradient(145deg,#15110e,#201711 62%,#2b1c11);border:1px solid rgba(255,255,255,.06)}.home-hero-visual{position:absolute;margin:0;overflow:hidden;background:#17120f}.home-hero-visual-main{left:7%;top:9%;width:64%;height:78%;border-radius:28px;z-index:2}.home-hero-visual-side-one{right:5%;top:8%;width:28%;height:33%;border-radius:22px;z-index:3}.home-hero-visual-side-two{right:5%;bottom:13%;width:31%;height:35%;border-radius:22px;z-index:3}.home-hero-picture,.home-hero-picture img{width:100%;height:100%;display:block}.home-hero-picture img{object-fit:cover}.home-hero-visual figcaption{position:absolute;left:0;right:0;bottom:0;padding:46px 18px 16px;background:linear-gradient(transparent,rgba(17,13,10,.84));color:#fff;display:grid;gap:3px}.home-hero-stage-label{position:absolute;left:7%;bottom:4%;z-index:4;color:#fff}.page-hero{padding:clamp(64px,8vw,112px) 0}.page-hero h1{font-family:Georgia,serif;font-size:clamp(3.2rem,7vw,7rem);line-height:.9;margin:0}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:12px;top:12px;z-index:999;background:#fff;padding:10px}@media(max-width:1040px){.nav-shell{height:72px}.menu-toggle{display:block}.main-nav{position:absolute;left:24px;right:24px;top:calc(100% + 8px);display:none;flex-direction:column;align-items:stretch;gap:5px;padding:12px;border-radius:22px;background:#fff;border:1px solid var(--border);max-height:calc(100dvh - 100px);overflow:auto}.main-nav.open{display:flex}.main-nav>a,.nav-link,.nav-group-toggle{width:100%;min-height:48px;justify-content:space-between;padding:0 14px}.nav-group{display:grid}.nav-group.is-open>.nav-submenu{display:grid}.nav-submenu{position:static;padding-left:10px}.nav-actions{display:grid}.nav-whatsapp{width:100%;min-height:50px}.home-hero-grid-v3163{grid-template-columns:1fr}.home-hero-stage-v3163{min-height:680px}}@media(max-width:760px){.shell{width:min(100% - 24px,1360px)}.nav-shell{height:68px}.brand-monogram{width:34px;height:34px;flex-basis:34px}.home-hero-v3163{padding-top:32px;padding-bottom:58px}.home-hero-grid-v3163{gap:24px}.home-hero-copy-v3163 h1{font-size:clamp(3.55rem,18vw,5.6rem);line-height:.88;margin-bottom:20px}.home-hero-lead{font-size:.96rem}.home-hero-proof{gap:6px;margin-top:20px}.home-hero-proof span{font-size:.58rem}.home-hero-stage-v3163{min-height:390px;border-radius:24px}.home-hero-visual-main{left:4%;top:5%;width:92%;height:88%;border-radius:20px}.home-hero-visual-desktop-extra{display:none!important}.home-hero-stage-label{left:6%;bottom:3%}.home-hero-actions-v3163{display:grid;grid-template-columns:1fr}.home-hero-actions-v3163 a{width:100%}}'
 
+# ============================================================
+# V3.3.33 · HOMEPAGE CRITICAL CSS
+# Inlines only the rules the first screen needs (skip link, header and
+# announcement bar, hero, floating actions, consent banner) so the 68 KB
+# stylesheet no longer blocks first paint. Selection is by class name, not
+# by DOM matching, because several first-screen parts are created by JS.
+# ============================================================
+_CRITICAL_JS_PREFIXES_V3333 = (
+    'announcement', 'consent', 'wa-', 'nav-', 'bg-assistant-trigger', 'home-motion',
+    'home-spatial', 'floating-', 'back-to-top', 'site-header', 'main-nav', 'menu-',
+)
+_CRITICAL_STATE_V3333 = re.compile(r'^(is|has)-|^(open|active|show|selected|scrolled|visible|loaded|ready|in-view|current)$')
+
+
+def _critical_scope_classes_v3333(html_text):
+    body = html_text[html_text.find('<body'):]
+    parts = [body[:body.find('<main')] if '<main' in body else '']
+    main_tag = re.search(r'<main\b[^>]*>', body)
+    if main_tag:
+        parts.append(main_tag.group(0))
+    hero_start = body.find('<section class="home-hero-v3191')
+    if hero_start >= 0:
+        hero_end = body.find('<section', hero_start + 10)
+        parts.append(body[hero_start:hero_end if hero_end > 0 else len(body)])
+    floating = re.search(r'<aside[^>]*class="floating-actions"[^>]*>.*?</aside>', body, re.S)
+    if floating:
+        parts.append(floating.group(0))
+    classes = set()
+    for part in parts:  # read each part on its own so a cut tag cannot merge attributes
+        for m in re.finditer(r'class="([^"<>]+)"', part):
+            classes.update(m.group(1).split())
+    return classes
+
+
+def _split_css_selectors_v3333(prelude):
+    out, depth, cur = [], 0, ''
+    for ch in prelude:
+        if ch in '([':
+            depth += 1
+        elif ch in ')]':
+            depth -= 1
+        if ch == ',' and depth == 0:
+            out.append(cur)
+            cur = ''
+        else:
+            cur += ch
+    out.append(cur)
+    return [s.strip() for s in out if s.strip()]
+
+
+def _parse_css_blocks_v3333(text, i=0):
+    """Minimal parser for the minified stylesheet: returns [(prelude, body, is_group)]."""
+    items, n = [], len(text)
+    while i < n:
+        j, k = text.find('{', i), text.find('}', i)
+        if j == -1 or (k != -1 and k < j):
+            return items, (k + 1 if k != -1 else n)
+        prelude = text[i:j].strip()
+        if prelude.startswith(('@media', '@supports', '@layer', '@container')):
+            inner, end = _parse_css_blocks_v3333(text, j + 1)
+            items.append((prelude, inner, True))
+            i = end
+            continue
+        depth, p, quote = 1, j + 1, None
+        while depth and p < n:
+            ch = text[p]
+            if quote:
+                if ch == '\\':
+                    p += 1
+                elif ch == quote:
+                    quote = None
+            elif ch in '"\'':
+                quote = ch
+            elif ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+            p += 1
+        items.append((prelude, text[j + 1:p - 1], False))
+        i = p
+    return items, n
+
+
+def build_home_critical_css_v3333(html_text):
+    try:
+        css_path = ROOT / 'assets/css/styles.min.css'
+        if not css_path.exists():
+            return ''
+        css_text = css_path.read_text(encoding='utf-8')
+        classes = _critical_scope_classes_v3333(html_text)
+        if not classes:
+            return ''
+
+        def class_ok(name):
+            return name in classes or name.startswith(_CRITICAL_JS_PREFIXES_V3333) or bool(_CRITICAL_STATE_V3333.search(name))
+
+        def selector_ok(selector):
+            # A :where()/:is()/:not() list matches if any alternative does, so its classes never exclude a rule.
+            plain = re.sub(r':(?:not|is|where|has)\([^()]*\)', '', selector)
+            return all(class_ok(c) for c in re.findall(r'\.([A-Za-z0-9_-]+)', plain))
+
+        used_keyframes = set()
+        keyframes = []
+
+        def emit(items):
+            out = []
+            for prelude, body, is_group in items:
+                if is_group:
+                    inner = emit(body)
+                    if inner:
+                        out.append(prelude + '{' + inner + '}')
+                elif prelude.startswith('@font-face'):
+                    out.append(prelude + '{' + body + '}')
+                elif prelude.startswith(('@keyframes', '@-webkit-keyframes')):
+                    keyframes.append((prelude, body))
+                elif prelude.startswith('@'):
+                    continue
+                else:
+                    keep = [s for s in _split_css_selectors_v3333(prelude) if selector_ok(s)]
+                    if keep:
+                        out.append(','.join(keep) + '{' + body + '}')
+                        for value in re.findall(r'animation(?:-name)?\s*:\s*([^;}]+)', body):
+                            used_keyframes.update(re.findall(r'[A-Za-z_][\w-]*', value))
+            return ''.join(out)
+
+        items, _ = _parse_css_blocks_v3333(css_text)
+        critical = emit(items)
+        critical += ''.join(p + '{' + b + '}' for p, b in keyframes if p.split()[-1] in used_keyframes)
+
+        # url() paths are relative to assets/css/; the inline copy lives in the root page.
+        def rebase(match):
+            raw = match.group(2).strip()
+            if re.match(r'^(?:[a-z]+:|/|#|data:)', raw, re.I):
+                return match.group(0)
+            rebased = posixpath.normpath(posixpath.join('assets/css', raw))
+            return f'url({match.group(1)}{rebased}{match.group(1)})'
+        critical = re.sub(r'url\(\s*(["\']?)([^"\')]+)\1\s*\)', rebase, critical)
+        return critical.replace('</style', '<\\/style')
+    except Exception:
+        return ''
+
+
 def sync_site_asset_versions():
     """Bump shared assets and install the separate navigation module on every public page."""
     changed = 0
@@ -2677,8 +2819,16 @@ def sync_site_asset_versions():
         # first paint and omit the obsolete critical block. Other pages keep the
         # existing async/critical strategy.
         updated = re.sub(r'<style\s+data-critical-v3183[^>]*>.*?</style>', '', updated, flags=re.I | re.S)
+        updated = re.sub(r'<style\s+data-critical-home-v3333[^>]*>.*?</style>', '', updated, flags=re.I | re.S)
         if html_path == ROOT / 'index.html':
-            updated = updated.replace('</head>', async_font + home_blocking_css + '</head>', 1)
+            # V3.3.33: unlike the stale V3.1.83 snapshot, this critical CSS is
+            # regenerated from the current stylesheet on every build, so hero
+            # changes cannot drift out of sync. Falls back to blocking CSS.
+            critical_home = build_home_critical_css_v3333(updated)
+            if critical_home:
+                updated = updated.replace('</head>', async_font + f'<style data-critical-home-v3333>{critical_home}</style>' + async_css + '</head>', 1)
+            else:
+                updated = updated.replace('</head>', async_font + home_blocking_css + '</head>', 1)
         else:
             updated = updated.replace('</head>', async_font + async_css + f'<style data-critical-v3183>{CRITICAL_CSS_V3183}</style></head>', 1)
 
