@@ -5,3 +5,6 @@ Thumbs.db
 data/backups/
 tools/product_manager/__pycache__/
 *.pyc
+
+# Wrangler local cache
+.wrangler/
