@@ -630,59 +630,207 @@ if (catalogCards.length && !window.BGStudioCatalogV3164) {
   applyCatalog();
 }
 
-// Product image lightbox
-const zoomableMedia = document.querySelectorAll('.zoomable-media');
-if (zoomableMedia.length) {
-  const lightbox = document.createElement('div');
-  lightbox.className = 'image-lightbox';
-  lightbox.setAttribute('role', 'dialog');
-  lightbox.setAttribute('aria-modal', 'true');
-  lightbox.setAttribute('aria-label', 'Ürün görseli');
+// Image lightbox (V3.3.27): gallery navigation, swipe, click-to-zoom with pan,
+// thumbnail strip and focus trap. Exposed as window.bgOpenImageLightbox so
+// runtime-injected media (NFC stand schema) shares the same dialog.
+const createImageLightbox = () => {
+  const make = (tag, className, attrs = {}) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+    return node;
+  };
+  const lightbox = make('div', 'image-lightbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Ürün görseli' });
   lightbox.hidden = true;
-
-  const close = document.createElement('button');
-  close.type = 'button';
-  close.setAttribute('aria-label', 'Görseli kapat');
+  const viewport = make('div', 'lightbox-viewport');
+  const img = make('img', 'lightbox-image', { alt: '', draggable: 'false' });
+  viewport.append(img);
+  const caption = make('p', 'lightbox-caption');
+  const counter = make('p', 'lightbox-counter', { 'aria-live': 'polite' });
+  const close = make('button', 'lightbox-close', { type: 'button', 'aria-label': 'Görseli kapat' });
   close.textContent = '×';
-  const img = document.createElement('img');
-  img.alt = '';
-  lightbox.append(img, close);
+  const prev = make('button', 'lightbox-nav lightbox-prev', { type: 'button', 'aria-label': 'Önceki görsel' });
+  prev.textContent = '‹';
+  const next = make('button', 'lightbox-nav lightbox-next', { type: 'button', 'aria-label': 'Sonraki görsel' });
+  next.textContent = '›';
+  const thumbs = make('div', 'lightbox-thumbs', { role: 'group', 'aria-label': 'Görseller' });
+  lightbox.append(viewport, caption, counter, prev, next, thumbs, close);
   document.body.append(lightbox);
+
+  const ZOOM = 2.2;
+  let slides = [];
+  let index = 0;
   let returnFocus = null;
+  let onClose = null;
+  let zoomed = false;
+  let pan = { x: 0, y: 0 };
+  let drag = null;
+
+  const applyTransform = () => {
+    img.style.transform = zoomed ? `translate(${pan.x}px, ${pan.y}px) scale(${ZOOM})` : '';
+    viewport.classList.toggle('is-zoomed', zoomed);
+  };
+  const clampPan = () => {
+    const maxX = (img.offsetWidth * (ZOOM - 1)) / 2;
+    const maxY = (img.offsetHeight * (ZOOM - 1)) / 2;
+    pan.x = Math.max(-maxX, Math.min(maxX, pan.x));
+    pan.y = Math.max(-maxY, Math.min(maxY, pan.y));
+  };
+  const setZoom = (on, clientX, clientY) => {
+    zoomed = on;
+    pan = { x: 0, y: 0 };
+    if (on && clientX != null) {
+      // Keep the clicked point under the pointer: t = p * (1 - scale).
+      const rect = img.getBoundingClientRect();
+      pan.x = (clientX - (rect.left + rect.width / 2)) * (1 - ZOOM);
+      pan.y = (clientY - (rect.top + rect.height / 2)) * (1 - ZOOM);
+      clampPan();
+    }
+    applyTransform();
+  };
+
+  const show = (nextIndex) => {
+    if (!slides.length) return;
+    index = (nextIndex + slides.length) % slides.length;
+    const slide = slides[index];
+    setZoom(false);
+    img.src = slide.src;
+    img.alt = slide.alt || 'Ürün görseli';
+    caption.textContent = slide.alt || '';
+    const many = slides.length > 1;
+    counter.textContent = many ? `${index + 1} / ${slides.length}` : '';
+    prev.hidden = next.hidden = thumbs.hidden = counter.hidden = !many;
+    thumbs.querySelectorAll('button').forEach((button, i) => {
+      button.classList.toggle('active', i === index);
+      button.setAttribute('aria-current', i === index ? 'true' : 'false');
+    });
+    if (many) {
+      // Warm the neighbours so arrow/swipe navigation feels instant.
+      [index + 1, index - 1].forEach(i => { new Image().src = slides[(i + slides.length) % slides.length].src; });
+    }
+  };
 
   const closeBox = () => {
+    if (lightbox.hidden) return;
     lightbox.classList.remove('open');
     lightbox.hidden = true;
+    setZoom(false);
     document.body.style.overflow = '';
+    onClose?.(index);
     returnFocus?.focus?.();
   };
-  const openBox = (media) => {
-    const source = media.querySelector('img');
-    if (!source) return;
-    returnFocus = media;
-    img.src = source.currentSrc || source.src;
-    img.alt = source.alt || 'Ürün görseli';
+
+  const open = (items, startIndex = 0, focusTarget = null, closeCallback = null) => {
+    slides = (items || []).filter(item => item && item.src);
+    if (!slides.length) return;
+    returnFocus = focusTarget;
+    onClose = closeCallback;
+    thumbs.replaceChildren(...slides.map((slide, i) => {
+      const button = make('button', 'lightbox-thumb', { type: 'button', 'aria-label': `Görsel ${i + 1}: ${slide.alt || 'Ürün görseli'}` });
+      const thumb = make('img', '', { src: slide.src, alt: '', loading: 'lazy', decoding: 'async' });
+      button.append(thumb);
+      button.addEventListener('click', () => show(i));
+      return button;
+    }));
+    show(startIndex);
     lightbox.hidden = false;
     requestAnimationFrame(() => lightbox.classList.add('open'));
     document.body.style.overflow = 'hidden';
     close.focus();
+    trackEvent('view_item_image', { item_name: slides[0].alt || document.title, image_count: slides.length });
   };
 
-  zoomableMedia.forEach(media => {
-    media.addEventListener('click', () => openBox(media));
-    media.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        openBox(media);
-      }
-    });
-  });
+  prev.addEventListener('click', () => show(index - 1));
+  next.addEventListener('click', () => show(index + 1));
   close.addEventListener('click', closeBox);
   lightbox.addEventListener('click', event => { if (event.target === lightbox) closeBox(); });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !lightbox.hidden) closeBox();
+
+  // One pointer stream handles click-to-zoom, pan while zoomed and swipe otherwise.
+  viewport.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    drag = { x: event.clientX, y: event.clientY, panX: pan.x, panY: pan.y, moved: false };
+    viewport.setPointerCapture(event.pointerId);
   });
-}
+  viewport.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) drag.moved = true;
+    if (zoomed && drag.moved) {
+      pan = { x: drag.panX + dx, y: drag.panY + dy };
+      clampPan();
+      applyTransform();
+    }
+  });
+  const endDrag = event => {
+    if (!drag) return;
+    const dx = event.clientX - drag.x;
+    const wasMoved = drag.moved;
+    drag = null;
+    if (!wasMoved) {
+      // Pointer capture retargets pointerup to the viewport, so hit-test the image box.
+      const rect = img.getBoundingClientRect();
+      const onImage = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      if (onImage) setZoom(!zoomed, event.clientX, event.clientY);
+      else if (!zoomed) closeBox();
+      return;
+    }
+    if (!zoomed && slides.length > 1 && Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
+  };
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', () => { drag = null; });
+
+  document.addEventListener('keydown', event => {
+    if (lightbox.hidden) return;
+    if (event.key === 'Escape') { event.preventDefault(); closeBox(); return; }
+    if (event.key === 'ArrowRight' && slides.length > 1) { event.preventDefault(); show(index + 1); return; }
+    if (event.key === 'ArrowLeft' && slides.length > 1) { event.preventDefault(); show(index - 1); return; }
+    if (event.key === 'Tab') {
+      const focusable = [...lightbox.querySelectorAll('button')].filter(button => !button.hidden && !button.closest('[hidden]'));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+
+  return open;
+};
+
+let imageLightboxOpen = null;
+window.bgOpenImageLightbox = (items, startIndex, focusTarget, closeCallback) => {
+  imageLightboxOpen = imageLightboxOpen || createImageLightbox();
+  imageLightboxOpen(items, startIndex, focusTarget, closeCallback);
+};
+
+const mediaSlides = (media) => {
+  const resolve = src => new URL(src, location.href).href;
+  // Product gallery: every thumbnail becomes a slide, starting at the shown one.
+  if (media.matches('[data-gallery-stage]')) {
+    const buttons = [...document.querySelectorAll('[data-gallery-src]')];
+    if (buttons.length) {
+      const items = buttons.map(button => ({ src: resolve(button.dataset.gallerySrc), alt: button.dataset.galleryAlt || '' }));
+      const start = Math.max(0, buttons.findIndex(button => button.classList.contains('active')));
+      return { items, start, onClose: i => { if (buttons[i] && !buttons[i].classList.contains('active')) buttons[i].click(); } };
+    }
+  }
+  const source = media.querySelector('img');
+  return source ? { items: [{ src: source.currentSrc || source.src, alt: source.alt || '' }], start: 0 } : null;
+};
+
+document.querySelectorAll('.zoomable-media').forEach(media => {
+  const openMedia = () => {
+    const set = mediaSlides(media);
+    if (set) window.bgOpenImageLightbox(set.items, set.start, media, set.onClose);
+  };
+  media.addEventListener('click', openMedia);
+  media.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openMedia();
+    }
+  });
+});
 
 // Back to top
 const backToTop = document.querySelector('.back-to-top');
@@ -763,6 +911,10 @@ if (backToTop) {
     if (media) {
       const openRuntimeLightbox = () => {
         const source = media.querySelector('img'); if (!source) return;
+        if (window.bgOpenImageLightbox) {
+          window.bgOpenImageLightbox([{ src: source.currentSrc || source.src, alt: source.alt || 'BG Studio NFC stand şeması' }], 0, media);
+          return;
+        }
         let box = document.querySelector('.image-lightbox');
         if (!box) {
           box = document.createElement('div'); box.className='image-lightbox'; box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('aria-label','Stand şeması görseli'); box.hidden=true;

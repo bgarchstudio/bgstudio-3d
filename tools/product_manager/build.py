@@ -2094,7 +2094,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.26'
+SITE_ASSET_VERSION = '3.3.27'
 RELEASE_CHANNEL = 'stable'
 RELEASE_CANDIDATE = 'V3.3.25-STABLE'
 
