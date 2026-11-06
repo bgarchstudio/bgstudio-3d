@@ -4904,3 +4904,25 @@ body.bg-assistant-keyboard .bg-assistant-panel{
   .order-option-choice{transition:none}
   .order-option-choice:hover{transform:none}
 }
+
+
+/* ==========================================================
+   V3.3.30 · COMPACT PROJECT INDEX
+   Cards carried the full multi-paragraph case text, making the
+   archive ~8,300px (desktop) / ~15,400px (mobile). Description is
+   clamped visually (full text stays in the HTML), 3 columns on
+   wide screens, tags hidden on phones (they stay on detail pages).
+   ========================================================== */
+.project-index-body{padding:clamp(18px,2.2vw,26px)}
+.project-index-meta{margin-bottom:12px}
+.project-index-body p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.project-index-tags{margin-top:14px}
+.project-index-link{margin-top:auto;padding-top:16px}
+@media(min-width:1100px){
+  .project-index-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:20px!important}
+  .project-index-body h2{font-size:clamp(1.45rem,1.9vw,2rem)!important;line-height:1.08!important}
+}
+@media(max-width:680px){
+  .project-index-tags{display:none}
+  .project-index-body h2{font-size:1.6rem!important}
+}
