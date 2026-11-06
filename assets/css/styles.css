@@ -4878,3 +4878,29 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 .review-stars-v3328{color:#b7791f;letter-spacing:.08em;font-size:.95rem}
 .review-count-v3328{color:#5f5850;font-size:.86rem}
 .home-reviews-actions-v3328{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
+
+
+/* ==========================================================
+   V3.3.29 · PRODUCT OPTION CARDS
+   "Seçenek" renders as choice cards instead of a dropdown; the
+   controls row then holds only set + quantity (like color-mode).
+   ========================================================== */
+.order-option-chips{display:flex;flex-wrap:wrap;gap:7px}
+.order-option-choice{min-height:40px;padding:8px 14px;border:1px solid var(--line);border-radius:11px;background:#f8f1e8;color:var(--ink);font:inherit;font-size:.78rem;line-height:1.2;text-align:left;cursor:pointer;transition-property:border-color,background-color,box-shadow,transform;transition-duration:.16s}
+.order-option-choice:hover{border-color:rgba(138,78,14,.42);transform:translateY(-1px)}
+.order-option-choice.selected{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);background:#fff}
+.order-option-choice:focus-visible{outline:2px solid #8a5527;outline-offset:2px}
+.order-option-section{margin-bottom:12px}
+.order-controls.option-mode.has-tier{grid-template-columns:minmax(0,1fr) 124px}
+.order-controls.option-mode.has-tier .order-qty-field{grid-column:auto}
+.order-controls.option-mode:not(.has-tier){grid-template-columns:124px;justify-content:start}
+@media(max-width:900px){
+  .order-controls.option-mode.has-tier{grid-template-columns:1fr 118px}
+}
+@media(max-width:680px){
+  .order-controls.option-mode.has-tier,.order-controls.option-mode:not(.has-tier){grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .order-option-choice{transition:none}
+  .order-option-choice:hover{transform:none}
+}

@@ -1631,6 +1631,19 @@ if (orderConfig) {
   });
   qty?.addEventListener('input', () => buildMessage(true));
   option?.addEventListener('change', () => buildMessage(false));
+
+  // V3.3.29 option cards drive the hidden option select.
+  const optionChips = orderConfig.querySelectorAll('[data-option-value]');
+  optionChips.forEach(chip => chip.addEventListener('click', () => {
+    if (!option) return;
+    option.value = chip.dataset.optionValue;
+    optionChips.forEach(item => {
+      const active = item === chip;
+      item.classList.toggle('selected', active);
+      item.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    option.dispatchEvent(new Event('change', { bubbles: true }));
+  }));
   tier?.addEventListener('change', () => buildMessage(true));
   note?.addEventListener('input', () => buildMessage(false));
   tierBtns.forEach(btn => btn.addEventListener('click', () => {
