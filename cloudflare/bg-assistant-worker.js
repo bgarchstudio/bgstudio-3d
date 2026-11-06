@@ -426,19 +426,103 @@ const outputText = payload => {
   return chunks.join('\n').trim();
 };
 
+// Google Business reviews via Places API (New). The key stays a worker secret;
+// one upstream call per day is served from the Cloudflare cache to every visitor.
+const REVIEWS_CACHE_KEY = 'https://ai.bgstudio.com.tr/__cache/google-reviews-v1';
+const REVIEWS_TTL_SECONDS = 86400;
+const REVIEWS_ERROR_TTL_SECONDS = 600;
+const REVIEWS_FIELDS = ['id', 'displayName', 'rating', 'userRatingCount', 'googleMapsUri', 'reviews'];
+
+const fetchGooglePlace = async env => {
+  const headers = {
+    'X-Goog-Api-Key': env.GOOGLE_PLACES_API_KEY,
+    'Content-Type': 'application/json'
+  };
+  if (env.GOOGLE_PLACE_ID) {
+    const response = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(env.GOOGLE_PLACE_ID)}?languageCode=tr`, {
+      headers: { ...headers, 'X-Goog-FieldMask': REVIEWS_FIELDS.join(',') }
+    });
+    if (!response.ok) throw new Error(`Places details ${response.status}`);
+    return response.json();
+  }
+  // No Place ID configured: find the listing by name, then verify it is ours.
+  const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: { ...headers, 'X-Goog-FieldMask': REVIEWS_FIELDS.map(f => `places.${f}`).join(',') },
+    body: JSON.stringify({ textQuery: env.GOOGLE_PLACE_QUERY || 'BG Studio 3D Kuşadası', languageCode: 'tr', maxResultCount: 3 })
+  });
+  if (!response.ok) throw new Error(`Places search ${response.status}`);
+  const payload = await response.json();
+  const place = (payload.places || []).find(p => /bg\s*studio\s*3d/i.test(p?.displayName?.text || ''));
+  if (!place) throw new Error('Place not found');
+  return place;
+};
+
+const cleanPlace = place => ({
+  id: String(place?.id || ''),
+  name: String(place?.displayName?.text || 'BG Studio 3D'),
+  rating: Number(place?.rating) || null,
+  count: Number(place?.userRatingCount) || 0,
+  url: String(place?.googleMapsUri || ''),
+  reviews: (Array.isArray(place?.reviews) ? place.reviews : []).slice(0, 5).map(r => ({
+    author: String(r?.authorAttribution?.displayName || 'Google kullanıcısı'),
+    authorUrl: String(r?.authorAttribution?.uri || ''),
+    photo: String(r?.authorAttribution?.photoUri || ''),
+    rating: Number(r?.rating) || 0,
+    text: String(r?.originalText?.text || r?.text?.text || '').slice(0, 1200),
+    when: String(r?.relativePublishTimeDescription || ''),
+    published: String(r?.publishTime || '')
+  })).filter(r => r.text)
+});
+
+const handleGoogleReviews = async (request, env, corsOrigin, ctx) => {
+  if (request.method !== 'GET') return json({ error: 'Method not allowed.' }, 405, corsOrigin);
+  const withCors = response => {
+    const out = new Response(response.body, response);
+    out.headers.set('access-control-allow-origin', corsOrigin);
+    out.headers.set('vary', 'Origin');
+    out.headers.set('cache-control', 'public, max-age=3600');
+    return out;
+  };
+  const cache = caches.default;
+  const cached = await cache.match(REVIEWS_CACHE_KEY);
+  if (cached) return withCors(cached);
+  if (!env.GOOGLE_PLACES_API_KEY) return json({ error: 'Google Places key is not configured.' }, 503, corsOrigin);
+
+  let body;
+  let ttl = REVIEWS_TTL_SECONDS;
+  let status = 200;
+  try {
+    body = { ok: true, ...cleanPlace(await fetchGooglePlace(env)) };
+  } catch (error) {
+    console.error('Google reviews error', error?.message || error);
+    body = { ok: false, error: 'Google yorumları şu an alınamadı.' };
+    ttl = REVIEWS_ERROR_TTL_SECONDS;
+    status = 502;
+  }
+  const toCache = new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': `public, max-age=${ttl}` }
+  });
+  const put = cache.put(REVIEWS_CACHE_KEY, toCache.clone());
+  if (ctx?.waitUntil) ctx.waitUntil(put); else await put;
+  return withCors(toCache);
+};
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const corsOrigin = allowedOrigin(request, env);
 
     if (!corsOrigin) return json({ error: 'Origin not allowed.' }, 403, 'https://3d.bgstudio.com.tr');
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: {
       'access-control-allow-origin': corsOrigin,
-      'access-control-allow-methods': 'POST, OPTIONS',
+      'access-control-allow-methods': 'GET, POST, OPTIONS',
       'access-control-allow-headers': 'Content-Type',
       'access-control-max-age': '86400',
       'vary': 'Origin'
     }});
+    if (url.pathname === '/api/google-reviews') return handleGoogleReviews(request, env, corsOrigin, ctx);
     if (url.pathname !== '/api/bg-assistant') return json({ error: 'Not found.' }, 404, corsOrigin);
     if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, corsOrigin);
     if (!env.OPENAI_API_KEY) return json({ error: 'OpenAI secret is not configured.' }, 503, corsOrigin);

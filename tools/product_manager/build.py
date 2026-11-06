@@ -1419,6 +1419,20 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
+<section class="home-reviews-v3328 bg-section-compact" aria-labelledby="home-reviews-title" data-google-reviews data-reviews-endpoint="https://ai.bgstudio.com.tr/api/google-reviews">
+  <div class="shell">
+    <div class="home-reviews-head-v3328">
+      <div><p class="eyebrow">GOOGLE YORUMLARI</p><h2 id="home-reviews-title">Müşterilerimiz ne diyor?</h2></div>
+      <div class="home-reviews-summary-v3328" data-reviews-summary hidden></div>
+    </div>
+    <div class="home-reviews-grid-v3328" data-reviews-list></div>
+    <div class="home-reviews-actions-v3328">
+      <a class="secondary-cta" data-reviews-link href="https://www.google.com/maps/search/?api=1&amp;query=BG+Studio+3D+Ku%C5%9Fadas%C4%B1" rel="noopener" target="_blank">Tüm yorumları Google'da oku ↗</a>
+      <a class="text-cta" data-reviews-write href="https://www.google.com/maps/search/?api=1&amp;query=BG+Studio+3D+Ku%C5%9Fadas%C4%B1" rel="noopener" target="_blank">Yorum yaz ↗</a>
+    </div>
+  </div>
+</section>
+
 <section class="home-why-v3163 home-why-v3196 bg-section" aria-labelledby="home-why-title">
   <div class="shell home-why-shell home-why-shell-v3196">
     <div class="home-why-heading home-motion" data-home-motion><div class="home-why-kicker"><p class="eyebrow">{esc(home_copy["why_eyebrow"])}</p><p class="home-why-intro">Fikir, model, üretim ve teslim adımlarını birbirinden koparmadan tek stüdyo içinde yürütüyoruz.</p></div><h2 id="home-why-title">{_site_why_title_html(home_copy["why_title"])}</h2></div>
@@ -2094,7 +2108,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.27'
+SITE_ASSET_VERSION = '3.3.28'
 RELEASE_CHANNEL = 'stable'
 RELEASE_CANDIDATE = 'V3.3.25-STABLE'
 

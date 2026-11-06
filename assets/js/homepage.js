@@ -54,3 +54,104 @@
   window.addEventListener('scroll', requestParallax, { passive: true });
   window.addEventListener('resize', requestParallax, { passive: true });
 })();
+
+/* BG Studio 3D Google reviews v3.3.28
+   Fetches cached Google Business reviews from the BG Assistant worker. If the
+   endpoint is not configured or fails, the section keeps its Google links only. */
+(() => {
+  const section = document.querySelector('[data-google-reviews]');
+  if (!section) return;
+  const endpoint = section.dataset.reviewsEndpoint;
+  const list = section.querySelector('[data-reviews-list]');
+  const summary = section.querySelector('[data-reviews-summary]');
+  const readLink = section.querySelector('[data-reviews-link]');
+  const writeLink = section.querySelector('[data-reviews-write]');
+  if (!endpoint || !list) return;
+
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  };
+  const stars = rating => {
+    const wrap = el('span', 'review-stars-v3328');
+    const value = Math.max(0, Math.min(5, Math.round(rating)));
+    wrap.setAttribute('role', 'img');
+    wrap.setAttribute('aria-label', `5 üzerinden ${value} yıldız`);
+    wrap.textContent = '★'.repeat(value) + '☆'.repeat(5 - value);
+    return wrap;
+  };
+  const safeUrl = value => (/^https:\/\//i.test(value || '') ? value : '');
+
+  const render = data => {
+    if (!data?.ok || !Array.isArray(data.reviews) || !data.reviews.length) return;
+    const mapsUrl = safeUrl(data.url);
+    if (mapsUrl && readLink) readLink.href = mapsUrl;
+    if (data.id && writeLink) writeLink.href = `https://search.google.com/local/writereview?placeid=${encodeURIComponent(data.id)}`;
+
+    if (summary && data.rating) {
+      summary.replaceChildren(
+        el('strong', 'review-score-v3328', data.rating.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })),
+        stars(data.rating),
+        el('span', 'review-count-v3328', `${data.count} Google yorumu`)
+      );
+      summary.hidden = false;
+    }
+
+    list.replaceChildren(...data.reviews.map(review => {
+      const card = el('article', 'review-card-v3328');
+      const head = el('div', 'review-card-head-v3328');
+      const avatarUrl = safeUrl(review.photo);
+      if (avatarUrl) {
+        const avatar = el('img', 'review-avatar-v3328');
+        avatar.src = avatarUrl;
+        avatar.alt = '';
+        avatar.width = 40;
+        avatar.height = 40;
+        avatar.loading = 'lazy';
+        avatar.referrerPolicy = 'no-referrer';
+        head.append(avatar);
+      } else {
+        head.append(el('span', 'review-avatar-v3328 review-avatar-letter-v3328', (review.author || '?').trim().charAt(0).toUpperCase()));
+      }
+      const who = el('div', 'review-who-v3328');
+      const authorUrl = safeUrl(review.authorUrl);
+      if (authorUrl) {
+        const link = el('a', '', review.author);
+        link.href = authorUrl;
+        link.rel = 'noopener nofollow';
+        link.target = '_blank';
+        who.append(link);
+      } else {
+        who.append(el('strong', '', review.author));
+      }
+      who.append(el('small', '', review.when));
+      head.append(who);
+      const text = el('p', 'review-text-v3328', review.text);
+      card.append(head, stars(review.rating), text, el('span', 'review-source-v3328', 'Google'));
+      return card;
+    }));
+    section.classList.add('has-reviews');
+  };
+
+  const load = () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    fetch(endpoint, { signal: controller.signal, credentials: 'omit' })
+      .then(response => (response.ok ? response.json() : null))
+      .then(render)
+      .catch(() => {})
+      .finally(() => clearTimeout(timer));
+  };
+
+  // Reviews sit low on the page; fetch only when the section approaches the viewport.
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { io.disconnect(); load(); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(section);
+  } else {
+    load();
+  }
+})();

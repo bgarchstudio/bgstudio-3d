@@ -4863,3 +4863,36 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 @media(prefers-reduced-motion:reduce){
   .image-lightbox .lightbox-image{transition:none}
 }
+
+
+/* ==========================================================
+   V3.3.28 · GOOGLE REVIEWS
+   Filled by homepage.js from the worker's cached Places API data.
+   Without data the section shows only its Google links.
+   ========================================================== */
+.home-reviews-v3328{background:#fbf8f4;border-bottom:1px solid rgba(31,23,17,.07)}
+.home-reviews-head-v3328{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:20px 40px;margin-bottom:clamp(22px,3vw,36px)}
+.home-reviews-head-v3328 h2{margin:.42rem 0 0;font-size:clamp(2.2rem,4.2vw,4.4rem);line-height:.95;letter-spacing:-.045em;font-weight:560;color:#171513;text-wrap:balance}
+.home-reviews-summary-v3328{display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid rgba(31,23,17,.1);border-radius:999px;background:#fff}
+.review-score-v3328{font-size:1.5rem;font-weight:700;color:#171513;font-variant-numeric:tabular-nums}
+.review-stars-v3328{color:#b7791f;letter-spacing:.08em;font-size:.95rem}
+.review-count-v3328{color:#5f5850;font-size:.86rem}
+.home-reviews-grid-v3328{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.home-reviews-grid-v3328:empty{display:none}
+.review-card-v3328{position:relative;display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid rgba(31,23,17,.09);border-radius:20px;background:#fff;box-shadow:0 10px 26px rgba(40,26,14,.05)}
+.review-card-head-v3328{display:flex;align-items:center;gap:12px}
+.review-avatar-v3328{width:40px;height:40px;flex:0 0 40px;border-radius:50%;object-fit:cover;background:#efe6dc}
+.review-avatar-letter-v3328{display:grid;place-items:center;color:#5e4936;font-weight:700}
+.review-who-v3328{display:grid;gap:2px;min-width:0}
+.review-who-v3328 a,.review-who-v3328 strong{color:#171513;font-weight:650;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.review-who-v3328 a:hover{text-decoration:underline}
+.review-who-v3328 small{color:#6b665f;font-size:.78rem}
+.review-text-v3328{margin:0;color:#3a332d;font-size:.95rem;line-height:1.55;text-wrap:pretty;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.review-source-v3328{margin-top:auto;color:#6b665f;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.home-reviews-actions-v3328{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;margin-top:clamp(20px,3vw,30px)}
+.home-reviews-v3328:not(.has-reviews) .home-reviews-actions-v3328{margin-top:0}
+
+@media(max-width:760px){
+  .home-reviews-grid-v3328{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:0 16px 6px}
+  .review-card-v3328{flex:0 0 84%;scroll-snap-align:start}
+}
