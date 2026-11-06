@@ -1419,16 +1419,15 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
-<section class="home-reviews-v3328 bg-section-compact" aria-labelledby="home-reviews-title" data-google-reviews data-reviews-endpoint="https://ai.bgstudio.com.tr/api/google-reviews">
-  <div class="shell">
-    <div class="home-reviews-head-v3328">
-      <div><p class="eyebrow">GOOGLE YORUMLARI</p><h2 id="home-reviews-title">Müşterilerimiz ne diyor?</h2></div>
-      <div class="home-reviews-summary-v3328" data-reviews-summary hidden></div>
-    </div>
-    <div class="home-reviews-grid-v3328" data-reviews-list></div>
-    <div class="home-reviews-actions-v3328">
-      <a class="secondary-cta" data-reviews-link href="https://www.google.com/maps/search/?api=1&amp;query=BG+Studio+3D+Ku%C5%9Fadas%C4%B1" rel="noopener" target="_blank">Tüm yorumları Google'da oku ↗</a>
-      <a class="text-cta" data-reviews-write href="https://www.google.com/maps/search/?api=1&amp;query=BG+Studio+3D+Ku%C5%9Fadas%C4%B1" rel="noopener" target="_blank">Yorum yaz ↗</a>
+<section class="home-reviews-v3328 bg-section-compact" aria-labelledby="home-reviews-title">
+  <div class="shell home-reviews-head-v3328">
+    <div><p class="eyebrow">GOOGLE YORUMLARI</p><h2 id="home-reviews-title">Müşterilerimiz ne diyor?</h2></div>
+    <div class="home-reviews-side-v3328">
+      <p class="home-reviews-summary-v3328"><strong class="review-score-v3328">{GOOGLE_RATING_V3328}</strong><span class="review-stars-v3328" role="img" aria-label="5 üzerinden {GOOGLE_RATING_V3328} yıldız">★★★★★</span><span class="review-count-v3328">Google puanı</span></p>
+      <div class="home-reviews-actions-v3328">
+        <a class="secondary-cta" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank">Yorumları Google'da oku ↗</a>
+        <a class="text-cta" href="{GOOGLE_WRITE_REVIEW_URL_V3328}" rel="noopener" target="_blank">Yorum yaz ↗</a>
+      </div>
     </div>
   </div>
 </section>
@@ -2109,6 +2108,13 @@ def render_product_page(p, related):
 
 # V3.3.04 · Floating Back-To-Top Polish
 SITE_ASSET_VERSION = '3.3.28'
+
+# Homepage Google reviews block (static, no Places API). Update the rating by
+# hand if the Google Business score changes. The lrd fragment ",3" opens
+# Google's write-review dialog for this listing.
+GOOGLE_RATING_V3328 = '5,0'
+GOOGLE_REVIEWS_URL_V3328 = 'https://maps.google.com/?cid=7240535998596070578'
+GOOGLE_WRITE_REVIEW_URL_V3328 = 'https://www.google.com/search?q=BG+Studio+3D+Ku%C5%9Fadas%C4%B1#lrd=0x8ea54b705e76b9c9:0x647b8d20f3bf3cb2,3'
 RELEASE_CHANNEL = 'stable'
 RELEASE_CANDIDATE = 'V3.3.25-STABLE'
 

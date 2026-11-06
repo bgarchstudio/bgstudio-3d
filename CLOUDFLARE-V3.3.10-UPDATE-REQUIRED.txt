@@ -1,7 +1,7 @@
 HISTORICAL FILENAME - CURRENT STATUS
 
 Site release: V3.3.28
-Expected BG Assistant Worker baseline: V3.3.28 (google-reviews endpoint) or newer.
+Expected BG Assistant Worker baseline: V3.3.26 (Origin check + rate limit) or newer.
 
-V3.3.28 adds /api/google-reviews; worker version 0745c183 must be deployed.
-Cloudflare Worker redeploy IS required for V3.3.28.
+V3.3.26 updated the worker; it is already deployed (version 183c4f51).
+Cloudflare Worker redeploy is NOT required.
