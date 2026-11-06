@@ -998,7 +998,7 @@ def render_home_showcase_product(product, index=0):
         f'<a class="home-showcase-media" href="{href}">{picture}</a>'
         f'<div class="home-showcase-body"><div class="home-showcase-top"><span>{label}</span>{price_html}</div>'
         f'<h3><a href="{href}">{name}</a></h3>'
-        f'<a class="home-showcase-link" href="{href}">Ürünü incele ↗</a></div></article>'
+        f'<a class="home-showcase-link" href="{href}" aria-label="{name} ürününü incele">Ürünü incele ↗</a></div></article>'
     )
 
 
@@ -1225,8 +1225,12 @@ def render_home_spatial_control(product, index=0):
     copy = _home_spatial_product_copy(product, index)
     active_class = ' is-active' if index == 0 else ''
     thumb_src = str((product or {}).get('main_image') or '').strip()
+    # V3.3.31: the dock thumb renders ~58x44px; ship a 160px derivative instead
+    # of the full product image (PageSpeed flagged ~200 KB per thumb).
     if thumb_src:
-        thumb = f'<span class="home-spatial-control-thumb"><img src="{esc(thumb_src)}" alt="" loading="lazy" decoding="async"/></span>'
+        thumb_src = _ensure_responsive_variant(thumb_src, 160) or _ensure_responsive_variant(thumb_src, 480) or thumb_src
+    if thumb_src:
+        thumb = f'<span class="home-spatial-control-thumb"><img src="{esc(thumb_src)}" alt="" width="160" height="160" loading="lazy" decoding="async"/></span>'
     else:
         thumb = '<span class="home-spatial-control-thumb home-spatial-control-thumb-fallback">BG</span>'
     return (
@@ -2118,7 +2122,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.30'
+SITE_ASSET_VERSION = '3.3.31'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
@@ -2573,6 +2577,8 @@ def sync_site_asset_versions():
         updated = re.sub(r'((?:\.\./)*assets/css/(?:styles|styles\.min)\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
         updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        # V3.3.31: consent.js was loaded without a version, so fixes reached visitors only after cache expiry.
+        updated = re.sub(r'((?:\.\./)*assets/js/consent\.js)(?:\?v=[^"\']*)?(?=["\'])', rf'\g<1>?v={SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/homepage\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/catalog\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/nfc-hub\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)

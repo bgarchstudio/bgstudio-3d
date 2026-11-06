@@ -4926,3 +4926,37 @@ body.bg-assistant-keyboard .bg-assistant-panel{
   .project-index-tags{display:none}
   .project-index-body h2{font-size:1.6rem!important}
 }
+
+
+/* ==========================================================
+   V3.3.31 · PAGESPEED FIXES
+   ========================================================== */
+/* Process steps: inactive steps were dimmed with opacity:.46, which pushed their
+   text below WCAG AA. Keep full opacity; mark the inactive state with a softer
+   heading colour (3.9:1, large text) while the active step keeps its dark badge. */
+.home-process-step-v3200{opacity:1}
+.home-process-step-v3200:not(.is-active) h3{color:#7d746b}
+
+/* WhatsApp idle pulse: box-shadow keyframes cannot be composited. Draw the ring
+   on the (now unused) ::after layer and animate only transform/opacity. */
+.floating-whatsapp{animation:none!important}
+.floating-whatsapp::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:50%!important;
+  background:rgba(37,211,102,.42)!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  animation:bgWaPulse 2.45s cubic-bezier(.2,.7,.25,1) infinite!important;
+}
+.floating-whatsapp.wa-seen:not(:hover)::after,
+.floating-whatsapp.is-open::after{animation:none!important;opacity:0!important}
+@keyframes bgWaPulse{
+  0%{transform:scale(1);opacity:.55}
+  70%,100%{transform:scale(1.65);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .floating-whatsapp::after{animation:none!important;opacity:0!important}
+}

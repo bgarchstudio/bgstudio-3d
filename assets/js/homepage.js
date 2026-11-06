@@ -4,7 +4,11 @@
   if (!home) return;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const motionItems = [...home.querySelectorAll('[data-home-motion]')];
+  // V3.3.31: the hero holds the LCP image. Revealing it with the scroll fade hid an
+  // already-loaded image until the observer fired (~2s render delay on mobile), so
+  // hero items are shown immediately and only below-the-fold sections animate.
+  home.querySelectorAll('[data-spatial-hero] [data-home-motion]').forEach((item) => item.classList.add('is-in-view'));
+  const motionItems = [...home.querySelectorAll('[data-home-motion]')].filter((item) => !item.closest('[data-spatial-hero]'));
 
   if (!reduceMotion && motionItems.length) {
     document.documentElement.classList.add('home-motion-ready');

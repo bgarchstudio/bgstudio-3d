@@ -122,8 +122,12 @@
     const syncHeaderState = () => {
       header.classList.toggle('is-scrolled', window.scrollY > 12);
     };
-    syncHeaderState();
-    syncDesktopSubmenuOffsets();
+    // Measure on the next frame: reading scrollY/rects synchronously at startup
+    // forced a layout while styles were still dirty (PageSpeed "forced reflow").
+    requestAnimationFrame(() => {
+      syncHeaderState();
+      syncDesktopSubmenuOffsets();
+    });
     window.addEventListener('scroll', syncHeaderState, { passive: true });
     window.addEventListener('resize', syncDesktopSubmenuOffsets, { passive: true });
     window.addEventListener('load', syncDesktopSubmenuOffsets, { once: true });

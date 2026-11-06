@@ -88,7 +88,8 @@
 
   const mount = () => {
     if (document.querySelector('[data-consent-banner]')) return;
-    banner = document.createElement('aside');
+    // <aside> may not carry role="dialog"; a plain container can.
+    banner = document.createElement('div');
     banner.className = 'consent-banner';
     banner.dataset.consentBanner = '';
     banner.setAttribute('role', 'dialog');
