@@ -4960,3 +4960,12 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 @media(prefers-reduced-motion:reduce){
   .floating-whatsapp::after{animation:none!important;opacity:0!important}
 }
+
+/* content-visibility: the process section is a scroll-driven sticky timeline;
+   skipping its rendering left it at the 760px placeholder while its steps laid out
+   over the next section (axe then measured contrast against that section's image).
+   Other sections keep the optimisation but remember their real size ("auto") so
+   scrolling back up no longer collapses them to the placeholder and jumps. */
+.home-process-v3200{content-visibility:visible;contain-intrinsic-size:none}
+.home-products-v3163,.home-production-v3163,.home-business-v3163,.home-projects-v3163,.home-why-v3163,.home-final-v3163,.footer{contain-intrinsic-size:auto 900px}
+.context-clients-v3200{contain-intrinsic-size:auto 760px}
