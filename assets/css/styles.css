@@ -4794,3 +4794,37 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 .local-landing .info-panel-dark .metric strong{color:#2f2117}
 .local-landing .info-panel-dark .metric span{color:#746356}
 .local-landing .info-panel-dark .eyebrow{color:#d8a46c}
+
+
+/* ==========================================================
+   V3.3.26 · WCAG AA CONTRAST + MOBILE LAUNCHER STACK
+   Darkens small labels that measured below 4.5:1 in axe-core,
+   and fixes dark-on-dark text inside the featured NFC package.
+   ========================================================== */
+.home-process-step-v3200 small{color:#7a5428}
+.home-process-step-v3200 p{color:#5f5850}
+.home-client-copy-v3199r1 em{color:#6b665f}
+.form-privacy-note,.order-local-note{color:#6c5a4a!important}
+.nfc-browser-body aside{color:#a2968b}
+.nfc-capacity-range-labels{color:#6e5643}
+.nfc-all-prices summary span{color:#6e5643}
+.nfc-breadcrumb{color:#6e5643}
+.nfc-config-total span{color:#5e4936}
+.v3169-process article>span,.v3169-about-grid article>span,.v3169-contact-grid article>span{color:#8a5a2e}
+.project-breadcrumb{color:#6c5848}
+.project-facts span,.project-related-card>span{color:#7f5d3c}
+.quote-type-card>span{color:#8a5527}
+.nfc-software-copy article>span{color:#8a5a2e}
+.quote-type-card.is-active>span{color:#d39a62}
+
+/* Featured package card has a dark surface; its labels inherited light-theme browns. */
+.nfc-v3167-package-card.featured .package-badge{color:#f3e6d9;background:rgba(255,255,255,.12)}
+.nfc-v3167-package-card.featured .package-price small{color:#d9a66f}
+.nfc-v3167-package-card.featured .package-price span,
+.nfc-v3167-package-card.featured .nfc-config-head small{color:#c9b8a6}
+
+/* Phones: three stacked launchers covered body text and the hero slider arrows.
+   Back-to-top is the least needed of the three on touch devices. */
+@media(max-width:760px){
+  .floating-actions .back-to-top{display:none!important}
+}

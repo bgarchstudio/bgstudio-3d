@@ -14,8 +14,32 @@ const allowedOrigin = (request, env) => {
   const origin = request.headers.get('Origin') || '';
   const allowed = String(env.ALLOWED_ORIGINS || 'https://3d.bgstudio.com.tr')
     .split(',').map(v => v.trim()).filter(Boolean);
-  if (!origin) return allowed[0] || 'https://3d.bgstudio.com.tr';
+  // Browsers always send Origin on cross-origin POST; a missing header means a
+  // script outside the site, so it is rejected instead of defaulting to allowed.
+  if (!origin) return '';
   return allowed.includes(origin) ? origin : '';
+};
+
+// Per-IP limiter. Prefers the Cloudflare Rate Limiting binding (RATE_LIMITER in
+// wrangler.toml); falls back to a per-isolate window so abuse is slowed even
+// before the binding is configured.
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX_PER_WINDOW = 8;
+const isolateHits = new Map();
+const isRateLimited = async (request, env) => {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (env.RATE_LIMITER && typeof env.RATE_LIMITER.limit === 'function') {
+    try {
+      const { success } = await env.RATE_LIMITER.limit({ key: ip });
+      return !success;
+    } catch (_) { /* fall through to isolate limiter */ }
+  }
+  const now = Date.now();
+  const recent = (isolateHits.get(ip) || []).filter(t => now - t < RATE_WINDOW_MS);
+  recent.push(now);
+  isolateHits.set(ip, recent);
+  if (isolateHits.size > 5000) isolateHits.clear();
+  return recent.length > RATE_MAX_PER_WINDOW;
 };
 
 const cleanHistory = history => Array.isArray(history)
@@ -418,6 +442,7 @@ export default {
     if (url.pathname !== '/api/bg-assistant') return json({ error: 'Not found.' }, 404, corsOrigin);
     if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, corsOrigin);
     if (!env.OPENAI_API_KEY) return json({ error: 'OpenAI secret is not configured.' }, 503, corsOrigin);
+    if (await isRateLimited(request, env)) return json({ error: 'Çok fazla istek gönderildi. Lütfen bir dakika sonra tekrar deneyin.' }, 429, corsOrigin);
 
     const length = Number(request.headers.get('content-length') || 0);
     if (length > 65536) return json({ error: 'Request too large.' }, 413, corsOrigin);

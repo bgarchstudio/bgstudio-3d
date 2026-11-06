@@ -1,0 +1,56 @@
+# Publishes only the public website to GitHub Pages.
+# Internal tooling (tools/, launcher/, cloudflare/, build scripts, release
+# notes, data backups) stays in the repo but is never served.
+#
+# One-time setup: GitHub repo -> Settings -> Pages -> Source: "GitHub Actions".
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect public files
+        run: |
+          set -euo pipefail
+          mkdir -p _site/data
+          # Root files served by the site.
+          for f in index.html 404.html CNAME robots.txt sitemap.xml site.webmanifest \
+                   favicon.ico bgstudio3d.ico apple-touch-icon.png .nojekyll; do
+            if [ -e "$f" ]; then cp "$f" _site/; fi
+          done
+          cp -r assets _site/
+          # main.js reads this at runtime; the other data files are build input.
+          cp data/site_settings.json _site/data/
+          # Every top-level page folder (has an index.html), except internal ones.
+          for d in */; do
+            d="${d%/}"
+            case "$d" in tools|launcher|cloudflare|data|assets|_site) continue ;; esac
+            if [ -f "$d/index.html" ]; then cp -r "$d" _site/; fi
+          done
+          echo "Published files: $(find _site -type f | wc -l)"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

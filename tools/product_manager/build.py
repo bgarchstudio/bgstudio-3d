@@ -1100,7 +1100,7 @@ def render_contextual_business_marquee(items, eyebrow, title, description, prefi
     is_static = len(selected) <= 1
     loop = (
         f'<div class="home-client-marquee-group-v3199r1">{cards}</div>'
-        + ('' if is_static else f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true">{cards}</div>')
+        + ('' if is_static else f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true" inert>{cards}</div>')
     )
     safe_context = re.sub(r'[^a-z0-9-]+', '-', str(context or 'general').casefold()).strip('-') or 'general'
     static_class = ' is-static-v3201r1' if is_static else ''
@@ -1274,7 +1274,7 @@ def render_homepage_v3163(active, featured, field_items):
     client_cards = ''.join(render_home_business_marquee_card(item, index + 1, '') for index, item in enumerate(client_items))
     client_loop = (
         f'<div class="home-client-marquee-group-v3199r1">{client_cards}</div>'
-        f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true">{client_cards}</div>'
+        f'<div class="home-client-marquee-group-v3199r1" aria-hidden="true" inert>{client_cards}</div>'
     ) if client_cards else ''
 
     return f'''<main class="home-v3163" id="main-content">
@@ -2485,7 +2485,7 @@ def sync_bg_assistant_widget():
         flags=re.I | re.S
     )
     floating_pattern = re.compile(
-        r'(<div\b[^>]*class="[^"]*\bfloating-actions\b[^"]*"[^>]*>)',
+        r'(<(?:div|aside)\b[^>]*class="[^"]*\bfloating-actions\b[^"]*"[^>]*>)',
         flags=re.I
     )
     for html_path in ROOT.rglob('*.html'):
@@ -3135,11 +3135,11 @@ def _nfc_v3167_media(key, alt, prefix='../../'):
 def _nfc_v3167_browser_frame(title='İşletme paneli'):
     modules = ['NFC taramaları','Menü etkileşimleri','Feedback','Google yönlendirme','Sosyal medya','Çoklu dil','Alerjen','Kalori','Bildirimler']
     module_html = ''.join(f'<span>{esc(x)}</span>' for x in modules)
-    return f'''<div class="nfc-browser-frame" aria-label="BG Studio NFC yazılım arayüzü sunumu"><div class="nfc-browser-top"><span></span><span></span><span></span><b>{esc(title)}</b></div><div class="nfc-browser-body"><aside><strong>BG NFC</strong><i>Panel</i><i>Analitik</i><i>Menü</i><i>Feedback</i><i>Ayarlar</i></aside><div class="nfc-browser-content"><div class="nfc-browser-title"><div><small>YÖNETİM ALTYAPISI</small><strong>Fiziksel standın arkasındaki dijital sistem</strong></div><span>Canlı sistem yapısı</span></div><div class="nfc-browser-module-grid">{module_html}</div><div class="nfc-browser-panels"><div><small>ETKİLEŞİM AKIŞI</small><strong>NFC / QR → dijital hedef → panel</strong></div><div><small>YÖNETİM</small><strong>Uzaktan hedef ve içerik yönetimi</strong></div></div></div></div></div>'''
+    return f'''<div class="nfc-browser-frame" aria-label="BG Studio NFC yazılım arayüzü sunumu"><div class="nfc-browser-top"><span></span><span></span><span></span><b>{esc(title)}</b></div><div class="nfc-browser-body"><aside role="none"><strong>BG NFC</strong><i>Panel</i><i>Analitik</i><i>Menü</i><i>Feedback</i><i>Ayarlar</i></aside><div class="nfc-browser-content"><div class="nfc-browser-title"><div><small>YÖNETİM ALTYAPISI</small><strong>Fiziksel standın arkasındaki dijital sistem</strong></div><span>Canlı sistem yapısı</span></div><div class="nfc-browser-module-grid">{module_html}</div><div class="nfc-browser-panels"><div><small>ETKİLEŞİM AKIŞI</small><strong>NFC / QR → dijital hedef → panel</strong></div><div><small>YÖNETİM</small><strong>Uzaktan hedef ve içerik yönetimi</strong></div></div></div></div></div>'''
 
 
 def _nfc_v3167_flow():
-    return '''<div class="nfc-digital-flow" aria-label="BG Studio NFC sistem akışı"><span><b>01</b>Stand</span><i>→</i><span><b>02</b>Telefon</span><i>→</i><span><b>03</b>Dijital deneyim</span><i>→</i><span><b>04</b>İşletme paneli</span></div>'''
+    return '''<div class="nfc-digital-flow" role="region" tabindex="0" aria-label="BG Studio NFC sistem akışı"><span><b>01</b>Stand</span><i>→</i><span><b>02</b>Telefon</span><i>→</i><span><b>03</b>Dijital deneyim</span><i>→</i><span><b>04</b>İşletme paneli</span></div>'''
 
 
 def _nfc_v3167_option_calculator(code, label, tables, qr_count, base_price, qr_unit, menu_price, logo_price, offer_prefix='../../'):
@@ -3609,7 +3609,7 @@ def render_project_index(project_items):
     }
     collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project-collection">{collection_json}</script><section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Panel ve veri tabanlı saha kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/" data-project-index-quote>Teklif Al ↗</a></div></section>'''
-    return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
+    return _project_page_shell('Projeler – Kuşadası 3D Baskı ve NFC İşleri | BG Studio 3D','BG Studio 3D proje arşivi: Kuşadası ve çevresinde sahadan işler, kurumsal üretimler, NFC + QR kurulumları ve prototip parça çalışmaları.','/projeler/',body,'../')
 
 
 def render_project_detail(item, project_items):
@@ -3941,13 +3941,13 @@ def render_prototype_page_v3169(items):
 def render_about_page_v3169():
     page_copy = read_site_content_v3175()['about']
     body=f'''<section class="v3169-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p><div class="hero-actions"><a class="primary-cta" href="{esc(page_copy["primary_url"])}">{esc(page_copy["primary_label"])}</a><a class="secondary-cta" href="{esc(page_copy["secondary_url"])}">{esc(page_copy["secondary_label"])}</a></div></div><div class="v3169-brand-panel"><span>TASARIM</span><span>3D ÜRETİM</span><span>PROTOTİP</span><span>İŞLETME SİSTEMLERİ</span></div></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">YAKLAŞIM</p><h2>Önce kullanım. Sonra biçim.</h2></div><p>Ürünün nasıl görüneceği kadar nerede, kim tarafından ve hangi üretim koşullarında kullanılacağı da tasarım kararının parçasıdır.</p></div><div class="v3169-about-grid"><article><span>01</span><h3>BG Studio nedir?</h3><p>Fiziksel ürün ve işletme çözümlerini tasarım, 3D üretim ve dijital sistemlerle bir araya getiren bağımsız üretim markası.</p></article><article><span>02</span><h3>Tasarım yaklaşımı</h3><p>Gereksiz form yerine işlev, temiz detay, üretilebilirlik ve marka bütünlüğüne odaklanırız.</p></article><article><span>03</span><h3>Üretim süreci</h3><p>Model, baskı hazırlığı, üretim, kontrol, paketleme ve teslim adımlarını tek akışta yürütürüz.</p></article><article><span>04</span><h3>Atölye mantığı</h3><p>Tek seferlik özel işten tekrar üretilecek kurumsal parçaya kadar ölçeklenebilen çalışma biçimi.</p></article></div></section><section class="section-pad shell"><div class="split-title"><div><p class="eyebrow">ÜRETİM HATTI</p><h2>Modelden teslimata.</h2></div></div><div class="v3169-process"><article><span>01</span><h3>Model</h3><p>Ürün veya parçanın dijital modeli hazırlanır ya da mevcut dosya kontrol edilir.</p></article><article><span>02</span><h3>Baskı hazırlığı</h3><p>Yön, destek, malzeme, renk ve üretim parametreleri belirlenir.</p></article><article><span>03</span><h3>Üretim</h3><p>3D yazıcıda üretim alınır ve parça kontrol edilir.</p></article><article><span>04</span><h3>Paketleme & teslim</h3><p>Kuşadası elden teslim veya Türkiye geneli kargo akışına geçilir.</p></article></div></section><section class="v3169-architecture"><div class="shell"><div><p class="eyebrow">DİĞER İŞ KOLU</p><h2>BG Studio Architecture</h2><p>Mimarlık, 3D görselleştirme ve proje çalışmalarımız ayrı marka kolunda devam eder.</p></div><a class="secondary-cta" href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture sitesine geç ↗</a></div></section>'''
-    return _editorial_page_shell('Hakkımızda | BG Studio 3D','BG Studio 3D; Kuşadası merkezli 3D baskı, özel üretim, prototip, kurumsal ürün ve NFC + QR işletme sistemleri stüdyosu.','/hakkimizda/',body,'about')
+    return _editorial_page_shell('Hakkımızda – Kuşadası 3D Baskı Stüdyosu | BG Studio 3D','BG Studio 3D; Kuşadası merkezli 3D baskı, özel üretim, prototip, kurumsal ürün ve NFC + QR işletme sistemleri stüdyosu.','/hakkimizda/',body,'about')
 
 
 def render_contact_page_v3169():
     page_copy = read_site_content_v3175()['contact']
     body=f'''<section class="v3169-hero v3169-contact-hero"><div class="shell v3169-hero-grid"><div><p class="eyebrow">{esc(page_copy["hero_eyebrow"])}</p><h1>{esc(page_copy["hero_title"])}</h1><p class="lead">{esc(page_copy["hero_lead"])}</p></div><div class="v3169-contact-primary"><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D%2C%20web%20sitenizden%20yaz%C4%B1yorum." rel="noopener" target="_blank"><small>EN HIZLI İLETİŞİM</small><strong>WhatsApp</strong><span>Mesaj gönder ↗</span></a><a href="https://instagram.com/bgstudio.3dtr" rel="noopener" target="_blank"><small>SOSYAL MEDYA</small><strong>@bgstudio.3dtr</strong><span>Instagram'a git ↗</span></a></div></div></section><section class="section-pad shell"><div class="v3169-contact-grid"><article><span>01</span><h2>Kuşadası</h2><p>BG Studio 3D üretim ve elden teslim süreci Kuşadası merkezlidir.</p></article><article><span>02</span><h2>Elden teslim</h2><p>Uygun siparişlerde Kuşadası elden teslim seçeneği bulunur.</p></article><article><span>03</span><h2>Türkiye geneli kargo</h2><p>Gönderime uygun ürün ve üretimler Türkiye geneline kargolanır.</p></article><article><span>04</span><h2>Teklif</h2><p>Özel üretim ve işletme projelerinde kapsamı form üzerinden düzenli şekilde iletebilirsin.</p><a class="text-cta" href="../teklif/">Teklif formuna geç ↗</a></article></div></section><section class="v3169-dark-cta"><div class="shell"><div><p class="eyebrow">İLK MESAJDA</p><h2>İşi hızlı netleştirelim.</h2><p>Ürün / parça türü, adet, yaklaşık ölçü, renk ve varsa görsel veya dosya bilgisini paylaşman teklif sürecini hızlandırır.</p></div><a class="primary-cta" href="../teklif/">Teklif talebi gönder ↗</a></div></section>'''
-    return _editorial_page_shell('İletişim | BG Studio 3D','BG Studio 3D iletişim. Kuşadası elden teslim, Türkiye geneli kargo, WhatsApp ve Instagram üzerinden 3D baskı ve özel üretim talepleri.','/iletisim/',body,'contact')
+    return _editorial_page_shell('İletişim – Kuşadası 3D Baskı ve Özel Üretim | BG Studio 3D','BG Studio 3D iletişim. Kuşadası elden teslim, Türkiye geneli kargo, WhatsApp ve Instagram üzerinden 3D baskı ve özel üretim talepleri.','/iletisim/',body,'contact')
 
 # ==============================================================
 # V3.1.70 + V3.1.72 COMBINED FINAL EXPERIENCE
@@ -3982,7 +3982,7 @@ def render_global_footer(prefix=''):
     <nav aria-label="Üretim"><strong>ÜRETİM</strong><a href="{prefix}ozel-uretim/">Özel Üretim</a><a href="{prefix}prototip-parca/">Prototip &amp; Parça</a><a href="{prefix}kurumsal/">Kurumsal Üretim</a><a href="{prefix}kusadasi-3d-baski/">Kuşadası 3D Baskı</a></nav>
     <nav aria-label="İşletmeler"><strong>İŞLETMELER</strong><a href="{prefix}nfc-qr/">NFC + QR Sistemleri</a><a href="{prefix}nfc-qr/restoran/">Restoran Sistemleri</a><a href="{prefix}nfc-qr/hizli-baglanti/">Hızlı Bağlantı</a><a href="{prefix}nfc-qr/feedback/">Feedback</a></nav>
     <nav aria-label="BG Studio"><strong>BG STUDIO</strong><a href="{prefix}projeler/">Projeler</a><a href="{prefix}hakkimizda/">Hakkımızda</a><a href="https://bgstudio.com.tr" rel="noopener" target="_blank">Architecture ↗</a><a href="{prefix}iletisim/">İletişim</a></nav>
-    <nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a></nav>
+    <nav aria-label="Destek"><strong>DESTEK</strong><a href="{prefix}siparis-bilgilendirme/">Sipariş Bilgilendirme</a><a href="{prefix}teslimat-iade/">Teslimat / İade</a><a href="{prefix}kisiye-ozel-urun-kosullari/">Kişiye Özel Ürün Koşulları</a><a href="{prefix}gizlilik/">Gizlilik</a><a href="{prefix}kvkk/">KVKK</a></nav>
   </div>
   <div class="footer-v3202-socialrow">
     <div class="footer-v3202-socials" aria-label="Sosyal medya bağlantıları"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram <span>↗</span></a><a href="https://www.facebook.com/bgstudio.3dtr" rel="me noopener" target="_blank">Facebook <span>↗</span></a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp <span>↗</span></a></div>
@@ -4056,14 +4056,14 @@ def render_quote_center_v3170():
     body = f'''<section class="quote-hero"><div class="shell quote-hero-grid"><div><p class="eyebrow">TEKLİF MERKEZİ</p><h1>İhtiyacını seç.<br>Doğru detayları gönder.</h1><p class="lead">Form, seçtiğin çalışma tipine göre yalnız gereken alanları gösterir. Gönderim sonunda düzenli bir WhatsApp özeti hazırlanır.</p></div><div class="quote-hero-note"><strong>Hızlı başlangıç</strong><span>01 · Çalışma tipini seç</span><span>02 · Detayları doldur</span><span>03 · Özeti WhatsApp'tan gönder</span></div></div></section><section class="section-pad shell quote-center" aria-labelledby="quote-type-title"><div class="quote-section-head"><p class="eyebrow">01 · ÇALIŞMA TİPİ</p><h2 id="quote-type-title">Ne için teklif istiyorsunuz?</h2></div><form class="quote-form quote-form-v3170" data-quote-form novalidate><select class="sr-only" name="talep_turu" aria-label="Talep türü" required><option value="kisiye-ozel">Özel Üretim</option><option value="kurumsal">Kurumsal</option><option value="prototip">Prototip / Parça</option><option value="nfc">NFC &amp; QR</option><option value="diger">Diğer</option></select><div class="quote-type-grid" role="group" aria-label="Teklif türü"><button class="quote-type-card" type="button" data-quote-type="kisiye-ozel" aria-pressed="false"><span>01</span><strong>Özel Üretim</strong><small>Fikir, görsel, ölçü veya mevcut üründen üretim.</small></button><button class="quote-type-card" type="button" data-quote-type="kurumsal" aria-pressed="false"><span>02</span><strong>Kurumsal</strong><small>Toplu üretim, markalama ve işletmeye özel ürün.</small></button><button class="quote-type-card" type="button" data-quote-type="prototip" aria-pressed="false"><span>03</span><strong>Prototip / Parça</strong><small>STL, 3MF, STEP, PDF veya ölçüyle teknik üretim.</small></button><button class="quote-type-card" type="button" data-quote-type="nfc" aria-pressed="false"><span>04</span><strong>NFC &amp; QR</strong><small>Restoran, hızlı stand ve feedback çözümleri.</small></button><button class="quote-type-card" type="button" data-quote-type="diger" aria-pressed="false"><span>05</span><strong>Diğer</strong><small>Kapsamı farklı olan talepler.</small></button></div><div class="quote-dynamic" data-quote-dynamic><div class="quote-section-head compact"><p class="eyebrow">02 · DETAYLAR</p><h2>Teklif için gereken bilgiler.</h2></div><div class="quote-form-grid"><div class="field"><label for="quote-name">Ad / Soyad</label><input id="quote-name" name="ad" autocomplete="name" required maxlength="100" placeholder="Adınız"></div><div class="field"><label for="quote-business">İşletme / Marka</label><input id="quote-business" name="isletme" autocomplete="organization" maxlength="120" placeholder="Varsa işletme veya marka adı"></div><div class="field"><label for="quote-city">Şehir</label><input id="quote-city" name="sehir" autocomplete="address-level2" maxlength="80" placeholder="Örn. Kuşadası"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip nfc"><label for="quote-qty">Adet</label><input id="quote-qty" name="adet" inputmode="numeric" min="1" type="number" placeholder="Örn. 50"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip"><label for="quote-size">Yaklaşık ölçü / ebat</label><input id="quote-size" name="olcu" maxlength="100" placeholder="Örn. 120 × 80 × 30 mm"></div><div class="field" data-quote-scope="kisiye-ozel kurumsal prototip nfc"><label for="quote-color">Renk / malzeme tercihi</label><input id="quote-color" name="renk" maxlength="120" placeholder="Örn. Siyah PETG / fark etmez"></div><div class="field field-wide" data-quote-scope="kisiye-ozel"><label for="quote-product-type">Ürün tipi</label><input id="quote-product-type" name="urun_tipi" maxlength="140" placeholder="Örn. masaüstü stand, dekor, aparat, kişiye özel ürün"></div><div class="field" data-quote-scope="kurumsal"><label for="quote-corporate-use">Kullanım / sektör</label><input id="quote-corporate-use" name="kurumsal_kullanim" maxlength="140" placeholder="Örn. promosyon, mağaza, restoran, teknik kullanım"></div><div class="field" data-quote-scope="kurumsal"><label for="quote-branding">Logo / markalama</label><input id="quote-branding" name="kurumsal_markalama" maxlength="140" placeholder="Logo, isim, renk veya ambalaj talebi"></div><div class="field" data-quote-scope="prototip"><label for="quote-prototype-job">Parçanın görevi</label><input id="quote-prototype-job" name="prototip_gorev" maxlength="180" placeholder="Nereye bağlanıyor, ne işe yarıyor?"></div><div class="field" data-quote-scope="prototip"><label for="quote-prototype-material">Tercih edilen malzeme</label><input id="quote-prototype-material" name="prototip_malzeme" maxlength="120" placeholder="PETG, PLA, TPU veya kararsızım"></div></div><section class="quote-nfc-config" data-nfc-quote-config hidden data-quote-scope="nfc"><div class="quote-nfc-head"><div><p class="eyebrow">NFC + QR SİSTEMİ</p><h3>Paket ve kapsam seçimi</h3></div><small>{year} web fiyat yapısı</small></div><div class="quote-form-grid"><div class="field field-wide"><label for="quote-nfc-package">Sistem / paket</label><select id="quote-nfc-package" name="nfc_paket" required>{package_options}</select></div><div class="field" data-feedback-capacity-wrap hidden><label for="quote-feedback-capacity">Feedback Duo kapasitesi</label><select id="quote-feedback-capacity" name="feedback_duo_capacity">{duo_options}</select></div></div><div class="quote-package-summary" data-nfc-package-summary hidden><div><small>SEÇİLİ ÇÖZÜM</small><strong data-nfc-package-title>Çözüm seç</strong><span data-nfc-package-capacity></span></div><div><small data-nfc-price-year>{year} BAŞLANGIÇ</small><strong data-nfc-package-price>Özel teklif</strong><span data-nfc-package-renewal></span></div></div><div class="quote-options"><label><input type="checkbox" name="nfc_qr" data-nfc-option><span><strong>QR sistemi</strong><small data-nfc-qr-copy>{qr} / QR</small></span></label><label><input type="checkbox" name="nfc_menu_design" data-nfc-option><span><strong>Menü Tasarımı</strong><small data-nfc-menu-price-copy>+{menu}</small></span></label><label><input type="checkbox" name="nfc_logo_design" data-nfc-option><span><strong>Logo Tasarımı</strong><small data-nfc-logo-price-copy>+{logo}</small></span></label></div><div class="quote-total" data-nfc-quote-total hidden><span>Seçili toplam</span><strong data-nfc-total-value></strong></div></section><section class="quote-files" data-quote-scope="kisiye-ozel kurumsal"><div><p class="eyebrow">DOSYA / GÖRSEL</p><h3>Referans ekle</h3><p>PNG, JPG, WEBP veya PDF. Her dosya en fazla 15 MB.</p></div><label class="quote-file-drop"><input type="file" data-quote-files accept=".png,.jpg,.jpeg,.webp,.pdf" multiple><span>Görsel veya PDF seç</span><small>Dosya adları teklife eklenir.</small></label></section><section class="quote-files" data-quote-scope="prototip"><div><p class="eyebrow">TEKNİK DOSYA</p><h3>Dosyan varsa ekle</h3><p>STL, 3MF, STEP, STP, PDF veya görsel. Her dosya en fazla 15 MB.</p></div><label class="quote-file-drop"><input type="file" data-quote-files accept=".stl,.3mf,.step,.stp,.pdf,.png,.jpg,.jpeg,.webp" multiple><span>Teknik dosya seç</span><small>Dosyalar web sunucusuna yüklenmez.</small></label></section><input type="hidden" name="dosya_ozeti"><ul class="quote-file-list" data-quote-file-list hidden></ul><p class="quote-security-note">🔒 Dosyalar bu sayfadan sunucuya gönderilmez. WhatsApp açıldığında seçtiğin dosyaları sohbete ayrıca ekle.</p><div class="field field-wide quote-detail-field"><label for="quote-detail">Talebini anlat</label><textarea id="quote-detail" name="detay" rows="6" required maxlength="1800" placeholder="Kullanım amacı, ölçü, adet ve önemli detayları yazın…"></textarea></div><div class="quote-status" role="status" aria-live="polite" data-quote-status></div><button class="primary-cta quote-submit" type="submit" data-quote-submit>Teklif özetini WhatsApp'ta aç ↗</button></div></form></section><section class="quote-trust"><div class="shell"><article><strong>Kuşadası</strong><span>Elden teslim</span></article><article><strong>Türkiye geneli</strong><span>Kargo</span></article><article><strong>Özel üretim</strong><span>İhtiyaca göre teklif</span></article><article><strong>NFC + QR</strong><span>Paket seçimine bağlı canlı hesap</span></article></div></section>'''
     org = {'@context':'https://schema.org','@type':'Service','name':'BG Studio 3D Teklif Merkezi','provider':{'@id':BASE_URL + '/#organization'},'areaServed':'Türkiye','url':canonical}
     schema = json.dumps(org,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
-    return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teklif Al | BG Studio 3D</title><meta name="description" content="{esc(desc)}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="Teklif Al | BG Studio 3D"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="index,follow"><meta name="theme-color" content="#ffffff"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"><script type="application/ld+json">{schema}</script></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="quote-page-v3170">{body}</main><script type="application/json" id="quote-pricing-data">{quote_pricing_json}</script>{render_global_footer('../')}<script defer src="../assets/js/consent.js"></script><script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/quote-center.js?v={SITE_ASSET_VERSION}"></script><div aria-label="Hızlı işlemler" class="floating-actions"><a aria-label="WhatsApp üzerinden iletişime geç" class="floating-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><button aria-label="Sayfanın başına dön" class="back-to-top" type="button">↑</button></div></body></html>'''
+    return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teklif Al – 3D Baskı, Kurumsal ve NFC | BG Studio 3D</title><meta name="description" content="{esc(desc)}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="Teklif Al – 3D Baskı, Kurumsal ve NFC | BG Studio 3D"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="index,follow"><meta name="theme-color" content="#ffffff"><link rel="icon" href="../favicon.ico" sizes="any"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"><script type="application/ld+json">{schema}</script></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="quote-page-v3170">{body}</main><script type="application/json" id="quote-pricing-data">{quote_pricing_json}</script>{render_global_footer('../')}<script defer src="../assets/js/consent.js"></script><script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/quote-center.js?v={SITE_ASSET_VERSION}"></script><div aria-label="Hızlı işlemler" class="floating-actions"><a aria-label="WhatsApp üzerinden iletişime geç" class="floating-whatsapp" href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp</a><button aria-label="Sayfanın başına dön" class="back-to-top" type="button">↑</button></div></body></html>'''
 
 
 def render_legal_page_v3171(slug, title, intro, sections, indexable=True):
     canonical = f'{BASE_URL}/{slug}/'
     blocks = ''.join(f'<article><h2>{esc(head)}</h2><p>{esc(text)}</p></article>' for head,text in sections)
     robots = 'index,follow' if indexable else 'noindex,follow'
-    body = f'''<section class="legal-hero"><div class="shell"><p class="eyebrow">BİLGİLENDİRME</p><h1>{esc(title)}</h1><p class="lead">{esc(intro)}</p></div></section><section class="section-pad shell legal-layout"><div class="legal-content">{blocks}</div><aside class="legal-aside"><strong>BG Studio 3D</strong><p>Kuşadası merkezli 3D baskı ve özel üretim.</p><a class="text-cta" href="../iletisim/">İletişime geç ↗</a></aside></section>'''
+    body = f'''<section class="legal-hero"><div class="shell"><p class="eyebrow">BİLGİLENDİRME</p><h1>{esc(title)}</h1><p class="lead">{esc(intro)}</p></div></section><section class="section-pad shell legal-layout"><div class="legal-content">{blocks}</div><aside class="legal-aside" role="none"><strong>BG Studio 3D</strong><p>Kuşadası merkezli 3D baskı ve özel üretim.</p><a class="text-cta" href="../iletisim/">İletişime geç ↗</a></aside></section>'''
     return f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} | BG Studio 3D</title><meta name="description" content="{esc(clip_seo_text(intro,160))}"><link rel="canonical" href="{canonical}"><meta property="og:type" content="website"><meta property="og:locale" content="tr_TR"><meta property="og:site_name" content="BG Studio 3D"><meta property="og:title" content="{esc(title)} | BG Studio 3D"><meta property="og:description" content="{esc(clip_seo_text(intro,160))}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><meta name="robots" content="{robots}"><link rel="stylesheet" href="../assets/css/styles.css?v={SITE_ASSET_VERSION}"></head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>{render_site_header('../','')}<main id="main-content" class="legal-page-v3171">{body}</main>{render_global_footer('../')}<script defer src="../assets/js/consent.js"></script><script defer src="../assets/js/navigation.js?v={SITE_ASSET_VERSION}"></script><script defer src="../assets/js/main.js?v={SITE_ASSET_VERSION}"></script></body></html>'''
 
 
@@ -5033,7 +5033,7 @@ def render_project_index(project_items):
     collection_schema={'@context':'https://schema.org','@type':'CollectionPage','@id':BASE_URL+'/projeler/#collection','name':'BG Studio 3D Projeler','description':'BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','url':BASE_URL+'/projeler/','isPartOf':{'@id':BASE_URL+'/#website'},'publisher':{'@id':BASE_URL+'/#organization'},'mainEntity':{'@type':'ItemList','itemListElement':[{'@type':'ListItem','position':pos,'name':str(row.get('project_title') or row.get('headline') or row.get('project_client') or row.get('name') or 'BG Studio 3D Projesi'),'url':BASE_URL+'/projeler/'+_project_slug(row)+'/'} for pos,row in enumerate(project_items,1)]}}
     collection_json=json.dumps(collection_schema,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
     body=f'''<script type="application/ld+json" data-schema="project-collection">{collection_json}</script><section class="project-index-hero"><div class="shell project-index-hero-grid"><div><p class="eyebrow">SAHADAN İŞLER</p><h1>Gerçek ihtiyaçlar.<br>Gerçek teslimler.</h1><p class="lead">Restoranlardan kurumsal üretime, NFC sistemlerinden teknik parçalara kadar tamamlanan BG Studio işlerini tek proje arşivinde incele.</p></div><div class="project-index-stat"><span>Aktif proje kaydı</span><strong>{len(project_items)}</strong><small>Ürün Yöneticisindeki proje kayıtlarından üretilir.</small></div></div></section><section class="section-pad shell"><div class="project-filterbar" aria-label="Proje filtreleri">{''.join(filters)}<div class="project-result-count"><strong data-project-count>{len(project_items)}</strong> proje gösteriliyor</div></div><div class="project-index-grid" data-project-grid>{''.join(cards)}</div><div class="project-empty" data-project-empty hidden>Bu filtrede yayınlanmış proje bulunmuyor.</div></section><section class="project-index-cta"><div class="shell"><div><p class="eyebrow">SIRADAKİ PROJE</p><h2>Senin işletmen veya parçan olabilir.</h2><p>Kurumsal üretim, özel parça, prototip veya NFC + QR sistemi için kapsamı gönder.</p></div><a class="primary-cta" href="../teklif/" data-project-index-quote>Teklif Al ↗</a></div></section>'''
-    return _project_page_shell('Projeler | BG Studio 3D','BG Studio 3D sahadan işler, kurumsal üretim, NFC + QR ve prototip proje arşivi.','/projeler/',body,'../')
+    return _project_page_shell('Projeler – Kuşadası 3D Baskı ve NFC İşleri | BG Studio 3D','BG Studio 3D proje arşivi: Kuşadası ve çevresinde sahadan işler, kurumsal üretimler, NFC + QR kurulumları ve prototip parça çalışmaları.','/projeler/',body,'../')
 
 
 def render_project_detail(item, project_items):
@@ -5196,6 +5196,90 @@ def sync_kusadasi_local_seo_v3317(project_items):
     if text != original:
         path.write_text(text, encoding='utf-8')
     return {'ok': True, 'changed': text != original, 'projects': len(selected), 'slugs': [_project_slug(x) for x in selected]}
+
+
+# ============================================================
+# V3.3.26 · SEO + ACCESSIBILITY AUDIT FIXES
+# Final idempotent pass over every public page. Covers markup that comes
+# from hand-maintained pages or several templates at once.
+# ============================================================
+DEFAULT_OG_IMAGE_V3326 = BASE_URL + '/assets/brand/og-bgstudio3d-share-v2.jpg'
+
+
+def _matching_div_end_v3326(text, start):
+    """Index just past the </div> that closes the <div> opened at `start`."""
+    depth = 0
+    for m in re.compile(r'<div\b|</div>', re.I).finditer(text, start):
+        depth += 1 if m.group(0).lower() == '<div' else -1
+        if depth == 0:
+            return m.end()
+    return -1
+
+
+def _page_og_image_v3326(html_path, text):
+    """Project pages share their own hero photo; everything else the brand card."""
+    if html_path.relative_to(ROOT).as_posix().startswith('projeler/') and html_path.parent.name != 'projeler':
+        main = text[text.find('<main'):] if '<main' in text else text
+        m = re.search(r'<img\b[^>]*\bsrc="([^"]+\.(?:jpe?g|png|webp))"', main, re.I)
+        if m:
+            candidate = (html_path.parent / html.unescape(m.group(1))).resolve()
+            if candidate.is_file() and ROOT.resolve() in candidate.parents:
+                return BASE_URL + '/' + candidate.relative_to(ROOT.resolve()).as_posix(), None
+    return DEFAULT_OG_IMAGE_V3326, (1200, 630)
+
+
+def sync_audit_fixes_v3326():
+    scanned = changed = 0
+    for html_path in ROOT.rglob('*.html'):
+        if 'tools' in html_path.relative_to(ROOT).parts:
+            continue
+        try:
+            text = html_path.read_text(encoding='utf-8')
+        except Exception:
+            continue
+        scanned += 1
+        updated = text
+
+        # Share preview: every page gets an og:image (WhatsApp/Instagram/Facebook cards).
+        if 'property="og:image"' not in updated and '</head>' in updated:
+            image, size = _page_og_image_v3326(html_path, updated)
+            tags = f'<meta property="og:image" content="{esc(image)}">'
+            if size:
+                tags += f'<meta property="og:image:width" content="{size[0]}"><meta property="og:image:height" content="{size[1]}">'
+            if 'name="twitter:image"' not in updated:
+                tags += f'<meta name="twitter:image" content="{esc(image)}">'
+            updated = updated.replace('</head>', tags + '</head>', 1)
+            updated = re.sub(r'(<meta name="twitter:card" content=")summary(")', r'\1summary_large_image\2', updated, count=1)
+
+        # Duplicated marquee copies are aria-hidden; inert also removes their links from Tab order.
+        updated = re.sub(r'(<div class="home-client-marquee-group-v3199r1" aria-hidden="true")(?! inert)>', r'\1 inert>', updated)
+
+        # Horizontally scrollable flow strip must be reachable by keyboard.
+        updated = re.sub(r'<div class="nfc-digital-flow"(?![^>]*tabindex)', '<div class="nfc-digital-flow" role="region" tabindex="0"', updated)
+
+        # Side panels nested inside <main> are layout, not complementary landmarks.
+        updated = re.sub(r'<aside class="(info-panel[^"]*|legal-aside)"(?![^>]*\brole=)', r'<aside class="\1" role="none"', updated)
+        updated = updated.replace('<aside><strong>BG NFC</strong>', '<aside role="none"><strong>BG NFC</strong>')
+
+        # Floating launchers sit outside every landmark; make the group its own one.
+        start = updated.find('<div aria-label="Hızlı işlemler" class="floating-actions">')
+        if start >= 0:
+            end = _matching_div_end_v3326(updated, start)
+            if end > 0:
+                block = updated[start:end]
+                block = '<aside' + block[4:-6] + '</aside>'
+                updated = updated[:start] + block + updated[end:]
+
+        # Catalog cards use <h3>; give the grid the missing <h2> level.
+        if html_path == ROOT / 'urunler' / 'index.html' and 'id="catalog-grid-title"' not in updated:
+            updated = updated.replace(
+                '<div class="product-grid catalog-grid" id="catalog-grid">',
+                '<h2 class="sr-only" id="catalog-grid-title">Tüm ürünler</h2><div class="product-grid catalog-grid" id="catalog-grid">', 1)
+
+        if updated != text:
+            html_path.write_text(updated, encoding='utf-8')
+            changed += 1
+    return {'scanned': scanned, 'changed': changed}
 
 
 def build_site(nfc_family_theme_overrides=None):
@@ -5380,6 +5464,7 @@ def build_site(nfc_family_theme_overrides=None):
     css_minify = write_minified_css_v3312()
     seo_a11y_sync = sync_seo_accessibility_performance_v3171()
     canonical_sync = sync_canonical_integrity_v3321()
+    audit_fixes = sync_audit_fixes_v3326()
     site_content_state = read_site_content_v3175()
     sitemap_sync = build_canonical_sitemap_v3321()
     indexability_sync = build_indexability_manifest_v3322()
@@ -5389,7 +5474,7 @@ def build_site(nfc_family_theme_overrides=None):
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'indexability_sync': indexability_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'audit_fixes': audit_fixes, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'indexability_sync': indexability_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
 
 
 if __name__ == '__main__':
