@@ -2122,7 +2122,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.35'
+SITE_ASSET_VERSION = '3.3.36'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
@@ -4168,10 +4168,22 @@ def _bg_entity_schema_v3317():
             {'@type': 'AdministrativeArea', 'name': 'Aydın'},
             {'@type': 'Country', 'name': 'Türkiye'},
         ],
+        # V3.3.36: tie the site entity to its Google Business Profile. The profile
+        # is a service-area listing (no public street address, map pin is the
+        # Aydın region centre), so no geo/address beyond the city is added.
+        'hasMap': GOOGLE_REVIEWS_URL_V3328,
         'sameAs': [
             'https://instagram.com/bgstudio.3dtr',
             'https://www.facebook.com/bgstudio.3dtr',
+            GOOGLE_REVIEWS_URL_V3328,
         ],
+        # Hours as published on the Google Business Profile (every day 10:00-19:00).
+        'openingHoursSpecification': [{
+            '@type': 'OpeningHoursSpecification',
+            'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            'opens': '10:00',
+            'closes': '19:00',
+        }],
         'founder': {'@type': 'Person', 'name': 'Berkant Gökbel'},
         'contactPoint': {
             '@type': 'ContactPoint',
