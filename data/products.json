@@ -1,40 +1,51 @@
 [
   {
+    "featured": true,
+    "technical_info": "",
+    "sort_order": 1,
+    "pricing_tiers": [],
+    "estimated_production_time": "",
     "card_description": "Klima ızgarasına takılan, pamuk hazneli fan görünümlü koku difüzörü.",
-    "material_ids": [
-      "petg"
-    ],
-    "color_ids": [],
-    "price_value": "239",
-    "seo_description": "Klima ızgarasına takılan araç koku difüzörü. Pamuk haznesine parfüm damlat, fan dönerken kokuyu yaysın. PETG 3D baskı, 3 renk; Türkiye geneli kargo.",
-    "active": true,
-    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
-    "tags": [
-      "Araç",
-      "Pratik"
-    ],
-    "options": [
-      "Full Siyah",
-      "Full Beyaz",
-      "Siyah Fan / Beyaz Gövde"
-    ],
+    "box_contents": "",
     "features": [
       "Çıkarılabilir iç kapak",
       "Pamuk haznesi",
       "Klima ızgarasına montaj",
       "Tek renk 239 TL / çift renk 249 TL"
     ],
-    "slug": "arac-koku-difuzoru",
-    "price_text": "239 TL",
-    "pricing_tiers": [],
-    "sale_price_value": null,
-    "featured": true,
-    "category": "pratik-fonksiyonel",
     "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
-    "name": "Araç Koku Difüzörü",
-    "sort_order": 1,
-    "seo_title": "Araç Koku Difüzörü – Klima Izgarası Tipi | BG Studio 3D",
+    "price_value": "249",
+    "personalization_info": "",
+    "category": "pratik-fonksiyonel",
     "personalizable": false,
+    "price_text": "249 TL",
+    "seo_title": "Araç Koku Difüzörü – Klima Izgarası Tipi | BG Studio 3D",
+    "dimensions": "",
+    "slug": "arac-koku-difuzoru",
+    "active": true,
+    "tags": [
+      "Araç",
+      "Pratik"
+    ],
+    "usage_info": "",
+    "production_status": "",
+    "color_ids": [],
+    "name": "Araç Koku Difüzörü",
+    "seo_description": "Klima ızgarasına takılan araç koku difüzörü. Pamuk haznesine parfüm damlat, fan dönerken kokuyu yaysın. PETG 3D baskı, 3 renk; Türkiye geneli kargo.",
+    "weight": "",
+    "material_ids": [
+      "petg"
+    ],
+    "sale_price_value": null,
+    "production_time": "",
+    "og_image_source": "main",
+    "print_method": "",
+    "options": [
+      "Full Siyah",
+      "Full Beyaz",
+      "Siyah Fan / Beyaz Gövde"
+    ],
+    "description": "Pamuk haznesine parfüm, oda kokusu veya araç kokusu damlatılarak kullanılan; fan döndükçe kokuyu araç içine yaymaya yardımcı olan 3D baskı difüzör.",
     "gallery_images": [],
     "main_image": "assets/images/products/arac-koku-difuzoru.webp",
     "main_image_width": 1000,
