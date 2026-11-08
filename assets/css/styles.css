@@ -4980,3 +4980,10 @@ body.bg-assistant-keyboard .bg-assistant-panel{
 .gallery-thumbs-slots .gallery-thumb.active,.gallery-thumbs-slots .gallery-thumb[aria-pressed="true"]{border-color:rgba(138,78,14,.75);box-shadow:none}
 .gallery-thumbs-slots .gallery-thumb:focus-visible{outline:2px solid #8a4e0e;outline-offset:2px}
 @media(max-width:680px){.gallery-thumbs.gallery-thumbs-slots{gap:7px}.gallery-thumbs-slots .gallery-thumb{border-radius:10px}}
+
+/* v3.3.48 — öne çıkanlar şeridi: masaüstünde fareyle tut-çek */
+@media (hover:hover) and (pointer:fine){
+  .home-product-carousel-track{cursor:grab}
+  .home-product-carousel-track.is-dragging{cursor:grabbing;scroll-snap-type:none!important;scroll-behavior:auto!important;user-select:none;-webkit-user-select:none}
+  .home-product-carousel-track.is-dragging a{pointer-events:none}
+}

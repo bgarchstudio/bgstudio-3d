@@ -2305,6 +2305,52 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       event.preventDefault();
       goToPage(currentPage + (event.key === 'ArrowRight' ? 1 : -1));
     });
+
+    // V3.3.48: masaüstünde fareyle tut-çek. Sürüklerken şerit imleci izler; bırakınca 50px'den fazla
+    // çekildiyse sonraki/önceki sayfaya, değilse aynı sayfaya oturur. Dokunmatik kaydırma tarayıcıda kalır.
+    let drag = null;
+    let suppressClick = false;
+    const endDrag = event => {
+      if (!drag) return;
+      const { moved, dx, startPage } = drag;
+      drag = null;
+      track.classList.remove('is-dragging');
+      if (event?.pointerId != null && track.hasPointerCapture?.(event.pointerId)) track.releasePointerCapture(event.pointerId);
+      if (!moved) return;
+      suppressClick = true;
+      window.setTimeout(() => { suppressClick = false; }, 0);
+      const target = dx <= -50 ? startPage + 1 : dx >= 50 ? startPage - 1 : startPage;
+      requestAnimationFrame(() => goToPage(target));
+    };
+    track.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+      drag = { x: event.clientX, left: track.scrollLeft, startPage: currentPage, dx: 0, moved: false, id: event.pointerId };
+    });
+    track.addEventListener('pointermove', event => {
+      if (!drag || event.pointerId !== drag.id) return;
+      drag.dx = event.clientX - drag.x;
+      if (!drag.moved && Math.abs(drag.dx) > 5) {
+        drag.moved = true;
+        track.classList.add('is-dragging');
+        track.setPointerCapture?.(event.pointerId);
+      }
+      if (drag.moved) {
+        event.preventDefault();
+        track.scrollLeft = drag.left - drag.dx;
+      }
+    });
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('lostpointercapture', endDrag);
+    // Sürükleme sonrası bağlantı açılmasın; normal tıklama etkilenmez.
+    track.addEventListener('click', event => {
+      if (!suppressClick) return;
+      event.preventDefault();
+      event.stopPropagation();
+      suppressClick = false;
+    }, true);
+    track.addEventListener('dragstart', event => event.preventDefault());
+
     window.addEventListener('resize', () => {
       syncEndSpacer();
       currentPage = Math.min(currentPage, pageCount() - 1);
