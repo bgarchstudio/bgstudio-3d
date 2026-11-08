@@ -4149,11 +4149,13 @@ def build_legal_pages_v3171():
             ('Veri minimizasyonu', 'BG Studio 3D teklif ve sipariş süreci için gerekli olmayan kişisel bilgileri istememeyi hedefler. Web sitesinde çevrimiçi ödeme altyapısı devrede değildir.'),
             ('Başvuru ve iletişim', 'Kişisel verilerle ilgili talepler için BG Studio 3D iletişim kanalları üzerinden başvuru yapılabilir. Yasal saklama yükümlülükleri bulunan kayıtlar ayrı değerlendirilir.'),
         ]),
-        'teslimat-iade': ('Teslimat / İade', '3D baskı, özel üretim ve kişiselleştirilen ürünlerde teslim ve iade süreci ürünün niteliğine göre değerlendirilir.', [
-            ('Teslim seçenekleri', 'Uygun siparişlerde Kuşadası elden teslim ve Türkiye geneli kargo seçenekleri bulunur. Kesin teslim yöntemi sipariş öncesinde netleştirilir.'),
-            ('Üretim süresi', '3D baskı üretim süresi ürün, adet, malzeme ve atölye yoğunluğuna göre değişir. Tahmini süre sipariş onayından önce paylaşılır.'),
-            ('Kişiye özel üretimler', 'İsim, logo, ölçü veya müşteriye özgü başka bir detayla üretilen ürünler standart stok ürünü gibi değerlendirilemeyebilir. Üretim öncesi kapsamın doğru onaylanması önemlidir.'),
-            ('Hasarlı kargo', 'Kargo kaynaklı hasar görülmesi halinde paket ve ürün görselleriyle mümkün olan en kısa sürede iletişime geçilmesi değerlendirme sürecini hızlandırır.'),
+        # v3.3.42 — Shopier dükkan ayarlarıyla aynı kurallar: 1–3 iş günü üretim, kargo ücreti teslimatta alıcıdan,
+        # hasarlı/hatalı üründe değişim veya iade, kişiye özel ürünler iade dışı.
+        'teslimat-iade': ('Teslimat / İade', 'Ürünler sipariş üzerine üretilir; teslim, kargo ve iade kuralları aşağıdadır.', [
+            ('Üretim süresi', 'Ürünler sipariş onayından sonra 1–3 iş günü içinde PLA veya PETG malzemeden üretilir, ardından kargoya verilir. Toplu ve kurumsal siparişlerde süre sipariş öncesinde ayrıca paylaşılır.'),
+            ('Kargo', 'Türkiye geneline kargo ile gönderilir. Kargo ücreti teslimat sırasında alıcı tarafından ödenir. Uygun siparişlerde Kuşadası’nda elden teslim seçeneği vardır.'),
+            ('Hasarlı veya hatalı ürün', 'Kargo kaynaklı hasar veya üretim hatası olursa paketin ve ürünün fotoğraflarıyla WhatsApp (0530 246 69 03) ya da bgstudio.3dtr@gmail.com üzerinden bize ulaşın; değişim ya da iade yapıyoruz.'),
+            ('Kişiye özel ürünler', 'İsim, logo, ölçü veya müşteriye özgü başka bir detayla kişiselleştirilen ürünler iade kapsamında değildir. Bu nedenle üretim öncesinde kişiselleştirme bilgilerinin doğru onaylanması önemlidir.'),
         ]),
         'kisiye-ozel-urun-kosullari': ('Kişiye Özel Ürün Koşulları', 'İsim, logo, ölçü, renk veya işletmeye özgü tasarımla hazırlanan işlerde onaylanan üretim kapsamı esas alınır.', [
             ('Onay', 'Üretim öncesinde isim, logo, ölçü, renk, adet ve diğer kişiselleştirme detaylarının doğru iletilmesi müşterinin sorumluluğundadır.'),

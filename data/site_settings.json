@@ -9,7 +9,7 @@
         "id": "ucretsiz-kargo",
         "text": "3.000 TL üzeri ücretsiz kargo",
         "url": "",
-        "enabled": true,
+        "enabled": false,
         "source_type": "manual",
         "source_ref": ""
       },
