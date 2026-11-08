@@ -655,17 +655,31 @@
     "main_image_height": 760
   },
   {
-    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
-    "name": "Kişiye Özel Gaming Stand",
-    "category": "gaming-masaustu",
-    "price_value": "949",
-    "personalizable": true,
-    "featured": true,
-    "weight": "",
+    "pricing_tiers": [],
     "options": [
       "Xbox logo",
       "PlayStation logo"
     ],
+    "active": true,
+    "sale_price_value": null,
+    "name": "Kişiye Özel Gaming Stand",
+    "price_value": "949",
+    "sort_order": 15,
+    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
+    "price_text": "949 TL",
+    "usage_info": "",
+    "technical_info": "",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "category": "gaming-masaustu",
+    "slug": "kisiye-ozel-gaming-stand",
+    "material_ids": [
+      "pla"
+    ],
+    "personalizable": true,
+    "og_image_source": "main",
     "features": [
       "Kişiye özel isim veya kısa yazı",
       "Xbox veya PlayStation logo seçeneği",
@@ -674,14 +688,16 @@
       "Masaüstü kullanım",
       "Siparişe özel 3D üretim"
     ],
-    "print_method": "",
-    "technical_info": "",
-    "color_ids": [
-      "siyah",
-      "beyaz"
-    ],
-    "sort_order": 15,
-    "active": true,
+    "box_contents": "",
+    "personalization_info": "",
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "estimated_production_time": "",
+    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
+    "dimensions": "",
+    "seo_description": "Kulaklık ve 2 kontrolcü için kişiye özel gaming stand. Xbox veya PlayStation logo seçeneği, ön yüzde istediğin isim. Oyunculara hediye; Türkiye geneli kargo.",
+    "seo_title": "İsimli Gaming Stand – Kulaklık ve Kontrolcü | BG Studio 3D",
+    "production_time": "",
+    "production_status": "",
     "tags": [
       "Gaming",
       "Kişiye Özel",
@@ -689,25 +705,9 @@
       "Xbox",
       "Masaüstü"
     ],
-    "personalization_info": "",
-    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
-    "usage_info": "",
-    "production_time": "",
-    "slug": "kisiye-ozel-gaming-stand",
-    "seo_title": "İsimli Gaming Stand – Kulaklık ve Kontrolcü | BG Studio 3D",
-    "price_text": "949 TL",
-    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
-    "seo_description": "Kulaklık ve 2 kontrolcü için kişiye özel gaming stand. Xbox veya PlayStation logo seçeneği, ön yüzde istediğin isim. Oyunculara hediye; Türkiye geneli kargo.",
-    "material_ids": [
-      "pla"
-    ],
-    "production_status": "",
-    "pricing_tiers": [],
-    "sale_price_value": null,
-    "estimated_production_time": "",
-    "dimensions": "",
-    "box_contents": "",
-    "og_image_source": "main",
+    "print_method": "",
+    "featured": true,
+    "weight": "",
     "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
     "main_image_width": 1000,
@@ -1986,7 +1986,7 @@
     "sort_order": 39,
     "seo_title": "Atatürk İmzalı Anahtarlık – İki Renkli | BG Studio 3D",
     "og_image_source": "main",
-    "featured": true,
+    "featured": false,
     "production_time": "Yaklaşık 1–2 saat",
     "personalization_info": "Bu ürün standart tasarım olarak sunulur.\nKişiye özel isim, yazı veya farklı form talepleri özel sipariş kapsamında ayrıca değerlendirilebilir.",
     "description": "Kemal Atatürk’ün imzasından ilham alınarak hazırlanan bu özel anahtarlık, sade ve şık görünümüyle günlük kullanım ve hediye için ideal bir üründür. İki renkli 3D baskı tekniğiyle üretilen model, anahtarlık halkasıyla birlikte kullanıma hazır şekilde sunulur.\nMinimal formu sayesinde çanta, anahtar ve kişisel aksesuarlarda rahatlıkla kullanılabilir. Hem anlam taşıyan hem de estetik duran bu tasarım, Atatürk temalı özel bir hediye alternatifi olarak da öne çıkar.\nKatmanlı üretim tekniğiyle hazırlanan ürün, hafif yapısı ve dikkat çekici görünümüyle günlük kullanıma uygundur.",
