@@ -1283,6 +1283,70 @@ def remove_file(rel):
         p.unlink()
 
 
+PRODUCT_IMAGE_SLOTS = 5
+PRODUCT_IMAGE_SIZE = (1000, 760)
+
+
+def product_media_entries(product):
+    """Ürünün diskteki tüm görselleri (kapak + eski afiş + galeri): path -> (width, height)."""
+    out = {}
+    if not product:
+        return out
+    if product.get('main_image'):
+        out[str(product['main_image'])] = (int(product.get('main_image_width') or 1000), int(product.get('main_image_height') or 760))
+    if product.get('poster_image'):
+        out[str(product['poster_image'])] = (int(product.get('poster_image_width') or 1254), int(product.get('poster_image_height') or 1254))
+    for item in normalize_gallery(product.get('gallery_images')):
+        out.setdefault(item['path'], (item['width'], item['height']))
+    return out
+
+
+def apply_product_images(p, old, images):
+    """v3.3.39 — tek tip ürün görselleri: en fazla 5 slot, hepsi 1000×760.
+
+    images sırası korunur; 1. slot kapak (main_image), 2–5 galeri olur. Her eleman ya
+    {'keep': mevcut_yol} ya da {'data': data_uri}. Listede olmayan eski görseller silinir.
+    Yeni dosyalara benzersiz ad verilir; böylece yer değiştiren görseller birbirinin üzerine yazılmaz
+    ve tarayıcı/CDN önbelleği eski görseli göstermez.
+    """
+    if not isinstance(images, list) or not images:
+        raise ValueError('En az 1 ürün görseli (kapak) gerekli.')
+    if len(images) > PRODUCT_IMAGE_SLOTS:
+        raise ValueError(f'Bir ürüne en fazla {PRODUCT_IMAGE_SLOTS} görsel eklenebilir.')
+    existing = product_media_entries(old)
+    stamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    final, used = [], set()
+    for n, image in enumerate(images, 1):
+        image = image or {}
+        keep = str(image.get('keep') or '')
+        if keep:
+            if keep not in existing:
+                raise ValueError(f'{n}. görsel bulunamadı; sayfayı yenileyip tekrar dene.')
+            if keep in used:
+                continue
+            final.append((keep, *existing[keep]))
+            used.add(keep)
+        elif image.get('data'):
+            rel = f"assets/images/products/{p['slug']}-{n}-{stamp}.webp"
+            save_data_uri(image.get('data'), ROOT / rel)
+            final.append((rel, *PRODUCT_IMAGE_SIZE))
+            used.add(rel)
+        else:
+            raise ValueError(f'{n}. görsel okunamadı.')
+    for path in existing:
+        if path not in used:
+            remove_file(path)
+    p['main_image'], p['main_image_width'], p['main_image_height'] = final[0]
+    p['gallery_images'] = [
+        {'path': rel, 'width': w, 'height': h, 'alt': f"{p['name']} ürün görseli {i}"}
+        for i, (rel, w, h) in enumerate(final[1:], 2)
+    ]
+    for key in ('poster_image', 'poster_image_width', 'poster_image_height'):
+        p.pop(key, None)
+    if p.get('og_image_source') == 'poster':
+        p['og_image_source'] = 'main'
+
+
 def normalize_gallery(value):
     out = []
     for item in value or []:
@@ -2040,7 +2104,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'build_revision': 'v3182-r1-admin-loop-toolbar-hotfix', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'image_slots': PRODUCT_IMAGE_SLOTS, 'build_revision': 'v3182-r1-admin-loop-toolbar-hotfix', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -2190,7 +2254,8 @@ class Handler(BaseHTTPRequestHandler):
                 poster = payload.get('poster_image')
                 gallery = payload.get('gallery_images') or []
                 replace_gallery = bool(payload.get('replace_gallery'))
-                if idx is None and not main:
+                slot_images = payload.get('images')
+                if idx is None and not main and not isinstance(slot_images, list):
                     raise ValueError('Yeni üründe ana görsel zorunlu.')
 
                 old = products[idx] if idx is not None else {}
@@ -2267,6 +2332,9 @@ class Handler(BaseHTTPRequestHandler):
                     p['gallery_images'] = saved_gallery
                 elif idx is not None:
                     p['gallery_images'] = normalize_gallery(old.get('gallery_images'))
+
+                if isinstance(slot_images, list):
+                    apply_product_images(p, old, slot_images)
 
                 backup()
                 if idx is None:

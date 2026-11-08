@@ -21,9 +21,8 @@
     wrap.innerHTML = `
       <label>Paylaşım / OG görseli
         <select id="og_image_source">
-          <option value="main">Ana ürün görseli</option>
-          <option value="poster">Afiş / ikinci görsel</option>
-          <option value="gallery">İlk galeri görseli</option>
+          <option value="main">1. görsel (kapak)</option>
+          <option value="gallery">2. ürün görseli</option>
         </select>
         <small>WhatsApp, sosyal medya ve arama paylaşım önizlemelerinde tercih edilen görsel. Seçilen görsel yoksa ana ürün görseline döner.</small>
       </label>`;
@@ -65,7 +64,7 @@
 
   function valueFor(id, product) {
     if (!product) return id === 'og_image_source' ? 'main' : '';
-    if (id === 'og_image_source') return product[id] || 'main';
+    if (id === 'og_image_source') return product[id] === 'gallery' ? 'gallery' : 'main';
     return product[id] ?? '';
   }
 

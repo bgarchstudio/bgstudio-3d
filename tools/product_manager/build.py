@@ -1979,34 +1979,31 @@ def render_product_page(p, related):
     og_path, og_w, og_h = product_og_media(p)
     og_abs = f"{BASE_URL}/{og_path}" if og_path else main_abs
 
-    poster_thumb = ''
+    # v3.3.39 — ürün görselleri tek tip: en fazla 5 görsel, hepsi 1000×760. Tek görselde küçük resim
+    # şeridi gösterilmez; 2–5 görselde eşit boy küçük resimlerle geçiş yapılır. Eski afiş kaydı varsa
+    # sıradan bir ürün görseli gibi listeye katılır.
+    slide_items = [(esc(main_rel), w, h, name)]
+    legacy_media = []
     if p.get('poster_image'):
-        poster_rel = '../../' + p['poster_image']
-        pw = int(p.get('poster_image_width') or 1254)
-        ph = int(p.get('poster_image_height') or 1254)
-        poster_thumb = (
-            f'<button aria-label="Afiş görselini göster" aria-pressed="false" class="gallery-thumb" '
-            f'data-gallery-alt="{name} ürün afişi" data-gallery-src="{esc(poster_rel)}" type="button">'
-            f'<img alt="{name} ürün afişi" decoding="async" height="{ph}" loading="lazy" src="{esc(poster_rel)}" width="{pw}"/>'
-            f'<span>Afiş</span></button>'
-        )
-    gallery_thumbs = ''
-    for i, item in enumerate(p.get('gallery_images') or [], 1):
+        legacy_media.append({'path': p['poster_image'], 'width': p.get('poster_image_width') or 1254, 'height': p.get('poster_image_height') or 1254})
+    legacy_media += list(p.get('gallery_images') or [])
+    for item in legacy_media:
         if isinstance(item, str):
-            item = {'path': item, 'width': 1000, 'height': 1000, 'alt': ''}
+            item = {'path': item, 'width': 1000, 'height': 760}
         path = item.get('path') if isinstance(item, dict) else None
         if not path:
             continue
-        rel = '../../' + path
-        gw = int(item.get('width') or 1000)
-        gh = int(item.get('height') or 1000)
-        galt = esc(item.get('alt') or f"{p['name']} galeri görseli {i}")
-        gallery_thumbs += (
-            f'<button aria-label="Galeri görseli {i} göster" aria-pressed="false" class="gallery-thumb" '
-            f'data-gallery-alt="{galt}" data-gallery-src="{esc(rel)}" type="button">'
-            f'<img alt="{galt}" decoding="async" height="{gh}" loading="lazy" src="{esc(rel)}" width="{gw}"/>'
-            f'<span>{i + 2}. Görsel</span></button>'
-        )
+        n = len(slide_items) + 1
+        galt = esc(item.get('alt') or f"{p['name']} ürün görseli {n}")
+        slide_items.append((esc('../../' + path), int(item.get('width') or 1000), int(item.get('height') or 760), galt))
+    gallery_thumbs_html = ''
+    if len(slide_items) > 1:
+        gallery_thumbs_html = '<div aria-label="Ürün görselleri" class="gallery-thumbs gallery-thumbs-slots">' + ''.join(
+            f'<button aria-label="{i}. ürün görselini göster" aria-pressed="{"true" if i == 1 else "false"}" '
+            f'class="gallery-thumb{" active" if i == 1 else ""}" data-gallery-alt="{galt}" data-gallery-src="{src}" type="button">'
+            f'<img alt="" decoding="async" height="{gh}" loading="lazy" src="{src}" width="{gw}"/></button>'
+            for i, (src, gw, gh, galt) in enumerate(slide_items, 1)
+        ) + '</div>'
 
     color_entries = product_color_entries(p)
     legacy_options = legacy_order_options(p)
@@ -2138,7 +2135,7 @@ def render_product_page(p, related):
 </head><body><a class="skip-link" href="#main-content">İçeriğe geç</a>
 {render_site_header('../../', 'products')}
 {notice}
-<main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" fetchpriority="high" height="{h}" src="{esc(main_rel)}" width="{w}"/></div><div aria-label="Ürün görselleri" class="gallery-thumbs"><button aria-label="Ürün görselini göster" aria-pressed="true" class="gallery-thumb active" data-gallery-alt="{name}" data-gallery-src="{esc(main_rel)}" type="button"><img alt="{name}" decoding="async" height="{h}" loading="lazy" src="{esc(main_rel)}" width="{w}"/><span>Ürün</span></button>{poster_thumb}{gallery_thumbs}</div><p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
+<main id="main-content"><section class="product-detail shell"><div class="breadcrumb"><a href="../../">Ana Sayfa</a><span>/</span><a href="../">Ürünler</a><span>/</span><span>{name}</span></div><div class="product-detail-grid"><div class="product-gallery"><div aria-label="Seçili ürün görselini büyüt" class="gallery-stage zoomable-media" data-gallery-stage="" role="button" tabindex="0"><img alt="{name}" data-gallery-main="" decoding="async" fetchpriority="high" height="{h}" src="{esc(main_rel)}" width="{w}"/></div>{gallery_thumbs_html}<p class="gallery-hint">Görseli büyütmek için ana görsele tıkla.</p></div>
 <div class="product-info"><p class="eyebrow">{label.upper()}</p><h1>{name}</h1><p class="product-lead">{desc}</p>{status_badge_html}<div class="price-block{' has-discount' if sale_info else ''}"><small>Fiyat</small><div class="price-display-row">{price_list_html}<strong data-product-price-display="">{selected_display_price}</strong>{discount_badge_html}</div></div>{tier_cards_html}<div class="order-configurator" data-order-config="" data-product-name="{name}" data-product-price="{price}" data-product-base-price-value="{esc(active_base_value or '')}"><div class="order-config-head"><strong>Siparişini hazırla</strong><span>Seçimini yap, mesajı hazır gönder.</span></div>{option_chips_html}<div class="order-controls{' has-tier' if pricing_tiers else ''}{' color-mode' if color_public else ''}{' option-mode' if legacy_options else ''}">{option_field_html}{tier_field_html}<div class="order-field order-qty-field"><span>{'Set adedi' if pricing_tiers else 'Adet'}</span><div class="qty-stepper"><button aria-label="Adedi azalt" data-qty-minus="" type="button">−</button><input aria-label="Adet" data-order-qty="" max="12" min="1" type="number" value="1"/><button aria-label="Adedi artır" data-qty-plus="" type="button">+</button></div></div></div>{color_picker_html}{color_data_html}<label class="order-field order-note-field"><span>Not (isteğe bağlı)</span><input data-order-note="" maxlength="160" placeholder="Örn. hediye olacak, teslim notu…" type="text"/></label><div class="order-summary"><span>Seçim:</span><strong data-order-summary="">{esc(initial_summary)}</strong></div><a class="primary-cta wide-cta smart-order-whatsapp" data-order-whatsapp="" href="#" rel="noopener" target="_blank">Seçimi WhatsApp’tan gönder ↗</a><p class="order-local-note">Seçimin site üzerinde kaydedilmez; yalnızca WhatsApp mesajını hazırlamak için kullanılır.</p></div><div class="product-action-row share-only-row"><button class="secondary-cta share-product" data-share-title="{name}" type="button">Ürün linkini paylaş</button></div><div class="detail-note">📍 Kuşadası elden teslim   •   📦 Türkiye geneli kargo</div><div class="product-facts"><div><small>Üretim</small><strong>3D baskı</strong></div><div><small>Teslim</small><strong>Kuşadası / kargo</strong></div><div><small>Seçenek</small><strong>Ürüne göre</strong></div><div><small>Sipariş</small><strong>WhatsApp</strong></div></div>{technical_html}<div class="detail-section"><h2>Öne çıkan özellikler</h2><ul>{feats}</ul></div><div class="detail-section"><h2>{detail_options_heading}</h2><div class="option-tags">{tags or '<span>WhatsApp üzerinden netleştirilir.</span>'}</div></div>{product_tag_section}{product_service_links_v3320(p)}<div class="detail-section"><h2>Üretim notu</h2><p>{production}</p></div></div></div><div class="assurance-strip"><div><strong>Kuşadası</strong><span>Elden teslim</span></div><div><strong>Türkiye</strong><span>Kargo seçeneği</span></div><div><strong>Atölye</strong><span>3D baskı üretim</span></div><div><strong>Sipariş</strong><span>WhatsApp üzerinden</span></div></div></section>
 <section class="order-process shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ SÜRECİ</p><h2>Nasıl ilerliyoruz?</h2></div></div><div class="order-steps"><article class="order-step"><span>01</span><h3>Ürünü seç</h3><p>Renk, adet ve varsa kişiselleştirme isteğini bize ilet.</p></article><article class="order-step"><span>02</span><h3>Detayları netleştir</h3><p>Üretim seçeneği ve teslim/kargo detaylarını sipariş öncesi netleştir.</p></article><article class="order-step"><span>03</span><h3>Üretim</h3><p>Ürün atölyede 3D baskı ile hazırlanır ve kontrol edilir.</p></article><article class="order-step"><span>04</span><h3>Teslim</h3><p>Kuşadası elden teslim veya uygun kargo seçeneğiyle gönderim.</p></article></div></section>
 <section class="product-faq shell"><div class="section-title"><div><p class="eyebrow">SİPARİŞ ÖNCESİ</p><h2>Bilmen gerekenler.</h2></div></div><div class="faq">{faq_html}</div></section>
@@ -2149,7 +2146,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.36'
+SITE_ASSET_VERSION = '3.3.39'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
