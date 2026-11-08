@@ -453,3 +453,14 @@ textarea{line-height:1.55;resize:vertical}
 .campaign-preview-viewport{contain:layout paint;transform:translateZ(0)}
 .campaign-preview-track{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:preserve-3d}
 @media(max-width:620px){.modal-open .toast{top:12px;left:12px;right:12px;bottom:auto;max-width:none}.campaign-preview-box{margin-inline:-4px}}
+
+/* v3.3.37 — görsel kaldırma butonları */
+.preview{position:relative}
+.image-remove-btn{position:absolute;top:10px;right:10px;z-index:2;border:0;border-radius:999px;padding:7px 12px;background:rgba(17,16,15,.82);color:#fff;font:600 11px/1 system-ui,-apple-system,Segoe UI,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.image-remove-btn:hover,.image-remove-btn:focus-visible{background:#a74a43}
+.image-remove-btn[hidden]{display:none}
+.gallery-mini .gallery-remove{position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(17,16,15,.82);color:#fff;font:700 14px/1 system-ui,sans-serif;padding:0;cursor:pointer;display:grid;place-items:center}
+.gallery-mini .gallery-remove:hover,.gallery-mini .gallery-remove:focus-visible{background:#a74a43}
+.gallery-mini.is-new{outline:2px solid rgba(157,99,35,.55);outline-offset:-2px}
+.gallery-tools{display:flex;align-items:center;gap:10px;margin-left:auto;align-self:center}
+.gallery-pending{color:#a74a43!important;font-size:10px}

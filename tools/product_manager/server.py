@@ -2160,11 +2160,50 @@ class Handler(BaseHTTPRequestHandler):
                     p['poster_image_width'] = int(poster.get('width') or 1254)
                     p['poster_image_height'] = int(poster.get('height') or 1254)
                     save_data_uri(poster.get('data'), ROOT / p['poster_image'])
+                elif idx is not None and payload.get('remove_poster'):
+                    remove_file(old.get('poster_image'))
+                    for k in ('poster_image', 'poster_image_width', 'poster_image_height'):
+                        p.pop(k, None)
+                    if p.get('og_image_source') == 'poster':
+                        p['og_image_source'] = 'main'
                 elif idx is not None:
                     for k in ('poster_image', 'poster_image_width', 'poster_image_height'):
                         p[k] = old.get(k)
 
-                if replace_gallery:
+                gallery_keep = payload.get('gallery_keep')
+                if isinstance(gallery_keep, list) and idx is not None:
+                    # v3.3.37 — tekil galeri yönetimi: tutulanlar korunur, kaldırılanlar silinir, yeniler eklenir.
+                    old_gallery = normalize_gallery(old.get('gallery_images'))
+                    by_path = {item.get('path'): item for item in old_gallery if item.get('path')}
+                    kept = []
+                    for path in gallery_keep:
+                        item = by_path.get(str(path or ''))
+                        if item and item not in kept:
+                            kept.append(item)
+                    for item in old_gallery:
+                        if item not in kept:
+                            remove_file(item.get('path'))
+                    used = {item.get('path') for item in kept}
+                    saved_gallery = list(kept)
+                    n = 0
+                    for image in gallery[:max(0, 12 - len(kept))]:
+                        n += 1
+                        rel = f"assets/images/products/{p['slug']}-gallery-{n:02d}.webp"
+                        while rel in used:
+                            n += 1
+                            rel = f"assets/images/products/{p['slug']}-gallery-{n:02d}.webp"
+                        used.add(rel)
+                        save_data_uri(image.get('data'), ROOT / rel)
+                        saved_gallery.append({
+                            'path': rel,
+                            'width': int(image.get('width') or 1000),
+                            'height': int(image.get('height') or 1000),
+                            'alt': f"{p['name']} galeri görseli {len(saved_gallery) + 1}"
+                        })
+                    for pos, item in enumerate(saved_gallery, 1):
+                        item['alt'] = f"{p['name']} galeri görseli {pos}"
+                    p['gallery_images'] = saved_gallery
+                elif replace_gallery:
                     for item in normalize_gallery(old.get('gallery_images')):
                         remove_file(item.get('path'))
                     saved_gallery = []
