@@ -373,9 +373,14 @@ def make_seo(p):
         source = re.sub(r'^' + re.escape(name) + r'\s*[-—–:,.]*\s*', '', source, flags=re.I)
         source = re.sub(r'\s+', ' ', source).strip()
         source = re.sub(r'[.!?]+$', '', source).strip()
-    title = compact_serp_title(name, 'Kuşadası 3D Baskı') if name else ''
-    suffix = '3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli kargo.'
-    description = f"{name}, {source}. {suffix}" if source else f"{name}, {suffix}"
+    # v3.3.41 — "Ürün, Büyük harfle devam eden cümle" birleşimi bozuk görünüyordu; ad kaynakta yoksa iki noktayla bağlanır.
+    title = compact_serp_title(name, '3D Baskı') if name else ''
+    suffix = '3D baskı ile üretilir, Türkiye geneli kargo.'
+    if source:
+        lead = f"{source}." if name and name.casefold() in source.casefold() else f"{name}: {source}."
+        description = f"{lead} {suffix}"
+    else:
+        description = f"{name}: {suffix}"
     return title, clip_seo_text(description, 160)
 
 
@@ -1893,6 +1898,7 @@ def render_schema(p):
         'url': canonical,
         'image': images or [image],
         'category': category_label(p),
+        'sku': str(p.get('slug') or ''),
     }
     if p.get('tags'):
         obj['keywords'] = ', '.join(str(x) for x in p.get('tags') or [])
@@ -1912,6 +1918,7 @@ def render_schema(p):
                 'priceCurrency': 'TRY',
                 'price': str(price_value),
                 'availability': product_schema_availability(p),
+                'itemCondition': 'https://schema.org/NewCondition',
                 'url': canonical,
                 'seller': {'@id': BASE_URL + '/#organization'},
                 'eligibleQuantity': {'@type': 'QuantitativeValue', 'value': int(t.get('quantity') or 1), 'unitText': 'adet'},
@@ -1923,6 +1930,7 @@ def render_schema(p):
             {
                 '@type': 'Offer', 'name': option, 'priceCurrency': 'TRY', 'price': price,
                 'availability': product_schema_availability(p), 'url': canonical,
+                'itemCondition': 'https://schema.org/NewCondition',
                 'seller': {'@id': BASE_URL + '/#organization'},
             }
             for option, price in option_prices.items()
@@ -1933,6 +1941,7 @@ def render_schema(p):
             'priceCurrency': 'TRY',
             'price': str(fallback_price),
             'availability': product_schema_availability(p),
+            'itemCondition': 'https://schema.org/NewCondition',
             'url': canonical,
             'seller': {'@id': BASE_URL + '/#organization'},
         }
@@ -3607,6 +3616,9 @@ def _project_quantity(item):
 
 
 def _project_metrics(item):
+    # v3.3.41 — NFC taraması / menü açılışı / feedback / Google yönlendirmesi yalnızca NFC + QR projelerine ait.
+    if _project_kind(item) != 'nfc':
+        return []
     raw = item.get('metrics') if isinstance(item.get('metrics'), dict) else {}
     aliases = [
         ('NFC taraması', ('nfc_scans','nfc_scan','scans')),
@@ -5047,6 +5059,9 @@ def _project_quantity(item):
 
 
 def _project_metrics(item):
+    # v3.3.41 — NFC taraması / menü açılışı / feedback / Google yönlendirmesi yalnızca NFC + QR projelerine ait.
+    if _project_kind(item) != 'nfc':
+        return []
     has_override = 'project_metrics' in item
     raw = item.get('project_metrics') if has_override and isinstance(item.get('project_metrics'), dict) else (item.get('metrics') if isinstance(item.get('metrics'), dict) else {})
     aliases = [
@@ -5130,6 +5145,8 @@ def render_project_detail(item, project_items):
     facts_html=''.join(f'<article><span>{esc(k)}</span><strong>{esc(v)}</strong></article>' for k,v in facts if v)
     tags=''.join(f'<span>{esc(t)}</span>' for t in _project_tags(item))
     story=[]
+    if _project_kind(item) == 'nfc':
+        need = solution = ''  # v3.3.41 — İhtiyaç / çözüm anlatımı NFC + QR projelerinde gösterilmez.
     if need: story.append(('01','İhtiyaç',need))
     if solution: story.append((f'{len(story)+1:02d}','BG Studio çözümü',solution))
     if result: story.append((f'{len(story)+1:02d}','Sonuç',result))

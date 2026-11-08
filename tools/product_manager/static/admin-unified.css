@@ -1004,3 +1004,10 @@ html body .bg-site-content-editor form{padding-bottom:6px}
 /* 7) Projeler: filtre düğmeleri 14 px'e sıkışıp listenin altında kalıyordu. */
 html body .bg-project-admin-filters{height:auto!important;min-height:0!important;overflow:visible!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;padding-bottom:10px!important}
 html body .bg-project-admin-filters button{min-height:28px!important;height:auto!important;padding:6px 11px!important;font-size:11px!important;line-height:1.2!important;border-radius:999px!important}
+
+/* v3.3.41 — kampanya canlı önizlemesi Opera'da takılıyordu: sürekli kayan şerit, tam ekran blur(9px) arka planın
+   ve altındaki 5 ayrı backdrop-filter katmanının (üst menü, kaydet çubuğu, rozetler) her karede yeniden
+   hesaplanmasına yol açıyordu. Pencere açıkken bulanıklıklar kapatılır; arka plan düz koyu renk olur. */
+html body[data-bg-admin-page] #campaignModal .modal-backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(18,14,11,.86)!important}
+html body.modal-open :is(.top,.form-footer,.save-state,.quality-chip,#previewProduct,.intro-side button){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html body #campaignPreviewLine{transform-style:flat!important;backface-visibility:visible!important}

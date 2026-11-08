@@ -134,6 +134,8 @@
     state.newGallery = []; state.removedGallery = new Set(); state.coverFile = null; state.coverClear = false;
     const cover = item.cover_image ? `/${String(item.cover_image).replace(/^\//,'')}` : '';
     const gallery = Array.isArray(item.gallery_images) ? item.gallery_images : [];
+    // v3.3.41 — metrikler yalnızca NFC + QR projelerinde; ihtiyaç/çözüm yalnızca NFC + QR dışındaki projelerde.
+    const isNfc = String(item.source_kind || '').toLowerCase() === 'nfc';
     editor.innerHTML = `
       <form id="bgProjectForm" class="bg-project-admin-form">
         <div class="bg-project-admin-editor-head">
@@ -149,7 +151,7 @@
           <div class="bg-project-admin-grid two"><label>Müşteri / işletme<input id="pa_client" maxlength="120" value="${escapeHtml(item.client)}"></label><label>Sektör<input id="pa_sector" maxlength="120" value="${escapeHtml(item.sector)}"></label></div>
           <label>Proje başlığı<input id="pa_title" maxlength="180" value="${escapeHtml(item.title)}"></label>
           <label>Kısa özet<textarea id="pa_summary" rows="3" maxlength="800">${escapeHtml(item.summary)}</textarea></label>
-          <div class="bg-project-admin-grid two"><label>İhtiyaç<textarea id="pa_need" rows="5">${escapeHtml(item.need)}</textarea></label><label>BG Studio çözümü<textarea id="pa_solution" rows="5">${escapeHtml(item.solution)}</textarea></label></div>
+          ${isNfc ? '' : `<div class="bg-project-admin-grid two"><label>İhtiyaç<textarea id="pa_need" rows="5">${escapeHtml(item.need)}</textarea></label><label>BG Studio çözümü<textarea id="pa_solution" rows="5">${escapeHtml(item.solution)}</textarea></label></div>`}
           <div class="bg-project-admin-grid three"><label>Üretim adedi<input id="pa_quantity" maxlength="120" value="${escapeHtml(item.quantity)}"></label><label>Sistem<input id="pa_system" maxlength="240" value="${escapeHtml(item.system)}"></label><label>Teslim<input id="pa_delivery" maxlength="180" value="${escapeHtml(item.delivery)}"></label></div>
           <label>Sonuç<textarea id="pa_result" rows="5">${escapeHtml(item.result)}</textarea></label>
           <label>Etiketler<input id="pa_tags" value="${escapeHtml((item.tags || []).join(', '))}" placeholder="NFC, QR, Dijital Menü"></label>
@@ -164,9 +166,9 @@
           <label class="file-btn gallery-add">+ Galeri görseli ekle<input id="pa_gallery_files" type="file" accept="image/*" multiple hidden></label>
         </section>
 
-        <section class="bg-project-admin-section"><div class="bg-project-admin-section-title"><b>Gerçek metrikler</b><span>Boş bıraktığın değerler sitede görünmez.</span></div>
+        ${isNfc ? `<section class="bg-project-admin-section"><div class="bg-project-admin-section-title"><b>Gerçek metrikler</b><span>Boş bıraktığın değerler sitede görünmez.</span></div>
           <div class="bg-project-admin-grid four"><label>NFC taraması<input id="pa_nfc_scans" type="number" min="0" value="${escapeHtml(metric(item,'nfc_scans'))}"></label><label>Menü açılışı<input id="pa_menu_opens" type="number" min="0" value="${escapeHtml(metric(item,'menu_opens'))}"></label><label>Feedback<input id="pa_feedback_count" type="number" min="0" value="${escapeHtml(metric(item,'feedback_count'))}"></label><label>Google yönlendirmesi<input id="pa_google_redirects" type="number" min="0" value="${escapeHtml(metric(item,'google_redirects'))}"></label></div>
-        </section>
+        </section>` : ''}
 
         <section class="bg-project-admin-section"><div class="bg-project-admin-section-title"><b>SEO</b><span>Boş bırakılırsa proje başlığı ve özeti otomatik değerlendirilir.</span></div>
           <label>SEO title<input id="pa_seo_title" maxlength="180" value="${escapeHtml(item.seo_title)}"></label><label>SEO description<textarea id="pa_seo_description" rows="3" maxlength="220">${escapeHtml(item.seo_description)}</textarea></label>
@@ -230,6 +232,8 @@
   }
 
   function field(id) { return String($(`#${id}`)?.value ?? '').trim(); }
+  // Gizlenen alanlar formda yoksa mevcut değer korunur; kayıtta boşla ezilmez.
+  function keepField(id, fallback) { return $(`#${id}`) ? field(id) : (fallback ?? ''); }
   function numField(id) { const v = field(id); return v === '' ? '' : Number(v); }
   function payloadFromForm() {
     const item = current();
@@ -239,9 +243,9 @@
         project_active: !!$('#pa_active')?.checked,
         sort_order: Math.max(1, Number(field('pa_sort') || item.sort_order || 999)),
         client: field('pa_client'), title: field('pa_title'), summary: field('pa_summary'), sector: field('pa_sector'),
-        need: field('pa_need'), solution: field('pa_solution'), quantity: field('pa_quantity'), system: field('pa_system'), delivery: field('pa_delivery'), result: field('pa_result'),
+        need: keepField('pa_need', item.need), solution: keepField('pa_solution', item.solution), quantity: field('pa_quantity'), system: field('pa_system'), delivery: field('pa_delivery'), result: field('pa_result'),
         tags: field('pa_tags').split(',').map(x => x.trim()).filter(Boolean),
-        metrics: { nfc_scans:numField('pa_nfc_scans'), menu_opens:numField('pa_menu_opens'), feedback_count:numField('pa_feedback_count'), google_redirects:numField('pa_google_redirects') },
+        metrics: $('#pa_nfc_scans') ? { nfc_scans:numField('pa_nfc_scans'), menu_opens:numField('pa_menu_opens'), feedback_count:numField('pa_feedback_count'), google_redirects:numField('pa_google_redirects') } : (item.metrics || {}),
         seo_title: field('pa_seo_title'), seo_description: field('pa_seo_description'), cover_image: item.cover_image || ''
       },
       cover_file: state.coverFile,
