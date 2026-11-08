@@ -644,25 +644,13 @@
     "main_image_height": 760
   },
   {
-    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
-    "material_ids": [
-      "pla"
-    ],
-    "color_ids": [
-      "siyah",
-      "beyaz"
-    ],
+    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
+    "name": "Kişiye Özel Gaming Stand",
+    "category": "gaming-masaustu",
     "price_value": "949",
-    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
-    "active": true,
-    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
-    "tags": [
-      "Gaming",
-      "Kişiye Özel",
-      "PlayStation",
-      "Xbox",
-      "Masaüstü"
-    ],
+    "personalizable": true,
+    "featured": true,
+    "weight": "",
     "options": [
       "Xbox logo",
       "PlayStation logo"
@@ -675,25 +663,41 @@
       "Masaüstü kullanım",
       "Siparişe özel 3D üretim"
     ],
+    "print_method": "",
+    "technical_info": "",
+    "color_ids": [
+      "siyah",
+      "beyaz"
+    ],
+    "sort_order": 15,
+    "active": true,
+    "tags": [
+      "Gaming",
+      "Kişiye Özel",
+      "PlayStation",
+      "Xbox",
+      "Masaüstü"
+    ],
+    "personalization_info": "",
+    "description": "Gaming alanınızı düzenli ve kişisel hale getiren masaüstü standı; kulaklığınızı ve kontrolcülerinizi tek noktada sergilemek için tasarlanır. Xbox veya PlayStation logo seçeneğiyle hazırlanır ve ön yüzüne istediğiniz isim veya kısa yazı eklenir. 3D baskı teknolojisiyle siparişe özel üretilir.",
+    "usage_info": "",
+    "production_time": "",
     "slug": "kisiye-ozel-gaming-stand",
+    "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
     "price_text": "949 TL",
+    "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
+    "seo_description": "Kişiye özel gaming stand; Xbox veya PlayStation logo seçeneği, isim özelleştirme, kulaklık ve 2 kontrolcü alanı. Kuşadası 3D baskı.",
+    "material_ids": [
+      "pla"
+    ],
+    "production_status": "",
     "pricing_tiers": [],
     "sale_price_value": null,
-    "featured": true,
-    "category": "gaming-masaustu",
-    "production_note": "Ürün siparişe özel 3D baskı yöntemiyle üretilir. Logo seçimi, isim/yazı ve renk tercihi sipariş öncesinde netleştirilir. 3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır.",
-    "name": "Kişiye Özel Gaming Stand",
-    "sort_order": 15,
-    "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
-    "personalizable": true,
-    "gallery_images": [
-      {
-        "path": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
-        "width": 1254,
-        "height": 1254,
-        "alt": "Xbox logolu kişiye özel gaming standı"
-      }
-    ],
+    "estimated_production_time": "",
+    "dimensions": "",
+    "box_contents": "",
+    "og_image_source": "main",
+    "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
     "main_image_width": 1000,
     "main_image_height": 760
@@ -2144,20 +2148,14 @@
     "main_image_height": 760
   },
   {
-    "production_status": "",
-    "price_text": "249 TL",
-    "box_contents": "1 adet 3 bölmeli günlük ilaç kutusu\n1 adet kapak",
-    "og_image_source": "main",
-    "technical_info": "3 ayrı iç bölme\nKapaklı tasarım\nYaklaşık 23 g ağırlık\nKompakt taşıma formu\nFDM 3D baskı üretim",
-    "dimensions": "",
-    "price_value": "249",
-    "sort_order": 42,
-    "featured": false,
-    "production_time": "Yaklaşık 47 dakika",
     "production_note": "Ürün 3D baskı yöntemiyle üretilir. Üç ayrı bölmesi günlük tablet ve kapsüllerin düzenlenmesine göre tasarlanmıştır. 3D baskıya özgü ince katman izleri görülebilir. Ürün tıbbi cihaz değildir.",
     "name": "3 Bölmeli Günlük İlaç Kutusu",
-    "weight": "Yaklaşık 23 g",
     "category": "pratik-fonksiyonel",
+    "price_value": "249",
+    "personalizable": false,
+    "featured": false,
+    "weight": "Yaklaşık 23 g",
+    "options": [],
     "features": [
       "3 ayrı ilaç bölmesi",
       "Günlük kullanıma uygun",
@@ -2167,15 +2165,8 @@
       "Hafif yapı",
       "3D baskı üretim"
     ],
-    "seo_description": "Günlük tablet ve kapsülleri üç ayrı bölümde düzenlemek için tasarlanan kompakt 3D baskı ilaç kutusu. Sabah, öğle ve akşam düzenine uygun.",
-    "usage_info": "Günlük tablet veya kapsülleri üç ayrı bölmeye yerleştirin.\nKapağı tamamen kapatarak taşıyın.\nTemizlik sonrasında ürünün tamamen kurumasını bekleyin.\nYüksek sıcaklığa maruz bırakmayın.",
-    "pricing_tiers": [],
-    "card_description": "Günlük tablet ve kapsülleri 3 ayrı bölmede düzenlemek için tasarlanan kompakt ilaç kutusu.",
-    "slug": "3-bolmeli-gunluk-ilac-kutusu",
-    "options": [],
-    "personalization_info": "",
     "print_method": "FDM 3D baskı • 0.4 mm nozzle",
-    "active": true,
+    "technical_info": "3 ayrı iç bölme\nKapaklı tasarım\nYaklaşık 23 g ağırlık\nKompakt taşıma formu\nFDM 3D baskı üretim",
     "color_ids": [
       "silk-kings-gold",
       "sakura-pink",
@@ -2189,13 +2180,8 @@
       "beyaz",
       "kirmizi"
     ],
-    "material_ids": [
-      "pla",
-      "pla-plus",
-      "pla-hd",
-      "petg"
-    ],
-    "estimated_production_time": "1–3 iş günü",
+    "sort_order": 42,
+    "active": true,
     "tags": [
       "İlaç Kutusu",
       "3 Bölmeli",
@@ -2208,16 +2194,31 @@
       "Masaüstü",
       "3D Baskı"
     ],
-    "seo_title": "3 Bölmeli Günlük İlaç Kutusu | BG Studio 3D",
-    "personalizable": false,
-    "sale_price_value": null,
+    "personalization_info": "",
     "description": "3 Bölmeli Günlük İlaç Kutusu, gün içinde kullanılacak tablet ve kapsülleri üç ayrı bölümde düzenli biçimde taşımak için tasarlanmıştır. Sabah, öğle ve akşam kullanımını ayrı bölmelerde planlamaya uygun kompakt bir yapı sunar.\nKapaklı tasarımı sayesinde içerikleri tek kutuda toplar. Küçük boyutu çanta, masa çekmecesi veya seyahat çantasında kolayca taşınmasını sağlar. Günlük kullanım için sade, hafif ve işlevsel bir düzenleyicidir.\nÜrün tıbbi bir cihaz değildir. İlaç kullanım düzeni için doktor veya eczacı tarafından verilen talimatlar esas alınmalıdır.",
+    "usage_info": "Günlük tablet veya kapsülleri üç ayrı bölmeye yerleştirin.\nKapağı tamamen kapatarak taşıyın.\nTemizlik sonrasında ürünün tamamen kurumasını bekleyin.\nYüksek sıcaklığa maruz bırakmayın.",
+    "production_time": "Yaklaşık 47 dakika",
+    "slug": "3-bolmeli-gunluk-ilac-kutusu",
+    "seo_title": "3 Bölmeli Günlük İlaç Kutusu | BG Studio 3D",
+    "price_text": "249 TL",
+    "card_description": "Günlük tablet ve kapsülleri 3 ayrı bölmede düzenlemek için tasarlanan kompakt ilaç kutusu.",
+    "seo_description": "Günlük tablet ve kapsülleri üç ayrı bölümde düzenlemek için tasarlanan kompakt 3D baskı ilaç kutusu. Sabah, öğle ve akşam düzenine uygun.",
+    "material_ids": [
+      "pla",
+      "pla-plus",
+      "pla-hd",
+      "petg"
+    ],
+    "production_status": "",
+    "pricing_tiers": [],
+    "sale_price_value": null,
+    "estimated_production_time": "1–3 iş günü",
+    "dimensions": "",
+    "box_contents": "1 adet 3 bölmeli günlük ilaç kutusu\n1 adet kapak",
+    "og_image_source": "main",
     "gallery_images": [],
     "main_image": "assets/images/products/3-bolmeli-gunluk-ilac-kutusu-foto.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/3-bolmeli-gunluk-ilac-kutusu.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   }
 ]
