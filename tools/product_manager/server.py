@@ -22,9 +22,60 @@ def _fresh_build_module():
     build_module = importlib.reload(build_module)
     return build_module
 
+# v3.3.44 — tüm build'ler tek kilitle sıraya girer; aynı anda iki build sayfaları yarım yazamaz.
+_BUILD_RUN_LOCK = threading.RLock()
+
+
 def build_site(*args, **kwargs):
     # Product Manager uzun süre açık kalsa bile diskteki en güncel build.py kullanılır.
-    return _fresh_build_module().build_site(*args, **kwargs)
+    with _BUILD_RUN_LOCK:
+        return _fresh_build_module().build_site(*args, **kwargs)
+
+
+# v3.3.44 — yıldız / arşiv / sıralama gibi hızlı işlemler veriyi anında kaydeder, site build'i arka planda yapılır.
+# Build sürerken yeni istek gelirse tek bir ek build'de birleştirilir. Durum /api/status içinde "build" alanında.
+_BUILD_STATE_LOCK = threading.Lock()
+_BUILD_STATE = {'running': False, 'pending': False, 'last_ok': None, 'last_error': '', 'finished_at': None}
+
+
+def build_state():
+    with _BUILD_STATE_LOCK:
+        return dict(_BUILD_STATE)
+
+
+def _background_build_worker():
+    while True:
+        ok, err = True, ''
+        try:
+            build_site()
+        except Exception as exc:  # hata panelde gösterilir; worker durmaz
+            traceback.print_exc()
+            ok, err = False, str(exc)
+        with _BUILD_STATE_LOCK:
+            _BUILD_STATE.update(last_ok=ok, last_error=err, finished_at=time.time())
+            if _BUILD_STATE['pending']:
+                _BUILD_STATE['pending'] = False
+                continue
+            _BUILD_STATE['running'] = False
+            return
+
+
+def schedule_build():
+    with _BUILD_STATE_LOCK:
+        if _BUILD_STATE['running']:
+            _BUILD_STATE['pending'] = True
+            return
+        _BUILD_STATE['running'] = True
+    threading.Thread(target=_background_build_worker, daemon=True).start()
+
+
+def wait_for_background_build(timeout=180):
+    end = time.time() + timeout
+    while time.time() < end:
+        if not build_state()['running']:
+            return True
+        time.sleep(0.5)
+    return False
 
 def sync_public_shell_from_current_build():
     module = _fresh_build_module()
@@ -2120,7 +2171,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/materials':
             return self.send_json({'materials': read_materials(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/status':
-            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'image_slots': PRODUCT_IMAGE_SLOTS, 'build_revision': 'v3182-r1-admin-loop-toolbar-hotfix', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
+            return self.send_json({'ok': True, 'root': str(ROOT), 'version': PANEL_VERSION, 'image_slots': PRODUCT_IMAGE_SLOTS, 'build': build_state(), 'build_revision': 'v3182-r1-admin-loop-toolbar-hotfix', 'panel_static_sync': PANEL_STATIC_SYNC, 'catalog_admin_static_sync': CATALOG_ADMIN_STATIC_SYNC, 'startup_shell_sync': STARTUP_SHELL_SYNC, 'storage': storage_status()})
         if u.path == '/api/site-settings':
             return self.send_json({'ok': True, 'settings': read_site_settings(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/nfc-site-settings':
@@ -2407,8 +2458,8 @@ class Handler(BaseHTTPRequestHandler):
                 if not new_active:
                     p['featured'] = False
                 write_products(products)
-                build_site()
-                return self.send_json({'ok': True, 'message': 'Ürün yayına alındı.' if new_active else 'Ürün arşivlendi.', 'product': p})
+                schedule_build()
+                return self.send_json({'ok': True, 'message': ('Ürün yayına alındı.' if new_active else 'Ürün arşivlendi.') + ' Site arka planda hazırlanıyor.', 'product': p, 'build': build_state()})
 
             if self.path == '/api/feature':
                 payload = self.read_json()
@@ -2422,8 +2473,8 @@ class Handler(BaseHTTPRequestHandler):
                 if p['featured']:
                     p['active'] = True
                 write_products(products)
-                build_site()
-                return self.send_json({'ok': True, 'message': 'Öne çıkan durumu güncellendi.', 'product': p})
+                schedule_build()
+                return self.send_json({'ok': True, 'message': 'Öne çıkan durumu güncellendi. Site arka planda hazırlanıyor.', 'product': p, 'build': build_state()})
 
             if self.path == '/api/reorder':
                 payload = self.read_json()
@@ -2440,8 +2491,8 @@ class Handler(BaseHTTPRequestHandler):
                 for i, p in enumerate(ordered, 1):
                     p['sort_order'] = i
                 write_products(products)
-                build_site()
-                return self.send_json({'ok': True, 'message': 'Katalog sırası güncellendi.', 'products': products})
+                schedule_build()
+                return self.send_json({'ok': True, 'message': 'Katalog sırası güncellendi. Site arka planda hazırlanıyor.', 'products': products, 'build': build_state()})
 
             if self.path == '/api/delete':
                 payload = self.read_json()
@@ -2550,6 +2601,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json({'ok': True, 'result': build_site(), 'message': 'Site yeniden oluşturuldu.'})
 
             if self.path == '/api/shutdown':
+                # v3.3.44 — süren arka plan build'i yarıda kesilmesin (yarım sayfa commit'lenmesin).
+                wait_for_background_build()
                 self.send_json({'ok': True, 'message': 'Panel kapatılıyor.'})
                 threading.Thread(target=self.server.shutdown, daemon=True).start()
                 return
