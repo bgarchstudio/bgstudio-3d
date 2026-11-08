@@ -439,6 +439,18 @@ def legacy_order_options(p):
     return [x for x in options if x.casefold() not in color_names]
 
 
+def order_option_prices(p):
+    """Read prices from options labeled like '40 cm · 549 TL'."""
+    prices = {}
+    for option in legacy_order_options(p):
+        _, separator, label = option.rpartition(' · ')
+        if separator and label.endswith(' TL'):
+            price = canonical_price_value(label)
+            if price:
+                prices[option] = price
+    return prices
+
+
 def ensure_explicit_reference_themes():
     """Persist one explicit light/dark value for every managed reference.
 
@@ -1841,13 +1853,14 @@ def render_schema(p):
     images = product_schema_images_v3320(p)
     image = images[0] if images else f"{BASE_URL}/{p['main_image']}"
     tiers = effective_pricing_tiers(p)
+    option_prices = order_option_prices(p)
     fallback_price = schema_price_value(p)
 
     # Google Product snippets require at least one of offers, review or
     # aggregateRating. We do not fabricate ratings/reviews. Products whose
     # price is genuinely quote/measurement based therefore use ItemPage
     # markup instead of emitting an invalid Product rich-result item.
-    if not tiers and fallback_price in (None, ''):
+    if not tiers and not option_prices and fallback_price in (None, ''):
         obj = {
             '@context': 'https://schema.org',
             '@type': 'ItemPage',
@@ -1905,6 +1918,15 @@ def render_schema(p):
             })
         if offers:
             obj['offers'] = offers
+    elif option_prices:
+        obj['offers'] = [
+            {
+                '@type': 'Offer', 'name': option, 'priceCurrency': 'TRY', 'price': price,
+                'availability': product_schema_availability(p), 'url': canonical,
+                'seller': {'@id': BASE_URL + '/#organization'},
+            }
+            for option, price in option_prices.items()
+        ]
     elif fallback_price not in (None, ''):
         obj['offers'] = {
             '@type': 'Offer',
@@ -1988,7 +2010,12 @@ def render_product_page(p, related):
 
     color_entries = product_color_entries(p)
     legacy_options = legacy_order_options(p)
-    options_html = ''.join(f'<option value="{esc(o)}">{esc(o)}</option>' for o in legacy_options)
+    option_prices = order_option_prices(p)
+    options_html = ''.join(
+        f'<option value="{esc(o)}" data-option-price="{esc(option_prices.get(o, ""))}">{esc(o)}</option>'
+        if o in option_prices else f'<option value="{esc(o)}">{esc(o)}</option>'
+        for o in legacy_options
+    )
     option_field_html = ''
     option_chips_html = ''
     if legacy_options:
@@ -2575,7 +2602,8 @@ def sync_site_asset_versions():
             continue
         prefix = _relative_prefix_for_html(html_path)
         updated = re.sub(r'((?:\.\./)*assets/css/(?:styles|styles\.min)\.css\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', text)
-        updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
+        main_version = SITE_ASSET_VERSION + ('-option-price' if 'data-option-price=' in text else '')
+        updated = re.sub(r'((?:\.\./)*assets/js/main\.js\?v=)[^"\']+', rf'\g<1>{main_version}', updated)
         updated = re.sub(r'((?:\.\./)*assets/js/navigation\.js\?v=)[^"\']+', rf'\g<1>{SITE_ASSET_VERSION}', updated)
         # V3.3.31: consent.js was loaded without a version, so fixes reached visitors only after cache expiry.
         updated = re.sub(r'((?:\.\./)*assets/js/consent\.js)(?:\?v=[^"\']*)?(?=["\'])', rf'\g<1>?v={SITE_ASSET_VERSION}', updated)

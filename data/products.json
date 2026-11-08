@@ -38,10 +38,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/arac-koku-difuzoru.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/arac-koku-difuzoru.webp",
-    "poster_image_width": 1120,
-    "poster_image_height": 1400
+    "main_image_height": 760
   },
   {
     "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
@@ -59,7 +56,12 @@
       "Duvar Dekoru",
       "Hediye"
     ],
-    "options": [],
+    "options": [
+      "40 cm · 549 TL",
+      "48 cm · 649 TL",
+      "60 cm · 899 TL",
+      "80 cm · 1.299 TL"
+    ],
     "features": [
       "İstenen ölçüde üretim",
       "40 / 48 / 60 / 80 cm örnekleri",
@@ -67,7 +69,7 @@
       "Siyah renk üretim"
     ],
     "slug": "ataturk-imzasi",
-    "price_text": "Ölçüye göre fiyatlandırma",
+    "price_text": "549 TL’den başlayan fiyatlarla",
     "pricing_tiers": [],
     "sale_price_value": null,
     "featured": false,
@@ -80,10 +82,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/ataturk-imzasi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/ataturk-imzasi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Katmanlı dalga formu ve LED aydınlatmalı çerçeveli masa lambası.",
@@ -124,10 +123,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/cerceveli-dalga-lamba.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/cerceveli-dalga-lamba.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Modern çizgili, tek parça 3D baskı dekoratif kuş objesi.",
@@ -179,10 +175,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-kus-obje.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/dekoratif-kus-obje.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Renkli, çizgili ve modern 3D baskı lale objesi.",
@@ -244,10 +237,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-lale.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/dekoratif-lale.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Sevimli ve minimal mirket formunda 3D baskı dekor.",
@@ -299,10 +289,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mirket-obje.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/dekoratif-mirket-obje.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Yapay pilli mum dahil, sıcak ambiyanslı dekoratif mumluk.",
@@ -343,10 +330,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-mumluk.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/dekoratif-mumluk.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Kalp detaylı, zarif çizgili tavşan dekor objesi.",
@@ -398,10 +382,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/dekoratif-tavsan-obje.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/dekoratif-tavsan-obje.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "İçeceği su üzerinde dengede tutmaya yönelik yüzen 3D baskı tasarım.",
@@ -444,10 +425,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/havuz-icecek-tutucu.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/havuz-icecek-tutucu.webp",
-    "poster_image_width": 1120,
-    "poster_image_height": 1400
+    "main_image_height": 760
   },
   {
     "card_description": "Katmanlı heykel formuyla sıcak ışık veren sanatsal masa lambası.",
@@ -487,10 +465,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/heykel-bust-masa-lambasi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/heykel-bust-masa-lambasi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Kask, mont ve anahtarı tek noktada toplayan duvar tipi askılık.",
@@ -531,10 +506,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/kask-askiligi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kask-askiligi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım.",
@@ -542,7 +514,7 @@
       "pla"
     ],
     "color_ids": [],
-    "price_value": null,
+    "price_value": "299",
     "seo_description": "Kişiye Özel Mıknatıslı Açacak, 58 mm mıknatıslı açacak üzerine kişiye özel çok renkli tasarım. 3D baskı ile üretilir. Kuşadası elden teslim ve Türkiye geneli.",
     "active": true,
     "description": "İsim, figür, tema ve renklerle kişiselleştirilebilen ön yüzü; arka yüzde metal açacak ve mıknatıs ile tamamlanan etkinlik ve hediyelik ürünü.",
@@ -563,7 +535,7 @@
       "Toplu üretime uygun"
     ],
     "slug": "kisiye-ozel-miknatisli-acacak",
-    "price_text": "Özel üretim",
+    "price_text": "299 TL",
     "pricing_tiers": [],
     "sale_price_value": null,
     "featured": true,
@@ -576,10 +548,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/kisiye-ozel-miknatisli-acacak.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kisiye-ozel-miknatisli-acacak.webp",
-    "poster_image_width": 1400,
-    "poster_image_height": 1050
+    "main_image_height": 760
   },
   {
     "card_description": "Farklı filament renkleriyle üretilebilen sıcak ışıklı masa lambası.",
@@ -632,10 +601,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/renkli-masa-lambasi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/renkli-masa-lambasi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Heykelsi spiral form ve gün beyaz LED ışık.",
@@ -675,10 +641,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/spiral-masa-lambasi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/spiral-masa-lambasi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Xbox veya PlayStation logo seçeneği ve kişiye özel isimle üretilen kulaklık ve kontrolcü standı.",
@@ -723,13 +686,17 @@
     "sort_order": 15,
     "seo_title": "Kişiye Özel Gaming Stand | Kuşadası 3D Baskı | BG Studio 3D",
     "personalizable": true,
-    "gallery_images": [],
+    "gallery_images": [
+      {
+        "path": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
+        "width": 1254,
+        "height": 1254,
+        "alt": "Xbox logolu kişiye özel gaming standı"
+      }
+    ],
     "main_image": "assets/images/products/kisiye-ozel-gaming-stand.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kisiye-ozel-gaming-stand.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Iron Man’ın ikonik elinden ilham alan, ışıklı masaüstü dekor lambası. Gaming setup ve çalışma masaları için dikkat çekici bir tasarım.",
@@ -1128,7 +1095,7 @@
     "seo_title": "Diş Macunu Tüp Sıkacağı | Kuşadası 3D Baskı | BG Studio 3D",
     "personalizable": false,
     "gallery_images": [],
-    "main_image": "assets/images/products/dis-macunu-tup-sikacagi.webp",
+    "main_image": "assets/images/products/dis-macunu-tup-sikacagi-foto.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": null,
@@ -1244,7 +1211,7 @@
     "seo_title": "Drenajlı Lavabo Düzenleyici | Kuşadası 3D Baskı | BG Studio 3D",
     "personalizable": false,
     "gallery_images": [],
-    "main_image": "assets/images/products/drenajli-lavabo-duzenleyici.webp",
+    "main_image": "assets/images/products/drenajli-lavabo-duzenleyici-foto.webp",
     "main_image_width": 1000,
     "main_image_height": 760,
     "poster_image": null,
@@ -1696,13 +1663,17 @@
     "sort_order": 32,
     "seo_title": "Kedili Kitap Ayracı | Kuşadası 3D Baskı | BG Studio 3D",
     "personalizable": false,
-    "gallery_images": [],
+    "gallery_images": [
+      {
+        "path": "assets/images/posters/kedili-kitap-ayraci.webp",
+        "width": 1254,
+        "height": 1254,
+        "alt": "Kitap sayfaları arasında kedili ayraç"
+      }
+    ],
     "main_image": "assets/images/products/kedili-kitap-ayraci.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/kedili-kitap-ayraci.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Elde tekrar tekrar katlanıp açılan hareketli yapısıyla masa başında oynamaya uygun Sonsuzluk Küpü fidget oyuncak.",
@@ -1845,10 +1816,7 @@
     "gallery_images": [],
     "main_image": "assets/images/products/taki-aksesuar-tepsisi.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": "assets/images/posters/taki-aksesuar-tepsisi.webp",
-    "poster_image_width": 1254,
-    "poster_image_height": 1254
+    "main_image_height": 760
   },
   {
     "card_description": "Gözlüğünüzü araç güneşliğine sabitleyen, kolay erişim sağlayan kompakt 3D baskı gözlük tutucu.",
@@ -2245,7 +2213,7 @@
     "card_description": "Günlük tablet ve kapsülleri 3 ayrı bölmede düzenlemek için tasarlanan kompakt ilaç kutusu.",
     "seo_description": "Günlük tablet ve kapsülleri üç ayrı bölümde düzenlemek için tasarlanan kompakt 3D baskı ilaç kutusu. Sabah, öğle ve akşam düzenine uygun.",
     "gallery_images": [],
-    "main_image": "assets/images/products/3-bolmeli-gunluk-ilac-kutusu.webp",
+    "main_image": "assets/images/products/3-bolmeli-gunluk-ilac-kutusu-foto.webp",
     "main_image_width": 1000,
     "main_image_height": 760
   }
