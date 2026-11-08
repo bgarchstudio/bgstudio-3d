@@ -1460,6 +1460,7 @@ if (orderConfig) {
   const fallbackPriceText = orderConfig.dataset.productPrice || '';
   const basePriceValue = Number(String(orderConfig.dataset.productBasePriceValue || '').replace(',', '.')) || 0;
   const option = orderConfig.querySelector('[data-order-option]');
+  const selectedOptionPrice = () => Number(option?.selectedOptions?.[0]?.dataset.optionPrice) || 0;
   const tier = orderConfig.querySelector('[data-order-tier]');
   const qty = orderConfig.querySelector('[data-order-qty]');
   const note = orderConfig.querySelector('[data-order-note]');
@@ -1518,7 +1519,8 @@ if (orderConfig) {
       btn.classList.toggle('selected', active);
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
-    const label = t?.priceLabel || (basePriceValue ? formatTL(basePriceValue) : fallbackPriceText);
+    const unitPrice = selectedOptionPrice() || basePriceValue;
+    const label = t?.priceLabel || (unitPrice ? formatTL(unitPrice) : fallbackPriceText);
     if (priceDisplay && label) priceDisplay.textContent = label;
     if (mobilePrice && label) mobilePrice.textContent = label;
   };
@@ -1560,8 +1562,7 @@ if (orderConfig) {
     const selected = option?.value || '';
     const t = selectedTier();
     const totalItems = t ? t.packQty * amount : amount;
-    let totalValue = basePriceValue ? basePriceValue * amount : 0;
-    if (t) totalValue = t.packPrice * amount;
+    const totalValue = (t ? t.packPrice : selectedOptionPrice() || basePriceValue) * amount;
     if (refreshColors && colorOptions.length) renderColorSlots();
     const colors = colorSummaryText();
     const summaryParts = [];
@@ -1600,7 +1601,7 @@ if (orderConfig) {
     const t = selectedTier();
     const product = analyticsProductContext();
     const totalItems = t ? t.packQty * amount : amount;
-    const totalValue = t?.packPrice ? t.packPrice * amount : (product?.price ? product.price * amount : basePriceValue * amount);
+    const totalValue = (t?.packPrice || selectedOptionPrice() || product?.price || basePriceValue) * amount;
     const payload = {
       method: 'product_order_whatsapp',
       item_id: product?.item_id || name,
