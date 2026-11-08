@@ -5482,6 +5482,14 @@ def build_site(nfc_family_theme_overrides=None):
     home_path = ROOT / 'index.html'
     home = home_path.read_text(encoding='utf-8')
     featured = [p for p in active if p.get('featured')]
+    # v3.3.47 — öne çıkanların panelde sürükle-bırak ile verilen kendi sırası (featured_order); sırası olmayanlar
+    # katalog sırasına göre sona dizilir. Ana sayfanın üst bölümü ve vitrin şeridi bu sırayı izler.
+    def _featured_key(product):
+        try:
+            return (0, int(product.get('featured_order')), 0)
+        except (TypeError, ValueError):
+            return (1, 0, int(product.get('sort_order') or 9999))
+    featured.sort(key=_featured_key)
     homecards = '\n'.join(render_card(p, '') for p in featured)
     home = replace_between(home, '<!-- PRODUCT_MANAGER:FEATURED_START -->', '<!-- PRODUCT_MANAGER:FEATURED_END -->', homecards)
     home_path.write_text(home, encoding='utf-8')

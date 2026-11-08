@@ -1489,11 +1489,16 @@ def clean_product(p):
         'slug', 'name', 'category', 'price_text', 'price_value', 'sale_price_value', 'card_description', 'description',
         'options', 'features', 'production_note', 'main_image', 'main_image_width', 'main_image_height',
         'poster_image', 'poster_image_width', 'poster_image_height', 'gallery_images', 'featured', 'active',
-        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'material_ids', 'personalizable', 'tags', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source'
+        'sort_order', 'seo_title', 'seo_description', 'pricing_tiers', 'color_ids', 'material_ids', 'personalizable', 'tags', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source', 'featured_order'
     }
     out = {k: p.get(k) for k in allowed if k in p}
     out['name'] = str(out.get('name') or '').strip()
     out['slug'] = slugify(str(out.get('slug') or out['name']))
+    if 'featured_order' in out:
+        try:
+            out['featured_order'] = int(out['featured_order'])
+        except (TypeError, ValueError):
+            out.pop('featured_order', None)
     if not out['name'] or not out['slug']:
         raise ValueError('Ürün adı ve URL slug zorunlu.')
     category = str(out.get('category') or '').strip()
@@ -2309,7 +2314,7 @@ class Handler(BaseHTTPRequestHandler):
                 idx = next((i for i, x in enumerate(products) if x['slug'] == original), None) if original else None
                 raw_product = dict(payload.get('product') or {})
                 old_for_meta = products[idx] if idx is not None else {}
-                for meta_key in ('material_ids', 'personalizable', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source'):
+                for meta_key in ('material_ids', 'personalizable', 'dimensions', 'weight', 'print_method', 'production_time', 'estimated_production_time', 'box_contents', 'technical_info', 'usage_info', 'personalization_info', 'production_status', 'og_image_source', 'featured_order'):
                     if meta_key not in raw_product and meta_key in old_for_meta:
                         raw_product[meta_key] = old_for_meta.get(meta_key)
                 p = clean_product(raw_product)
@@ -2472,9 +2477,36 @@ class Handler(BaseHTTPRequestHandler):
                 p['featured'] = not bool(p.get('featured'))
                 if p['featured']:
                     p['active'] = True
+                    # v3.3.47 — yeni yıldızlanan ürün öne çıkanlar sırasının sonuna eklenir.
+                    orders = [int(x.get('featured_order')) for x in products if x is not p and x.get('featured') and str(x.get('featured_order', '')).lstrip('-').isdigit()]
+                    if orders:
+                        p['featured_order'] = max(orders) + 1
+                    else:
+                        p.pop('featured_order', None)
+                else:
+                    p.pop('featured_order', None)
                 write_products(products)
                 schedule_build()
                 return self.send_json({'ok': True, 'message': 'Öne çıkan durumu güncellendi. Site arka planda hazırlanıyor.', 'product': p, 'build': build_state()})
+
+            if self.path == '/api/featured-reorder':
+                # v3.3.47 — öne çıkanların kendi sırası; katalog sırasını (sort_order) değiştirmez.
+                payload = self.read_json()
+                order = [str(x) for x in (payload.get('order') or [])]
+                products = read_products()
+                featured = [x for x in products if x.get('featured')]
+                by_slug = {x.get('slug'): x for x in featured}
+                ranked, seen = [], set()
+                for slug in order:
+                    if slug in by_slug and slug not in seen:
+                        ranked.append(by_slug[slug]); seen.add(slug)
+                ranked += [x for x in featured if x.get('slug') not in seen]
+                backup()
+                for i, x in enumerate(ranked, 1):
+                    x['featured_order'] = i
+                write_products(products)
+                schedule_build()
+                return self.send_json({'ok': True, 'message': 'Öne çıkanların sırası güncellendi. Site arka planda hazırlanıyor.', 'products': products, 'build': build_state()})
 
             if self.path == '/api/reorder':
                 payload = self.read_json()
