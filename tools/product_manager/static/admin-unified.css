@@ -1011,3 +1011,11 @@ html body .bg-project-admin-filters button{min-height:28px!important;height:auto
 html body[data-bg-admin-page] #campaignModal .modal-backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(18,14,11,.86)!important}
 html body.modal-open :is(.top,.form-footer,.save-state,.quality-chip,#previewProduct,.intro-side button){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body #campaignPreviewLine{transform-style:flat!important;backface-visibility:visible!important}
+
+/* v3.3.43 — Ürünler sayfası açıklaması penceresi ve kenar çubuğu butonu */
+html body .catalog-intro-launch{display:block;width:100%;margin-top:8px;padding:10px 12px!important;border-radius:999px;font-size:12px!important;text-align:center}
+html body .catalog-intro-card{max-width:640px}
+html body #catalogIntroText{width:100%;min-height:150px;margin-top:10px}
+html body .catalog-intro-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+html body .catalog-intro-foot #catalogIntroState{flex:1;color:var(--muted,#816f61);font-size:12px}
+html body .moved-note a{color:inherit;text-decoration:underline}

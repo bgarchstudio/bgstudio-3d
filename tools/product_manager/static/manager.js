@@ -325,3 +325,21 @@ document.addEventListener('click',e=>{if(e.target.matches('[data-close-publish]'
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('publishModal').hidden){$('publishModal').hidden=true;document.body.classList.remove('modal-open')}});
 
 $('openContent').onclick=()=>location.href='content.html';
+
+// v3.3.43 — "Ürünler sayfası açıklaması" artık ürün yöneticisinde (önceden NFC ekranındaydı).
+// Mevcut /api/nfc-site-settings/save uç noktası yalnızca website_copy gönderildiğinde fiyat ve görselleri korur.
+(()=>{const btn=document.createElement('button');btn.type='button';btn.id='openCatalogIntro';btn.className='ghost catalog-intro-launch';btn.textContent='Ürünler sayfası açıklaması';$('newProduct').after(btn);
+const modal=document.createElement('div');modal.className='modal';modal.id='catalogIntroModal';modal.hidden=true;
+modal.innerHTML=`<div class="modal-backdrop" data-close-catalog-intro></div><div class="modal-card catalog-intro-card" role="dialog" aria-modal="true" aria-labelledby="catalogIntroTitle"><button class="modal-close" type="button" data-close-catalog-intro aria-label="Kapat">×</button><p class="eyebrow-preview">ÜRÜNLER SAYFASI</p><h2 id="catalogIntroTitle">“Atölyeden çıkanlar” açıklaması</h2><p class="publish-intro">Ürünler sayfasının üstündeki tanıtım metni. Kategoriler büyüdükçe buradan güncelleyebilirsin.</p><textarea id="catalogIntroText" maxlength="520" rows="6" aria-label="Ürünler sayfası açıklaması"></textarea><div class="catalog-intro-foot"><small><span id="catalogIntroCount">0</span>/520 karakter</small><span id="catalogIntroState" role="status"></span><button id="saveCatalogIntro" class="primary" type="button">Kaydet ve siteyi hazırla</button></div></div>`;
+document.body.append(modal);
+const close=()=>{modal.hidden=true;document.body.classList.remove('modal-open');btn.focus()};
+const count=()=>{$('catalogIntroCount').textContent=$('catalogIntroText').value.length};
+btn.onclick=async()=>{try{const d=await api('/api/nfc-site-settings');$('catalogIntroText').value=d.website_copy?.catalog_intro||'';count();$('catalogIntroState').textContent='';modal.hidden=false;document.body.classList.add('modal-open');$('catalogIntroText').focus()}catch(e){toast(e.message,true)}};
+$('catalogIntroText').addEventListener('input',()=>{count();$('catalogIntroState').textContent='Kaydedilmemiş değişiklik var.'});
+modal.addEventListener('click',e=>{if(e.target.closest('[data-close-catalog-intro]'))close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
+$('saveCatalogIntro').onclick=async()=>{const b=$('saveCatalogIntro');const text=$('catalogIntroText').value.trim();if(!text){toast('Açıklama boş olamaz.',true);return}b.disabled=true;$('catalogIntroState').textContent='Kaydediliyor, site hazırlanıyor…';try{await api('/api/nfc-site-settings/save',{method:'POST',body:JSON.stringify({website_copy:{catalog_intro:text}})});$('catalogIntroState').textContent='Kaydedildi · 1 dk bekleyip Commit + Push';toast('✅ Ürünler sayfası açıklaması kaydedildi ve site hazırlandı.')}catch(e){$('catalogIntroState').textContent='Hata · metin pencerede duruyor';toast(e.message,true)}finally{b.disabled=false}};})();
+
+// v3.3.43 — Başlığın yanında "Hazır · 9/9" ve "Hazır" yan yana iki kez yazıyordu: sistem boştayken ikinci "Hazır" gizlenir;
+// kaydetme, hata ve "kaydedilmemiş değişiklik" mesajları görünmeye devam eder.
+(()=>{const s=$('saveState');if(!s)return;const sync=()=>{s.hidden=/^\s*Hazır\s*$/.test(s.textContent)};new MutationObserver(sync).observe(s,{childList:true,characterData:true,subtree:true});sync()})();
