@@ -44,6 +44,14 @@
         "enabled": true,
         "source_type": "manual",
         "source_ref": ""
+      },
+      {
+        "id": "mesaj-6",
+        "text": "Shopier Mağaza Linkimiz",
+        "url": "https://www.shopier.com/bgstudio3dtr",
+        "enabled": true,
+        "source_type": "manual",
+        "source_ref": ""
       }
     ],
     "integration": {
