@@ -88,7 +88,7 @@
     try {
       const response = await api('/api/projects-admin');
       const data = await response.json();
-      if (!response.ok || !data.ok) throw new Error(data.message || 'Projeler alınamadı.');
+      if (!response.ok || !data.ok) throw new Error(data.error || data.message || 'Projeler alınamadı.');
       state.items = Array.isArray(data.items) ? data.items : [];
       if (!preserve || !state.items.some(x => x.id === state.activeId)) state.activeId = state.items[0]?.id || '';
       renderList();
@@ -256,7 +256,7 @@
     if (status) status.textContent = 'Kaydediliyor ve site yeniden üretiliyor...'; if (button) button.disabled = true;
     try {
       const response = await api('/api/projects-admin/save', { method:'POST', body: JSON.stringify(payloadFromForm()) });
-      const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.message || 'Kayıt başarısız.');
+      const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || data.message || 'Kayıt başarısız.');
       if (status) status.textContent = 'Kaydedildi. Proje sayfaları güncellendi.';
       await loadProjects(true);
     } catch (error) { if (status) status.textContent = error.message; alert(error.message); }
@@ -268,7 +268,7 @@
     if (!confirm('Bu projenin özel Case Study ayarlarını sıfırlayıp kaynak saha kaydına dönmek istiyor musun?')) return;
     try {
       const response = await api('/api/projects-admin/reset', { method:'POST', body:JSON.stringify({ id:item.id }) });
-      const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.message || 'Sıfırlama başarısız.');
+      const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || data.message || 'Sıfırlama başarısız.');
       await loadProjects(true);
     } catch (error) { alert(error.message); }
   }

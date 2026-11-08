@@ -971,3 +971,12 @@ body[data-bg-admin-page="content"] .bg-v3182-save-explainer{
   html[data-bg-admin-ui="v3182"] *::before,
   html[data-bg-admin-ui="v3182"] *::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+
+/* v3.3.37 — okunabilirlik + klavye erişimi: 8.5–9px yardımcı metinler okunmuyordu, butonlarda odak halkası yoktu. */
+:where(button,a,[role=button],summary,input[type=checkbox],input[type=radio],input[type=file]):focus-visible{outline:2px solid #b77736!important;outline-offset:2px!important}
+html:root body:is([data-bg-admin-page],:not([data-bg-admin-page])) :is(small,.image-spec-status,#saveState,#qualityState,#dragNote,#repoPath,#productionStatusHint,.pricing-empty,.gallery-preview>small,.seo-meter span){font-size:11px!important;line-height:1.45}
+html:root body[data-bg-admin-page] :is(.top button,.top a,#openSite){font-size:11px!important}
+.catalog-admin-filter-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:999px;background:rgba(41,29,21,.1);font-size:10px;font-weight:700;line-height:1}
+button.active .catalog-admin-filter-count,[aria-pressed=true] .catalog-admin-filter-count{background:rgba(255,255,255,.22)}
+button:disabled{cursor:progress;opacity:.7}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

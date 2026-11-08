@@ -6,7 +6,7 @@
   const api = async (path, options={}) => {
     const res = await fetch(path, {cache:'no-store', headers:{'Content-Type':'application/json', ...(options.headers||{})}, ...options});
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || data.ok === false) throw new Error(data.message || 'İşlem tamamlanamadı.');
+    if (!res.ok || data.ok === false) throw new Error(data.error || data.message || `İşlem tamamlanamadı (${res.status}).`);
     return data;
   };
 

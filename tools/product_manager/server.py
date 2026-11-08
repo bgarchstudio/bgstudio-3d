@@ -1102,6 +1102,14 @@ def preflight():
         checks.append({'status':'pass','label':'Ürün verisi','detail':f'{len(products)} ürün JSON dosyasından okunuyor.'})
     except Exception as e:
         return {'ok':False,'checks':[{'status':'fail','label':'Ürün verisi','detail':str(e)}]}
+    pillow_ok = getattr(build_module, 'PILImage', None) is not None
+    checks.append({
+        'status': 'pass' if pillow_ok else 'fail',
+        'label': 'Görsel işleme (Pillow)',
+        'detail': 'Pillow yüklü; küçük görseller ve ölçüler HTML’e yazılıyor.' if pillow_ok else
+                  f'Bu Python’da Pillow yok ({sys.executable}). Site oluşturulurken görsel ölçüleri kaybolur ve PageSpeed düşer. '
+                  f'Çözüm: komut satırında "{sys.executable}" -m pip install Pillow'
+    })
     active = [x for x in products if x.get('active', True)]
     slugs = [x.get('slug') for x in products]
     dupes = sorted({x for x in slugs if x and slugs.count(x) > 1})
@@ -1944,9 +1952,41 @@ def reset_project_admin(project_id):
     return build_site()
 
 
+_LOCAL_HOSTS = {'127.0.0.1', 'localhost', '::1'}
+# v3.3.37 — ThreadingHTTPServer istekleri paralel işler; iki kayıt aynı anda products.json'u
+# okuyup yazarsa biri diğerini ezer. Tüm yazma işlemleri bu kilitle sıraya girer.
+_WRITE_LOCK = threading.RLock()
+
+
+def _host_only(value):
+    value = (value or '').strip().lower()
+    if value.startswith('['):
+        return value[1:value.find(']')] if ']' in value else value
+    return value.rsplit(':', 1)[0] if value.count(':') == 1 else value
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print('[Panel]', fmt % args)
+
+    def _is_trusted_request(self, write=False):
+        """v3.3.37 — panel yalnızca kendi sayfasından kullanılabilir.
+
+        Host kontrolü DNS rebinding saldırısını, Origin/Sec-Fetch-Site kontrolü ise ziyaret edilen
+        başka bir sitenin arka planda 127.0.0.1 paneline ürün silme/geri yükleme isteği atmasını engeller.
+        """
+        if _host_only(self.headers.get('Host')) not in _LOCAL_HOSTS:
+            return False
+        if not write:
+            return True
+        origin = self.headers.get('Origin')
+        if origin is not None:
+            if _host_only(urlparse(origin).netloc) not in _LOCAL_HOSTS:
+                return False
+        if (self.headers.get('Sec-Fetch-Site') or '').lower() == 'cross-site':
+            return False
+        content_type = (self.headers.get('Content-Type') or '').split(';', 1)[0].strip().lower()
+        return content_type == 'application/json'
 
     def send_json(self, obj, status=200):
         b = json.dumps(obj, ensure_ascii=False).encode('utf-8')
@@ -1989,6 +2029,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(b)
 
     def do_GET(self):
+        if not self._is_trusted_request():
+            return self.send_json({'ok': False, 'error': 'Panel yalnızca bu bilgisayardan açılabilir.'}, 403)
         u = urlparse(self.path)
         if u.path == '/api/products':
             categories = [{'id': category_id, 'label': label} for category_id, label in CATEGORY_OPTIONS]
@@ -2023,6 +2065,12 @@ class Handler(BaseHTTPRequestHandler):
         return self.send_file(STATIC / path, STATIC)
 
     def do_POST(self):
+        if not self._is_trusted_request(write=True):
+            return self.send_json({'ok': False, 'error': 'Bu istek panel dışından geldiği için reddedildi.'}, 403)
+        with _WRITE_LOCK:
+            return self._handle_post()
+
+    def _handle_post(self):
         try:
             if self.path == '/api/site-settings/save':
                 payload = self.read_json()
@@ -2463,7 +2511,39 @@ def _shutdown_stale_panel_servers():
         time.sleep(0.65)
 
 
+def _relaunch_with_pillow_python():
+    """v3.3.37 — Pillow olmayan bir Python ile açılırsa, Pillow'lu bir Python bulup paneli onunla başlatır.
+
+    Pillow yoksa build görsel ölçülerini ve küçük türev görselleri üretemez; panel her açılışta
+    yayındaki sayfaları PageSpeed açısından geriletir. Bu yüzden sessizce devam etmek yerine
+    uygun yorumlayıcıya geçilir; bulunamazsa açık bir uyarı basılır.
+    """
+    import os, subprocess
+    if getattr(build_module, 'PILImage', None) is not None or os.environ.get('BG_PANEL_PILLOW_RELAUNCH'):
+        return
+    candidates = []
+    try:
+        out = subprocess.run(['py', '-0p'], capture_output=True, text=True, timeout=8).stdout
+        candidates += [m.group(1).strip() for m in re.finditer(r'(\S:\\.*?python\.exe)\s*$', out, re.M)]
+    except Exception:
+        pass
+    for exe in candidates:
+        if Path(exe).resolve() == Path(sys.executable).resolve():
+            continue
+        try:
+            if subprocess.run([exe, '-c', 'import PIL'], capture_output=True, timeout=15).returncode != 0:
+                continue
+        except Exception:
+            continue
+        print(f'Pillow bu Python’da yok; panel Pillow’lu Python ile açılıyor: {exe}')
+        env = dict(os.environ, BG_PANEL_PILLOW_RELAUNCH='1')
+        sys.exit(subprocess.call([exe, str(Path(__file__).resolve()), *sys.argv[1:]], env=env))
+    print('\n[UYARI] Pillow bulunamadı. Görsel ölçüleri HTML’e yazılamaz.')
+    print(f'Çözüm: "{sys.executable}" -m pip install Pillow\n')
+
+
 def run():
+    _relaunch_with_pillow_python()
     _shutdown_stale_panel_servers()
     # Always regenerate public pages from the persistent AppData collections
     # before opening the manager. This prevents a correct panel record set from
