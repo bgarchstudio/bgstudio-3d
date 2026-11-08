@@ -1102,7 +1102,10 @@ def preflight():
         checks.append({'status':'pass','label':'Ürün verisi','detail':f'{len(products)} ürün JSON dosyasından okunuyor.'})
     except Exception as e:
         return {'ok':False,'checks':[{'status':'fail','label':'Ürün verisi','detail':str(e)}]}
-    pillow_ok = getattr(build_module, 'PILImage', None) is not None
+    try:
+        pillow_ok = getattr(_fresh_build_module(), 'PILImage', None) is not None
+    except Exception:
+        pillow_ok = getattr(build_module, 'PILImage', None) is not None
     checks.append({
         'status': 'pass' if pillow_ok else 'fail',
         'label': 'Görsel işleme (Pillow)',
@@ -1175,9 +1178,22 @@ def preflight():
     cname_ok = cname.exists() and cname.read_text(encoding='utf-8').strip() == '3d.bgstudio.com.tr'
     checks.append({'status':'fail' if not cname_ok else 'pass','label':'Canlı domain','detail':'CNAME = 3d.bgstudio.com.tr' if cname_ok else 'CNAME eksik veya beklenen domain farklı.'})
     sitemap = ROOT / 'sitemap.xml'
-    expected = len(active) + 12
-    locs = sitemap.read_text(encoding='utf-8').count('<loc>') if sitemap.exists() else 0
-    checks.append({'status':'pass' if locs == expected else 'warn','label':'Sitemap','detail':f'{locs} URL bulundu; beklenen {expected}.'})
+    # v3.3.40 — sabit "ürün + 12" beklentisi projeler/NFC sayfaları eklenince yanlış uyarı veriyordu.
+    # Artık her aktif ürünün sitemap'te olduğu ve sitemap'teki her adresin gerçekten var olduğu doğrulanır.
+    sm_text = sitemap.read_text(encoding='utf-8') if sitemap.exists() else ''
+    sm_urls = re.findall(r'<loc>\s*([^<\s]+)\s*</loc>', sm_text)
+    missing_in_sitemap = [x.get('slug') for x in active if f"/urunler/{x.get('slug')}/" not in sm_text]
+    dead_in_sitemap = []
+    for url in sm_urls:
+        rel = re.sub(r'^https?://[^/]+/?', '', url).split('#', 1)[0].split('?', 1)[0]
+        target = ROOT / rel
+        if not rel or rel.endswith('/'):
+            target = target / 'index.html'
+        if not target.exists():
+            dead_in_sitemap.append(rel or '/')
+    sm_problems = ([f"Eksik ürün: {', '.join(missing_in_sitemap[:6])}"] if missing_in_sitemap else []) + ([f"Var olmayan adres: {', '.join(dead_in_sitemap[:6])}"] if dead_in_sitemap else [])
+    checks.append({'status': 'warn' if (sm_problems or not sm_urls) else 'pass', 'label': 'Sitemap',
+                   'detail': ' · '.join(sm_problems) if sm_problems else (f'{len(sm_urls)} URL; tüm aktif ürünler var, her adres gerçek bir sayfaya gidiyor.' if sm_urls else 'sitemap.xml bulunamadı.')})
 
     # Site-wide chrome and internal-link audit. This catches navigation drift before GitHub push.
     public_html = [p for p in ROOT.rglob('*.html') if 'tools\\product_manager' not in str(p) and 'tools/product_manager' not in p.as_posix()]
@@ -1205,7 +1221,7 @@ def preflight():
         nav_match = re.search(r'<nav\b[^>]*class="[^"]*main-nav[^"]*"[^>]*>(.*?)</nav>', html, re.S | re.I)
         if nav_match:
             nav_html = nav_match.group(1)
-            if 'prototip-parca/' not in nav_html or proto_label not in nav_html:
+            if not re.search(r'href="(?:\.\./)*(?:/)?prototip-parca/"', nav_html):
                 nav_issues.append(rel_page)
             expected_href = expected_active.get(rel_page)
             if expected_href:
@@ -1238,7 +1254,7 @@ def preflight():
             if not target.exists():
                 broken_links.append(f'{rel_page} → {href}')
     duplicate_titles = [f"{title}: {', '.join(pages[:3])}" for title,pages in title_map.items() if title and len(pages) > 1]
-    checks.append({'status':'fail' if nav_issues else 'pass','label':'Ana menü tutarlılığı','detail':('Prototip sekmesi eksik/farklı: '+', '.join(nav_issues[:8])) if nav_issues else 'Tüm sayfalarda Prototip & Parça Üretim sekmesi aynı.'})
+    checks.append({'status':'fail' if nav_issues else 'pass','label':'Ana menü tutarlılığı','detail':('Prototip & Parça bağlantısı menüde yok: '+', '.join(nav_issues[:8])) if nav_issues else 'Tüm sayfaların ana menüsünde Prototip & Parça bağlantısı var.'})
     checks.append({'status':'warn' if active_nav_issues else 'pass','label':'Aktif sekme durumu','detail':('Aktif menü yanlış/eksik: '+', '.join(active_nav_issues[:8])) if active_nav_issues else 'Ana hizmet sayfalarında aktif sekme doğru işaretleniyor.'})
     checks.append({'status':'warn' if h1_issues else 'pass','label':'Sayfa başlık yapısı','detail':('Kontrol et: '+', '.join(h1_issues[:8])) if h1_issues else 'Tüm ana sayfalarda tek H1 kullanılıyor.'})
     checks.append({'status':'warn' if duplicate_titles else 'pass','label':'SEO başlık benzersizliği','detail':('Tekrarlanan title: '+ ' | '.join(duplicate_titles[:4])) if duplicate_titles else 'HTML title alanları birbirinden ayrışıyor.'})
