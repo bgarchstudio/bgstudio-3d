@@ -51,17 +51,18 @@
     "main_image_height": 760
   },
   {
-    "card_description": "İstenen ölçülerde 3D baskı siyah Atatürk imzası.",
+    "card_description": "İstenen ölçülerde siyah veya beyaz 3D baskı Atatürk imzası.",
     "material_ids": [
       "petg"
     ],
     "color_ids": [
-      "siyah"
+      "siyah",
+      "beyaz"
     ],
     "price_value": null,
-    "seo_description": "Duvar ve mermer yüzeyler için siyah 3D baskı Atatürk imzası. 40, 48, 60 ve 80 cm ölçülerde veya istediğin özel ölçüde üretilir. Türkiye geneli kargo.",
+    "seo_description": "Duvar ve mermer yüzeyler için siyah veya beyaz 3D baskı Atatürk imzası. 40, 48, 60 ve 80 cm ölçülerde ya da istediğin ölçüde üretilir. Türkiye geneli kargo.",
     "active": true,
-    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah 3D baskı Atatürk imzası.",
+    "description": "Duvar ve mermer yüzeylerde dekoratif kullanım için farklı ölçülerde üretilebilen siyah veya beyaz 3D baskı Atatürk imzası.",
     "tags": [
       "Duvar Dekoru",
       "Hediye"
@@ -76,7 +77,7 @@
       "İstenen ölçüde üretim",
       "40 / 48 / 60 / 80 cm örnekleri",
       "Duvar ve mermer yüzeye uygun",
-      "Siyah renk üretim"
+      "Siyah veya beyaz renk seçeneği"
     ],
     "slug": "ataturk-imzasi",
     "price_text": "549 TL’den başlayan fiyatlarla",
