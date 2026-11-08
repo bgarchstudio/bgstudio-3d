@@ -1267,7 +1267,17 @@ def render_homepage_v3163(active, featured, field_items):
     hero_main = hero_products[0] if hero_products else None
     hero_side_1 = hero_products[1] if len(hero_products) > 1 else hero_main
     hero_side_2 = hero_products[2] if len(hero_products) > 2 else hero_side_1
-    showcase_slots = _homepage_slot_products(active, featured, home_copy.get('showcase_product_slugs'), 6, allow_hide=True)
+    # v3.3.45 — vitrin şeridi üstteki 3 ürünü tekrar etmez ve (otomatik moddayken) tüm öne çıkan ürünleri gösterir;
+    # şerit kaydırmalı olduğu için 6 ile sınırlı değildir. Site İçerikleri'nden elle seçilen yuvalar aynen korunur.
+    showcase_config = list(home_copy.get('showcase_product_slugs') or [])[:6]
+    if any(str(token or '').strip() for token in showcase_config):
+        showcase_slots = _homepage_slot_products(active, featured, showcase_config, 6, allow_hide=True)
+    else:
+        hero_slugs = {str(p.get('slug') or '') for p in hero_products if p}
+        showcase_slots = [p for p in (featured or []) if str(p.get('slug') or '') not in hero_slugs]
+        if len(showcase_slots) < 6:
+            used = hero_slugs | {str(p.get('slug') or '') for p in showcase_slots}
+            showcase_slots += [p for p in (active or []) if str(p.get('slug') or '') not in used][:6 - len(showcase_slots)]
     product_cards = '\n'.join(render_home_showcase_product(product, i) for i, product in enumerate(showcase_slots) if product)
     project_cards = '\n'.join(render_home_project_feature(x, i + 1, '') for i, x in enumerate((field_items or [])[:4]))
     production_product = _homepage_single_product(active, featured, home_copy.get('production_product_slug'), fallback_index=1)
