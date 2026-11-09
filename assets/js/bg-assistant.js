@@ -388,9 +388,10 @@
 
   const setBusy = busy => {
     state.busy = busy;
-    // V3.3.55: keep the input focusable while waiting — disabling it blurs the field and
-    // closes the mobile keyboard, which made the panel jump on every message.
-    if (input) { input.readOnly = busy; input.setAttribute('aria-busy', busy ? 'true' : 'false'); }
+    // V3.3.81: never touch disabled/readOnly on the input while it is focused — iOS Safari
+    // dismisses the keyboard the moment a focused field becomes read-only, so the panel
+    // shrank on every reply. The user may keep typing; sending is blocked by state.busy.
+    if (input) input.setAttribute('aria-busy', busy ? 'true' : 'false');
     if (sendButton) { sendButton.setAttribute('aria-disabled', busy ? 'true' : 'false'); sendButton.classList.toggle('is-busy', busy); }
     panel.classList.toggle('is-thinking', busy);
   };
@@ -525,13 +526,25 @@
     btn.addEventListener('pointerdown', event => { if (document.activeElement === input) event.preventDefault(); });
     btn.addEventListener('mousedown', event => { if (document.activeElement === input) event.preventDefault(); });
   });
-  form?.addEventListener('submit', event => {
-    event.preventDefault();
+  const sendFromInput = () => {
     state.refocusAfterReply = document.activeElement === input;
     if (state.busy) return;
     const value = input?.value || '';
+    if (!value.trim()) return;
     if (input) input.value = '';
     submitQuery(value);
+  };
+  form?.addEventListener('submit', event => {
+    event.preventDefault();
+    sendFromInput();
+  });
+  // Enter is handled here instead of the implicit form submit, which some mobile
+  // browsers treat as "done" and use to hide the keyboard.
+  if (input) input.setAttribute('enterkeyhint', 'send');
+  input?.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    sendFromInput();
   });
   quickButtons.forEach(button => button.addEventListener('click', () => submitQuery(button.dataset.bgAssistantPrompt || button.textContent)));
   handoff?.addEventListener('click', () => {

@@ -219,7 +219,7 @@
     geometry.translate(-center.x, -center.y, -center.z);
     geometry.rotateX(-Math.PI / 2); // STL Z-yukarı → sahne Y-yukarı
     geometry.computeVertexNormals();
-    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xf3f0eb, roughness: 0.5, metalness: 0.02 }));
+    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.5, metalness: 0.02 }));
     scene.add(mesh);
     const size = new THREE.Vector3(); box.getSize(size);
     const r = Math.max(size.x, size.y, size.z) || 1;

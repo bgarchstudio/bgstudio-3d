@@ -65,7 +65,7 @@
       if (!loaded) {
         const gltf = await new lib.GLTFLoader().loadAsync(btn.dataset.model3d);
         const model = gltf.scene;
-        const mat = new THREE.MeshStandardMaterial({ color: 0xf3f0eb, roughness: 0.48, metalness: 0.02, side: THREE.DoubleSide });
+        const mat = new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.48, metalness: 0.02, side: THREE.DoubleSide });
         model.traverse((o) => { if (o.isMesh) { o.material = mat; o.geometry.computeVertexNormals(); } });
         const box = new THREE.Box3().setFromObject(model);
         const c = box.getCenter(new THREE.Vector3()); model.position.sub(c);
