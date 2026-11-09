@@ -5448,3 +5448,54 @@ th,td,dt,.order-field>span,.color-choice>span,.footer-v3202-bottom>p,.case-proje
 :is(.wide-cta,.smart-order-whatsapp,.share-product,.catalog-reset,.quote-submit,.bg-assistant-handoff,.menu-toggle,.primary-cta,.secondary-cta,.filter-btn,.project-filter):active{transform:scale(.97)}
 :is(a,button,summary,[role="button"]):focus-visible{outline:2px solid #8a4e0e;outline-offset:3px;border-radius:6px}
 @media (prefers-reduced-motion:reduce){:is(.home-showcase-media,.home-case-study-media-link,.project-index-media-link,.project-related-card) img{transition:none}}
+
+/* ==========================================================
+   v3.3.57 · STL STÜDYO (Teklif sayfası)
+   ========================================================== */
+.stl-studio{background:#14110f;color:#f6f1ea;padding:clamp(56px,7vw,104px) 0}
+.stl-studio-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,4vw,64px);align-items:start}
+.stl-studio .eyebrow{color:#c8894a!important}
+.stl-studio h2{color:#fff;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:clamp(2rem,3.6vw,3.2rem);line-height:1.04;letter-spacing:-.03em;margin:.5rem 0 1rem;text-wrap:balance}
+.stl-studio-copy>p{color:rgba(246,241,234,.72);max-width:46ch;line-height:1.65}
+.stl-studio-points{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px}
+.stl-studio-points li{display:flex;gap:10px;align-items:center;color:rgba(246,241,234,.86);font-size:.95rem}
+.stl-studio-points li::before{content:"";width:6px;height:6px;border-radius:50%;background:#c8894a;flex:0 0 auto}
+.stl-studio-stage{position:relative;grid-row:span 2}
+.stl-drop{position:relative;display:grid;place-items:center;align-content:center;gap:8px;min-height:clamp(260px,32vw,400px);border:1.5px dashed rgba(246,241,234,.22);border-radius:24px;background:radial-gradient(60% 60% at 50% 45%,rgba(200,137,74,.12),transparent 70%),#1b1714;cursor:pointer;text-align:center;padding:24px;transition:border-color .2s ease,background-color .2s ease,transform .2s cubic-bezier(.23,1,.32,1)}
+.stl-drop.is-over{border-color:#c8894a;transform:scale(.99)}
+@media (hover:hover) and (pointer:fine){.stl-drop:hover{border-color:rgba(200,137,74,.7)}}
+.stl-drop:focus-visible{outline:2px solid #c8894a;outline-offset:4px}
+.stl-drop strong{font-size:1.1rem;color:#fff}
+.stl-drop small{color:rgba(246,241,234,.6);font-size:.82rem}
+.stl-drop-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:rgba(200,137,74,.14);color:#c8894a;margin-bottom:6px}
+.stl-drop-icon svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+@media (prefers-reduced-motion:no-preference){.stl-drop-icon{animation:stlFloat 3.2s ease-in-out infinite}}
+@keyframes stlFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.stl-viewer{display:none;position:relative;height:clamp(300px,36vw,460px);border-radius:24px;overflow:hidden;background:radial-gradient(70% 70% at 50% 40%,#2a231e,#14110f);border:1px solid rgba(246,241,234,.1);touch-action:none}
+.stl-viewer canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
+.stl-studio.has-model .stl-drop{display:none}
+.stl-studio.has-model .stl-viewer{display:block}
+.stl-studio.is-loading .stl-drop{opacity:.6;pointer-events:none}
+.stl-status{min-height:1.4em;margin:12px 2px 0;color:rgba(246,241,234,.62);font-size:.86rem}
+.stl-status.is-error{color:#f0a37a}
+.stl-result{display:grid;gap:16px}
+.stl-result[hidden]{display:none}
+.stl-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(246,241,234,.1)}
+.stl-result-head strong{font-size:.95rem;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stl-reset{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(246,241,234,.2);background:transparent;color:#f6f1ea;font-weight:600;cursor:pointer}
+.stl-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0}
+.stl-metrics div{padding:14px;border-radius:16px;background:rgba(246,241,234,.05);border:1px solid rgba(246,241,234,.08)}
+.stl-metrics dt{font-size:.75rem;color:rgba(246,241,234,.6);margin-bottom:4px}
+.stl-metrics dd{margin:0;font-size:1.05rem;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+.stl-fit{margin:0;font-size:.88rem;color:rgba(246,241,234,.75)}
+.stl-fit.is-warn{color:#f0c27a}
+.stl-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.stl-material{display:inline-flex;padding:4px;border-radius:999px;background:rgba(246,241,234,.06);border:1px solid rgba(246,241,234,.1)}
+.stl-material button{min-height:40px;padding:0 18px;border-radius:999px;border:0;background:transparent;color:rgba(246,241,234,.75);font-weight:650;cursor:pointer;transition:background-color .2s ease,color .2s ease}
+.stl-material button[aria-pressed="true"]{background:#f6f1ea;color:#14110f}
+.stl-field{display:grid;gap:4px;font-size:.75rem;color:rgba(246,241,234,.6)}
+.stl-field input,.stl-field select{min-height:44px;width:96px;padding:0 12px;border-radius:12px;border:1px solid rgba(246,241,234,.16);background:#1b1714;color:#fff;font:inherit;font-size:16px}
+.stl-whatsapp.stl-whatsapp{justify-content:center;background:#f6f1ea!important;color:#14110f!important;min-height:52px}
+.stl-note{margin:0;font-size:.8rem;color:rgba(246,241,234,.55)}
+@media(max-width:860px){.stl-studio-grid{grid-template-columns:1fr}.stl-studio-stage{grid-row:auto}}
+@media(max-width:680px){.stl-drop{min-height:220px}.stl-viewer{height:300px}.stl-metrics dd{font-size:.98rem}}
