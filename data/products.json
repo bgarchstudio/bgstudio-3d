@@ -761,38 +761,23 @@
     "poster_image_height": null
   },
   {
-    "card_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekleriyle çok renkli 3D baskı futbol takımı anahtarlığı.",
-    "material_ids": [
-      "pla"
-    ],
-    "color_ids": [],
+    "box_contents": "",
+    "usage_info": "",
+    "estimated_production_time": "",
     "price_value": "99",
-    "seo_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekli logolu anahtarlık. Çok renkli 3D baskı, metal halkalı; taraftarlara hediye. Türkiye geneli kargo.",
+    "color_ids": [],
+    "weight": "",
+    "production_time": "",
+    "technical_info": "",
     "active": true,
     "description": "Takımını her yerde yanında taşı. Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekleriyle hazırlanan futbol takımı anahtarlıkları, çok renkli 3D baskı teknolojisiyle üretilir. Takımların karakteristik renkleri ve logo detaylarıyla tasarlanan anahtarlıklar; anahtar, çanta ve sırt çantası kullanımına uygundur.",
-    "tags": [
-      "Logolu",
-      "Hediye",
-      "Anahtarlık",
-      "Futbol"
-    ],
-    "options": [
-      "Galatasaray",
-      "Fenerbahçe",
-      "Beşiktaş",
-      "Trabzonspor"
-    ],
-    "features": [
-      "4 takım seçeneği",
-      "Çok renkli 3D baskı",
-      "Detaylı takım logosu",
-      "Metal anahtarlık halkası",
-      "Hafif ve günlük kullanıma uygun",
-      "Anahtar ve çantalarda kullanıma uygun",
-      "Hediye seçeneği"
-    ],
-    "slug": "futbol-takimi-logolu-anahtarlik",
-    "price_text": "99 TL",
+    "featured": false,
+    "personalizable": false,
+    "name": "Futbol Takımı Logolu Anahtarlık",
+    "production_status": "",
+    "category": "anahtarlik-aksesuar",
+    "seo_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekli logolu anahtarlık. Çok renkli 3D baskı, metal halkalı; taraftarlara hediye. Türkiye geneli kargo.",
+    "dimensions": "",
     "pricing_tiers": [
       {
         "label": "2’li alım",
@@ -813,21 +798,44 @@
         "note": "Set Fiyatı"
       }
     ],
-    "sale_price_value": null,
-    "featured": false,
-    "category": "anahtarlik-aksesuar",
-    "production_note": "Ürün çok renkli 3D baskı yöntemiyle üretilir. Takım logosu ve renkleri seçilen modele göre hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
-    "name": "Futbol Takımı Logolu Anahtarlık",
+    "slug": "futbol-takimi-logolu-anahtarlik",
+    "print_method": "",
+    "og_image_source": "main",
     "sort_order": 17,
+    "material_ids": [
+      "pla"
+    ],
+    "production_note": "Ürün çok renkli 3D baskı yöntemiyle üretilir. Takım logosu ve renkleri seçilen modele göre hazırlanır. 3D baskı ürünlerde görülebilen ince katman dokuları üretim yönteminin doğal bir parçasıdır.",
+    "tags": [
+      "Logolu",
+      "Hediye",
+      "Anahtarlık",
+      "Futbol"
+    ],
+    "personalization_info": "",
     "seo_title": "Futbol Takımı Anahtarlık – GS, FB, BJK, TS | BG Studio 3D",
-    "personalizable": false,
+    "sale_price_value": null,
+    "card_description": "Galatasaray, Fenerbahçe, Beşiktaş ve Trabzonspor seçenekleriyle çok renkli 3D baskı futbol takımı anahtarlığı.",
+    "features": [
+      "4 takım seçeneği",
+      "Çok renkli 3D baskı",
+      "Detaylı takım logosu",
+      "Metal anahtarlık halkası",
+      "Hafif ve günlük kullanıma uygun",
+      "Anahtar ve çantalarda kullanıma uygun",
+      "Hediye seçeneği"
+    ],
+    "price_text": "149 TL",
+    "options": [
+      "Galatasaray",
+      "Fenerbahçe",
+      "Beşiktaş",
+      "Trabzonspor"
+    ],
     "gallery_images": [],
     "main_image": "assets/images/products/futbol-takimi-logolu-anahtarlik.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": null,
-    "poster_image_width": null,
-    "poster_image_height": null
+    "main_image_height": 760
   },
   {
     "card_description": "Katmanlı 3D yapısıyla Batman siluetini duvarda hacimli ve gölgeli bir görünüme taşıyan dekoratif yüz tasarımı.",
