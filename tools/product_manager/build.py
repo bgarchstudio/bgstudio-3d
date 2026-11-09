@@ -2227,7 +2227,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.75'
+SITE_ASSET_VERSION = '3.3.76'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
@@ -4219,10 +4219,10 @@ def _quote_package_options(pricing):
 
 
 STL_STUDIO_HTML_V3357 = '''<section class="stl-studio" id="stl-studyo" data-stl-studio aria-labelledby="stl-studio-title"><div class="shell stl-studio-grid">
-<div class="stl-studio-copy"><p class="eyebrow">STL STÜDYO</p><h2 id="stl-studio-title">Dosyanı bırak, modelini hemen gör.</h2><p>STL ya da 3MF dosyanı yükle; ölçüsünü, tahmini malzeme miktarını ve baskı süresini anında hesaplayalım. Dosyan cihazından çıkmaz, inceleme tamamen tarayıcında yapılır.</p>
+<div class="stl-studio-copy"><p class="eyebrow">STL STÜDYO</p><h2 id="stl-studio-title">Dosyanı bırak, modelini hemen gör.</h2><p>STL, 3MF ya da OBJ dosyanı yükle; ölçüsünü, tahmini malzeme miktarını ve baskı süresini anında hesaplayalım. Dosyan cihazından çıkmaz, inceleme tamamen tarayıcında yapılır.</p>
 <ul class="stl-studio-points"><li>Parmakla ya da fareyle döndür, yakınlaştır</li><li>PLA veya PETG için tahmini gram</li><li>Bilgiler hazır, tek dokunuşla WhatsApp teklifi</li></ul></div>
 <div class="stl-studio-stage">
-<div class="stl-drop" data-stl-drop role="button" tabindex="0" aria-label="STL veya 3MF dosyası seç veya buraya bırak"><input type="file" accept=".stl,.3mf" data-stl-input hidden><span class="stl-drop-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></span><strong>STL veya 3MF dosyanı buraya bırak</strong><small>ya da dokunup seç · en fazla 60 MB</small></div>
+<div class="stl-drop" data-stl-drop role="button" tabindex="0" aria-label="STL veya 3MF dosyası seç veya buraya bırak"><input type="file" accept=".stl,.3mf,.obj" data-stl-input hidden><span class="stl-drop-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></span><strong>STL, 3MF veya OBJ dosyanı buraya bırak</strong><small>ya da dokunup seç · en fazla 60 MB</small></div>
 <div class="stl-viewer" data-stl-viewer aria-label="3D model önizlemesi"></div>
 <p class="stl-status" data-stl-status role="status" aria-live="polite"></p>
 </div>

@@ -1,4 +1,4 @@
-/* BG Studio 3D — STL Stüdyo (v3.3.57)
+/* BG Studio 3D — STL Stüdyo (v3.3.76: kendi 3MF okuyucusu + OBJ)
    Müşteri STL dosyasını bırakır; model tarayıcıda 3D açılır, ölçü / hacim / tahmini gram
    ve baskı süresi hesaplanır, WhatsApp teklif mesajı hazırlanır. Dosya cihazdan çıkmaz.
    three.js yalnızca dosya seçilince CDN'den yüklenir (sayfa hızını etkilemez). */
@@ -8,7 +8,6 @@
 
   const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/+esm';
   const STL_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js/+esm';
-  const TMF_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/3MFLoader.js/+esm';
   const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js/+esm';
   const WA_NUMBER = '905302466903';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,25 +52,88 @@
     lib = { THREE, STLLoader: stl.STLLoader, OrbitControls: orbit.OrbitControls };
     return lib;
   };
-  const load3MF = async () => {
-    if (!lib.ThreeMFLoader) lib.ThreeMFLoader = (await import(TMF_URL)).ThreeMFLoader;
-    return lib.ThreeMFLoader;
+  // v3.3.76 — Kendi 3MF okuyucumuz: Bambu Studio / OrcaSlicer / PrusaSlicer "production"
+  // uzantısı (parçalar 3D/Objects/*.model içinde, p:path ile bağlı), bileşen + yapı dönüşümleri,
+  // birim dönüşümü ve Bambu ayar hacimlerinin (modifier) atlanması.
+  const FFLATE_URL = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/+esm';
+  const OBJ_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/OBJLoader.js/+esm';
+  const attr = (s, k) => { const m = s.match(new RegExp('(?:^|\\s)' + k + '="([^"]*)"')); return m ? m[1] : null; };
+  const mat = (t) => {
+    if (!t) return [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
+    const v = t.trim().split(/\s+/).map(Number);
+    return v.length >= 12 ? v.slice(0, 12) : [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
   };
-  // 3MF: tüm parçaları dünya dönüşümleriyle tek bir geometriye birleştir.
-  const mergeGroup = (group) => {
-    const { THREE } = lib;
-    group.updateMatrixWorld(true);
-    const chunks = []; let total = 0;
-    group.traverse((o) => {
-      if (!o.isMesh || !o.geometry?.attributes?.position) return;
-      let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
-      g.applyMatrix4(o.matrixWorld);
-      const a = g.attributes.position.array; chunks.push(a); total += a.length;
-    });
-    const merged = new Float32Array(total); let off = 0;
-    chunks.forEach((a) => { merged.set(a, off); off += a.length; });
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(merged, 3));
+  // 3MF matrisi satır vektörü: p' = [x y z 1] · M(4x3)
+  const mul = (a, b) => { // a sonra b uygulanır (önce a, sonra b) → a·b
+    const r = new Array(12);
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) {
+      r[i * 3 + j] = (i < 3 ? 0 : b[9 + j]) + a[i * 3] * b[j] + a[i * 3 + 1] * b[3 + j] + a[i * 3 + 2] * b[6 + j];
+    }
+    return r;
+  };
+  const parse3MF = async (buf) => {
+    const { unzipSync, strFromU8 } = await import(FFLATE_URL);
+    const files = unzipSync(new Uint8Array(buf));
+    const names = Object.keys(files);
+    const skip = new Set();
+    const cfgName = names.find((n) => /model_settings\.config$/i.test(n));
+    if (cfgName) {
+      const cfg = strFromU8(files[cfgName]);
+      for (const m of cfg.matchAll(/<part\s+id="(\d+)"\s+subtype="([^"]+)"/g)) if (m[2] !== 'normal_part') skip.add(m[1]);
+    }
+    const objects = new Map(); let unit = 1;
+    const UNITS = { micron: 0.001, millimeter: 1, centimeter: 10, inch: 25.4, foot: 304.8, meter: 1000 };
+    for (const n of names.filter((x) => /\.model$/i.test(x))) {
+      const path = '/' + n.replace(/^\/+/, '');
+      const text = strFromU8(files[n]);
+      if (/3dmodel\.model$/i.test(n)) { const u = attr(text.slice(0, 2000), 'unit'); if (u && UNITS[u]) unit = UNITS[u]; }
+      for (const o of text.matchAll(/<object\b([^>]*)>([\s\S]*?)<\/object>/g)) {
+        const id = attr(o[1], 'id'); const body = o[2]; const entry = {};
+        const mesh = body.match(/<mesh>([\s\S]*?)<\/mesh>/);
+        if (mesh) {
+          const vs = []; for (const v of mesh[1].matchAll(/<vertex\b([^>]*)\/?>/g)) vs.push(+attr(v[1], 'x'), +attr(v[1], 'y'), +attr(v[1], 'z'));
+          const ts = []; for (const t of mesh[1].matchAll(/<triangle\b([^>]*)\/?>/g)) ts.push(+attr(t[1], 'v1'), +attr(t[1], 'v2'), +attr(t[1], 'v3'));
+          if (vs.length && ts.length) entry.mesh = [vs, ts];
+        }
+        const comps = [];
+        for (const c of body.matchAll(/<component\b([^>]*)\/?>/g)) comps.push([attr(c[1], 'p:path') || path, attr(c[1], 'objectid'), mat(attr(c[1], 'transform'))]);
+        if (comps.length) entry.comps = comps;
+        objects.set(path + '#' + id, entry);
+      }
+    }
+    const rootName = names.find((n) => /3dmodel\.model$/i.test(n));
+    const rootPath = '/' + (rootName || '3D/3dmodel.model');
+    const rootText = rootName ? strFromU8(files[rootName]) : '';
+    const items = [...rootText.matchAll(/<item\b([^>]*)\/?>/g)].map((m) => [attr(m[1], 'objectid'), mat(attr(m[1], 'transform'))]);
+    const tri = [];
+    const emit = (path, id, M, depth) => {
+      const e = objects.get(path + '#' + id);
+      if (!e || depth > 10) return;
+      if (depth > 0 && skip.has(String(id))) return;
+      if (e.mesh) {
+        const [vs, ts] = e.mesh;
+        for (let i = 0; i < ts.length; i++) {
+          const k = ts[i] * 3, x = vs[k], y = vs[k + 1], z = vs[k + 2];
+          tri.push((x * M[0] + y * M[3] + z * M[6] + M[9]) * unit, (x * M[1] + y * M[4] + z * M[7] + M[10]) * unit, (x * M[2] + y * M[5] + z * M[8] + M[11]) * unit);
+        }
+      }
+      for (const [cp, cid, cm] of e.comps || []) emit(cp, cid, mul(cm, M), depth + 1);
+    };
+    if (items.length) items.forEach(([id, M]) => emit(rootPath, id, M, 0));
+    else objects.forEach((e, key) => { if (e.mesh) { const [p, id] = key.split('#'); emit(p, id, mat(null), 0); } });
+    if (!tri.length) throw new Error('3MF içinde model bulunamadı');
+    const geo = new lib.THREE.BufferGeometry();
+    geo.setAttribute('position', new lib.THREE.Float32BufferAttribute(tri, 3));
+    return geo;
+  };
+  const parseOBJ = async (buf) => {
+    const { OBJLoader } = await import(OBJ_URL);
+    const group = new OBJLoader().parse(new TextDecoder().decode(buf));
+    const out = [];
+    group.traverse((o) => { if (o.isMesh) { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry; const a = g.attributes.position.array; for (let i = 0; i < a.length; i++) out.push(a[i]); } });
+    if (!out.length) throw new Error('OBJ içinde model bulunamadı');
+    const geo = new lib.THREE.BufferGeometry();
+    geo.setAttribute('position', new lib.THREE.Float32BufferAttribute(out, 3));
     return geo;
   };
 
@@ -168,14 +230,15 @@
 
   const handleFile = async (file) => {
     if (!file) return;
-    if (!/\.(stl|3mf)$/i.test(file.name)) { setStatus('STL veya 3MF dosyası açabiliyoruz. STEP veya OBJ için dosyanı WhatsApp’tan gönder.', true); return; }
+    if (!/\.(stl|3mf|obj)$/i.test(file.name)) { setStatus('STL, 3MF veya OBJ dosyası açabiliyoruz. STEP ya da başka bir format için dosyanı WhatsApp’tan gönder, biz açalım.', true); return; }
     if (file.size > MAX_MB * 1024 * 1024) { setStatus(`Dosya ${MAX_MB} MB’tan büyük. WhatsApp’tan gönderirsen birlikte bakalım.`, true); return; }
     root.classList.add('is-loading');
     setStatus('Model açılıyor…');
     try {
       await loadLib();
       const buf = await file.arrayBuffer();
-      const geometry = /\.3mf$/i.test(file.name) ? mergeGroup(new (await load3MF())().parse(buf)) : new lib.STLLoader().parse(buf);
+      const ext = (file.name.match(/\.(\w+)$/) || [])[1].toLowerCase();
+      const geometry = ext === '3mf' ? await parse3MF(buf) : ext === 'obj' ? await parseOBJ(buf) : new lib.STLLoader().parse(buf);
       const pos = geometry.attributes.position.array;
       if (!pos.length) throw new Error('empty');
       geometry.computeBoundingBox();
@@ -189,7 +252,8 @@
       render();
     } catch (err) {
       console.warn('[STL Stüdyo]', err);
-      setStatus('Dosya okunamadı. Bozuk olabilir; WhatsApp’tan gönderirsen biz açalım.', true);
+      const why = String(err && err.message || '');
+      setStatus(/model bulunamadı/i.test(why) ? 'Dosyada basılabilir bir model bulamadık. Dosyayı WhatsApp’tan gönderirsen birlikte bakalım.' : 'Bu dosyayı tarayıcıda açamadık. WhatsApp’tan gönderirsen biz açıp ölçülerini iletelim.', true);
     } finally {
       root.classList.remove('is-loading');
     }
