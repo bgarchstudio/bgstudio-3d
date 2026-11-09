@@ -451,7 +451,7 @@
   const start = () => {
     if (state.started) return;
     state.started = true;
-    addMessage('assistant', 'Merhaba 👋 Ben BG Assistant. BG Studio 3D ürünlerini ve sistemlerini biliyorum; NFC, QR ve 3D baskı gibi genel konuları da sorabilirsin. Ne hakkında konuşalım?');
+    addMessage('assistant', 'Merhaba 👋 Ben BG Studio Asistan. Ürünlerimizi, özel üretimi, NFC sistemlerimizi ve kurucumuz Mimar Berkant Gökbel’i anlatabilirim. Ne arıyorsun?');
   };
 
   const openPanel = () => {
@@ -543,7 +543,7 @@
     const topic = recentUsers.join(' / ') || state.lastUser || 'BG Studio 3D ürün ve hizmetleri hakkında bilgi almak istiyorum.';
     const answer = String(state.lastAssistant || '').replace(/\s+/g, ' ').slice(0, 260);
     const summary = answer ? `\nBG Assistant son yanıtı: ${answer}` : '';
-    const message = `Merhaba BG Studio 3D, BG Assistant üzerinden şu konuyu görüşüyordum: ${topic}${summary}`;
+    const message = `Merhaba BG Studio 3D, web sitenizdeki asistanla şu konuyu konuşuyordum: ${topic}${summary}`;
     window.open(`https://wa.me/905302466903?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
   });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) closePanel(); });
