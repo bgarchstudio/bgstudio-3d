@@ -4381,7 +4381,7 @@ def build_legal_pages_v3171():
         # hasarlı/hatalı üründe değişim veya iade, kişiye özel ürünler iade dışı.
         'teslimat-iade': ('Teslimat / İade', 'Ürünler sipariş üzerine üretilir; teslim, kargo ve iade kuralları aşağıdadır.', [
             ('Üretim süresi', 'Ürünler sipariş onayından sonra 1–3 iş günü içinde PLA veya PETG malzemeden üretilir, ardından kargoya verilir. Toplu ve kurumsal siparişlerde süre sipariş öncesinde ayrıca paylaşılır.'),
-            ('Kargo', 'Türkiye geneline kargo ile gönderilir. Kargo ücreti teslimat sırasında alıcı tarafından ödenir. Uygun siparişlerde Kuşadası’nda elden teslim seçeneği vardır.'),
+            ('Kargo', 'Türkiye geneline kargo ile gönderilir; kargoya verilen ürün genellikle 1 hafta içinde teslim edilir. Kargo ücreti teslimat sırasında alıcı tarafından ödenir. Uygun siparişlerde Kuşadası’nda elden teslim seçeneği vardır.'),
             ('Hasarlı veya hatalı ürün', 'Kargo kaynaklı hasar veya üretim hatası olursa paketin ve ürünün fotoğraflarıyla WhatsApp (0530 246 69 03) ya da bgstudio.3dtr@gmail.com üzerinden bize ulaşın; değişim ya da iade yapıyoruz.'),
             ('Kişiye özel ürünler', 'İsim, logo, ölçü veya müşteriye özgü başka bir detayla kişiselleştirilen ürünler iade kapsamında değildir. Bu nedenle üretim öncesinde kişiselleştirme bilgilerinin doğru onaylanması önemlidir.'),
         ]),
