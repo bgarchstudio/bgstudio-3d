@@ -1450,14 +1450,37 @@ def render_homepage_v3163(active, featured, field_items):
   </div>
 </section>
 
-<section class="home-reviews-v3328 bg-section-compact" aria-labelledby="home-reviews-title">
-  <div class="shell home-reviews-head-v3328">
-    <div><p class="eyebrow">GOOGLE YORUMLARI</p><h2 id="home-reviews-title">Müşterilerimiz ne diyor?</h2></div>
-    <div class="home-reviews-side-v3328">
-      <p class="home-reviews-summary-v3328"><strong class="review-score-v3328">{GOOGLE_RATING_V3328}</strong><span class="review-stars-v3328" role="img" aria-label="5 üzerinden {GOOGLE_RATING_V3328} yıldız">★★★★★</span><span class="review-count-v3328">Google puanı</span></p>
-      <div class="home-reviews-actions-v3328">
-        <a class="secondary-cta" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank">Yorumları Google'da oku ↗</a>
-        <a class="text-cta" href="{GOOGLE_WRITE_REVIEW_URL_V3328}" rel="noopener" target="_blank">Yorum yaz ↗</a>
+<section class="home-reviews-v3328 home-gplace-v3350 bg-section-compact" aria-labelledby="home-reviews-title">
+  <div class="shell gplace-card-v3350">
+    <a class="gplace-map-v3350" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank" aria-label="BG Studio 3D'yi Google Haritalar'da aç">
+      <svg class="gplace-map-art-v3350" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <rect width="560" height="420" fill="#efe6da"/>
+        <path d="M0 0H190C170 60 205 92 176 140C150 184 196 214 168 262C146 300 182 352 150 420H0Z" fill="#cddfe0"/>
+        <path d="M190 0C170 60 205 92 176 140C150 184 196 214 168 262C146 300 182 352 150 420" fill="none" stroke="#b9d0d2" stroke-width="6"/>
+        <g fill="none" stroke="#fffaf3" stroke-linecap="round">
+          <path d="M176 140C260 150 340 128 560 150" stroke-width="16"/>
+          <path d="M168 262C280 250 390 284 560 268" stroke-width="12"/>
+          <path d="M300 0C312 120 286 250 318 420" stroke-width="14"/>
+          <path d="M440 0C430 110 462 240 436 420" stroke-width="9"/>
+          <path d="M210 60L560 52M196 350L560 360M372 0L384 420" stroke-width="5"/>
+        </g>
+        <g fill="#e2d6c5"><rect x="330" y="170" width="92" height="66" rx="8"/><rect x="456" y="178" width="70" height="60" rx="8"/><rect x="330" y="290" width="88" height="48" rx="8"/><rect x="216" y="168" width="70" height="70" rx="8"/><rect x="456" y="290" width="76" height="52" rx="8"/><rect x="330" y="72" width="92" height="50" rx="8"/></g>
+        <g fill="#d3e2c9"><rect x="216" y="290" width="74" height="46" rx="12"/><rect x="456" y="72" width="70" height="52" rx="12"/></g>
+        <text x="40" y="214" fill="#86a9ac" font-size="15" font-style="italic" letter-spacing="2">Ege Denizi</text>
+      </svg>
+      <span class="gplace-pin-v3350" aria-hidden="true"><span class="gplace-pin-head-v3350"><img src="assets/brand/bgstudio3d-monogram.webp" alt="" width="40" height="40" loading="lazy" decoding="async"/></span></span>
+      <span class="gplace-place-v3350"><strong>BG Studio 3D</strong><small>Kuşadası, Aydın · Haritada aç ↗</small></span>
+    </a>
+    <div class="gplace-copy-v3350">
+      <p class="gplace-source-v3350"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.2z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.6-3.9-12.4-9.1H4.3v5.7C7.9 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.3C2.8 17.1 2 20.5 2 24s.8 6.9 2.3 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.7c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.2 30 2 24 2 15.4 2 7.9 6.9 4.3 14.1l7.3 5.7c1.8-5.2 6.6-9.1 12.4-9.1z"/></svg>Google İşletme Profili</p>
+      <h2 id="home-reviews-title">Kuşadası'ndayız. Müşterilerimiz bizi Google'da anlatıyor.</h2>
+      <div class="gplace-score-v3350">
+        <strong class="review-score-v3328">{GOOGLE_RATING_V3328}</strong>
+        <span class="gplace-score-meta-v3350"><span class="review-stars-v3328" role="img" aria-label="5 üzerinden {GOOGLE_RATING_V3328} yıldız">★★★★★</span><span class="review-count-v3328">{GOOGLE_REVIEW_COUNT_V3350} Google yorumu</span></span>
+      </div>
+      <div class="gplace-actions-v3350">
+        <a class="primary-cta" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank">Yorumları oku</a>
+        <a class="secondary-cta" href="{GOOGLE_WRITE_REVIEW_URL_V3328}" rel="noopener" target="_blank">Yorum yaz</a>
       </div>
     </div>
   </div>
@@ -2165,12 +2188,13 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.50'
+SITE_ASSET_VERSION = '3.3.51'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
 # Google's write-review dialog for this listing.
 GOOGLE_RATING_V3328 = '5,0'
+GOOGLE_REVIEW_COUNT_V3350 = 11
 GOOGLE_REVIEWS_URL_V3328 = 'https://maps.google.com/?cid=7240535998596070578'
 GOOGLE_WRITE_REVIEW_URL_V3328 = 'https://www.google.com/search?q=BG+Studio+3D+Ku%C5%9Fadas%C4%B1#lrd=0x8ea54b705e76b9c9:0x647b8d20f3bf3cb2,3'
 RELEASE_CHANNEL = 'stable'
