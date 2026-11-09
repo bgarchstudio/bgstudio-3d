@@ -5603,3 +5603,31 @@ body.model3d-open{overflow:hidden}
 .gplace-map-art-v3350 .gmap-small{font-size:10px}
 .gplace-pin-v3350{left:56.4%!important;top:40.6%!important}
 .gplace-place-v3350{left:56.4%!important;top:calc(40.6% + 18px)!important}
+
+/* v3.3.65 · Telefonda hikâye sahnesi adımlar boyunca ekranda kalır */
+@media(max-width:860px){
+  .home-process-v3200 .home-process-sticky-v3200{display:contents!important}
+  .home-process-v3200 .home-process-story-v3363{position:sticky!important;top:66px;z-index:4;align-self:start;min-height:0!important;height:210px;border-radius:20px!important;box-shadow:0 14px 30px rgba(20,17,15,.22)!important}
+  .home-process-story-v3363 .print-story-v3363{inset:0 0 40px 0}
+  .home-process-story-v3363 .home-process-visual-badge-v3200{left:14px!important;right:14px!important;bottom:10px!important;flex-direction:column;align-items:flex-start;gap:2px}
+  .home-process-story-v3363 .home-process-visual-badge-v3200 strong{font-size:.86rem!important;white-space:normal;line-height:1.25}
+  .home-process-v3200 .home-process-timeline-v3200{margin-top:8px}
+}
+
+/* v3.3.66 · Telefon: sahne üstte sabit görünür, adımlar yatay kaydırmalı kartlar */
+@media(max-width:860px){
+  .home-process-v3200 .home-process-sticky-v3200{display:grid!important}
+  .home-process-v3200 .home-process-story-v3363{position:relative!important;top:auto!important;height:230px;box-shadow:0 14px 30px rgba(20,17,15,.18)!important}
+  .home-process-v3200 .home-process-timeline-v3200{display:flex!important;gap:12px;margin:14px -16px 0;padding:2px 16px 6px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .home-process-v3200 .home-process-timeline-v3200::-webkit-scrollbar{display:none}
+  .home-process-v3200 .home-process-rail-v3200{display:none!important}
+  .home-process-v3200 .home-process-step-v3200{flex:0 0 84%;scroll-snap-align:center;min-height:0!important;margin:0!important;padding:18px 16px!important;border:1px solid rgba(20,17,15,.1)!important;border-radius:18px;background:#fff;grid-template-columns:40px minmax(0,1fr)!important;gap:12px!important;opacity:1!important;transition:border-color .25s ease,box-shadow .25s ease}
+  .home-process-v3200 .home-process-step-v3200.is-current{border-color:#14110f!important;box-shadow:0 10px 24px rgba(20,17,15,.1)}
+  .home-process-v3200 .home-process-step-v3200 h3{font-size:1.2rem!important}
+  .home-process-v3200 .home-process-step-v3200 p{font-size:.9rem!important;line-height:1.5!important}
+  .ps-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+  .ps-dots button{width:28px;height:28px;padding:0;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+  .ps-dots button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(20,17,15,.2);transition:width .25s cubic-bezier(.23,1,.32,1),background-color .25s ease}
+  .ps-dots button[aria-current="true"]::before{width:22px;border-radius:999px;background:#14110f}
+}
+@media(min-width:861px){.ps-dots{display:none}}

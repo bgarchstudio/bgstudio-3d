@@ -2665,7 +2665,8 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   const updatePrint = () => {
     raf = 0;
     const s3 = steps[3];
-    if (!s3 || mobile.matches || reduce) { story.style.setProperty('--print', '1'); return; }
+    if (mobile.matches) return;
+    if (!s3 || reduce) { story.style.setProperty('--print', '1'); return; }
     const r = s3.getBoundingClientRect();
     const trigger = window.innerHeight * 0.45;
     const p = Math.min(1, Math.max(0.05, (trigger - r.top) / Math.max(1, r.height)));
@@ -2686,8 +2687,34 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   const stopAuto = () => { window.clearInterval(timer); timer = 0; };
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && mobile.matches) startAuto(); else stopAuto();
+      stopAuto(); // v3.3.65: telefonda da kaydırmaya bağlı (sahne yapışkan)
     }, { threshold: 0.35 }).observe(story);
+  }
+  // v3.3.66 — Telefon: yatay kart kaydırması sahneyi sürer; noktalarla gezinme.
+  const track = section.querySelector('.home-process-timeline-v3200');
+  if (track) {
+    const dots = document.createElement('div');
+    dots.className = 'ps-dots'; dots.setAttribute('role', 'group'); dots.setAttribute('aria-label', 'Üretim adımları');
+    steps.forEach((s, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', `${i + 1}. adım`);
+      b.addEventListener('click', () => s.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', inline: 'center', block: 'nearest' }));
+      dots.appendChild(b);
+    });
+    track.after(dots);
+    const syncMobile = () => {
+      if (!mobile.matches) return;
+      const mid = track.getBoundingClientRect().left + track.clientWidth / 2;
+      let best = 0, dist = Infinity;
+      steps.forEach((s, i) => { const r = s.getBoundingClientRect(); const d = Math.abs(r.left + r.width / 2 - mid); if (d < dist) { dist = d; best = i; } });
+      show(best);
+      steps.forEach((s, i) => s.classList.toggle('is-current', i === best));
+      [...dots.children].forEach((d, i) => d.setAttribute('aria-current', String(i === best)));
+      story.style.setProperty('--print', best === 3 ? '1' : best > 3 ? '1' : '0.05');
+    };
+    let r2 = 0;
+    track.addEventListener('scroll', () => { if (!r2) r2 = requestAnimationFrame(() => { r2 = 0; syncMobile(); }); }, { passive: true });
+    mobile.addEventListener?.('change', syncMobile);
+    syncMobile();
   }
   show(activeIndex());
 })();
