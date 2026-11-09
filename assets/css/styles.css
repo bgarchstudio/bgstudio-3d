@@ -5333,3 +5333,45 @@ span.bg-card-icon.bg-card-icon svg{display:block;margin:0}
 .floating-whatsapp.floating-whatsapp::after,.floating-whatsapp.floating-whatsapp:hover::after{animation:none!important;display:none!important}
 .floating-whatsapp.floating-whatsapp{transition:transform .25s cubic-bezier(.23,1,.32,1),background-color .2s ease!important}
 @media (hover:hover) and (pointer:fine){.floating-whatsapp.floating-whatsapp:hover{transform:translateY(-2px)!important}}
+
+/* ==========================================================
+   v3.3.54 · HERO — espresso + bronz, yörüngesiz, sürüklenebilir
+   ========================================================== */
+.home-hero-v3191.home-hero-v3191{background:#12100e!important;color:#f6f1ea}
+.home-hero-v3191::before,.home-hero-v3191::after{background:radial-gradient(55% 60% at 26% 52%,rgba(200,137,74,.16),transparent 62%),radial-gradient(40% 45% at 80% 20%,rgba(246,241,234,.05),transparent 70%)!important;opacity:1!important}
+.home-spatial-orbit,.home-spatial-orbit-two::before,.home-spatial-orbit-three::after{display:none!important}
+.home-spatial-visual::after{content:none!important;display:none!important}
+.home-spatial-reactive-glow{background:radial-gradient(circle,rgba(200,137,74,.22) 0%,rgba(200,137,74,.06) 30%,transparent 66%)!important}
+/* Ürün kaidesi: yumuşak zemin gölgesi */
+.home-spatial-slides::after{content:"";position:absolute;left:50%;bottom:-2%;width:62%;height:9%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);filter:blur(6px);pointer-events:none;z-index:0}
+.home-spatial-product{translate:var(--drag-x,0px) 0;transition-property:opacity,transform,translate,filter;transition-duration:.6s;transition-timing-function:cubic-bezier(.23,1,.32,1)}
+.home-hero-v3191.is-dragging .home-spatial-product{transition-property:opacity,transform,filter}
+.home-hero-v3191 .home-hero-v3191-shell{touch-action:pan-y}
+@media (hover:hover) and (pointer:fine){.home-hero-v3191 [data-spatial-stage]{cursor:grab!important}.home-hero-v3191.is-dragging,.home-hero-v3191.is-dragging *{cursor:grabbing!important}}
+.home-hero-v3191.is-dragging{user-select:none;-webkit-user-select:none}
+/* Mavi vurgular → bronz */
+.home-hero-v3191 .home-spatial-info .eyebrow{color:#c8894a!important}
+.home-hero-v3191 .home-spatial-info-topline span{color:rgba(246,241,234,.55)!important}
+.home-hero-v3191 [data-spatial-progress]{background:linear-gradient(90deg,#8a4e0e,#c8894a)!important}
+.home-hero-v3191 .home-spatial-progress{background:rgba(246,241,234,.1)!important}
+.home-hero-v3191 .home-spatial-dot{background:#c8894a!important;box-shadow:0 0 0 4px rgba(200,137,74,.18)!important}
+.home-hero-v3191 .home-spatial-dock{background:rgba(29,25,21,.82)!important;border-color:rgba(246,241,234,.08)!important}
+.home-hero-v3191 .home-spatial-control.is-active{background:rgba(200,137,74,.14)!important;border-color:rgba(200,137,74,.35)!important}
+.home-hero-v3191 .home-spatial-control-copy small{color:#c8894a!important}
+.home-hero-v3191 .home-spatial-product-kicker span{color:#c8894a!important}
+.home-hero-v3191 .home-spatial-spec-card{background:rgba(246,241,234,.04)!important;border-color:rgba(246,241,234,.1)!important}
+/* Başlık: sitenin serif dili */
+.home-hero-v3191 h1{font-family:"Playfair Display",Georgia,serif!important;font-weight:500!important;letter-spacing:-.035em!important;line-height:1!important}
+.home-hero-v3191 .home-spatial-product-copy h2{font-family:"Playfair Display",Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important}
+/* Kontroller: görselin altında tek satır */
+.home-hero-v3191 .home-spatial-stage-controls{top:auto!important;bottom:12px!important;right:12px!important;left:auto!important;gap:8px}
+.home-hero-v3191 .home-spatial-stage-controls button{background:rgba(246,241,234,.06)!important;border-color:rgba(246,241,234,.14)!important;color:#f6f1ea!important;transition:background-color .2s ease,color .2s ease,transform .15s ease}
+@media (hover:hover) and (pointer:fine){.home-hero-v3191 .home-spatial-stage-controls button:hover{background:#f6f1ea!important;color:#14110f!important}}
+.home-hero-v3191 .home-spatial-stage-controls button:active{transform:scale(.95)}
+.home-hero-v3191 .home-spatial-visual-status{top:auto!important;bottom:12px!important;left:12px!important;background:rgba(246,241,234,.06)!important;border-color:rgba(246,241,234,.12)!important}
+.home-hero-v3191 .home-spatial-visual-status b{color:rgba(246,241,234,.6)!important}
+.home-hero-v3191 .primary-cta{background:#f6f1ea!important;color:#14110f!important}
+.home-hero-v3191 .home-spatial-visual-status{display:none!important}
+.home-hero-v3191 .home-spatial-control strong{color:rgba(246,241,234,.78)!important}
+.home-hero-v3191 .home-spatial-control.is-active strong{color:#fff!important}
+@media(max-width:680px){.home-hero-v3191 .home-spatial-stage-controls{display:none!important}}

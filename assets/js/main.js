@@ -2140,22 +2140,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
       centerActiveControl(activeIndex);
     }, { passive: true });
 
-    // Mobile swipe. Vertical page scrolling remains untouched.
-    stage.addEventListener('touchstart', event => {
-      const touch = event.changedTouches?.[0];
-      if (!touch) return;
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    }, { passive: true });
-    stage.addEventListener('touchend', event => {
-      const touch = event.changedTouches?.[0];
-      if (!touch) return;
-      const dx = touch.clientX - touchStartX;
-      const dy = touch.clientY - touchStartY;
-      if (Math.abs(dx) < 52 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
-      suppressClickUntil = Date.now() + 450;
-      setActive(activeIndex + (dx < 0 ? 1 : -1), true);
-    }, { passive: true });
+    // V3.3.54: swipe/drag moved to the hero drag module at the end of this file.
     stage.addEventListener('click', event => {
       if (Date.now() >= suppressClickUntil) return;
       event.preventDefault();
@@ -2592,4 +2577,55 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   };
   window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
   update();
+})();
+
+/* v3.3.54 — Hero: parmağı/fareyi takip eden sürükleyerek ürün geçişi.
+   Yatay hareket kilitlenir, dikey kaydırma tarayıcıda kalır (touch-action: pan-y). */
+(() => {
+  const hero = document.querySelector('[data-spatial-hero]');
+  if (!hero) return;
+  const zone = hero.querySelector('.home-hero-v3191-shell') || hero;
+  const stage = hero.querySelector('[data-spatial-stage]');
+  const prev = hero.querySelector('[data-spatial-prev]');
+  const next = hero.querySelector('[data-spatial-next]');
+  if (!stage || !prev || !next) return;
+  let id = null, startX = 0, startY = 0, lastX = 0, lastT = 0, vx = 0, axis = null, suppress = 0;
+  const ignored = (el) => el.closest('.home-spatial-dock-wrap, .hero-actions, button, input, select, textarea');
+  const setDrag = (px) => stage.style.setProperty('--drag-x', `${px.toFixed(1)}px`);
+  const reset = () => { id = null; axis = null; hero.classList.remove('is-dragging'); setDrag(0); };
+  zone.addEventListener('pointerdown', (e) => {
+    if ((e.pointerType === 'mouse' && e.button !== 0) || ignored(e.target)) return;
+    id = e.pointerId; startX = lastX = e.clientX; startY = e.clientY; lastT = performance.now(); vx = 0; axis = null;
+  });
+  zone.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== id) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (axis === null) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      axis = Math.abs(dx) > Math.abs(dy) * 1.1 ? 'x' : 'y';
+      if (axis === 'x') { hero.classList.add('is-dragging'); try { zone.setPointerCapture(id); } catch (_) {} }
+    }
+    if (axis !== 'x') return;
+    const now = performance.now();
+    vx = (e.clientX - lastX) / Math.max(1, now - lastT); lastX = e.clientX; lastT = now;
+    const limit = stage.clientWidth * 0.45;
+    const eased = Math.sign(dx) * Math.min(limit, Math.abs(dx) * 0.7);
+    setDrag(eased);
+  });
+  const finish = (e) => {
+    if (e.pointerId !== id) return;
+    if (axis === 'x') {
+      const dx = e.clientX - startX;
+      const flick = Math.abs(vx) > 0.45 && Math.abs(dx) > 24;
+      if (Math.abs(dx) > Math.min(90, stage.clientWidth * 0.18) || flick) {
+        (dx < 0 ? next : prev).click();
+      }
+      suppress = Date.now() + 380;
+    }
+    reset();
+  };
+  zone.addEventListener('pointerup', finish);
+  zone.addEventListener('pointercancel', (e) => { if (e.pointerId === id) reset(); });
+  zone.addEventListener('click', (e) => { if (Date.now() < suppress) { e.preventDefault(); e.stopPropagation(); } }, true);
+  zone.addEventListener('dragstart', (e) => { if (e.target.closest('[data-spatial-stage]')) e.preventDefault(); });
 })();
