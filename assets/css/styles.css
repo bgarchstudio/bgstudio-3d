@@ -5012,3 +5012,20 @@ body.bg-assistant-keyboard .bg-assistant-panel{
   .home-hero-v3191 .home-spatial-stage-controls{top:8px!important;right:8px!important}
   .home-hero-v3191 .home-spatial-dock-wrap{bottom:10px!important}
 }
+
+/* v3.3.50 — asistan: hızlı soru butonları tüm Android/iOS ekranlarında kesilmesin */
+@media(max-width:680px){
+  .bg-assistant-body{grid-template-rows:minmax(0,1fr) auto!important}
+  .bg-assistant-messages{min-height:0!important}
+  .bg-assistant-quick{flex-wrap:nowrap;align-items:center;min-height:0}
+  .bg-assistant-quick button{flex:0 0 auto}
+  body.bg-assistant-keyboard .bg-assistant-head{min-height:60px;padding-block:8px}
+  body.bg-assistant-keyboard .bg-assistant-mark{width:36px;height:36px;flex-basis:36px}
+  body.bg-assistant-keyboard .bg-assistant-close{width:36px;height:36px;flex-basis:36px}
+  body.bg-assistant-keyboard .bg-assistant-messages{padding-top:10px}
+  body.bg-assistant-keyboard .bg-assistant-quick{padding:6px 10px 8px}
+  body.bg-assistant-keyboard .bg-assistant-quick button{min-height:36px}
+  body.bg-assistant-keyboard .bg-assistant-compose{gap:0;padding-top:8px}
+  body.bg-assistant-keyboard .bg-assistant-compose-meta,
+  body.bg-assistant-keyboard .bg-assistant-note{display:none!important}
+}
