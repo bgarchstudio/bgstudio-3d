@@ -11,6 +11,18 @@
   const fileInputs = [...form.querySelectorAll('[data-quote-files]')];
   const fileList = form.querySelector('[data-quote-file-list]');
   const fileSummary = form.querySelector('input[name="dosya_ozeti"]');
+  const uploadEndpoint = String(form.dataset.uploadEndpoint || '').trim();
+  const submitButton = form.querySelector('[type="submit"]');
+  let goodFiles = [];
+
+  // Drive bağlıysa dosya alanı metinleri gerçeği anlatsın.
+  if (uploadEndpoint) {
+    form.querySelectorAll('.quote-file-drop small').forEach(node => {
+      node.textContent = 'Dosyalar teklifle birlikte bize güvenle iletilir.';
+    });
+    const note = form.querySelector('.quote-security-note');
+    if (note) note.textContent = '🔒 Dosyaların yalnızca BG Studio’ya özel bir klasöre kaydedilir; herkese açık paylaşılmaz. WhatsApp’a tekrar eklemene gerek yok.';
+  }
 
   const nfcConfig = form.querySelector('[data-nfc-quote-config]');
   const packageSelect = form.querySelector('#quote-nfc-package');
@@ -237,7 +249,7 @@
   };
 
   const updateFiles = () => {
-    const files = fileInputs.flatMap(input => [...(input.files || [])]);
+    const files = fileInputs.filter(input => !input.disabled).flatMap(input => [...(input.files || [])]);
     const good = [];
     const errors = [];
 
@@ -257,6 +269,7 @@
       });
       fileList.hidden = good.length === 0;
     }
+    goodFiles = good;
     if (fileSummary) fileSummary.value = good.map(file => file.name).join(', ');
     if (errors.length) setStatus(errors[0], 'error');
     else setStatus('');
@@ -328,7 +341,36 @@
     return lines;
   };
 
-  form.addEventListener('submit', event => {
+  const readBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+  // Dosyaları müşterinin adıyla açılan Drive klasörüne yükler; klasör bağlantısını döner.
+  const uploadFiles = async (files, customer) => {
+    const ref = Math.random().toString(36).slice(2, 6).toUpperCase();
+    let folder = '';
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      setStatus(`Dosyalar gönderiliyor… ${i + 1}/${files.length} · ${file.name}`, '');
+      const data = await readBase64(file);
+      const response = await fetch(uploadEndpoint, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: file.name, type: file.type, data, ref, customer,
+          last: i === files.length - 1, count: files.length
+        })
+      });
+      const result = await response.json();
+      if (!result || result.error || !result.folder) throw new Error(result?.error || 'Yükleme başarısız.');
+      folder = result.folder;
+    }
+    return folder;
+  };
+
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     setStatus('');
 
@@ -359,16 +401,41 @@
     }
 
     const files = String(fileSummary?.value || '').trim();
+    let folderUrl = '';
+    let popup = null;
+    if (files && uploadEndpoint && goodFiles.length) {
+      // Pencereyi tıklama anında aç; yükleme bitince WhatsApp'a yönlendir (açılır pencere engeline takılmaz).
+      popup = window.open('about:blank', '_blank');
+      if (submitButton) submitButton.disabled = true;
+      const customer = String(form.elements.ad?.value || '').trim();
+      try {
+        folderUrl = await uploadFiles(goodFiles, customer);
+      } catch (error) {
+        folderUrl = '';
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    }
     if (files) {
-      lines.push('', `Dosyalar: ${files}`, 'Not: Dosyaları WhatsApp sohbetine ayrıca ekleyeceğim.');
+      if (folderUrl) lines.push('', `Dosyalar: ${files}`, `Dosya klasörü (Drive): ${folderUrl}`);
+      else lines.push('', `Dosyalar: ${files}`, 'Not: Dosyaları WhatsApp sohbetine ayrıca ekleyeceğim.');
     }
 
     lines.push('', 'Bu talep için fiyat ve üretim kapsamını netleştirebilir misiniz?');
 
     const url = `https://wa.me/905302466903?text=${encodeURIComponent(lines.join('\n'))}`;
-    const opened = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!opened) window.location.href = url;
-    setStatus('Teklif özeti WhatsApp için hazırlandı.', 'success');
+    if (popup && !popup.closed) {
+      popup.opener = null;
+      popup.location.href = url;
+    } else {
+      const opened = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!opened) window.location.href = url;
+    }
+    if (files && uploadEndpoint && !folderUrl) {
+      setStatus('Dosyalar gönderilemedi; WhatsApp açıldığında dosyaları sohbete ekleyebilirsin.', 'error');
+    } else {
+      setStatus(folderUrl ? 'Dosyaların iletildi; teklif özeti WhatsApp için hazırlandı.' : 'Teklif özeti WhatsApp için hazırlandı.', 'success');
+    }
   });
 
   // URL-prefill: /teklif/?tur=nfc&paket=profesyonel

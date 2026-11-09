@@ -5807,3 +5807,6 @@ body.model3d-open{overflow:hidden}
   .maket-route b{width:40px;height:40px;font-size:14px}
   .maket-route li:hover{transform:none}
 }
+
+/* v3.3.78 — Türkçe başlıklar: İ noktası ile y/ç/ş kuyruğu çakışmasın */
+h1,h2,.maket-start-copy h2{line-height:1.08!important}
