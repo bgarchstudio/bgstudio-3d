@@ -19,7 +19,7 @@
  * bgstudio.3dtr@gmail.com hesabı açabilir. Talep başına tek bildirim e-postası gelir.
  */
 
-const FOLDER_ID = 'BURAYA_KLASOR_KIMLIGI';
+const FOLDER_ID = '1k29hXH90zXfCEPczat2Gx5yWx-NcAA3C';
 const NOTIFY_EMAIL = 'bgstudio.3dtr@gmail.com';
 const MAX_BYTES = 15 * 1024 * 1024;
 const ALLOWED_EXT = ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'stl', '3mf', 'step', 'stp', 'obj'];
