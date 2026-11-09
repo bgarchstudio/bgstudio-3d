@@ -1667,7 +1667,7 @@ def offer_policies_v3384(p):
         'deliveryTime': {
             '@type': 'ShippingDeliveryTime',
             'handlingTime': {'@type': 'QuantitativeValue', 'minValue': 1, 'maxValue': 3, 'unitCode': 'DAY'},
-            'transitTime': {'@type': 'QuantitativeValue', 'minValue': 1, 'maxValue': 3, 'unitCode': 'DAY'},
+            'transitTime': {'@type': 'QuantitativeValue', 'minValue': 1, 'maxValue': 7, 'unitCode': 'DAY'},
         },
     }
     return {'hasMerchantReturnPolicy': policy, 'shippingDetails': shipping}
