@@ -4987,3 +4987,28 @@ body.bg-assistant-keyboard .bg-assistant-panel{
   .home-product-carousel-track.is-dragging{cursor:grabbing;scroll-snap-type:none!important;scroll-behavior:auto!important;user-select:none;-webkit-user-select:none}
   .home-product-carousel-track.is-dragging a{pointer-events:none}
 }
+
+/* v3.3.49 — hero ürün şeridi: başlık küçük görselin üstüne taşmasın (span'lara gelen place-items:center'ı geri al) */
+.home-spatial-control>.home-spatial-control-copy{place-items:initial;justify-items:start;align-content:center;text-align:left;width:100%;min-width:0;overflow:hidden}
+.home-spatial-control-copy strong,.home-spatial-control-copy small{display:block;width:100%;max-width:100%;text-align:left}
+
+/* v3.3.49 — mobil hero (otomatik kayan ürün alanı) site ilk açıldığında tek ekrana sığsın */
+@media(max-width:680px){
+  .home-hero-v3191{--hero-stage-h:clamp(160px,calc(100svh - 512px),330px)}
+  .home-hero-v3191 .home-hero-v3191-shell{padding-top:14px!important;padding-bottom:86px!important}
+  .home-hero-v3191 .home-spatial-info-topline{margin-bottom:6px!important}
+  .home-hero-v3191 .home-spatial-info h1{font-size:clamp(1.95rem,9.4vw,2.55rem)!important;line-height:1.02!important;max-width:none!important}
+  .home-hero-v3191 .home-hero-lead{display:none!important}
+  .home-hero-v3191 .home-spatial-product-copy{margin-top:10px!important;gap:6px!important}
+  .home-hero-v3191 .home-spatial-product-copy h2{font-size:1.18rem!important;line-height:1.15!important;margin:0!important}
+  .home-hero-v3191 .home-spatial-product-copy>p{display:none!important}
+  .home-hero-v3191 .home-spatial-spec-card{margin-top:4px!important;padding:8px 12px!important;border-radius:14px!important}
+  .home-hero-v3191 .home-spatial-spec-card strong{font-size:.86rem!important}
+  .home-hero-v3191 .home-hero-actions-v3191{margin-top:10px!important;gap:8px!important}
+  .home-hero-v3191 .home-hero-actions-v3191 a{min-height:44px!important;padding-block:0!important}
+  .home-hero-v3191 .home-spatial-visual{min-height:0!important;height:var(--hero-stage-h)!important;margin-top:10px!important}
+  .home-hero-v3191 .home-spatial-product{width:min(80vw,calc(var(--hero-stage-h) * .92))!important}
+  .home-hero-v3191 .home-spatial-visual-status{bottom:10px!important;left:10px!important;min-height:32px!important}
+  .home-hero-v3191 .home-spatial-stage-controls{top:8px!important;right:8px!important}
+  .home-hero-v3191 .home-spatial-dock-wrap{bottom:10px!important}
+}

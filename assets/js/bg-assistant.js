@@ -21,13 +21,23 @@
   const state = { started: false, lastUser: '', lastAssistant: '', busy: false, history: [] };
 
 
+  // V3.3.49: some in-app browsers (Instagram, Facebook WebViews) shrink the layout
+  // viewport itself when the keyboard opens, so visualViewport.height equals innerHeight.
+  // Track the tallest height seen at this width and treat a big drop while typing as "keyboard open".
+  let baseWidth = window.innerWidth;
+  let baseHeight = window.innerHeight;
   const syncAssistantViewport = () => {
     const viewport = window.visualViewport;
     const height = Math.round(viewport?.height || window.innerHeight || 0);
     const offsetTop = Math.round(viewport?.offsetTop || 0);
     if (height > 0) document.documentElement.style.setProperty('--bg-assistant-vvh', `${height}px`);
     document.documentElement.style.setProperty('--bg-assistant-vvo', `${offsetTop}px`);
-    const keyboardOpen = Boolean(viewport && height > 0 && height < window.innerHeight * .78 && !panel.hidden);
+    const typing = document.activeElement === input;
+    if (window.innerWidth !== baseWidth) { baseWidth = window.innerWidth; baseHeight = window.innerHeight; }
+    else if (!typing) baseHeight = Math.max(baseHeight, window.innerHeight);
+    const visualShrunk = Boolean(viewport && height < window.innerHeight * .78);
+    const layoutShrunk = typing && height < baseHeight * .8;
+    const keyboardOpen = Boolean(height > 0 && !panel.hidden && (visualShrunk || layoutShrunk));
     document.body.classList.toggle('bg-assistant-keyboard', keyboardOpen);
   };
 
@@ -529,5 +539,8 @@
   window.addEventListener('resize', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
   window.visualViewport?.addEventListener('resize', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
   window.visualViewport?.addEventListener('scroll', () => { syncAssistantViewport(); positionAssistantPanel(); }, { passive: true });
+  const resyncSoon = () => [60, 280, 600].forEach(ms => window.setTimeout(() => { syncAssistantViewport(); positionAssistantPanel(); }, ms));
+  input?.addEventListener('focus', resyncSoon);
+  input?.addEventListener('blur', resyncSoon);
   syncAssistantViewport();
 })();
