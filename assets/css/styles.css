@@ -5526,3 +5526,80 @@ th,td,dt,.order-field>span,.color-choice>span,.footer-v3202-bottom>p,.case-proje
 .model3d-hint{margin:0;padding:12px 18px;font-size:.8rem;color:rgba(246,241,234,.55);text-align:center}
 body.model3d-open{overflow:hidden}
 @media(max-width:680px){.model3d-dialog{padding:0;place-items:end}.model3d-card{border-radius:22px 22px 0 0}.model3d-stage{height:62vh}}
+
+/* ==========================================================
+   v3.3.63 · ÜRETİM HİKÂYESİ — adımlarla dönüşen çizim sahnesi
+   ========================================================== */
+.home-process-story-v3363{background:radial-gradient(70% 70% at 50% 42%,#2a231e,#14110f)!important}
+.home-process-story-v3363>img,.home-process-story-v3363>picture,.home-process-story-v3363>a{display:none!important}
+.print-story-v3363{position:absolute;inset:0 0 56px 0;display:grid;place-items:center}
+.print-story-v3363 svg{width:100%;height:100%;max-height:100%;overflow:visible}
+.ps-floor{stroke:rgba(246,241,234,.18);stroke-width:1.2;stroke-dasharray:3 5}
+.ps-s{opacity:0;transform:translateY(8px);transition:opacity .55s cubic-bezier(.23,1,.32,1),transform .55s cubic-bezier(.23,1,.32,1)}
+.print-story-v3363[data-stage="0"] .ps-s0,.print-story-v3363[data-stage="1"] .ps-s1,.print-story-v3363[data-stage="2"] .ps-s2,.print-story-v3363[data-stage="3"] .ps-s3,.print-story-v3363[data-stage="4"] .ps-s4{opacity:1;transform:none}
+/* 0 Fikir */
+.ps-sketch{fill:none;stroke:#f6f1ea;stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.ps-sketch-2{stroke:rgba(246,241,234,.45);stroke-width:1.2}
+.ps-pencil path{fill:none;stroke:#c8894a;stroke-width:1.6;stroke-linejoin:round}
+.print-story-v3363[data-stage="0"] .ps-sketch{animation:psDraw 1.6s cubic-bezier(.77,0,.175,1) both}
+.print-story-v3363[data-stage="0"] .ps-sketch-2{animation-delay:.9s}
+@keyframes psDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+/* 1 Modelleme */
+.ps-wire,.ps-wire *{fill:none;stroke:#c8894a;stroke-width:1;opacity:.9}
+.ps-rings{opacity:.75}
+.ps-dim path{fill:none;stroke:rgba(246,241,234,.55);stroke-width:1}
+.ps-dim text,.ps-route text{fill:rgba(246,241,234,.8);font:600 10px "DM Sans",Arial,sans-serif;letter-spacing:.02em}
+/* 2 Test */
+.ps-proto{fill:#ece6dc}
+.ps-caliper path{fill:none;stroke:#f6f1ea;stroke-width:1.4;stroke-linejoin:round}
+.ps-check circle{fill:rgba(200,137,74,.18);stroke:#c8894a;stroke-width:1.4}
+.ps-check path{fill:none;stroke:#c8894a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.print-story-v3363[data-stage="2"] .ps-check{animation:psPop .5s cubic-bezier(.23,1,.32,1) .5s both;transform-box:fill-box;transform-origin:center}
+@keyframes psPop{from{opacity:0;transform:scale(.6)}}
+/* 3 Üretim — --print: 0..1 (kaydırmaya bağlı) */
+.ps-frame{fill:none;stroke:rgba(246,241,234,.3);stroke-width:2;stroke-linejoin:round}
+.ps-outline{fill:none;stroke:rgba(200,137,74,.6);stroke-width:1;stroke-dasharray:3 3}
+.ps-fill{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--print,.65))}
+.ps-gantry{transform:translateY(calc(236px - 117px * var(--print,.65)))}
+.ps-rail{stroke:rgba(246,241,234,.4);stroke-width:2;stroke-linecap:round}
+.ps-head rect{fill:#f6f1ea}.ps-nozzle{fill:#c8894a}
+@media (prefers-reduced-motion:no-preference){.print-story-v3363[data-stage="3"] .ps-head{animation:psHead .8s ease-in-out infinite alternate}}
+@keyframes psHead{from{transform:translateX(-26px)}to{transform:translateX(26px)}}
+/* 4 Teslim */
+.ps-box-back{fill:#3a2f27}.ps-box-front{fill:#8a5a2b}.ps-tape{fill:#c8894a;opacity:.9}
+.ps-flap{fill:#a06a35;transform-box:fill-box}
+.ps-flap-l{transform-origin:100% 0}.ps-flap-r{transform-origin:0 0}
+.ps-vase-mini{fill:#ece6dc}
+.print-story-v3363[data-stage="4"] .ps-vase-mini{animation:psDrop .7s cubic-bezier(.23,1,.32,1) both}
+.print-story-v3363[data-stage="4"] .ps-flap-l{animation:psFlapL .5s cubic-bezier(.23,1,.32,1) .55s both}
+.print-story-v3363[data-stage="4"] .ps-flap-r{animation:psFlapR .5s cubic-bezier(.23,1,.32,1) .55s both}
+@keyframes psDrop{from{transform:translateY(-40px);opacity:0}}
+@keyframes psFlapL{from{transform:rotate(-70deg)}}
+@keyframes psFlapR{from{transform:rotate(70deg)}}
+.ps-route path{fill:none;stroke:#c8894a;stroke-width:1.4;stroke-dasharray:4 4}
+.ps-route circle{fill:#f6f1ea}
+/* Alt etiket */
+.home-process-story-v3363 .home-process-visual-badge-v3200 [data-print-story-label]{font-size:.78rem!important;letter-spacing:.06em!important;color:#c8894a!important;font-variant-numeric:tabular-nums}
+.home-process-story-v3363 .home-process-visual-badge-v3200 strong{transition:opacity .3s ease}
+@media (prefers-reduced-motion:reduce){.ps-s,.ps-s *{animation:none!important;transition:none!important}}
+@media(max-width:860px){.home-process-story-v3363{min-height:300px!important}.print-story-v3363{inset:0 0 50px 0}}
+
+/* v3.3.63 · Rakamlar: espresso + bronz, sayaçla dolan çizgi */
+.home-stats-v3198{background:#14110f!important}
+.home-stats-v3198::before{background:radial-gradient(circle,rgba(200,137,74,.16),rgba(200,137,74,0) 62%)!important}
+.home-stat-card-v3198>strong{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.home-stat-card-v3198>div{position:relative}
+.home-stat-card-v3198>div::before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:linear-gradient(90deg,#8a4e0e,#c8894a);transform:scaleX(var(--count,1));transform-origin:left center;pointer-events:none}
+.home-stat-card-v3198>span{color:#c8894a!important}
+
+/* v3.3.64 · Gerçek Kuşadası haritası (Google kartı) */
+.gplace-map-art-v3350 .gmap-land{fill:#f1ece4;stroke:#d9cfc1;stroke-width:1.2;stroke-linejoin:round}
+.gplace-map-art-v3350 .gmap-island{fill:#e9e3da;stroke:#d5cbbd;stroke-width:1}
+.gplace-map-art-v3350 .gmap-road{fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.gplace-map-art-v3350 .gmap-road-minor{stroke-width:2.5}
+.gplace-map-art-v3350 .gmap-town{fill:#8a7a6a}
+.gplace-map-art-v3350 .gmap-label{fill:#5f5750;font:600 11px "DM Sans",Arial,sans-serif}
+.gplace-map-art-v3350 .gmap-sea{fill:#7fa4a8;font:italic 500 14px "Playfair Display",Georgia,serif;letter-spacing:.06em}
+.gplace-map-art-v3350 .gmap-small{font-size:10px}
+.gplace-pin-v3350{left:56.4%!important;top:40.6%!important}
+.gplace-place-v3350{left:56.4%!important;top:calc(40.6% + 18px)!important}

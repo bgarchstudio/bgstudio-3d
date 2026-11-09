@@ -2629,3 +2629,97 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   zone.addEventListener('click', (e) => { if (Date.now() < suppress) { e.preventDefault(); e.stopPropagation(); } }, true);
   zone.addEventListener('dragstart', (e) => { if (e.target.closest('[data-spatial-stage]')) e.preventDefault(); });
 })();
+
+/* v3.3.63 — Üretim hikâyesi: aktif adıma göre sahne, "Üretim" adımında kaydırmayla baskı. */
+(() => {
+  const story = document.querySelector('[data-print-story]');
+  const section = document.querySelector('[data-how-it-works]');
+  if (!story || !section) return;
+  const steps = [...section.querySelectorAll('[data-how-step]')];
+  const label = section.querySelector('[data-print-story-label]');
+  const caption = section.querySelector('[data-print-story-caption]');
+  const TEXT = [
+    ['01 · Fikir', 'Fikrin kâğıda dökülür.'],
+    ['02 · Modelleme', 'Ölçülü, üretilebilir 3D model.'],
+    ['03 · Test', 'Prototiple ölçü ve uyum kontrolü.'],
+    ['04 · Üretim', 'Katman katman basılır.'],
+    ['05 · Teslim', 'Paketlenir, Kuşadası’ndan yola çıkar.']
+  ];
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = window.matchMedia('(max-width: 860px)');
+  let stage = -1;
+  const show = (i) => {
+    i = Math.max(0, Math.min(4, i));
+    if (i === stage) return;
+    stage = i;
+    story.dataset.stage = String(i);
+    if (label) label.textContent = TEXT[i][0];
+    if (caption) caption.textContent = TEXT[i][1];
+  };
+  const activeIndex = () => Math.max(0, steps.findIndex((s) => s.classList.contains('is-active')));
+  // Masaüstü: mevcut adım mantığını izle
+  new MutationObserver(() => { if (!mobile.matches) show(activeIndex()); })
+    .observe(section, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  // "Üretim" adımında baskı yüksekliği kaydırmaya bağlı
+  let raf = 0;
+  const updatePrint = () => {
+    raf = 0;
+    const s3 = steps[3];
+    if (!s3 || mobile.matches || reduce) { story.style.setProperty('--print', '1'); return; }
+    const r = s3.getBoundingClientRect();
+    const trigger = window.innerHeight * 0.45;
+    const p = Math.min(1, Math.max(0.05, (trigger - r.top) / Math.max(1, r.height)));
+    story.style.setProperty('--print', p.toFixed(3));
+  };
+  window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(updatePrint); }, { passive: true });
+  updatePrint();
+  // Telefon: bölüm görünürken sahneleri sırayla oynat
+  let timer = 0;
+  const startAuto = () => {
+    if (timer || reduce) return;
+    timer = window.setInterval(() => {
+      const next = (stage + 1) % 5;
+      show(next);
+      steps.forEach((s, i) => s.classList.toggle('is-active', i === next));
+    }, 2600);
+  };
+  const stopAuto = () => { window.clearInterval(timer); timer = 0; };
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && mobile.matches) startAuto(); else stopAuto();
+    }, { threshold: 0.35 }).observe(story);
+  }
+  show(activeIndex());
+})();
+
+/* v3.3.63 — Rakamlar: tüm sayaçlar aynı anda başlar, 1.5 sn'de birlikte hedefe ulaşır (easeOutCubic). */
+(() => {
+  const section = document.querySelector('.home-stats-v3198');
+  if (!section) return;
+  const cards = [...section.querySelectorAll('.home-stat-card-v3198')];
+  const nums = cards.map((c) => c.querySelector(':scope > strong')).filter(Boolean);
+  if (!nums.length) return;
+  const targets = nums.map((n) => { const m = n.textContent.match(/\d+/); return m ? Number(m[0]) : 0; });
+  const suffix = nums.map((n) => n.textContent.replace(/^\s*\d+/, ''));
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  const set = (p) => {
+    nums.forEach((n, i) => { n.textContent = String(Math.round(targets[i] * p)) + (p >= 1 ? suffix[i] : ''); });
+    cards.forEach((c) => c.style.setProperty('--count', p.toFixed(3)));
+  };
+  set(0);
+  section.classList.add('is-counting-ready');
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    io.disconnect();
+    const start = performance.now(), dur = 1500;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / dur);
+      set(ease(t));
+      if (t < 1) requestAnimationFrame(tick); else set(1);
+    };
+    requestAnimationFrame(tick);
+  }, { threshold: 0.5 });
+  io.observe(section.querySelector('.home-stat-card-v3198')?.parentElement || section);
+})();

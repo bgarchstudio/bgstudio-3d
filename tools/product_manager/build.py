@@ -1260,6 +1260,48 @@ def render_home_spatial_control(product, index=0):
         f'</button>'
     )
 
+PRINT_STORY_SVG_V3363 = '''<div class="print-story-v3363" data-print-story data-stage="0" aria-hidden="true"><svg viewBox="62 72 276 206" preserveAspectRatio="xMidYMid meet" focusable="false">
+<defs>
+<pattern id="psGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(246,241,234,.06)" stroke-width="1"/></pattern>
+<pattern id="psLayers" width="8" height="3" patternUnits="userSpaceOnUse"><rect width="8" height="3" fill="#ece6dc"/><rect y="2.2" width="8" height=".8" fill="#c8894a" opacity=".55"/></pattern>
+<clipPath id="psVaseClip"><path d="M184 236C179 214 168 198 172 180C175 163 189 154 191 138C192 129 188 123 190 119H210C212 123 208 129 209 138C211 154 225 163 228 180C232 198 221 214 216 236Z"/></clipPath>
+</defs>
+<rect width="400" height="300" fill="url(#psGrid)"/>
+<line class="ps-floor" x1="70" y1="236" x2="330" y2="236"/>
+<g class="ps-s ps-s0">
+<path class="ps-sketch" pathLength="1" d="M184 236C179 214 168 198 172 180C175 163 189 154 191 138C192 129 188 123 190 119H210C212 123 208 129 209 138C211 154 225 163 228 180C232 198 221 214 216 236Z"/>
+<path class="ps-sketch ps-sketch-2" pathLength="1" d="M150 120c18-14 34-10 40 4M236 92c14 6 20 18 14 30"/>
+<g class="ps-pencil"><path d="M258 168l34-34 8 8-34 34-11 3z"/><path d="M292 134l8 8"/></g>
+</g>
+<g class="ps-s ps-s1">
+<path class="ps-wire" d="M184 236C179 214 168 198 172 180C175 163 189 154 191 138C192 129 188 123 190 119H210C212 123 208 129 209 138C211 154 225 163 228 180C232 198 221 214 216 236Z"/>
+<g class="ps-wire ps-rings"><ellipse cx="200" cy="236" rx="16" ry="4"/><ellipse cx="200" cy="214" rx="24" ry="5"/><ellipse cx="200" cy="196" rx="28" ry="5.5"/><ellipse cx="200" cy="178" rx="27" ry="5"/><ellipse cx="200" cy="160" rx="18" ry="4"/><ellipse cx="200" cy="142" rx="10" ry="3"/><ellipse cx="200" cy="120" rx="10" ry="2.5"/></g>
+<path class="ps-wire" d="M200 119V236M190 120c-12 40-26 70-6 116M210 120c12 40 26 70 6 116"/>
+<g class="ps-dim"><path d="M244 119v117M240 119h8M240 236h8"/><text x="252" y="182">120 mm</text><path d="M172 252h56M172 248v8M228 248v8"/><text x="181" y="268">Ø 56 mm</text></g>
+</g>
+<g class="ps-s ps-s2">
+<path class="ps-proto" transform="translate(100 118) scale(.5)" d="M184 236C179 214 168 198 172 180C175 163 189 154 191 138C192 129 188 123 190 119H210C212 123 208 129 209 138C211 154 225 163 228 180C232 198 221 214 216 236Z"/>
+<g class="ps-caliper"><path d="M178 170h94v8h-94z"/><path d="M178 170v-24h8v24M222 170v-24h8v24"/><path d="M262 178v14h10v-14"/></g>
+<g class="ps-check"><circle cx="268" cy="118" r="16"/><path d="M260 118l6 6 11-12"/></g>
+</g>
+<g class="ps-s ps-s3">
+<path class="ps-frame" d="M120 236V82h160v154M120 82h160"/>
+<g clip-path="url(#psVaseClip)"><rect class="ps-fill" x="160" y="114" width="80" height="122" fill="url(#psLayers)"/></g>
+<path class="ps-outline" d="M184 236C179 214 168 198 172 180C175 163 189 154 191 138C192 129 188 123 190 119H210C212 123 208 129 209 138C211 154 225 163 228 180C232 198 221 214 216 236Z"/>
+<g class="ps-gantry"><line x1="124" y1="0" x2="276" y2="0" class="ps-rail"/><g transform="translate(200 0)"><g class="ps-head"><rect x="-11" y="-14" width="22" height="14" rx="4"/><path d="M-4 0h8l-4 5z" class="ps-nozzle"/></g></g></g>
+</g>
+<g class="ps-s ps-s4">
+<path class="ps-box-back" d="M150 168h100v68H150z"/>
+<path class="ps-vase-mini" d="M192 196c-2-8-6-13-5-19 1-6 6-9 7-14h12c1 5 6 8 7 14 1 6-3 11-5 19z"/>
+<path class="ps-box-front" d="M150 196h100v40H150z"/>
+<path class="ps-flap ps-flap-l" d="M150 168l-26 18 26 10z"/>
+<path class="ps-flap ps-flap-r" d="M250 168l26 18-26 10z"/>
+<path class="ps-tape" d="M194 196h12v40h-12z"/>
+<g class="ps-route"><circle cx="96" cy="132" r="4"/><path d="M96 132C140 92 250 84 304 112"/><circle cx="304" cy="112" r="4"/><text x="72" y="152">Kuşadası</text><text x="282" y="132">Türkiye</text></g>
+</g>
+</svg></div>'''
+
+
 def render_homepage_v3163(active, featured, field_items):
     # V3.1.76: editorial copy and every homepage product placement can be managed without touching code.
     home_copy = read_site_content_v3175()['home']
@@ -1388,14 +1430,14 @@ def render_homepage_v3163(active, featured, field_items):
   <div class="shell home-process-grid-v3200">
     <div class="home-process-sticky-v3200 home-motion" data-home-motion>
       <div class="home-process-copy-v3200"><p class="eyebrow">NASIL İLERLİYORUZ?</p><h2 id="home-process-title">Fikirden teslimata. Beş net adım.</h2><p>{esc(home_copy["production_lead"])}</p><a class="primary-cta" href="{esc(home_copy["production_cta_url"])}">{esc(home_copy["production_cta_label"])}</a></div>
-      <div class="home-process-visual-v3200">{production_visual}<div class="home-process-visual-badge-v3200"><span>BG STUDIO 3D</span><strong>Tasarım + üretim aynı akışta.</strong></div></div>
+      <div class="home-process-visual-v3200 home-process-story-v3363">{PRINT_STORY_SVG_V3363}<div class="home-process-visual-badge-v3200"><span data-print-story-label>01 · Fikir</span><strong data-print-story-caption>Fikrin kâğıda dökülür.</strong></div></div>
     </div>
     <div class="home-process-timeline-v3200">
       <div class="home-process-rail-v3200" aria-hidden="true"><span data-how-progress></span></div>
       <article class="home-process-step-v3200 is-active" data-how-step="0" tabindex="0"><span>01</span><div><small>FİKİR</small><h3>İhtiyacı tarif et.</h3><p>Fotoğraf, eskiz, ölçü, örnek ürün veya kısa bir fikirle başlayabiliriz. Nasıl kullanacağını birlikte netleştiririz.</p></div></article>
       <article class="home-process-step-v3200" data-how-step="1" tabindex="0"><span>02</span><div><small>MODELLEME</small><h3>Üretilebilir geometri.</h3><p>Mevcut modeli kontrol eder veya gereken parçayı ölçü, detay ve baskı koşullarına göre modelleriz.</p></div></article>
       <article class="home-process-step-v3200" data-how-step="2" tabindex="0"><span>03</span><div><small>TEST</small><h3>Ölçü, uyum ve malzeme.</h3><p>Gereken işlerde prototip veya baskı testiyle tolerans, renk, bağlantı ve kullanım davranışını kontrol ederiz.</p></div></article>
-      <article class="home-process-step-v3200" data-how-step="3" tabindex="0"><span>04</span><div><small>ÜRETİM</small><h3>Onaylanan işi bas.</h3><p>Malzeme, renk, baskı yönü ve üretim ayarları netleşir. Tek adetten toplu siparişe üretim akışına geçeriz.</p></div></article>
+      <article class="home-process-step-v3200" data-how-step="3" tabindex="0"><span>04</span><div><small>ÜRETİM</small><h3>Onaylanan işi bas.</h3><p>Malzeme, renk, baskı yönü ve üretim ayarları netleşir. Tek adetten toplu siparişe kadar üretime başlarız.</p></div></article>
       <article class="home-process-step-v3200" data-how-step="4" tabindex="0"><span>05</span><div><small>TESLİM</small><h3>Kontrol et. Paketle. Gönder.</h3><p>Son kontrol sonrası Kuşadası elden teslim veya uygun siparişlerde Türkiye geneli kargo ile işi tamamlarız.</p></div></article>
     </div>
   </div>
@@ -1453,21 +1495,7 @@ def render_homepage_v3163(active, featured, field_items):
 <section class="home-reviews-v3328 home-gplace-v3350 bg-section-compact" aria-labelledby="home-reviews-title">
   <div class="shell gplace-card-v3350">
     <a class="gplace-map-v3350" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank" aria-label="BG Studio 3D'yi Google Haritalar'da aç">
-      <svg class="gplace-map-art-v3350" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-        <rect width="560" height="420" fill="#efe6da"/>
-        <path d="M0 0H190C170 60 205 92 176 140C150 184 196 214 168 262C146 300 182 352 150 420H0Z" fill="#cddfe0"/>
-        <path d="M190 0C170 60 205 92 176 140C150 184 196 214 168 262C146 300 182 352 150 420" fill="none" stroke="#b9d0d2" stroke-width="6"/>
-        <g fill="none" stroke="#fffaf3" stroke-linecap="round">
-          <path d="M176 140C260 150 340 128 560 150" stroke-width="16"/>
-          <path d="M168 262C280 250 390 284 560 268" stroke-width="12"/>
-          <path d="M300 0C312 120 286 250 318 420" stroke-width="14"/>
-          <path d="M440 0C430 110 462 240 436 420" stroke-width="9"/>
-          <path d="M210 60L560 52M196 350L560 360M372 0L384 420" stroke-width="5"/>
-        </g>
-        <g fill="#e2d6c5"><rect x="330" y="170" width="92" height="66" rx="8"/><rect x="456" y="178" width="70" height="60" rx="8"/><rect x="330" y="290" width="88" height="48" rx="8"/><rect x="216" y="168" width="70" height="70" rx="8"/><rect x="456" y="290" width="76" height="52" rx="8"/><rect x="330" y="72" width="92" height="50" rx="8"/></g>
-        <g fill="#d3e2c9"><rect x="216" y="290" width="74" height="46" rx="12"/><rect x="456" y="72" width="70" height="52" rx="12"/></g>
-        <text x="40" y="214" fill="#86a9ac" font-size="15" font-style="italic" letter-spacing="2">Ege Denizi</text>
-      </svg>
+      <svg class="gplace-map-art-v3350" viewBox="0 0 560 495" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><rect width="560" height="495" fill="#cfdfe1"/><g class="gmap-waves" fill="none" stroke="#bfd3d6" stroke-width="1"><path d="M20 40q8-5 16 0t16 0"/><path d="M57 110q8-5 16 0t16 0"/><path d="M94 180q8-5 16 0t16 0"/><path d="M131 250q8-5 16 0t16 0"/><path d="M168 320q8-5 16 0t16 0"/><path d="M205 40q8-5 16 0t16 0"/><path d="M242 110q8-5 16 0t16 0"/><path d="M279 180q8-5 16 0t16 0"/><path d="M316 250q8-5 16 0t16 0"/></g><path class="gmap-land" d="M252.0 0.0 L291.2 35.4 L330.4 70.7 L358.4 106.1 L352.8 141.4 L336.0 162.6 L320.3 183.9 L311.4 195.2 L302.4 200.8 L304.6 212.1 L315.8 226.3 L324.8 243.3 L315.8 261.6 L302.4 282.9 L291.2 304.1 L282.2 325.3 L266.6 350.7 L246.4 374.8 L201.6 401.7 L156.8 415.8 L112.0 428.5 L72.8 438.4 L87.4 461.1 L134.4 469.5 L190.4 479.4 L246.4 486.5 L313.6 495.0 L560.0 495.0 L560.0 0.0Z"/><path class="gmap-island" d="M0.0 297.0 L44.8 316.8 L80.6 356.4 L98.6 401.7 L87.4 428.5 L44.8 437.0 L0.0 424.3Z"/><circle class="gmap-land" cx="296.2" cy="195.9" r="3.4"/><path class="gmap-road" d="M315.8 200.8 L358.4 155.6 L397.6 106.1 L431.2 77.8"/><path class="gmap-road" d="M315.8 200.8 L358.4 243.3 L425.6 297.0 L481.6 350.7"/><path class="gmap-road gmap-road-minor" d="M315.8 200.8 L311.4 254.6 L296.8 304.1 L263.2 374.8"/><circle class="gmap-town" cx="431.2" cy="77.8" r="3.2"/><circle class="gmap-town" cx="481.6" cy="350.7" r="3.2"/><circle class="gmap-town" cx="333.8" cy="67.9" r="3.2"/><circle class="gmap-town" cx="275.5" cy="388.9" r="3.2"/><text class="gmap-label" x="442" y="68">Selçuk · Efes</text><text class="gmap-label" x="493" y="362">Söke</text><text class="gmap-label" x="342" y="54">Pamucak</text><text class="gmap-label" x="190" y="375">Güzelçamlı</text><text class="gmap-sea" x="112" y="163">Ege Denizi</text><text class="gmap-sea gmap-small" x="11" y="375">Sisam</text><text class="gmap-label gmap-small" x="146" y="455">Dilek Yarımadası</text></svg>
       <span class="gplace-pin-v3350" aria-hidden="true"><span class="gplace-pin-head-v3350"><img src="assets/brand/bgstudio3d-monogram.webp" alt="" width="40" height="40" loading="lazy" decoding="async"/></span></span>
       <span class="gplace-place-v3350"><strong>BG Studio 3D</strong><small>Kuşadası, Aydın · Haritada aç ↗</small></span>
     </a>
@@ -2199,7 +2227,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.62'
+SITE_ASSET_VERSION = '3.3.64'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens
