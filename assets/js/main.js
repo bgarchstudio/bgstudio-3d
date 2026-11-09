@@ -2750,3 +2750,51 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   }, { threshold: 0.5 });
   io.observe(section.querySelector('.home-stat-card-v3198')?.parentElement || section);
 })();
+
+/* v3.3.67 — Drone harita: Türkiye → Ege → Kuşadası (görünüm kutusu animasyonu). */
+(() => {
+  const svg = document.querySelector('[data-drone-map]');
+  if (!svg) return;
+  const card = svg.closest('.gplace-map-v3350');
+  const tag = card?.querySelector('[data-drone-tag]');
+  let views;
+  try { views = JSON.parse(svg.dataset.views); } catch (_) { return; }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const setVB = (v) => svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' '));
+  const setLevel = (l, label) => { svg.dataset.level = String(l); if (tag && label) tag.textContent = label; };
+  // Drone hissi: merkez doğrusal, genişlik üstel (logaritmik) değişir.
+  const lerpView = (a, b, t) => {
+    const ca = [a[0] + a[2] / 2, a[1] + a[3] / 2], cb = [b[0] + b[2] / 2, b[1] + b[3] / 2];
+    const w = Math.exp(Math.log(a[2]) + (Math.log(b[2]) - Math.log(a[2])) * t);
+    const h = w * (a[3] / a[2]);
+    const cx = ca[0] + (cb[0] - ca[0]) * t, cy = ca[1] + (cb[1] - ca[1]) * t;
+    return [cx - w / 2, cy - h / 2, w, h];
+  };
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const fly = (a, b, dur) => new Promise((res) => {
+    const s = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - s) / dur);
+      setVB(lerpView(a, b, ease(t)));
+      if (t < 1) requestAnimationFrame(step); else res();
+    };
+    requestAnimationFrame(step);
+  });
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  setVB(views.tr); setLevel(1, 'Türkiye'); card?.classList.add('is-flying');
+  const run = async () => {
+    await wait(500);
+    setLevel(2, 'Ege Bölgesi');
+    await fly(views.tr, views.ege, 1400);
+    await wait(450);
+    setLevel(3, 'Kuşadası');
+    await fly(views.ege, views.kus, 1500);
+    await wait(250);
+    card?.classList.remove('is-flying');
+  };
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    io.disconnect(); run();
+  }, { threshold: 0.55 });
+  io.observe(card || svg);
+})();

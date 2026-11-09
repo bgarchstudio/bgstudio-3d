@@ -5631,3 +5631,21 @@ body.model3d-open{overflow:hidden}
   .ps-dots button[aria-current="true"]::before{width:22px;border-radius:999px;background:#14110f}
 }
 @media(min-width:861px){.ps-dots{display:none}}
+
+/* v3.3.67 · Drone harita: Türkiye → Ege → Kuşadası */
+.m-drone .m-sea{fill:#cfdfe1}
+.m-drone .m-land{fill:#f1ece4;stroke:#d9cfc1;stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.m-drone .m-isle{fill:#e9e3da;stroke:#d5cbbd;stroke-width:1;vector-effect:non-scaling-stroke}
+.m-drone .m-road{fill:none;stroke:#fff;stroke-width:4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.m-drone .m-dot{fill:#8a7a6a}
+.m-drone .m-lab{fill:#5f5750;font-family:"DM Sans",Arial,sans-serif;font-weight:600}
+.m-drone .m-big{fill:#b9ad9f;letter-spacing:.3em;font-weight:700}
+.m-drone .m-sea-lab{fill:#7fa4a8;font-family:"Playfair Display",Georgia,serif;font-style:italic;font-weight:500;letter-spacing:.05em}
+.m-drone [data-lvl]{transition:opacity .5s ease}
+.m-drone[data-level="1"] [data-lvl="2"],.m-drone[data-level="1"] [data-lvl="3"],.m-drone[data-level="2"] [data-lvl="1"],.m-drone[data-level="2"] [data-lvl="3"],.m-drone[data-level="3"] [data-lvl="1"],.m-drone[data-level="3"] [data-lvl="2"]{opacity:0}
+.gplace-pin-v3350{left:50%!important;top:42%!important}
+.gplace-place-v3350{left:50%!important;top:calc(42% + 18px)!important}
+.gplace-map-v3350.is-flying .gplace-pin-v3350,.gplace-map-v3350.is-flying .gplace-place-v3350{opacity:0;visibility:hidden}
+.gplace-map-v3350 .gplace-pin-v3350,.gplace-map-v3350 .gplace-place-v3350{transition:opacity .45s ease}
+.gplace-zoom-tag{position:absolute;left:16px;top:16px;z-index:3;padding:6px 12px;border-radius:999px;background:rgba(20,17,15,.78);color:#f6f1ea;font-size:.75rem;font-weight:600;letter-spacing:.04em;opacity:0;transition:opacity .3s ease}
+.gplace-map-v3350.is-flying .gplace-zoom-tag{opacity:1}
