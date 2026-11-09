@@ -1,13 +1,13 @@
 {
   "site": "https://3d.bgstudio.com.tr/",
-  "asset_version": "3.3.71",
+  "asset_version": "3.3.73",
   "generated_at": "2026-11-09",
   "summary": {
-    "physical_html_pages": 77,
-    "canonical_indexable_pages": 74,
+    "physical_html_pages": 78,
+    "canonical_indexable_pages": 75,
     "noindex_pages": 3,
-    "index_html_aliases": 76,
-    "sitemap_urls": 74,
+    "index_html_aliases": 77,
+    "sitemap_urls": 75,
     "indexable_not_in_sitemap": 0,
     "duplicate_canonicals": 0
   },
@@ -111,6 +111,16 @@
       "indexable": false,
       "in_sitemap": false,
       "expected_treatment": "noindex"
+    },
+    {
+      "file": "mimari-maket-3d-baski/index.html",
+      "route": "/mimari-maket-3d-baski/",
+      "url": "https://3d.bgstudio.com.tr/mimari-maket-3d-baski/",
+      "canonical": "https://3d.bgstudio.com.tr/mimari-maket-3d-baski/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
     },
     {
       "file": "nfc-qr/feedback/index.html",
@@ -836,6 +846,12 @@
       "url": "https://3d.bgstudio.com.tr/mesafeli-satis/index.html",
       "canonical": "https://3d.bgstudio.com.tr/mesafeli-satis/",
       "source_file": "mesafeli-satis/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/mimari-maket-3d-baski/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/mimari-maket-3d-baski/",
+      "source_file": "mimari-maket-3d-baski/index.html",
       "expected_google_treatment": "alternate-canonical-or-redirect"
     },
     {
