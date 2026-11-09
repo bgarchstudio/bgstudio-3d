@@ -28,7 +28,18 @@
     "show_in_corporate": true,
     "theme": "dark",
     "image": "assets/images/references/circolo-kusadasi.webp",
-    "profile_image": "assets/images/references/circolo-kusadasi-profile.webp"
+    "profile_image": "assets/images/references/circolo-kusadasi-profile.webp",
+    "project_installation": "5 stand · 10 NFC",
+    "project_metrics": {
+      "total_scans": 317,
+      "nfc_scans": 55,
+      "qr_scans": 262,
+      "google_redirects": 251,
+      "instagram_opens": 66,
+      "google_review_growth": "+188",
+      "google_review_range": "211 → 399"
+    },
+    "project_metrics_date": "10 Kasım 2026"
   },
   {
     "slug": "planet-yucca",
@@ -59,7 +70,18 @@
     "show_in_corporate": true,
     "theme": "dark",
     "image": "assets/images/references/planet-yucca.webp",
-    "profile_image": "assets/images/references/planet-yucca-profile.webp"
+    "profile_image": "assets/images/references/planet-yucca-profile.webp",
+    "project_installation": "10 stand · 20 NFC",
+    "project_metrics": {
+      "total_scans": 143,
+      "nfc_scans": 14,
+      "qr_scans": 129,
+      "google_redirects": 100,
+      "instagram_opens": 43,
+      "google_review_growth": "+66",
+      "google_review_range": "1.487 → 1.553"
+    },
+    "project_metrics_date": "10 Kasım 2026"
   },
   {
     "slug": "istavrit-restaurant",
@@ -87,7 +109,18 @@
     "theme": "light",
     "image": "assets/images/references/istavrit-restaurant.webp",
     "profile_image": "assets/images/references/istavrit-restaurant-profile.webp",
-    "show_in_corporate": true
+    "show_in_corporate": true,
+    "project_installation": "10 masa · 30 NFC",
+    "project_metrics": {
+      "total_scans": 140,
+      "nfc_scans": 85,
+      "qr_scans": 55,
+      "menu_opens": 113,
+      "google_redirects": 2,
+      "google_review_growth": "+11",
+      "google_review_range": "80 → 91"
+    },
+    "project_metrics_date": "10 Kasım 2026"
   },
   {
     "slug": "yusuf-sef",
@@ -118,7 +151,18 @@
     "show_in_corporate": true,
     "theme": "light",
     "image": "assets/images/references/yusuf-sef.webp",
-    "profile_image": "assets/images/references/yusuf-sef-profile.webp"
+    "profile_image": "assets/images/references/yusuf-sef-profile.webp",
+    "project_installation": "15 masa · 45 NFC",
+    "project_metrics": {
+      "total_scans": 417,
+      "nfc_scans": 70,
+      "qr_scans": 347,
+      "menu_opens": 331,
+      "google_redirects": 4,
+      "google_review_growth": "+6",
+      "google_review_range": "2 → 8"
+    },
+    "project_metrics_date": "10 Kasım 2026"
   },
   {
     "slug": "naz-balik-restaurant",

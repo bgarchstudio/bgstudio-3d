@@ -621,7 +621,16 @@ def render_nfc_case(item, prefix='../'):
     klass = managed_case_class(theme, media_class)
     identity = f'<div class="case-identity">{profile}<span class="case-type">{kicker}</span></div>'
     project_link = f'<a class="case-project-link" href="{esc(project_public_url(item, prefix))}">Proje detayını gör ↗</a>'
-    body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p><div class="case-meta">{tags}</div>{project_link}</div>'
+    stats = ''
+    pm = item.get('project_metrics') if isinstance(item.get('project_metrics'), dict) else {}
+    if pm.get('total_scans'):
+        parts = [f'<span><b>{esc(pm.get("total_scans"))}</b> okutma</span>']
+        if pm.get('google_review_growth'):
+            parts.append(f'<span><b>{esc(pm.get("google_review_growth"))}</b> Google yorumu</span>')
+        elif pm.get('menu_opens'):
+            parts.append(f'<span><b>{esc(pm.get("menu_opens"))}</b> menü açılışı</span>')
+        stats = '<p class="case-stats">' + '<i></i>'.join(parts) + '</p>'
+    body = f'<div class="case-body">{identity}<h3>{name}</h3><p>{desc}</p>{stats}<div class="case-meta">{tags}</div>{project_link}</div>'
     return f'<article class="{klass}" id="referans-{reference_identity(item)}" data-reference-key="referans-{reference_identity(item)}" {reference_attrs(item)} data-card-theme="{theme}">{media}{body}</article>'
 
 def resolve_corporate_items():
@@ -2261,7 +2270,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.84'
+SITE_ASSET_VERSION = '3.3.86'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
@@ -3795,10 +3804,14 @@ def _project_metrics(item):
         return []
     raw = item.get('metrics') if isinstance(item.get('metrics'), dict) else {}
     aliases = [
-        ('NFC taraması', ('nfc_scans','nfc_scan','scans')),
+        ('Google yorum artışı', ('google_review_growth',)),
+        ('Toplam okutma', ('total_scans',)),
+        ('NFC okutma', ('nfc_scans','nfc_scan','scans')),
+        ('QR okutma', ('qr_scans',)),
         ('Menü açılışı', ('menu_opens','menu_views','menu_clicks')),
-        ('Feedback', ('feedback_count','feedbacks','reviews')),
+        ('Değerlendirme', ('feedback_count','feedbacks','reviews')),
         ('Google yönlendirmesi', ('google_redirects','google_clicks','google_transfers')),
+        ('Instagram açılışı', ('instagram_opens',)),
     ]
     out=[]
     for label, keys in aliases:
@@ -3877,6 +3890,7 @@ def render_project_detail(item, project_items):
     if quantity: facts.append(('Üretilen adet',quantity))
     if system: facts.append(('Sistem',system))
     if delivery: facts.append(('Teslim',delivery))
+    if item.get('project_installation'): facts.append(('Kurulum',str(item.get('project_installation'))))
     facts_html=''.join(f'<article><span>{esc(k)}</span><strong>{esc(v)}</strong></article>' for k,v in facts if v)
     tags=''.join(f'<span>{esc(t)}</span>' for t in (item.get('tags') or []))
     story=[]
@@ -5282,10 +5296,14 @@ def _project_metrics(item):
     has_override = 'project_metrics' in item
     raw = item.get('project_metrics') if has_override and isinstance(item.get('project_metrics'), dict) else (item.get('metrics') if isinstance(item.get('metrics'), dict) else {})
     aliases = [
-        ('NFC taraması', ('nfc_scans','nfc_scan','scans')),
+        ('Google yorum artışı', ('google_review_growth',)),
+        ('Toplam okutma', ('total_scans',)),
+        ('NFC okutma', ('nfc_scans','nfc_scan','scans')),
+        ('QR okutma', ('qr_scans',)),
         ('Menü açılışı', ('menu_opens','menu_views','menu_clicks')),
-        ('Feedback', ('feedback_count','feedbacks','reviews')),
+        ('Değerlendirme', ('feedback_count','feedbacks','reviews')),
         ('Google yönlendirmesi', ('google_redirects','google_clicks','google_transfers')),
+        ('Instagram açılışı', ('instagram_opens',)),
     ]
     out=[]
     for label, keys in aliases:
@@ -5359,6 +5377,7 @@ def render_project_detail(item, project_items):
     if quantity: facts.append(('Üretilen adet',quantity))
     if system: facts.append(('Sistem',system))
     if delivery: facts.append(('Teslim',delivery))
+    if item.get('project_installation'): facts.append(('Kurulum',str(item.get('project_installation'))))
     facts_html=''.join(f'<article><span>{esc(k)}</span><strong>{esc(v)}</strong></article>' for k,v in facts if v)
     tags=''.join(f'<span>{esc(t)}</span>' for t in _project_tags(item))
     story=[]
@@ -5373,7 +5392,7 @@ def render_project_detail(item, project_items):
     metrics=_project_metrics(item)
     metrics_html=''
     if metrics:
-        metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">GERÇEK SİSTEM VERİSİ</p><h2>Kayıtlı proje metrikleri.</h2><p>Yalnızca Ürün Yöneticisinde girilen değerler gösterilir.</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
+        metrics_html='<section class="section-pad-sm shell"><div class="project-metrics"><div><p class="eyebrow">PANEL VERİSİ'+((" · "+esc(str(item.get("project_metrics_date"))).upper()) if item.get("project_metrics_date") else "")+'</p><h2>Sahadan gerçek kullanım.</h2><p>BG Studio NFC panelinden, kurulumdan bu yana toplam veriler.'+((" Google yorum sayısı: "+esc(str(((item.get("project_metrics") or {}).get("google_review_range")) or ""))+".") if isinstance(item.get("project_metrics"),dict) and item["project_metrics"].get("google_review_range") else "")+'</p></div><div class="project-metric-grid">'+''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k)}</span></article>' for k,v in metrics)+'</div></div></section>'
     media=_project_media(item,'../../','project-detail-media',eager=True)
     gallery=_project_gallery(item)
     gallery_html=''

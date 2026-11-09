@@ -5848,3 +5848,15 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
 @keyframes mkNoz{from{transform:translateY(156px)}to{transform:translateY(0)}}
 @keyframes mkFade{from{opacity:0}to{opacity:1}}
 @media (max-width:860px){.mk-hud-br{display:none}.mk-hud-tl{left:34px;top:22px;font-size:9.5px}}
+
+/* v3.3.85 — NFC referans kartlarında gerçek panel verisi */
+.case-stats{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:10px 0 0!important;font-size:13px!important;color:inherit;opacity:.82}
+.case-stats b{font-family:"Playfair Display",Georgia,serif;font-weight:600;font-size:20px;line-height:1;color:#8a4e0e}
+.case-stats i{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.4}
+[data-card-theme="dark"] .case-stats b{color:#c8894a}
+/* v3.3.85b — kart rakamları: kartın kendi metin rengiyle, daha belirgin */
+.case-stats{gap:6px 18px!important;padding-top:14px;margin-top:14px!important;border-top:1px solid currentColor;border-top-color:color-mix(in srgb,currentColor 14%,transparent);opacity:1!important}
+.case-stats span{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;opacity:.78}
+.case-stats b,[data-card-theme] .case-stats b{color:inherit!important;font-size:26px!important;opacity:1}
+.case-stats span b{opacity:1}
+.case-stats i{display:none}
