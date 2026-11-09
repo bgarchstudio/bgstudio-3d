@@ -388,8 +388,10 @@
 
   const setBusy = busy => {
     state.busy = busy;
-    if (input) input.disabled = busy;
-    if (sendButton) sendButton.disabled = busy;
+    // V3.3.55: keep the input focusable while waiting — disabling it blurs the field and
+    // closes the mobile keyboard, which made the panel jump on every message.
+    if (input) { input.readOnly = busy; input.setAttribute('aria-busy', busy ? 'true' : 'false'); }
+    if (sendButton) { sendButton.setAttribute('aria-disabled', busy ? 'true' : 'false'); sendButton.classList.toggle('is-busy', busy); }
     panel.classList.toggle('is-thinking', busy);
   };
 
@@ -510,14 +512,23 @@
     } finally {
       state.history = state.history.slice(-14);
       setBusy(false);
-      window.setTimeout(() => input?.focus({ preventScroll: true }), 30);
+      if (state.refocusAfterReply) window.setTimeout(() => input?.focus({ preventScroll: true }), 30);
+      state.refocusAfterReply = false;
     }
   };
 
   trigger.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
   closeButton?.addEventListener('click', () => closePanel());
+  // V3.3.55: tapping send / quick replies must not steal focus from the input,
+  // otherwise the mobile keyboard closes and the panel resizes on every message.
+  [sendButton, ...quickButtons].filter(Boolean).forEach(btn => {
+    btn.addEventListener('pointerdown', event => { if (document.activeElement === input) event.preventDefault(); });
+    btn.addEventListener('mousedown', event => { if (document.activeElement === input) event.preventDefault(); });
+  });
   form?.addEventListener('submit', event => {
     event.preventDefault();
+    state.refocusAfterReply = document.activeElement === input;
+    if (state.busy) return;
     const value = input?.value || '';
     if (input) input.value = '';
     submitQuery(value);
@@ -543,4 +554,17 @@
   input?.addEventListener('focus', resyncSoon);
   input?.addEventListener('blur', resyncSoon);
   syncAssistantViewport();
+})();
+
+/* V3.3.55 — Son mesaj her zaman görünür: içerik ya da kutu boyu değişince en alta yapış.
+   Kullanıcı eski mesajları okumak için yukarı kaydırdıysa (80px'ten fazla) zorlamaz. */
+(() => {
+  const box = document.querySelector('[data-bg-assistant-messages]');
+  if (!box) return;
+  let pinned = true;
+  const toBottom = () => { box.scrollTop = box.scrollHeight; };
+  box.addEventListener('scroll', () => { pinned = box.scrollHeight - box.scrollTop - box.clientHeight < 80; }, { passive: true });
+  new MutationObserver(() => { pinned = true; requestAnimationFrame(toBottom); }).observe(box, { childList: true, subtree: true, characterData: true });
+  if ('ResizeObserver' in window) new ResizeObserver(() => { if (pinned) toBottom(); }).observe(box);
+  window.visualViewport?.addEventListener('resize', () => { if (pinned) requestAnimationFrame(toBottom); });
 })();
