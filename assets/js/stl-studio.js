@@ -8,8 +8,10 @@
 
   const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/+esm';
   const STL_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js/+esm';
+  const TMF_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/3MFLoader.js/+esm';
   const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js/+esm';
   const WA_NUMBER = '905302466903';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const MAX_MB = 60;
   const DENSITY = { PLA: 1.24, PETG: 1.27 };
   // Kabuk + %15 dolgu varsayımı: katı hacmin kabaca %35–%55'i kadar malzeme harcanır.
@@ -51,6 +53,27 @@
     lib = { THREE, STLLoader: stl.STLLoader, OrbitControls: orbit.OrbitControls };
     return lib;
   };
+  const load3MF = async () => {
+    if (!lib.ThreeMFLoader) lib.ThreeMFLoader = (await import(TMF_URL)).ThreeMFLoader;
+    return lib.ThreeMFLoader;
+  };
+  // 3MF: tüm parçaları dünya dönüşümleriyle tek bir geometriye birleştir.
+  const mergeGroup = (group) => {
+    const { THREE } = lib;
+    group.updateMatrixWorld(true);
+    const chunks = []; let total = 0;
+    group.traverse((o) => {
+      if (!o.isMesh || !o.geometry?.attributes?.position) return;
+      let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+      g.applyMatrix4(o.matrixWorld);
+      const a = g.attributes.position.array; chunks.push(a); total += a.length;
+    });
+    const merged = new Float32Array(total); let off = 0;
+    chunks.forEach((a) => { merged.set(a, off); off += a.length; });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(merged, 3));
+    return geo;
+  };
 
   const ensureScene = () => {
     const { THREE, OrbitControls } = lib;
@@ -69,6 +92,7 @@
     controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     controls.autoRotateSpeed = 1.1;
     controls.addEventListener('start', () => { controls.autoRotate = false; });
+    controls.addEventListener('end', () => { if (!reduce) controls.autoRotate = true; });
     const resize = () => {
       const w = viewer.clientWidth || 400, h = viewer.clientHeight || 300;
       renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
@@ -133,7 +157,7 @@
     geometry.translate(-center.x, -center.y, -center.z);
     geometry.rotateX(-Math.PI / 2); // STL Z-yukarı → sahne Y-yukarı
     geometry.computeVertexNormals();
-    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xc8894a, roughness: 0.55, metalness: 0.08 }));
+    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xf3f0eb, roughness: 0.5, metalness: 0.02 }));
     scene.add(mesh);
     const size = new THREE.Vector3(); box.getSize(size);
     const r = Math.max(size.x, size.y, size.z) || 1;
@@ -144,14 +168,14 @@
 
   const handleFile = async (file) => {
     if (!file) return;
-    if (!/\.stl$/i.test(file.name)) { setStatus('Şimdilik STL dosyası açabiliyoruz. 3MF, STEP veya OBJ için dosyanı WhatsApp’tan gönder.', true); return; }
+    if (!/\.(stl|3mf)$/i.test(file.name)) { setStatus('STL veya 3MF dosyası açabiliyoruz. STEP veya OBJ için dosyanı WhatsApp’tan gönder.', true); return; }
     if (file.size > MAX_MB * 1024 * 1024) { setStatus(`Dosya ${MAX_MB} MB’tan büyük. WhatsApp’tan gönderirsen birlikte bakalım.`, true); return; }
     root.classList.add('is-loading');
     setStatus('Model açılıyor…');
     try {
       await loadLib();
       const buf = await file.arrayBuffer();
-      const geometry = new lib.STLLoader().parse(buf);
+      const geometry = /\.3mf$/i.test(file.name) ? mergeGroup(new (await load3MF())().parse(buf)) : new lib.STLLoader().parse(buf);
       const pos = geometry.attributes.position.array;
       if (!pos.length) throw new Error('empty');
       geometry.computeBoundingBox();

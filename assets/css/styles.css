@@ -5499,3 +5499,30 @@ th,td,dt,.order-field>span,.color-choice>span,.footer-v3202-bottom>p,.case-proje
 .stl-note{margin:0;font-size:.8rem;color:rgba(246,241,234,.55)}
 @media(max-width:860px){.stl-studio-grid{grid-template-columns:1fr}.stl-studio-stage{grid-row:auto}}
 @media(max-width:680px){.stl-drop{min-height:220px}.stl-viewer{height:300px}.stl-metrics dd{font-size:.98rem}}
+
+/* v3.3.58 · Ürün 3D görüntüleyici */
+.model3d-btn{display:flex;align-items:center;gap:14px;width:100%;margin-top:14px;padding:14px 16px;border-radius:18px;border:1px solid rgba(20,17,15,.12);background:#14110f;color:#f6f1ea;text-align:left;cursor:pointer;transition:transform .2s cubic-bezier(.23,1,.32,1),box-shadow .2s ease}
+.model3d-btn strong{display:block;font-size:.98rem;color:#fff}
+.model3d-btn small{display:block;font-size:.78rem;color:rgba(246,241,234,.65)}
+.model3d-btn-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(200,137,74,.16);color:#c8894a;flex:0 0 auto}
+.model3d-btn-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+@media (prefers-reduced-motion:no-preference){.model3d-btn-icon svg{animation:model3dSpin 6s linear infinite}}
+@keyframes model3dSpin{to{transform:rotateY(360deg)}}
+@media (hover:hover) and (pointer:fine){.model3d-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(20,17,15,.22)}}
+.model3d-btn:active{transform:scale(.98)}
+.model3d-dialog{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:16px}
+.model3d-dialog[hidden]{display:none}
+.model3d-backdrop{position:absolute;inset:0;background:rgba(10,8,7,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.model3d-card{position:relative;width:min(960px,100%);border-radius:24px;overflow:hidden;background:#14110f;border:1px solid rgba(246,241,234,.1);box-shadow:0 40px 100px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:no-preference){.model3d-card{animation:model3dIn .35s cubic-bezier(.23,1,.32,1)}}
+@keyframes model3dIn{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.model3d-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(246,241,234,.08)}
+.model3d-head small{display:block;font-size:.75rem;color:#c8894a}
+.model3d-head strong{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:1.3rem;color:#fff}
+.model3d-close{width:44px;height:44px;border-radius:50%;border:1px solid rgba(246,241,234,.18);background:transparent;color:#fff;font-size:1.4rem;cursor:pointer}
+.model3d-stage{position:relative;height:min(68vh,620px);background:radial-gradient(70% 70% at 50% 42%,#2b241f,#14110f);touch-action:none}
+.model3d-stage canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
+.model3d-loading{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:rgba(246,241,234,.7);font-size:.9rem}
+.model3d-hint{margin:0;padding:12px 18px;font-size:.8rem;color:rgba(246,241,234,.55);text-align:center}
+body.model3d-open{overflow:hidden}
+@media(max-width:680px){.model3d-dialog{padding:0;place-items:end}.model3d-card{border-radius:22px 22px 0 0}.model3d-stage{height:62vh}}
