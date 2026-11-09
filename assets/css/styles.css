@@ -5375,3 +5375,76 @@ span.bg-card-icon.bg-card-icon svg{display:block;margin:0}
 .home-hero-v3191 .home-spatial-control strong{color:rgba(246,241,234,.78)!important}
 .home-hero-v3191 .home-spatial-control.is-active strong{color:#fff!important}
 @media(max-width:680px){.home-hero-v3191 .home-spatial-stage-controls{display:none!important}}
+
+/* ==========================================================
+   v3.3.56 · FAZ 1 — okunur punto, basılabilir hedefler, mobil yoğunluk
+   ========================================================== */
+
+/* 1) Etiket tabanı: hiçbir müşteri metni 11.5px altına inmez (mockup süsleri hariç) */
+:is(small,.eyebrow,[class*="badge"],[class*="kicker"]>*,.filter-count,.catalog-card-category,.case-type,.case-meta>span,
+.project-scope-tags>span,.home-project-tags>span,.home-spatial-info-topline>span,.home-stats-foot-v3198>*,.home-stat-card-v3198>span,
+th,td,dt,.order-field>span,.color-choice>span,.footer-v3202-bottom>p,.case-project-link,.home-showcase-top>span,.home-client-copy-v3199r1>*,
+.project-story-card>span,.project-related-card>span,.nfc-solution-meta>*,.nfc-compare-plan>*,.package-head>*,.package-price>small,
+.special-ready-total>*,.special-ready-price>small,.special-ready-metrics>span,.nfc-config-total>*,.nfc-config-head>small,.nfc-capacity-range-labels>span,
+.nfc-hub-proof>span,.nfc-digital-flow>span,.nfc-all-prices>summary,.set-pricing-head>*,.set-price-choice>small,.order-color-head>*,.color-slot-title>*,
+.gallery-hint,.order-local-note,.v3169-sector-cloud>*,.catalog-select>span,.catalog-search>span,.home-business-points>span,.project-index-meta>*,
+.project-index-stat>*,.nfc-compare-feature>small,.nfc-compare-foot>*,.quote-type-card>small,.home-spatial-control-copy>*,.home-bento-label-v3196,
+[class*="breadcrumb"]>*,.home-project-kicker>*,.home-case-study-client-v3197,.brand-text>small,.has-brand-icon>small)
+:not(:is(.nfc-browser *,.nfc-browser-title *,.nfc-motion-item *,.nfc-premium-plus-visual *,.nfc-v3167-schema *,.bento-nfc-screen *,.arch-browser *,.announcement-marquee *,.home-process-visual-badge-v3200 *,.brand-monogram,.floating-actions *,.bento-map-svg *)){
+  font-size:max(.72rem,.75em)!important;
+}
+/* Uzun büyük harfli etiketler daha sakin */
+.eyebrow,.home-bento-label-v3196,.case-type{letter-spacing:.1em!important}
+
+/* 2) Dokunma hedefleri (telefon): en az 44px */
+@media (max-width:680px){
+  .footer-v3202 a,.footer a{display:inline-flex;align-items:center;min-height:44px}
+  [class*="breadcrumb"] a{display:inline-flex;align-items:center;min-height:44px}
+  .text-cta,.home-showcase-link,.home-project-link,.case-project-link,.nfc-compare-plan a,.nfc-compare-foot a,.consent-actions a,.project-index-link{display:inline-flex!important;align-items:center;min-height:44px}
+  .case-project-link{width:100%;justify-content:space-between;border-top:1px solid var(--line,rgba(20,17,15,.1));margin-top:6px}
+  .catalog-card-footer .product-link{min-width:44px!important;min-height:44px!important}
+  .color-choice-grid .color-choice{min-width:44px;min-height:44px}
+}
+
+/* 3) Telefon başlık ölçeği */
+@media (max-width:680px){
+  main h1{font-size:clamp(2.05rem,9.6vw,2.5rem)!important;line-height:1.04!important;letter-spacing:-.03em}
+  :is(.split-title,.home-split-copy,.home-why-heading,.home-process-copy-v3200,.home-section-head,.footer-v3202-cta,.home-product-carousel-heading,
+      .home-stats-head-v3198,.section-title,.mini-banner,.arch-copy,.contact,.legal-hero) h2,
+  .shell>div>h2{font-size:clamp(1.75rem,7.8vw,2.15rem)!important;line-height:1.06!important}
+  :is(.home-project-body,.home-bento-copy-v3196,.case-body,.nfc-solution-card-body,.nfc-v3167-package-card) h3{font-size:1.4rem!important;line-height:1.15!important}
+  :is(.home-process-step-v3200,.cap-card,.nfc-capacity-lab-copy,.quote-files) h3{font-size:1.25rem!important;line-height:1.2!important}
+  .home-spatial-product-copy h2{font-size:1.18rem!important}
+}
+
+/* 4) Telefon kart yoğunluğu: ekranı kaplamayan kartlar */
+@media (max-width:680px){
+  .case-card .case-media img{aspect-ratio:16/10;height:auto!important;object-fit:cover}
+  .case-card .case-body>p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .case-card .case-meta>span:nth-child(n+5){display:none}
+  .home-project-card .home-project-media,.home-project-card .home-project-media img{aspect-ratio:16/10!important;height:auto!important}
+  .home-project-card .home-project-body>p:not(.home-case-study-client-v3197){display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .home-project-tags>span:nth-child(n+3){display:none}
+}
+@media (max-width:680px){
+  html body main .home-project-card .home-project-body h3{font-size:1.45rem!important;line-height:1.15!important;letter-spacing:-.02em!important}
+  html body main .project-detail-copy h1{font-size:clamp(2.05rem,9.6vw,2.5rem)!important;line-height:1.04!important}
+  html body main .nfc-hub-hero-badge>span{font-size:.72rem!important}
+}
+.footer-v3202 strong,.footer-v3202 h3,.footer-v3202 h4{font-size:max(.75rem,.75em)!important}
+.footer-v3202-socials a,.footer-v3202-socials a span,.footer-v3202 .footer-consent-button{font-size:.78rem!important}
+@media (max-width:680px){html body main .home-project-card .home-project-body h3{max-width:none!important;width:auto!important}html body main .home-project-card .home-case-study-facts-v3197{margin-top:16px!important}html body main .home-project-card .home-project-body>*{margin-top:10px}}
+
+/* v3.3.56 · Tutarlı hover dili — metin bağlantısı / görsel / buton */
+:is(.text-cta,.home-showcase-link,.home-project-link,.local-seo-link,.case-project-link,.project-index-link){background-image:linear-gradient(currentColor,currentColor);background-repeat:no-repeat;background-position:0 100%;background-size:0 1px;transition:background-size .45s cubic-bezier(.23,1,.32,1),color .2s ease}
+:is(.home-showcase-media,.home-case-study-media-link,.project-index-media-link,.project-related-card) img{transition:transform .7s cubic-bezier(.23,1,.32,1)}
+:is(.wide-cta,.smart-order-whatsapp,.share-product,.catalog-reset,.quote-submit,.bg-assistant-handoff,.menu-toggle,.primary-cta,.secondary-cta){transition:transform .2s cubic-bezier(.23,1,.32,1),background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease}
+@media (hover:hover) and (pointer:fine){
+  :is(.text-cta,.home-showcase-link,.home-project-link,.local-seo-link,.case-project-link,.project-index-link):hover{background-size:100% 1px;color:#8a4e0e}
+  :is(.home-showcase-media,.home-case-study-media-link,.project-index-media-link,.project-related-card):hover img{transform:scale(1.03)}
+  :is(.wide-cta,.smart-order-whatsapp,.share-product,.catalog-reset,.quote-submit,.bg-assistant-handoff,.menu-toggle):hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(20,17,15,.12)}
+  .catalog-card-footer .product-link:hover{background:#14110f!important;color:#fff!important;border-color:#14110f!important}
+}
+:is(.wide-cta,.smart-order-whatsapp,.share-product,.catalog-reset,.quote-submit,.bg-assistant-handoff,.menu-toggle,.primary-cta,.secondary-cta,.filter-btn,.project-filter):active{transform:scale(.97)}
+:is(a,button,summary,[role="button"]):focus-visible{outline:2px solid #8a4e0e;outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){:is(.home-showcase-media,.home-case-study-media-link,.project-index-media-link,.project-related-card) img{transition:none}}
