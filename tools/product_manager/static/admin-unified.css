@@ -1019,3 +1019,10 @@ html body #catalogIntroText{width:100%;min-height:150px;margin-top:10px}
 html body .catalog-intro-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
 html body .catalog-intro-foot #catalogIntroState{flex:1;color:var(--muted,#816f61);font-size:12px}
 html body .moved-note a{color:inherit;text-decoration:underline}
+html body .grating-stars{display:flex;gap:6px;margin:6px 0 14px}
+html body .grating-star{width:46px;height:46px;border:1px solid rgba(70,45,26,.14);border-radius:12px;background:#fff;color:#d9cdbd;font-size:26px;line-height:1;cursor:pointer}
+html body .grating-star.on{color:#f2a91c;border-color:rgba(242,169,28,.5);background:#fff8e8}
+html body .grating-star:focus-visible{outline:2px solid #8a4e0e;outline-offset:2px}
+html body .grating-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+html body .grating-fields label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--muted,#816f61)}
+html body .grating-fields input{height:42px;padding:0 12px;border:1px solid rgba(70,45,26,.16);border-radius:10px;font-size:15px}

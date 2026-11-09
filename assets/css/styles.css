@@ -5069,3 +5069,4 @@ body.bg-assistant-keyboard .bg-assistant-panel{
   .gplace-actions-v3350{width:100%}
   .gplace-actions-v3350 a{flex:1 1 0;justify-content:center;text-align:center}
 }
+.gplace-score-v3350 .review-stars-v3328{color:transparent;background:linear-gradient(90deg,#f2a91c var(--rating-pct,100%),#d9cdbd var(--rating-pct,100%));-webkit-background-clip:text;background-clip:text}

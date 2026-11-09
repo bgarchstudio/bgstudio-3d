@@ -63,6 +63,11 @@ def _merge_site_settings(value):
     """Return a safe, forward-compatible site-settings document."""
     source = value if isinstance(value, dict) else {}
     out = json.loads(json.dumps(DEFAULT_SITE_SETTINGS, ensure_ascii=False))
+    # V3.3.51: keep every other section (website_copy, nfc_site, nfc_media …);
+    # previously only announcement_bar survived, so panel text/rating edits were lost.
+    for key, section in source.items():
+        if key != 'announcement_bar':
+            out[key] = section
     bar_in = source.get('announcement_bar') if isinstance(source.get('announcement_bar'), dict) else {}
     bar = out['announcement_bar']
     if 'enabled' in bar_in:

@@ -690,6 +690,8 @@ def default_site_settings():
             },
         },
         'website_copy': {
+            'google_rating': 5.0,
+            'google_review_count': 11,
             'catalog_intro': 'Dekoratif tasarımlardan gaming ve masaüstü ürünlerine, pet çözümlerinden takı & makyaj, oyun & oyuncak, aksesuar ve kişiye özel üretimlere uzanan atölye seçkimiz. Fiyatı belirtilmeyen ürünlerde ölçü, adet ve üretim detayına göre teklif hazırlanır.'
         },
         'nfc_media': {
@@ -958,7 +960,18 @@ def clean_website_copy(value, current=None):
     intro = re.sub(r'\s+', ' ', str(incoming.get('catalog_intro', current.get('catalog_intro', defaults['catalog_intro'])) or '')).strip()
     if not intro:
         intro = defaults['catalog_intro']
-    return {'catalog_intro': intro[:520]}
+    # V3.3.51: Google İşletme Profili puanı ve yorum sayısı (panelden elle).
+    try:
+        rating = float(str(incoming.get('google_rating', current.get('google_rating', defaults['google_rating']))).replace(',', '.'))
+    except (TypeError, ValueError):
+        rating = float(current.get('google_rating', defaults['google_rating']) or defaults['google_rating'])
+    rating = min(5.0, max(1.0, round(rating, 1)))
+    try:
+        count = int(incoming.get('google_review_count', current.get('google_review_count', defaults['google_review_count'])))
+    except (TypeError, ValueError):
+        count = int(current.get('google_review_count', defaults['google_review_count']) or 0)
+    count = min(100000, max(0, count))
+    return {'catalog_intro': intro[:520], 'google_rating': rating, 'google_review_count': count}
 
 
 def clean_nfc_media_settings(value, current=None):

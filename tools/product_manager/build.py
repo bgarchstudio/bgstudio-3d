@@ -1475,8 +1475,8 @@ def render_homepage_v3163(active, featured, field_items):
       <p class="gplace-source-v3350"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.2z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.6-3.9-12.4-9.1H4.3v5.7C7.9 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.3C2.8 17.1 2 20.5 2 24s.8 6.9 2.3 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.7c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.2 30 2 24 2 15.4 2 7.9 6.9 4.3 14.1l7.3 5.7c1.8-5.2 6.6-9.1 12.4-9.1z"/></svg>Google İşletme Profili</p>
       <h2 id="home-reviews-title">Kuşadası'ndayız. Müşterilerimiz bizi Google'da anlatıyor.</h2>
       <div class="gplace-score-v3350">
-        <strong class="review-score-v3328">{GOOGLE_RATING_V3328}</strong>
-        <span class="gplace-score-meta-v3350"><span class="review-stars-v3328" role="img" aria-label="5 üzerinden {GOOGLE_RATING_V3328} yıldız">★★★★★</span><span class="review-count-v3328">{GOOGLE_REVIEW_COUNT_V3350} Google yorumu</span></span>
+        <strong class="review-score-v3328">{google_review_values_v3351()['label']}</strong>
+        <span class="gplace-score-meta-v3350"><span class="review-stars-v3328" role="img" aria-label="5 üzerinden {google_review_values_v3351()['label']} yıldız" style="--rating-pct:{google_review_values_v3351()['pct']}%">★★★★★</span><span class="review-count-v3328">{google_review_values_v3351()['count']} Google yorumu</span></span>
       </div>
       <div class="gplace-actions-v3350">
         <a class="primary-cta" href="{GOOGLE_REVIEWS_URL_V3328}" rel="noopener" target="_blank">Yorumları oku</a>
@@ -2195,6 +2195,21 @@ SITE_ASSET_VERSION = '3.3.51'
 # Google's write-review dialog for this listing.
 GOOGLE_RATING_V3328 = '5,0'
 GOOGLE_REVIEW_COUNT_V3350 = 11
+
+
+def google_review_values_v3351():
+    # V3.3.51: panelden (site_settings.website_copy) gelen Google puanı ve yorum sayısı.
+    copy = load_site_settings().get('website_copy') or {}
+    try:
+        rating = float(str(copy.get('google_rating', 5.0)).replace(',', '.'))
+    except (TypeError, ValueError):
+        rating = 5.0
+    rating = min(5.0, max(1.0, round(rating, 1)))
+    try:
+        count = max(0, int(copy.get('google_review_count', GOOGLE_REVIEW_COUNT_V3350)))
+    except (TypeError, ValueError):
+        count = GOOGLE_REVIEW_COUNT_V3350
+    return {'label': f'{rating:.1f}'.replace('.', ','), 'count': count, 'pct': round(rating / 5 * 100, 1)}
 GOOGLE_REVIEWS_URL_V3328 = 'https://maps.google.com/?cid=7240535998596070578'
 GOOGLE_WRITE_REVIEW_URL_V3328 = 'https://www.google.com/search?q=BG+Studio+3D+Ku%C5%9Fadas%C4%B1#lrd=0x8ea54b705e76b9c9:0x647b8d20f3bf3cb2,3'
 RELEASE_CHANNEL = 'stable'

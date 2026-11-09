@@ -58,5 +58,573 @@
       "discounts_enabled": false,
       "mode": "manual"
     }
+  },
+  "nfc_site": {
+    "active_year": "2026",
+    "years": {
+      "2026": {
+        "qr_unit": 150,
+        "menu_design": 2500,
+        "logo_design": 2500,
+        "packages": {
+          "baslangic": {
+            "price": 13900,
+            "list_price": 16900,
+            "renewal": 4900
+          },
+          "profesyonel": {
+            "price": 19900,
+            "list_price": 22900,
+            "renewal": 6900
+          },
+          "premium": {
+            "price": 25900,
+            "list_price": 28900,
+            "renewal": 8900
+          },
+          "hizli_stand": {
+            "price": 2000,
+            "list_price": 2500,
+            "renewal": 990
+          },
+          "feedback_duo": {
+            "price": 14900,
+            "list_price": null,
+            "renewal": 4900
+          }
+        },
+        "feedback_duo_packages": {
+          "10": {
+            "stands": 10,
+            "nfc": 20,
+            "price": 14900,
+            "renewal": 4900
+          },
+          "15": {
+            "stands": 15,
+            "nfc": 30,
+            "price": 19900,
+            "renewal": 6900
+          },
+          "20": {
+            "stands": 20,
+            "nfc": 40,
+            "price": 24900,
+            "renewal": 8900
+          },
+          "25": {
+            "stands": 25,
+            "nfc": 50,
+            "price": 29900,
+            "renewal": 9900
+          },
+          "30": {
+            "stands": 30,
+            "nfc": 60,
+            "price": 34900,
+            "renewal": 10900
+          },
+          "35": {
+            "stands": 35,
+            "nfc": 70,
+            "price": 39900,
+            "renewal": 11900
+          },
+          "40": {
+            "stands": 40,
+            "nfc": 80,
+            "price": 44900,
+            "renewal": 12900
+          },
+          "45": {
+            "stands": 45,
+            "nfc": 90,
+            "price": 49900,
+            "renewal": 13900
+          },
+          "50": {
+            "stands": 50,
+            "nfc": 100,
+            "price": 54900,
+            "renewal": 14900
+          },
+          "55": {
+            "stands": 55,
+            "nfc": 110,
+            "price": 59900,
+            "renewal": 15900
+          },
+          "60": {
+            "stands": 60,
+            "nfc": 120,
+            "price": 64900,
+            "renewal": 16900
+          },
+          "65": {
+            "stands": 65,
+            "nfc": 130,
+            "price": 68900,
+            "renewal": 17900
+          },
+          "70": {
+            "stands": 70,
+            "nfc": 140,
+            "price": 72900,
+            "renewal": 18900
+          },
+          "75": {
+            "stands": 75,
+            "nfc": 150,
+            "price": 76900,
+            "renewal": 19900
+          },
+          "80": {
+            "stands": 80,
+            "nfc": 160,
+            "price": 80900,
+            "renewal": 20900
+          },
+          "85": {
+            "stands": 85,
+            "nfc": 170,
+            "price": 84900,
+            "renewal": 21900
+          },
+          "90": {
+            "stands": 90,
+            "nfc": 180,
+            "price": 88900,
+            "renewal": 22900
+          },
+          "95": {
+            "stands": 95,
+            "nfc": 190,
+            "price": 92900,
+            "renewal": 23900
+          },
+          "100": {
+            "stands": 100,
+            "nfc": 200,
+            "price": 96900,
+            "renewal": 24900
+          },
+          "110": {
+            "stands": 110,
+            "nfc": 220,
+            "price": 104900,
+            "renewal": 26900
+          },
+          "120": {
+            "stands": 120,
+            "nfc": 240,
+            "price": 112900,
+            "renewal": 28900
+          }
+        },
+        "special_restaurant_packages": {
+          "25": {
+            "tables": 25,
+            "nfc": 75,
+            "price": 29900,
+            "renewal": 9900
+          },
+          "30": {
+            "tables": 30,
+            "nfc": 90,
+            "price": 34900,
+            "renewal": 10900
+          },
+          "35": {
+            "tables": 35,
+            "nfc": 105,
+            "price": 39900,
+            "renewal": 11900
+          },
+          "40": {
+            "tables": 40,
+            "nfc": 120,
+            "price": 44900,
+            "renewal": 12900
+          },
+          "45": {
+            "tables": 45,
+            "nfc": 135,
+            "price": 49900,
+            "renewal": 13900
+          },
+          "50": {
+            "tables": 50,
+            "nfc": 150,
+            "price": 54900,
+            "renewal": 14900
+          },
+          "55": {
+            "tables": 55,
+            "nfc": 165,
+            "price": 59900,
+            "renewal": 15900
+          },
+          "60": {
+            "tables": 60,
+            "nfc": 180,
+            "price": 64900,
+            "renewal": 16900
+          },
+          "65": {
+            "tables": 65,
+            "nfc": 195,
+            "price": 68900,
+            "renewal": 17900
+          },
+          "70": {
+            "tables": 70,
+            "nfc": 210,
+            "price": 72900,
+            "renewal": 18900
+          },
+          "75": {
+            "tables": 75,
+            "nfc": 225,
+            "price": 76900,
+            "renewal": 19900
+          },
+          "80": {
+            "tables": 80,
+            "nfc": 240,
+            "price": 80900,
+            "renewal": 20900
+          },
+          "85": {
+            "tables": 85,
+            "nfc": 255,
+            "price": 84900,
+            "renewal": 21900
+          },
+          "90": {
+            "tables": 90,
+            "nfc": 270,
+            "price": 88900,
+            "renewal": 22900
+          },
+          "95": {
+            "tables": 95,
+            "nfc": 285,
+            "price": 92900,
+            "renewal": 23900
+          },
+          "100": {
+            "tables": 100,
+            "nfc": 300,
+            "price": 96900,
+            "renewal": 24900
+          },
+          "110": {
+            "tables": 110,
+            "nfc": 330,
+            "price": 104900,
+            "renewal": 26900
+          },
+          "120": {
+            "tables": 120,
+            "nfc": 360,
+            "price": 112900,
+            "renewal": 28900
+          }
+        }
+      },
+      "2027": {
+        "qr_unit": 200,
+        "menu_design": 3000,
+        "logo_design": 3000,
+        "packages": {
+          "baslangic": {
+            "price": null,
+            "list_price": null,
+            "renewal": null
+          },
+          "profesyonel": {
+            "price": null,
+            "list_price": null,
+            "renewal": null
+          },
+          "premium": {
+            "price": null,
+            "list_price": null,
+            "renewal": null
+          },
+          "hizli_stand": {
+            "price": null,
+            "list_price": null,
+            "renewal": null
+          },
+          "feedback_duo": {
+            "price": null,
+            "list_price": null,
+            "renewal": null
+          }
+        },
+        "feedback_duo_packages": {
+          "10": {
+            "stands": 10,
+            "nfc": 20,
+            "price": null,
+            "renewal": null
+          },
+          "15": {
+            "stands": 15,
+            "nfc": 30,
+            "price": null,
+            "renewal": null
+          },
+          "20": {
+            "stands": 20,
+            "nfc": 40,
+            "price": null,
+            "renewal": null
+          },
+          "25": {
+            "stands": 25,
+            "nfc": 50,
+            "price": null,
+            "renewal": null
+          },
+          "30": {
+            "stands": 30,
+            "nfc": 60,
+            "price": null,
+            "renewal": null
+          },
+          "35": {
+            "stands": 35,
+            "nfc": 70,
+            "price": null,
+            "renewal": null
+          },
+          "40": {
+            "stands": 40,
+            "nfc": 80,
+            "price": null,
+            "renewal": null
+          },
+          "45": {
+            "stands": 45,
+            "nfc": 90,
+            "price": null,
+            "renewal": null
+          },
+          "50": {
+            "stands": 50,
+            "nfc": 100,
+            "price": null,
+            "renewal": null
+          },
+          "55": {
+            "stands": 55,
+            "nfc": 110,
+            "price": null,
+            "renewal": null
+          },
+          "60": {
+            "stands": 60,
+            "nfc": 120,
+            "price": null,
+            "renewal": null
+          },
+          "65": {
+            "stands": 65,
+            "nfc": 130,
+            "price": null,
+            "renewal": null
+          },
+          "70": {
+            "stands": 70,
+            "nfc": 140,
+            "price": null,
+            "renewal": null
+          },
+          "75": {
+            "stands": 75,
+            "nfc": 150,
+            "price": null,
+            "renewal": null
+          },
+          "80": {
+            "stands": 80,
+            "nfc": 160,
+            "price": null,
+            "renewal": null
+          },
+          "85": {
+            "stands": 85,
+            "nfc": 170,
+            "price": null,
+            "renewal": null
+          },
+          "90": {
+            "stands": 90,
+            "nfc": 180,
+            "price": null,
+            "renewal": null
+          },
+          "95": {
+            "stands": 95,
+            "nfc": 190,
+            "price": null,
+            "renewal": null
+          },
+          "100": {
+            "stands": 100,
+            "nfc": 200,
+            "price": null,
+            "renewal": null
+          },
+          "110": {
+            "stands": 110,
+            "nfc": 220,
+            "price": null,
+            "renewal": null
+          },
+          "120": {
+            "stands": 120,
+            "nfc": 240,
+            "price": null,
+            "renewal": null
+          }
+        },
+        "special_restaurant_packages": {
+          "25": {
+            "tables": 25,
+            "nfc": 75,
+            "price": null,
+            "renewal": null
+          },
+          "30": {
+            "tables": 30,
+            "nfc": 90,
+            "price": null,
+            "renewal": null
+          },
+          "35": {
+            "tables": 35,
+            "nfc": 105,
+            "price": null,
+            "renewal": null
+          },
+          "40": {
+            "tables": 40,
+            "nfc": 120,
+            "price": null,
+            "renewal": null
+          },
+          "45": {
+            "tables": 45,
+            "nfc": 135,
+            "price": null,
+            "renewal": null
+          },
+          "50": {
+            "tables": 50,
+            "nfc": 150,
+            "price": null,
+            "renewal": null
+          },
+          "55": {
+            "tables": 55,
+            "nfc": 165,
+            "price": null,
+            "renewal": null
+          },
+          "60": {
+            "tables": 60,
+            "nfc": 180,
+            "price": null,
+            "renewal": null
+          },
+          "65": {
+            "tables": 65,
+            "nfc": 195,
+            "price": null,
+            "renewal": null
+          },
+          "70": {
+            "tables": 70,
+            "nfc": 210,
+            "price": null,
+            "renewal": null
+          },
+          "75": {
+            "tables": 75,
+            "nfc": 225,
+            "price": null,
+            "renewal": null
+          },
+          "80": {
+            "tables": 80,
+            "nfc": 240,
+            "price": null,
+            "renewal": null
+          },
+          "85": {
+            "tables": 85,
+            "nfc": 255,
+            "price": null,
+            "renewal": null
+          },
+          "90": {
+            "tables": 90,
+            "nfc": 270,
+            "price": null,
+            "renewal": null
+          },
+          "95": {
+            "tables": 95,
+            "nfc": 285,
+            "price": null,
+            "renewal": null
+          },
+          "100": {
+            "tables": 100,
+            "nfc": 300,
+            "price": null,
+            "renewal": null
+          },
+          "110": {
+            "tables": 110,
+            "nfc": 330,
+            "price": null,
+            "renewal": null
+          },
+          "120": {
+            "tables": 120,
+            "nfc": 360,
+            "price": null,
+            "renewal": null
+          }
+        }
+      }
+    }
+  },
+  "website_copy": {
+    "catalog_intro": "Dekoratif tasarımlardan gaming ve masaüstü ürünlerine, pet çözümlerinden takı & makyaj, oyun & oyuncak, aksesuar ve kişiye özel üretimlere uzanan atölye seçkimiz. Fiyatı belirtilmeyen ürünlerde ölçü, adet ve üretim detayına göre teklif hazırlanır.",
+    "google_rating": 5.0,
+    "google_review_count": 11
+  },
+  "nfc_media": {
+    "feedback_duo": {
+      "image": "assets/images/nfc/products/feedback-duo.webp",
+      "theme": "light"
+    },
+    "restaurant_packages": {
+      "image": "assets/images/nfc/products/restaurant-packages.webp",
+      "theme": "light"
+    },
+    "quick_stand": {
+      "image": "assets/images/nfc/products/quick-stand.webp",
+      "theme": "light"
+    },
+    "premium_plus": {
+      "image": "",
+      "theme": "dark"
+    }
   }
 }
