@@ -3468,7 +3468,7 @@ def rebuild_nfc_platform_sections(html_text, theme_overrides=None):
         html_text = html_text[:start.start()] + rendered + '\n' + html_text[ref.start():]
     desc = 'BG Studio NFC + QR; restoran sistemleri, Hızlı Bağlantı ve Premium Feedback çözümleriyle fiziksel stand, dijital erişim ve işletme deneyimini birleştirir.'
     html_text = re.sub(r'(<meta\s+content=")[^"]*("\s+name="description"\s*/?>)', lambda m: m.group(1)+desc+m.group(2), html_text, count=1, flags=re.I)
-    html_text = re.sub(r'(<title>).*?(</title>)', lambda m: m.group(1)+'BG Studio NFC + QR | İşletme Sistemleri'+m.group(2), html_text, count=1, flags=re.I|re.S)
+    html_text = re.sub(r'(<title>).*?(</title>)', lambda m: m.group(1)+'Restoran NFC ve QR Menü Standı Sistemleri | BG Studio 3D'+m.group(2), html_text, count=1, flags=re.I|re.S)
     return html_text
 
 

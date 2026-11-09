@@ -47,7 +47,6 @@ DEFAULT_SITE_SETTINGS = {
         'direction': 'rtl',
         'separator': '✦',
         'messages': [
-            {'id': 'ucretsiz-kargo', 'text': '1.000 TL üzeri ücretsiz kargo', 'url': '', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
             {'id': 'kusadasi-teslim', 'text': 'Kuşadası elden teslim', 'url': '', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
             {'id': 'kisiye-ozel', 'text': 'Kişiye özel 3D üretim', 'url': '/ozel-uretim/', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},
             {'id': 'kurumsal', 'text': 'Kurumsal toplu sipariş', 'url': '/kurumsal/', 'enabled': True, 'source_type': 'manual', 'source_ref': ''},

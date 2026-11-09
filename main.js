@@ -264,7 +264,6 @@ const DEFAULT_ANNOUNCEMENT_BAR_CONFIG = {
   direction: 'rtl',
   separator: '✦',
   messages: [
-    { text: '1.000 TL üzeri ücretsiz kargo', url: '', enabled: true },
     { text: 'Kuşadası elden teslim', url: '', enabled: true },
     { text: 'Kişiye özel 3D üretim', url: '/ozel-uretim/', enabled: true },
     { text: 'Kurumsal toplu sipariş', url: '/kurumsal/', enabled: true },
