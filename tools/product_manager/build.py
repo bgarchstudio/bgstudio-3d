@@ -2227,7 +2227,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.70'
+SITE_ASSET_VERSION = '3.3.71'
 
 # Homepage Google reviews block (static, no Places API). Update the rating by
 # hand if the Google Business score changes. The lrd fragment ",3" opens

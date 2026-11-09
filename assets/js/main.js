@@ -2393,6 +2393,12 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     });
 
     const targetStepFromScroll = () => {
+      // v3.3.71: sabitlenmiş (pinned) modda aktif adım bölüm ilerlemesinden gelir.
+      if (section.classList.contains('is-story-pin')) {
+        const r = section.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight)));
+        return Math.min(steps.length - 1, Math.floor(p * steps.length * 0.999));
+      }
       const triggerY = Math.max(150, window.innerHeight * 0.38);
       let target = 0;
       steps.forEach((step, index) => {
@@ -2647,6 +2653,10 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   ];
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobile = window.matchMedia('(max-width: 860px)');
+  // v3.3.71: geniş ve yeterince yüksek ekranlarda bölüm sabitlenir, adımlar kaydırmayla ilerler.
+  const pinMq = window.matchMedia('(min-width: 861px) and (min-height: 640px)');
+  const syncPin = () => section.classList.toggle('is-story-pin', pinMq.matches && !reduce);
+  syncPin(); pinMq.addEventListener?.('change', syncPin);
   let stage = -1;
   const show = (i) => {
     i = Math.max(0, Math.min(4, i));
@@ -2666,6 +2676,12 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     raf = 0;
     const s3 = steps[3];
     if (mobile.matches) return;
+    if (section.classList.contains('is-story-pin')) {
+      const r = section.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight)));
+      story.style.setProperty('--print', Math.min(1, Math.max(0.05, (p - 0.6) / 0.2)).toFixed(3));
+      return;
+    }
     if (!s3 || reduce) { story.style.setProperty('--print', '1'); return; }
     const r = s3.getBoundingClientRect();
     const trigger = window.innerHeight * 0.45;

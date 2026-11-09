@@ -5668,3 +5668,19 @@ body.model3d-open{overflow:hidden}
 .m-drone{shape-rendering:geometricPrecision}
 .gplace-map-v3350:hover .gplace-map-art-v3350,.gplace-map-v3350 .gplace-map-art-v3350{transform:none!important;transition:none!important;will-change:auto}
 .m-drone [data-lvl]{transition:opacity .25s ease}
+
+/* v3.3.71 · Masaüstü: "Nasıl ilerliyoruz?" sabitlenir, adımlar 01→05 kaydırmayla ilerler */
+@media (min-width:861px) and (min-height:640px){
+  .home-process-v3200.is-story-pin{height:400vh;padding-top:0!important;padding-bottom:0!important}
+  .is-story-pin .home-process-grid-v3200{position:sticky;top:0;height:100vh;box-sizing:border-box;padding-top:clamp(84px,11vh,110px);padding-bottom:clamp(20px,4vh,40px);align-items:center!important}
+  .is-story-pin .home-process-sticky-v3200{position:relative!important;top:auto!important;gap:clamp(14px,2.4vh,26px)!important;align-self:center}
+  .is-story-pin .home-process-copy-v3200 h2{font-size:clamp(2.2rem,4.6vh,3.4rem)!important}
+  .is-story-pin .home-process-copy-v3200>p{margin-block:.5rem!important}
+  .is-story-pin .home-process-story-v3363{min-height:0!important;height:clamp(240px,36vh,340px)}
+  .is-story-pin .home-process-timeline-v3200{align-self:center}
+  .is-story-pin .home-process-step-v3200{min-height:0!important;padding:clamp(10px,1.8vh,18px) 0!important}
+  .is-story-pin .home-process-step-v3200 h3{font-size:clamp(1.3rem,2.8vh,1.9rem)!important;margin:0!important;transition:color .3s ease}
+  .is-story-pin .home-process-step-v3200 p{max-height:0;opacity:0;overflow:hidden;margin:0!important;transition:max-height .45s cubic-bezier(.23,1,.32,1),opacity .3s ease,margin .3s ease}
+  .is-story-pin .home-process-step-v3200.is-active p{max-height:110px;opacity:1;margin-top:8px!important}
+  .is-story-pin .home-process-step-v3200:not(.is-active) h3{color:rgba(20,17,15,.38)!important}
+}
