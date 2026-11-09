@@ -1642,6 +1642,37 @@ def product_production_status(p):
     key = str(p.get('production_status') or '').strip().lower()
     return key if key in PRODUCTION_STATUS else ''
 
+def offer_policies_v3384(p):
+    """Return policy + shipping for Product offers, from /teslimat-iade/ (Google Merchant fields)."""
+    if catalog_personalizable(p):
+        policy = {
+            '@type': 'MerchantReturnPolicy',
+            'applicableCountry': 'TR',
+            'returnPolicyCategory': 'https://schema.org/MerchantReturnNotPermitted',
+            'url': BASE_URL + '/teslimat-iade/',
+        }
+    else:
+        policy = {
+            '@type': 'MerchantReturnPolicy',
+            'applicableCountry': 'TR',
+            'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            'merchantReturnDays': 14,
+            'returnMethod': 'https://schema.org/ReturnByMail',
+            'returnFees': 'https://schema.org/ReturnShippingFees',
+            'url': BASE_URL + '/teslimat-iade/',
+        }
+    shipping = {
+        '@type': 'OfferShippingDetails',
+        'shippingDestination': {'@type': 'DefinedRegion', 'addressCountry': 'TR'},
+        'deliveryTime': {
+            '@type': 'ShippingDeliveryTime',
+            'handlingTime': {'@type': 'QuantitativeValue', 'minValue': 1, 'maxValue': 3, 'unitCode': 'DAY'},
+            'transitTime': {'@type': 'QuantitativeValue', 'minValue': 1, 'maxValue': 3, 'unitCode': 'DAY'},
+        },
+    }
+    return {'hasMerchantReturnPolicy': policy, 'shippingDetails': shipping}
+
+
 def product_schema_availability(p):
     key = product_production_status(p)
     if key == 'preorder':
@@ -1987,6 +2018,7 @@ def render_schema(p):
                 'url': canonical,
                 'seller': {'@id': BASE_URL + '/#organization'},
                 'eligibleQuantity': {'@type': 'QuantitativeValue', 'value': int(t.get('quantity') or 1), 'unitText': 'adet'},
+                **offer_policies_v3384(p),
             })
         if offers:
             obj['offers'] = offers
@@ -1997,6 +2029,7 @@ def render_schema(p):
                 'availability': product_schema_availability(p), 'url': canonical,
                 'itemCondition': 'https://schema.org/NewCondition',
                 'seller': {'@id': BASE_URL + '/#organization'},
+                **offer_policies_v3384(p),
             }
             for option, price in option_prices.items()
         ]
@@ -2009,6 +2042,7 @@ def render_schema(p):
             'itemCondition': 'https://schema.org/NewCondition',
             'url': canonical,
             'seller': {'@id': BASE_URL + '/#organization'},
+            **offer_policies_v3384(p),
         }
 
     return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
@@ -2227,7 +2261,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.83'
+SITE_ASSET_VERSION = '3.3.84'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
@@ -3148,6 +3182,55 @@ def validate_reference_theme_output(html_text, items, label):
         if f'data-card-theme="{expected}"' not in tag or f'theme-{expected}' not in tag:
             raise RuntimeError(f'{label}: {ref_id} kart tonu build çıktısına uygulanamadı ({expected}).')
 
+
+
+NFC_SUBPAGE_SERVICES_V3384 = {
+    'restoran': ('Restoran NFC + QR Sistemi', 'Restoranlar için NFC + QR Akıllı Menü, feedback, analitik ve işletme paneli; 10–120 masa ölçeklenebilir.',
+                 [('baslangic', 'Standart Restoran · Başlangıç'), ('profesyonel', 'Standart Restoran · Profesyonel'), ('premium', 'Standart Restoran · Premium')]),
+    'hizli-baglanti': ('NFC Hızlı Bağlantı Standı', 'Instagram, Google, WhatsApp ve web için 3 NFC bağlantılı, opsiyonel QR’lı, hedefleri uzaktan yönetilen stand.',
+                       [('hizli_stand', 'Hızlı Bağlantı Standı')]),
+    'feedback': ('NFC Değerlendirme Standları (Feedback Duo / Trio)', 'İşletme içi müşteri geri bildirimi, Google değerlendirme akışı, seçilebilir dijital hedefler ve analitik.', []),
+    'premium-plus': ('Premium Plus Restoran Katmanı', 'Doğrudan masa siparişi, Misafir CRM, sadakat, VIP tanıma ve rezervasyon için NFC üst katmanı.', []),
+}
+
+
+def sync_nfc_subpage_service_schema_v3384(pricing):
+    """Service schema on each NFC subpage (Search Console: rich results for services)."""
+    packages = pricing.get('packages') or {}
+    duo = pricing.get('feedback_duo_packages') if isinstance(pricing.get('feedback_duo_packages'), dict) else {}
+    marker = re.compile(r'<script type="application/ld\+json" data-schema="nfc-service">.*?</script>', flags=re.S)
+    for slug, (name, desc, keys) in NFC_SUBPAGE_SERVICES_V3384.items():
+        path = ROOT / 'nfc-qr' / slug / 'index.html'
+        if not path.exists():
+            continue
+        offers = []
+        for key, label in keys:
+            row = packages.get(key) if isinstance(packages.get(key), dict) else {}
+            if row.get('price') not in (None, ''):
+                offers.append({'@type': 'Offer', 'name': label, 'price': str(int(row['price'])), 'priceCurrency': 'TRY'})
+        if slug == 'feedback':
+            row = duo.get('10') if isinstance(duo.get('10'), dict) else {}
+            if row.get('price') not in (None, ''):
+                offers.append({'@type': 'Offer', 'name': 'Premium Feedback Duo · 10 Stand / 20 NFC', 'price': str(int(row['price'])), 'priceCurrency': 'TRY'})
+        schema = {
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            'name': name,
+            'description': desc,
+            'serviceType': 'NFC + QR işletme sistemi',
+            'url': f'{BASE_URL}/nfc-qr/{slug}/',
+            'provider': {'@id': BASE_URL + '/#organization'},
+            'areaServed': [{'@type': 'Country', 'name': 'Türkiye'}, {'@type': 'AdministrativeArea', 'name': 'Ege Bölgesi'}],
+        }
+        if offers:
+            schema['offers'] = offers
+        script = '<script type="application/ld+json" data-schema="nfc-service">' + json.dumps(schema, ensure_ascii=False, separators=(',', ':')) + '</script>'
+        html_text = path.read_text(encoding='utf-8')
+        if marker.search(html_text):
+            html_text = marker.sub(lambda _m: script, html_text, count=1)
+        else:
+            html_text = html_text.replace('</head>', script + '</head>', 1)
+        path.write_text(html_text, encoding='utf-8')
 
 
 def sync_nfc_offer_schema(html_text, pricing):
@@ -5634,6 +5717,7 @@ def build_site(nfc_family_theme_overrides=None):
     validate_reference_theme_output(nfc_html, nfc_items, 'NFC & QR')
     nfc_path.write_text(nfc_html, encoding='utf-8')
     nfc_subpages = build_nfc_v3167_subpages(nfc_items)
+    sync_nfc_subpage_service_schema_v3384(nfc_pricing)
 
     # Corporate-page visibility is independent from NFC publication. Linked NFC
     # records may stay live on NFC & QR (and on the homepage proof area) while
