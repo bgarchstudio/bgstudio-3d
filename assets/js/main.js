@@ -2494,3 +2494,101 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initViewportMarquees, { once: true });
   else initViewportMarquees();
 })();
+
+/* v3.3.53 — Kart ikonları: boş kartlara başlığa göre çizgi ikon ekler.
+   Dekoratif (aria-hidden), mutlak konumlu → yerleşim kaymaz. Görünüme girince çizilir. */
+(() => {
+  const P = {
+    camera: '<path d="M4 8h3l1.6-2.2h6.8L17 8h3v11H4z"/><circle cx="12" cy="13.2" r="3.6"/>',
+    ruler: '<path d="M3.5 15.5 15.5 3.5l5 5-12 12z"/><path d="m7 12 2 2M10 9l1.5 1.5M13 6l2 2"/>',
+    pen: '<path d="M4 20l1.2-4.6L15.6 5a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z"/><path d="m13.8 6.8 3.4 3.4M4 20h16"/>',
+    cube: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
+    layers: '<path d="m12 4 9 4.5-9 4.5-9-4.5z"/><path d="m3 12.5 9 4.5 9-4.5M3 16.5 12 21l9-4.5"/>',
+    printer: '<path d="M4 4h16v16H4z"/><path d="M4 8h16M10 8v3h4V8"/><path d="m11 11 1 2 1-2"/><path d="M8.5 20v-3.5h7V20"/>',
+    gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3 5.5 5.5"/><circle cx="12" cy="12" r="6.6"/>',
+    nfc: '<path d="M7 7.5a6 6 0 0 1 0 9M10.2 5.2a9.5 9.5 0 0 1 0 13.6M13.4 3a13 13 0 0 1 0 18"/>',
+    qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 19h2M19 14v2"/>',
+    box: '<path d="m12 3 8.5 4.2v9.6L12 21l-8.5-4.2V7.2z"/><path d="m3.5 7.2 8.5 4.3 8.5-4.3M12 11.5V21M7.8 5.1l8.5 4.3"/>',
+    truck: '<path d="M3 6h11v10H3zM14 9.5h4l3 3.2V16h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+    gift: '<path d="M4 9.5h16v3H4zM5.5 12.5h13V20h-13zM12 9.5V20"/><path d="M12 9.5C10.5 6 7 5.5 7.6 8c.3 1.2 2.4 1.5 4.4 1.5zM12 9.5c1.5-3.5 5-4 4.4-1.5-.3 1.2-2.4 1.5-4.4 1.5z"/>',
+    home: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5M10 20v-5h4v5"/>',
+    palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 1.9-1 1.6-2-.4-1.1.3-2.2 1.5-2.2h1.6A3.8 3.8 0 0 0 20.5 12 8.5 8.5 0 0 0 12 3.5z"/><circle cx="8" cy="11" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/>',
+    stack: '<path d="M5 15h14v5H5zM7 10h10v5H7zM9 5h6v5H9z"/>',
+    tag: '<path d="M3.5 12.5V4h8.5l8.5 8.5-8.5 8.5z"/><circle cx="8" cy="8.5" r="1.5"/>',
+    compass: '<circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+    workshop: '<path d="M3 20h18M5 20V9l4 2.5V9l4 2.5V9l4 2.5V5h2v15"/>',
+    building: '<path d="M5 20V4h9v16M14 9h5v11M3 20h18"/><path d="M8 7.5h3M8 11h3M8 14.5h3"/>',
+    check: '<circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.3 2.5 2.5 5-5.3"/>',
+    spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+    bulb: '<path d="M9 17.5h6M10 21h4M8.5 14.5a6 6 0 1 1 7 0c-.8.6-1 1.4-1 3h-5c0-1.6-.2-2.4-1-3z"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>',
+    star: '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+    menu: '<path d="M6 3.5h12v17H6z"/><path d="M9 8h6M9 11.5h6M9 15h4"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    phone: '<path d="M7.5 3h9v18h-9z"/><path d="M11 18h2"/>',
+    pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'
+  };
+  const RULES = [
+    [/fotoğraf|görsel|örnek ürün/, 'camera'], [/ölçü|ebat|boyut/, 'ruler'], [/eskiz|çizim|tasarım|form/, 'pen'],
+    [/stl|3mf|cad|model/, 'cube'], [/hazırlı|parametre|katman|dilimle/, 'layers'], [/prototip|parça|yedek|mekanik|teknik/, 'gear'],
+    [/qr/, 'qr'], [/nfc|işletme sistem|dijital|bağlantı/, 'nfc'], [/menü/, 'menu'], [/yorum|feedback|değerlendirme/, 'star'],
+    [/paket|teslim/, 'box'], [/kargo|gönderi|türkiye/, 'truck'], [/hediye|etkinlik|özel gün/, 'gift'], [/ev |ev&|ev ve|dekor|duvar|mekân/, 'home'],
+    [/renk|kimlik|logo|marka/, 'palette'], [/seri|adet|toplu|ölçek/, 'stack'], [/kişisel|isim|kişiye/, 'tag'], [/yaklaşım|strateji|yön/, 'compass'],
+    [/atölye|stüdyo/, 'workshop'], [/kurumsal|firma|şirket|promosyon/, 'building'], [/test|kontrol|kalite|garanti/, 'check'],
+    [/fikir|nedir|neden|amaç/, 'bulb'], [/iletişim|whatsapp|mesaj|talep|teklif/, 'chat'], [/süre|hız|gün/, 'clock'],
+    [/telefon|mobil/, 'phone'], [/kuşadası|konum|adres|yerel/, 'pin'], [/üretim|baskı|yazıcı|3d/, 'printer']
+  ];
+  const SELECTORS = [
+    '.v3169-brand-panel>span', '.v3169-about-grid>article', '.v3169-process>article', '.cap-card', '.flow-card',
+    '.metric', '.v3169-grid>article', '.v3169-card', '.service-card', '.feature-card', '.info-card', '.local-card', '.value-card'
+  ].join(',');
+  const pick = (text) => {
+    const t = ' ' + String(text || '').toLocaleLowerCase('tr-TR') + ' ';
+    for (const [re, key] of RULES) if (re.test(t)) return key;
+    return 'spark';
+  };
+  const titleOf = (el) => (el.querySelector('h3,h4,strong,b,.cap-title') || el).textContent;
+  const cards = [...document.querySelectorAll(SELECTORS)].filter((el) => !el.querySelector('.bg-card-icon, img, svg, video, picture'));
+  if (!cards.length) return;
+  cards.forEach((el) => {
+    const key = pick(titleOf(el));
+    const wrap = document.createElement('span');
+    wrap.className = 'bg-card-icon';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.dataset.icon = key;
+    wrap.innerHTML = `<svg viewBox="0 0 24 24" focusable="false">${P[key].replace(/<(path|circle)/g, '<$1 pathLength="1"')}</svg>`;
+    el.classList.add('has-card-icon');
+    el.prepend(wrap);
+  });
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) { cards.forEach((el) => el.classList.add('icon-drawn')); return; }
+  document.documentElement.classList.add('card-icons-anim');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('icon-drawn'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.2 });
+  cards.forEach((el) => io.observe(el));
+})();
+
+/* v3.3.53 — Architecture önizlemesi: 1440px iframe'i kutuya ölçekler. */
+(() => {
+  const frames = [...document.querySelectorAll('[data-arch-frame]')];
+  if (!frames.length) return;
+  const fit = (f) => { const w = f.parentElement.clientWidth || 600; f.parentElement.style.setProperty('--arch-scale', (w / 1440).toFixed(4)); };
+  frames.forEach(fit);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver((es) => es.forEach((e) => { const f = e.target.querySelector('[data-arch-frame]'); if (f) fit(f); })); frames.forEach((f) => ro.observe(f.parentElement)); }
+})();
+
+/* v3.3.53 — Yukarı dön butonu: kaydırma ilerlemesi (--p, 0–1). */
+(() => {
+  const btns = [...document.querySelectorAll('.back-to-top')];
+  if (!btns.length) return;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    btns.forEach((b) => b.style.setProperty('--p', p.toFixed(3)));
+  };
+  window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  update();
+})();
