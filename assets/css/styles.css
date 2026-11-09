@@ -5324,3 +5324,12 @@ span.bg-card-icon.bg-card-icon svg{display:block;margin:0}
 .project-filter.project-filter.is-active,.project-filter.project-filter[aria-pressed="true"]{background:#14110f;border-color:#14110f;color:#fff}
 .project-filter.project-filter.is-active>span,.project-filter.project-filter[aria-pressed="true"]>span{color:rgba(255,255,255,.7);background:none}
 @media (hover:hover) and (pointer:fine){.project-filter.project-filter:hover{border-color:rgba(20,17,15,.3)}}
+/* v3.3.53 — Yüzen butonlar aynı çapta */
+:root{--fab-size:56px}
+@media(max-width:680px){:root{--fab-size:52px}}
+.floating-actions>.bg-assistant-trigger,.floating-actions>.floating-whatsapp,.floating-actions>.back-to-top.back-to-top{width:var(--fab-size)!important;height:var(--fab-size)!important;min-width:var(--fab-size)!important;min-height:var(--fab-size)!important;max-width:var(--fab-size)!important;max-height:var(--fab-size)!important;flex:0 0 var(--fab-size)!important}
+/* v3.3.53 — WhatsApp: hover dalgası kaldırıldı, sade yükselme */
+.floating-whatsapp.floating-whatsapp,.floating-whatsapp.floating-whatsapp:hover,.floating-whatsapp.wa-seen:hover{animation:none!important}
+.floating-whatsapp.floating-whatsapp::after,.floating-whatsapp.floating-whatsapp:hover::after{animation:none!important;display:none!important}
+.floating-whatsapp.floating-whatsapp{transition:transform .25s cubic-bezier(.23,1,.32,1),background-color .2s ease!important}
+@media (hover:hover) and (pointer:fine){.floating-whatsapp.floating-whatsapp:hover{transform:translateY(-2px)!important}}

@@ -2529,6 +2529,7 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'
   };
   const RULES = [
+    [/ gönder/, 'chat'], [/değerlendir/, 'check'], [/netleştir/, 'compass'], [/ üret /, 'printer'],
     [/fotoğraf|görsel|örnek ürün/, 'camera'], [/ölçü|ebat|boyut/, 'ruler'], [/eskiz|çizim|tasarım|form/, 'pen'],
     [/stl|3mf|cad|model/, 'cube'], [/hazırlı|parametre|katman|dilimle/, 'layers'], [/prototip|parça|yedek|mekanik|teknik/, 'gear'],
     [/qr/, 'qr'], [/nfc|işletme sistem|dijital|bağlantı/, 'nfc'], [/menü/, 'menu'], [/yorum|feedback|değerlendirme/, 'star'],
