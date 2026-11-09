@@ -2751,50 +2751,51 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   io.observe(section.querySelector('.home-stat-card-v3198')?.parentElement || section);
 })();
 
-/* v3.3.67 — Drone harita: Türkiye → Ege → Kuşadası (görünüm kutusu animasyonu). */
+/* v3.3.68 — Drone harita (kaydırmaya bağlı): kart ekranda sabit kalır, kaydırdıkça
+   Türkiye → Ege → Kuşadası iner. Geri kaydırınca geri oynar. Kaydırma kilitlenmez. */
 (() => {
   const svg = document.querySelector('[data-drone-map]');
   if (!svg) return;
+  const section = svg.closest('.home-gplace-v3350');
   const card = svg.closest('.gplace-map-v3350');
   const tag = card?.querySelector('[data-drone-tag]');
   let views;
   try { views = JSON.parse(svg.dataset.views); } catch (_) { return; }
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  section.classList.add('is-drone-scroll');
   const setVB = (v) => svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' '));
-  const setLevel = (l, label) => { svg.dataset.level = String(l); if (tag && label) tag.textContent = label; };
-  // Drone hissi: merkez doğrusal, genişlik üstel (logaritmik) değişir.
   const lerpView = (a, b, t) => {
     const ca = [a[0] + a[2] / 2, a[1] + a[3] / 2], cb = [b[0] + b[2] / 2, b[1] + b[3] / 2];
     const w = Math.exp(Math.log(a[2]) + (Math.log(b[2]) - Math.log(a[2])) * t);
     const h = w * (a[3] / a[2]);
-    const cx = ca[0] + (cb[0] - ca[0]) * t, cy = ca[1] + (cb[1] - ca[1]) * t;
-    return [cx - w / 2, cy - h / 2, w, h];
+    return [ca[0] + (cb[0] - ca[0]) * t - w / 2, ca[1] + (cb[1] - ca[1]) * t - h / 2, w, h];
   };
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const fly = (a, b, dur) => new Promise((res) => {
-    const s = performance.now();
-    const step = (now) => {
-      const t = Math.min(1, (now - s) / dur);
-      setVB(lerpView(a, b, ease(t)));
-      if (t < 1) requestAnimationFrame(step); else res();
-    };
-    requestAnimationFrame(step);
-  });
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  setVB(views.tr); setLevel(1, 'Türkiye'); card?.classList.add('is-flying');
-  const run = async () => {
-    await wait(500);
-    setLevel(2, 'Ege Bölgesi');
-    await fly(views.tr, views.ege, 1400);
-    await wait(450);
-    setLevel(3, 'Kuşadası');
-    await fly(views.ege, views.kus, 1500);
-    await wait(250);
-    card?.classList.remove('is-flying');
+  const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
+  let last = '';
+  const render = () => {
+    raf = 0;
+    const r = section.getBoundingClientRect();
+    const total = Math.max(1, r.height - window.innerHeight);
+    const p = Math.min(1, Math.max(0, -r.top / total));
+    let vb, level, label;
+    if (p < 0.12) { vb = views.tr; level = 1; label = 'Türkiye'; }
+    else if (p < 0.46) { vb = lerpView(views.tr, views.ege, ease(seg(p, 0.12, 0.46))); level = p < 0.32 ? 1 : 2; label = 'Ege Bölgesi'; }
+    else if (p < 0.56) { vb = views.ege; level = 2; label = 'Ege Bölgesi'; }
+    else if (p < 0.88) { vb = lerpView(views.ege, views.kus, ease(seg(p, 0.56, 0.88))); level = p < 0.6 ? 2 : 3; label = 'Kuşadası'; }
+    else { vb = views.kus; level = 3; label = 'Kuşadası'; }
+    setVB(vb);
+    const key = level + label + (p >= 0.9);
+    if (key !== last) {
+      last = key;
+      svg.dataset.level = String(level);
+      if (tag) tag.textContent = label;
+      card?.classList.toggle('is-flying', p < 0.9);
+    }
   };
-  const io = new IntersectionObserver((entries) => {
-    if (!entries.some((e) => e.isIntersecting)) return;
-    io.disconnect(); run();
-  }, { threshold: 0.55 });
-  io.observe(card || svg);
+  let raf = 0;
+  const req = () => { if (!raf) raf = requestAnimationFrame(render); };
+  window.addEventListener('scroll', req, { passive: true });
+  window.addEventListener('resize', req, { passive: true });
+  render();
 })();
