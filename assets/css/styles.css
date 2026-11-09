@@ -5785,3 +5785,25 @@ body.model3d-open{overflow:hidden}
 .quote-type-card.is-active[data-quote-type="diger"]::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23c8894a%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%205h16v11H9l-5%204z%22%2F%3E%3Cpath%20d%3D%22M8%209.5h8M8%2012.5h5%22%2F%3E%3C%2Fsvg%3E")}
 /* v3.3.75 · Teklif: tipe ait olmayan alanlar gerçekten gizlensin (kilitli görünmesin) */
 .quote-form [data-quote-scope][hidden],.quote-form .field[hidden],.quote-form [hidden]{display:none!important}
+
+/* v3.3.77 — Mimari maket: dosya + süreç tek blokta, boşluksuz */
+.maket-start{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,5vw,72px);align-items:center;padding:clamp(28px,4vw,48px);border-radius:28px;background:#f4f3f1}
+.maket-start-copy h2{font-size:clamp(32px,3.6vw,48px)!important;line-height:1.04!important;margin:6px 0 14px!important;max-width:12ch}
+.maket-start-copy>p:not(.eyebrow){color:#5f5750;max-width:46ch;margin:0 0 20px}
+.maket-start-copy .maket-files{margin-bottom:22px}
+.maket-start-copy .maket-files span{min-height:40px;padding:0 14px;font-size:14px}
+.maket-route{list-style:none!important;margin:0!important;padding:0!important;display:grid;gap:10px;counter-reset:none;position:relative}
+.maket-route li{display:grid!important;grid-template-columns:48px 1fr;gap:16px;align-items:center;margin:0!important;padding:14px 18px!important;border-radius:18px;background:#fff;border:1px solid rgba(20,17,15,.08);transition:border-color .2s ease,transform .2s ease}
+.maket-route li::before,.maket-route li::marker{content:none!important}
+.maket-route li:hover{border-color:rgba(138,78,14,.35);transform:translateX(4px)}
+.maket-route b{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#14110f;color:#c8894a;font:600 15px/1 "Playfair Display",serif}
+.maket-route h3{margin:0 0 2px!important;font-size:19px!important;line-height:1.2!important;color:#14110f}
+.maket-route p{margin:0!important;font-size:14px!important;line-height:1.45!important;color:#5f5750!important}
+@media (max-width:860px){
+  .maket-start{grid-template-columns:1fr;padding:24px 18px;border-radius:22px}
+  .maket-start-copy h2{font-size:32px!important;max-width:none}
+  .maket-start-copy .primary-cta{width:100%;justify-content:center}
+  .maket-route li{grid-template-columns:40px 1fr;gap:12px;padding:12px 14px!important}
+  .maket-route b{width:40px;height:40px;font-size:14px}
+  .maket-route li:hover{transform:none}
+}
