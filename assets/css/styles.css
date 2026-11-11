@@ -5860,3 +5860,320 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
 .case-stats b,[data-card-theme] .case-stats b{color:inherit!important;font-size:26px!important;opacity:1}
 .case-stats span b{opacity:1}
 .case-stats i{display:none}
+
+/* v3.3.87 · Denetim kalanları (yalnız telefon): okunur etiketler, 44px dokunma alanı,
+   hizalı breadcrumb, sıkı kartlar, tam ekran 3D görüntüleyici. Masaüstü değişmez. */
+@media (max-width:760px){
+  /* Breadcrumb: bağlantılar 44px, ayraçlar aynı hizada */
+  .breadcrumb{align-items:center;column-gap:8px;row-gap:0;flex-wrap:wrap}
+  .breadcrumb > *{display:flex;align-items:center;min-height:44px}
+
+  /* Okunur etiketler: 11px altı kalmaz */
+  .home-spatial-spec-card span,.home-product-carousel-nav span,.home-bento-flow-v3196 span,
+  .home-bento-signal-v3196 span,.bento-nfc-screen small,.consent-kicker,
+  .nfc-stand-schema-points article > span,.nfc-solution-meta span,.nfc-solution-meta b,
+  .nfc-premium-plus-visual span,.nfc-premium-plus-visual small,.nfc-compare-optional,
+  .nfc-digital-flow b,.nfc-motion-item > span,.nfc-capacity-stepper span,.nfc-all-prices summary span,
+  .project-metric-grid article span,.nfc-browser-frame b,.nfc-browser-frame i,.nfc-browser-frame small,
+  .nfc-browser-frame span{font-size:11px!important}
+  .home-stat-card-v3198 b,.assurance-strip span,.special-ready-breakdown span,.special-ready-breakdown b,
+  .nfc-config-options button b,.special-ready-options button b,.nfc-stand-schema-figure figcaption,
+  .nfc-stand-schema-figure figcaption span,.nfc-v3167-schema figcaption{font-size:11.5px!important}
+  .nfc-browser-panels strong,.nfc-feedback-price span,.nfc-channel-grid > span,.nfc-quick-price-grid article > span,
+  .premium-plus-progress,.project-facts-wrap article > span,.v3169-contact-primary a > span,.v3169-contact-grid article > span,
+  .project-index-tags span,.v3169-tech-flow span{font-size:11px!important}
+  .nfc-feedback-compare li,.premium-plus-note,.premium-plus-note strong,.premium-plus-release-note{font-size:12.5px!important;line-height:1.45!important}
+  .nfc-stand-schema-points p,.nfc-solution-card-body li,.nfc-motion-item p,.nfc-v3167-package-card li{font-size:12.5px!important;line-height:1.45!important}
+
+  /* Dokunma alanları */
+  .home-showcase-body h3 a,.product-card-body h3 a{display:flex;align-items:center;min-height:44px}
+  .nfc-v3167-subpage > nav.shell a{display:inline-flex;align-items:center;min-height:44px;font-size:12px!important}
+
+  /* Referans kartları (kurumsal, NFC, restoran): sıkı düzen, tüm etiketler tek satırda kaydırılır */
+  .case-card .case-media{aspect-ratio:2/1!important;height:auto!important}
+  .case-card .case-media img{width:100%;height:100%!important;object-fit:cover}
+  .case-card .case-body{padding:16px 16px 18px!important}
+  .case-card .case-profile{width:34px!important;height:34px!important}
+  .case-card .case-profile img{width:32px!important;height:32px!important}
+  .case-card h3{font-size:1.16rem!important;line-height:1.18!important;margin:10px 0 8px!important}
+  .case-card .case-meta,.project-index-card .project-index-tags,.home-project-card .home-project-tags{
+    display:flex!important;flex-wrap:nowrap!important;gap:6px!important;overflow-x:auto;margin-top:12px!important;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .case-card .case-meta::-webkit-scrollbar,.project-index-card .project-index-tags::-webkit-scrollbar,
+  .home-project-card .home-project-tags::-webkit-scrollbar{display:none}
+  .case-card .case-meta span,.project-index-card .project-index-tags span,.home-project-card .home-project-tags span{display:block!important;flex:0 0 auto;white-space:nowrap}
+  .case-card .case-project-link{margin-top:4px!important}
+  .project-index-grid{gap:12px!important}
+  /* Referans ızgaraları telefonda yana kaydırılan kart şeridi: sonraki kart kenarda görünür */
+  .case-grid,.reference-grid{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column!important;
+    grid-auto-columns:86%!important;gap:12px!important;overflow-x:auto;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
+  .case-grid::-webkit-scrollbar,.reference-grid::-webkit-scrollbar{display:none}
+  .nfc-v3167-package-grid,.nfc-solution-grid{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column!important;
+    grid-auto-columns:86%!important;gap:12px!important;overflow-x:auto;overscroll-behavior-x:contain;align-items:stretch;
+    scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
+  .nfc-v3167-package-grid > *,.nfc-solution-grid > *{scroll-snap-align:start;margin:0!important}
+  .nfc-v3167-package-grid::-webkit-scrollbar,.nfc-solution-grid::-webkit-scrollbar{display:none}
+  .case-grid > .case-card,.reference-grid > .case-card{scroll-snap-align:start;margin:0!important}
+
+  /* Projeler dizini kartları */
+  .project-index-card .project-index-media{aspect-ratio:2/1!important;height:auto!important}
+  .project-index-card .project-index-media img{height:100%!important;object-fit:cover}
+  .project-index-card .project-index-body{padding:14px 16px 16px!important}
+  .project-index-card .project-index-meta{margin-bottom:6px!important}
+  .project-index-card h2{font-size:1.2rem!important;line-height:1.18!important;margin:0 0 8px!important}
+  .project-index-card .project-index-actions{padding-top:6px!important}
+
+  /* Ana sayfa proje kartları */
+  .home-project-card .home-project-media,.home-project-card .home-project-media img{height:auto!important;aspect-ratio:2/1!important;object-fit:cover}
+  .home-project-card .home-project-kicker{padding-bottom:8px!important}
+  .home-project-card .home-case-study-client-v3197{margin-top:12px!important}
+  .home-project-card h3{margin:8px 0 10px!important;font-size:1.25rem!important}
+  .home-project-card .home-case-study-facts-v3197 > div{padding-top:10px!important;padding-bottom:10px!important}
+
+  /* NFC paket kartları: özellik listesi iki sütun, ek hizmetler sıkı */
+  .nfc-v3167-package-card ul{display:grid!important;grid-template-columns:1fr 1fr;gap:6px 12px!important;margin:12px 0!important}
+  .nfc-v3167-package-card ul li{padding:6px 0!important;border:0!important}
+  .nfc-v3167-package-card .package-price{margin:12px 0 10px!important;padding:12px 0!important}
+  .nfc-config-options,.special-ready-options{gap:8px!important}
+  .nfc-config-options button,.special-ready-options button{padding:9px 12px!important;row-gap:2px!important}
+
+  /* 3D görüntüleyici: üstte boşluk kalmadan tam ekran */
+  .model3d-dialog{padding:0!important;place-items:stretch!important}
+  .model3d-card{width:100%!important;height:100dvh;display:flex;flex-direction:column;border-radius:0!important;border:0!important}
+  .model3d-head{padding-top:max(14px,env(safe-area-inset-top))}
+  .model3d-stage{flex:1 1 auto;height:auto!important;min-height:0}
+  .model3d-hint{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+}
+
+/* v3.3.87 · Google kartı haritası: beyaz Türkiye + bronz kontur, mimari çizim göstergesi,
+   Türkiye → Ege → Kuşadası adım çubuğu, görünen alan ölçeği, Kuşadası nabız noktası */
+.m-drone .m-sea{fill:#dfe7e8}
+.m-drone .m-nb{fill:#ebe9e6;stroke:#d9d4cd}
+.m-drone .m-land{fill:#ffffff;stroke:rgba(138,78,14,.55);stroke-width:1.4}
+.m-drone .m-isle{fill:#f7f6f4;stroke:rgba(138,78,14,.3)}
+.m-drone .m-road{stroke:#ece5dc}
+.m-drone .m-dot{fill:#14110f}
+.m-drone .m-big{fill:#8a4e0e;opacity:.42;letter-spacing:.42em}
+.m-drone .m-sea-lab{fill:#6f8c90}
+.m-drone .m-strong{fill:#8a4e0e}
+.gplace-map-v3350{background:#dfe7e8;box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 30px 70px -20px rgba(20,17,15,.28)!important;border-color:rgba(20,17,15,.12)!important}
+.gplace-zoom-tag{display:none!important}
+.gmap-hud{position:absolute;inset:0;z-index:3;pointer-events:none;font-family:"DM Sans",Arial,sans-serif}
+.gmap-hud::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(20,17,15,.16) 1px,transparent 1.2px);background-size:18px 18px;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 50%,transparent 45%,#000 100%);mask-image:radial-gradient(120% 90% at 50% 50%,transparent 45%,#000 100%)}
+.gmap-hud::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 60px rgba(20,17,15,.10);border-radius:inherit}
+.gmap-steps{position:absolute;left:16px;top:16px;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:rgba(20,17,15,.86);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 10px 24px rgba(20,17,15,.22);overflow:hidden}
+.gmap-steps i{font-style:normal;font-size:12px;font-weight:600;letter-spacing:.02em;line-height:1;padding:7px 11px;border-radius:999px;color:rgba(255,255,255,.55);
+  transition:color .35s ease,background-color .35s ease}
+.gmap-steps[data-level="1"] i:nth-child(1),.gmap-steps[data-level="2"] i:nth-child(2),.gmap-steps[data-level="3"] i:nth-child(3){color:#14110f;background:#ffffff}
+.gmap-steps-bar{position:absolute;left:14px;right:14px;bottom:1px;height:2px;border-radius:2px;background:rgba(255,255,255,.12)}
+.gmap-steps-bar b{display:block;height:100%;border-radius:inherit;background:#c8894a;transform-origin:left center;transform:scaleX(1)}
+.gmap-coord,.gmap-scale{position:absolute;bottom:14px;font-size:11px;font-weight:600;letter-spacing:.08em;color:#14110f;
+  padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-variant-numeric:tabular-nums}
+.gmap-coord{left:16px}
+.gmap-scale{right:16px;display:flex;align-items:center;gap:8px}
+.gmap-scale b{font-weight:700}
+.gmap-scale-line{width:28px;height:6px;border:1.5px solid #14110f;border-top:0}
+.gmap-corner{position:absolute;width:14px;height:14px;border-color:rgba(138,78,14,.7);border-style:solid;border-width:0}
+.gmap-corner-tl{left:8px;top:8px;border-top-width:1.5px;border-left-width:1.5px;opacity:0}
+.gmap-corner-tr{right:8px;top:8px;border-top-width:1.5px;border-right-width:1.5px}
+.gmap-corner-bl{left:8px;bottom:8px;border-bottom-width:1.5px;border-left-width:1.5px;opacity:0}
+.gmap-corner-br{right:8px;bottom:8px;border-bottom-width:1.5px;border-right-width:1.5px;opacity:0}
+.gmap-beacon{position:absolute;left:0;top:0;z-index:2;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .4s ease}
+.gmap-beacon::before,.gmap-beacon::after{content:"";position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%}
+.gmap-beacon::before{background:#8a4e0e;box-shadow:0 0 0 3px #fff,0 4px 12px rgba(20,17,15,.35)}
+.gmap-beacon::after{border:2px solid #8a4e0e}
+.gplace-map-v3350.is-flying .gmap-beacon{opacity:1}
+@media (prefers-reduced-motion:no-preference){.gmap-beacon::after{animation:gmapPulse 1.8s cubic-bezier(.2,.7,.2,1) infinite}}
+@keyframes gmapPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.6);opacity:0}}
+@media (max-width:760px){
+  .gmap-steps{left:12px;top:12px}
+  .gmap-steps i{font-size:11.5px;padding:7px 10px}
+  .gmap-coord,.gmap-scale{bottom:12px;font-size:11px;padding:5px 9px}
+  .gmap-coord{left:12px}
+  .gmap-scale{right:12px}
+  .gmap-scale-line{width:20px}
+}
+
+/* v3.3.89 · Ana sayfa: BG Studio Architecture vitrin kartı (sade bandın yerine) */
+.arch-feature-v3389{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:clamp(28px,4.5vw,72px);align-items:center;margin-top:clamp(28px,4vw,48px);padding:clamp(28px,4.5vw,64px);border-radius:28px;
+  background:#14110f;color:#fff;border:1px solid rgba(255,255,255,.08);box-shadow:0 40px 90px -30px rgba(20,17,15,.55)}
+.arch-feature-v3389::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:48px 48px;-webkit-mask-image:radial-gradient(90% 80% at 75% 50%,#000 20%,transparent 75%);mask-image:radial-gradient(90% 80% at 75% 50%,#000 20%,transparent 75%)}
+.arch-feature-v3389::after{content:"";position:absolute;z-index:-1;pointer-events:none;width:60%;aspect-ratio:1;right:-10%;top:-30%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(200,137,74,.22),transparent)}
+.arch-feature-eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 18px;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#c8894a}
+.arch-feature-eyebrow span{width:28px;height:1px;background:#c8894a}
+.arch-feature-title{margin:0;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:clamp(2.3rem,4.6vw,4.2rem);line-height:.98;letter-spacing:-.03em;color:#fff}
+.arch-feature-title em{display:block;font-style:italic;font-weight:500;color:#c8894a}
+.arch-feature-lead{margin:20px 0 0;max-width:40ch;font-size:clamp(.95rem,1.2vw,1.05rem);line-height:1.6;color:rgba(255,255,255,.72)}
+.arch-feature-tags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+.arch-feature-tags li{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12px;font-weight:600;letter-spacing:.02em;color:rgba(255,255,255,.85);background:rgba(255,255,255,.03)}
+.arch-feature-link.arch-link{margin-top:26px;font-size:clamp(1.5rem,2.6vw,2.2rem);color:#fff}
+.arch-feature-link.arch-link::after{transform:scaleX(.18)}
+.arch-feature-browser{position:relative}
+@media (hover:hover) and (pointer:fine){
+  .arch-feature-link.arch-link:hover::after{transform:scaleX(1)}
+  .arch-feature-link.arch-link:hover .arch-link-arrow{transform:rotate(45deg);background:#c8894a;border-color:#c8894a;color:#14110f}
+}
+@media (max-width:860px){
+  .arch-feature-v3389{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .arch-feature-v3389{padding:24px 18px 18px;border-radius:22px;gap:22px}
+  .arch-feature-eyebrow{font-size:11px;margin-bottom:12px}
+  .arch-feature-title{font-size:2.15rem}
+  .arch-feature-lead{margin-top:12px;font-size:.92rem}
+  .arch-feature-tags{margin-top:14px;gap:6px}
+  .arch-feature-tags li{font-size:11.5px;padding:6px 10px}
+  .arch-feature-link.arch-link{margin-top:16px;font-size:1.45rem;min-height:44px}
+  .arch-feature-v3389::before{-webkit-mask-image:radial-gradient(120% 70% at 50% 80%,#000 20%,transparent 75%);mask-image:radial-gradient(120% 70% at 50% 80%,#000 20%,transparent 75%)}
+}
+
+/* v3.3.90 · "Nasıl ilerliyoruz" → Üretim hattı: 5 adımlı bronz hat + adım başına çizim sahnesi.
+   Masaüstünde bölüm sabitlenir, kaydırma adımları ilerletir; telefonda adım kartları yana kaydırılır. */
+.pline-v3390{position:relative;background:#14110f;color:#fff;padding:clamp(72px,9vw,120px) 0}
+.pline-v3390 .eyebrow{color:#c8894a!important}
+.pline-headrow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,4vw,64px);align-items:end}
+.pline-headrow h2{margin:.4rem 0 0;font-size:clamp(2.2rem,4vw,3.6rem);line-height:1;letter-spacing:-.035em;color:#fff;font-weight:560}
+.pline-headrow h2 em{font-style:italic;font-weight:500;color:#c8894a}
+.pline-lead p{margin:0 0 18px;max-width:46ch;color:rgba(255,255,255,.72);line-height:1.6}
+.pline-v3390 .primary-cta{background:#fff!important;color:#14110f!important;border-color:#fff!important}
+/* Hat */
+.pline-trackwrap{position:relative;margin:clamp(28px,4vw,48px) 0 clamp(20px,3vw,32px)}
+.pline-track{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);margin:0;padding:0;list-style:none}
+.pline-tbtn{display:grid;justify-items:center;gap:10px;width:100%;min-height:44px;padding:0;border:0;background:none;color:rgba(255,255,255,.5);cursor:pointer;font:inherit}
+.pline-node{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:#14110f;
+  font-family:"Playfair Display",Georgia,serif;font-size:1rem;color:rgba(255,255,255,.7);transition:background-color .35s ease,color .35s ease,border-color .35s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
+.pline-tlabel{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:color .3s ease}
+.pline-tbtn.is-done .pline-node{border-color:#c8894a;color:#c8894a}
+.pline-tbtn.is-active .pline-node{background:#c8894a;border-color:#c8894a;color:#14110f;transform:scale(1.08)}
+.pline-tbtn.is-active .pline-tlabel,.pline-tbtn.is-done .pline-tlabel{color:#fff}
+.pline-tbtn:focus-visible{outline:2px solid #c8894a;outline-offset:4px;border-radius:12px}
+@media (hover:hover) and (pointer:fine){.pline-tbtn:hover .pline-node{border-color:#c8894a}.pline-tbtn:hover .pline-tlabel{color:#fff}}
+.pline-rail{position:absolute;left:10%;right:10%;top:21px;height:2px;background:rgba(255,255,255,.12);border-radius:2px}
+.pline-fill{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8a4e0e,#c8894a);transform-origin:left center;transform:scaleX(0);transition:transform .25s linear}
+/* Sahne */
+.pline-stage{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,4vw,64px);align-items:center}
+.pline-canvas{position:relative;aspect-ratio:4/3;max-height:min(50vh,460px);width:100%;border-radius:24px;overflow:hidden;
+  background:radial-gradient(80% 70% at 50% 45%,#2a231e,#171310);border:1px solid rgba(255,255,255,.08);box-shadow:0 40px 80px -30px rgba(0,0,0,.6)}
+.pline-canvas::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:32px 32px;-webkit-mask-image:radial-gradient(75% 70% at 50% 50%,#000 30%,transparent 90%);mask-image:radial-gradient(75% 70% at 50% 50%,#000 30%,transparent 90%)}
+.pline-hud{position:absolute;top:14px;z-index:2;font-size:11px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums}
+.pline-hud-l{left:18px;color:#c8894a}
+.pline-hud-r{right:18px}
+.pline-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pline-svg text{font-family:"DM Sans",Arial,sans-serif;font-size:12px;letter-spacing:.06em}
+.pline-art{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.pline-stage[data-step="0"] [data-art="0"],.pline-stage[data-step="1"] [data-art="1"],.pline-stage[data-step="2"] [data-art="2"],
+.pline-stage[data-step="3"] [data-art="3"],.pline-stage[data-step="4"] [data-art="4"]{opacity:1;transform:none}
+.pline-draw{fill:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1) .15s}
+.pline-stage[data-step="0"] [data-art="0"] .pline-draw,.pline-stage[data-step="1"] [data-art="1"] .pline-draw,.pline-stage[data-step="4"] [data-art="4"] .pline-draw{stroke-dashoffset:0}
+/* 01 Fikir */
+.pline-paper rect{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.22)}
+.pline-rules line{stroke:rgba(255,255,255,.14)}
+.pline-sketch{stroke:#fff;stroke-width:2;stroke-linecap:round}
+.pline-sketch2{stroke:rgba(255,255,255,.55);stroke-width:1.4}
+.pline-note line{stroke:#c8894a;stroke-width:1.2}
+.pline-note text{fill:#c8894a;font-style:italic}
+.pline-pencil rect,.pline-pencil path{fill:#c8894a}
+/* 02 Modelleme */
+.pline-grid3d path{stroke:rgba(255,255,255,.12);fill:none}
+.pline-wire *{fill:none;stroke:rgba(200,137,74,.6);stroke-width:1}
+.pline-wire-edge{stroke:#fff;stroke-width:1.6}
+.pline-gizmo line{stroke:rgba(255,255,255,.6);stroke-width:1.5}
+.pline-gizmo text,.pline-tag{fill:rgba(255,255,255,.7);font-weight:700}
+/* 03 Test */
+.pline-solid{fill:#f2efea}
+.pline-dim line{stroke:#c8894a;stroke-width:1}
+.pline-dim text{fill:#c8894a;text-anchor:middle;font-weight:700}
+.pline-caliper rect,.pline-caliper path{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.6)}
+.pline-ok circle{fill:rgba(200,137,74,.14);stroke:#c8894a;stroke-width:1.5}
+.pline-ok path{fill:none;stroke:#c8894a;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.pline-ok text{fill:#c8894a;text-anchor:middle;font-weight:700}
+/* 04 Üretim */
+.pline-frame rect,.pline-frame line{fill:none;stroke:rgba(255,255,255,.22);stroke-width:2}
+.pline-print-fill{fill:#f2efea}
+.pline-layers line{stroke:rgba(20,17,15,.14);stroke-width:1}
+.pline-ghost{fill:none;stroke:rgba(255,255,255,.3);stroke-dasharray:4 5}
+.pline-grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(.55)}
+.pline-head{transform:translateY(184px)}
+.pline-gantry{stroke:rgba(255,255,255,.45);stroke-width:3}
+.pline-nozzle rect,.pline-nozzle path{fill:#2b2521;stroke:rgba(255,255,255,.55)}
+.pline-hot{fill:#c8894a;filter:drop-shadow(0 0 4px #c8894a)}
+@media (prefers-reduced-motion:no-preference){
+  .pline-stage[data-step="3"] .pline-grow{animation:plineGrow 7s linear infinite}
+  .pline-stage[data-step="3"] .pline-head{animation:plineHead 7s linear infinite}
+  .pline-dest circle{animation:plinePulse 1.8s ease-in-out infinite}
+}
+@keyframes plineGrow{0%{transform:scaleY(.02)}85%,100%{transform:scaleY(1)}}
+@keyframes plineHead{0%{transform:translateY(298px)}85%,100%{transform:translateY(90px)}}
+@keyframes plinePulse{50%{opacity:.4}}
+/* 05 Teslim */
+.pline-route{stroke:#c8894a;stroke-width:1.6}
+.pline-dest circle{fill:#c8894a}
+.pline-box-top{fill:#3a302a;stroke:#c8894a;stroke-width:1}
+.pline-box-l{fill:#2a231e;stroke:rgba(200,137,74,.5)}
+.pline-box-r{fill:#1f1a16;stroke:rgba(200,137,74,.5)}
+.pline-tape{fill:rgba(200,137,74,.6)}
+/* Adım metinleri */
+.pline-panels{display:grid}
+.pline-panel{grid-area:1/1;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1),visibility 0s .45s}
+.pline-panel.is-active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease .05s,transform .55s cubic-bezier(.2,.8,.2,1) .05s,visibility 0s}
+.pline-num{display:block;font-family:"Playfair Display",Georgia,serif;font-size:clamp(3.4rem,6vw,5.6rem);line-height:.9;color:transparent;-webkit-text-stroke:1px rgba(200,137,74,.75)}
+.pline-panel small{display:block;margin-top:18px;font-size:12px;font-weight:700;letter-spacing:.16em;color:#c8894a}
+.pline-panel h3{margin:10px 0 14px;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:clamp(1.8rem,2.8vw,2.6rem);line-height:1.05;letter-spacing:-.02em;color:#fff}
+.pline-panel p{margin:0;max-width:40ch;color:rgba(255,255,255,.72);line-height:1.65}
+.pline-panel .pline-cap{display:flex;align-items:center;gap:12px;margin-top:20px;font-style:italic;color:rgba(255,255,255,.9)}
+.pline-panel .pline-cap::before{content:"";width:28px;height:1px;background:#c8894a;flex:0 0 auto}
+/* Masaüstü sabit mod */
+.pline-v3390.is-live{height:calc(100vh + 300vh);padding:0}
+.pline-v3390.is-live .pline-pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;padding-top:var(--pline-top,84px);box-sizing:border-box;overflow:hidden}
+.pline-v3390.is-live .pline-inner{width:100%}
+@media (max-height:760px){.pline-v3390.is-live .pline-headrow h2{font-size:clamp(2rem,3.2vw,2.8rem)}.pline-v3390.is-live .pline-trackwrap{margin:22px 0 18px}.pline-v3390.is-live .pline-canvas{max-height:44vh}}
+/* JS yoksa / hareket azaltma (masaüstü): tüm adımlar okunur */
+.pline-v3390:not(.is-live):not(.is-strip) .pline-panels{gap:28px}
+.pline-v3390:not(.is-live):not(.is-strip) .pline-panel{grid-area:auto;opacity:1;visibility:visible;transform:none}
+@media (max-width:860px){
+  .pline-headrow,.pline-stage{grid-template-columns:1fr}
+  .pline-canvas{max-height:none}
+}
+@media (max-width:760px){
+  .pline-v3390{padding:56px 0}
+  .pline-headrow{gap:14px}
+  .pline-headrow h2{font-size:2.2rem}
+  .pline-lead p{margin-bottom:14px;font-size:.95rem}
+  .pline-trackwrap{margin:26px 0 18px}
+  .pline-node{width:40px;height:40px;font-size:.92rem}
+  .pline-rail{top:19px}
+  .pline-tlabel{font-size:11px;letter-spacing:.06em}
+  .pline-stage{gap:16px}
+  .pline-canvas{border-radius:20px}
+  .pline-hud{font-size:11px;top:12px}
+  .pline-hud-l{left:14px}.pline-hud-r{right:14px}
+  /* Adım kartları yana kaydırılır: hepsi okunur */
+  .pline-v3390 .pline-panels{display:grid;grid-auto-flow:column;grid-auto-columns:86%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:4px}
+  .pline-v3390 .pline-panels::-webkit-scrollbar{display:none}
+  .pline-v3390 .pline-panel{grid-area:auto;opacity:1;visibility:visible;transform:none;scroll-snap-align:start;padding:18px;border-radius:18px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);transition:border-color .3s ease,background-color .3s ease}
+  .pline-v3390 .pline-panel.is-active{border-color:rgba(200,137,74,.6);background:rgba(200,137,74,.07)}
+  .pline-num{font-size:2.6rem}
+  .pline-panel small{margin-top:10px;font-size:11px}
+  .pline-panel h3{font-size:1.45rem;margin:6px 0 8px}
+  .pline-panel p{font-size:.92rem;line-height:1.55}
+  .pline-panel .pline-cap{margin-top:12px}
+}
+@media (min-width:861px) and (max-height:900px){
+  .pline-v3390.is-live .pline-headrow h2{font-size:clamp(2rem,3vw,2.7rem)}
+  .pline-v3390.is-live .pline-lead p{margin-bottom:12px;font-size:.95rem}
+  .pline-v3390.is-live .pline-trackwrap{margin:20px 0 16px}
+  .pline-v3390.is-live .pline-canvas{max-height:42vh}
+  .pline-v3390.is-live .pline-num{font-size:3.4rem}
+  .pline-v3390.is-live .pline-panel h3{font-size:2rem}
+}

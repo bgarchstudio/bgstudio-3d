@@ -2780,6 +2780,41 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   section.classList.add('is-drone-scroll');
   const setVB = (v) => svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' '));
+  /* v3.3.87 — gösterge: adım çubuğu, görünen alan (km), Kuşadası nabız noktası */
+  const steps = card?.querySelector('[data-drone-steps]');
+  const bar = card?.querySelector('[data-drone-progress]');
+  const scaleEl = card?.querySelector('[data-drone-scale]');
+  const beacon = card?.querySelector('[data-drone-beacon]');
+  const KUS = [3026, 7199];          // Kuşadası (harita birimi)
+  const KM_PER_UNIT = 0.085;         // İzmir–Bodrum ≈ 165 km'den
+  let lastKm = -1;
+  /* Telefonda kart, sabit başlığın altında 12px boşlukla kilitlenir (kırpılmaz) */
+  const stickyEl = section.querySelector('.gplace-card-v3350');
+  const phoneMq = window.matchMedia('(max-width:760px)');
+  let lastTop = '';
+  const placeSticky = () => {
+    if (!stickyEl) return;
+    let top = '';
+    if (phoneMq.matches) {
+      const header = document.querySelector('.site-header');
+      const b = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
+      top = `${Math.round(b + 12)}px`;
+    }
+    if (top !== lastTop) { lastTop = top; stickyEl.style.setProperty('top', top, top ? 'important' : ''); }
+  };
+  const hud = (vb, p) => {
+    if (bar) bar.style.transform = `scaleX(${p.toFixed(3)})`;
+    const km = vb[2] * KM_PER_UNIT;
+    const r = km > 200 ? Math.round(km / 100) * 100 : km > 20 ? Math.round(km / 5) * 5 : Math.round(km);
+    if (scaleEl && r !== lastKm) { lastKm = r; scaleEl.textContent = `≈ ${r.toLocaleString('tr-TR')} km`; }
+    if (beacon) {
+      const W = svg.clientWidth, H = svg.clientHeight;
+      const s = Math.max(W / vb[2], H / vb[3]);
+      const x = (KUS[0] - vb[0]) * s - (vb[2] * s - W) / 2;
+      const y = (KUS[1] - vb[1]) * s - (vb[3] * s - H) / 2;
+      beacon.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    }
+  };
   const lerpView = (a, b, t) => {
     const ca = [a[0] + a[2] / 2, a[1] + a[3] / 2], cb = [b[0] + b[2] / 2, b[1] + b[3] / 2];
     const w = Math.exp(Math.log(a[2]) + (Math.log(b[2]) - Math.log(a[2])) * t);
@@ -2801,10 +2836,13 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     else if (p < 0.88) { vb = lerpView(views.ege, views.kus, ease(seg(p, 0.56, 0.88))); level = p < 0.6 ? 2 : 3; label = 'Kuşadası'; }
     else { vb = views.kus; level = 3; label = 'Kuşadası'; }
     setVB(vb);
+    hud(vb, p);
+    placeSticky();
     const key = level + label + (p >= 0.9);
     if (key !== last) {
       last = key;
       svg.dataset.level = String(level);
+      if (steps) steps.dataset.level = String(level);
       if (tag) tag.textContent = label;
       card?.classList.toggle('is-flying', p < 0.9);
     }
@@ -2814,4 +2852,82 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   window.addEventListener('scroll', req, { passive: true });
   window.addEventListener('resize', req, { passive: true });
   render();
+})();
+
+/* v3.3.90 — Üretim hattı ("Nasıl ilerliyoruz"): masaüstünde bölüm sabitlenir ve kaydırma
+   adımları ilerletir; telefonda adım kartları yana kaydırılır, sahne ve hat aktif karta uyar. */
+(() => {
+  const sec = document.querySelector('[data-pline]');
+  if (!sec) return;
+  const stage = sec.querySelector('.pline-stage');
+  const btns = [...sec.querySelectorAll('[data-pline-go]')];
+  const panels = [...sec.querySelectorAll('[data-pline-panel]')];
+  const strip = sec.querySelector('[data-pline-panels]');
+  const fill = sec.querySelector('[data-pline-fill]');
+  const hud = sec.querySelector('[data-pline-hud]');
+  const N = panels.length || 5;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pinMq = window.matchMedia('(min-width: 861px) and (min-height: 640px)');
+  const stripMq = window.matchMedia('(max-width: 760px)');
+  let cur = -1;
+  const set = (i) => {
+    if (i === cur) return;
+    cur = i;
+    stage.dataset.step = String(i);
+    panels.forEach((p, k) => p.classList.toggle('is-active', k === i));
+    btns.forEach((b, k) => {
+      b.classList.toggle('is-done', k < i);
+      b.classList.toggle('is-active', k === i);
+      if (k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    if (hud) hud.textContent = `0${i + 1} / 0${N}`;
+  };
+  const isLive = () => pinMq.matches && !reduce;
+  const setFill = (f) => { if (fill) fill.style.transform = `scaleX(${Math.min(1, Math.max(0, f)).toFixed(3)})`; };
+  const headerTop = () => {
+    const h = document.querySelector('.site-header');
+    sec.style.setProperty('--pline-top', `${Math.round((h ? Math.max(0, h.getBoundingClientRect().bottom) : 0) + 16)}px`);
+  };
+  let raf = 0;
+  const onScroll = () => {
+    raf = 0;
+    if (!isLive()) return;
+    headerTop();
+    const r = sec.getBoundingClientRect();
+    const total = Math.max(1, r.height - window.innerHeight);
+    const p = Math.min(1, Math.max(0, -r.top / total));
+    set(Math.min(N - 1, Math.floor(p * N)));
+    setFill(p);
+  };
+  const req = () => { if (!raf) raf = requestAnimationFrame(onScroll); };
+  const onStrip = () => {
+    if (!sec.classList.contains('is-strip') || !strip) return;
+    const w = panels[1] ? panels[1].offsetLeft - panels[0].offsetLeft : strip.clientWidth;
+    const i = Math.min(N - 1, Math.max(0, Math.round(strip.scrollLeft / Math.max(1, w))));
+    set(i);
+    setFill(i / (N - 1));
+  };
+  const apply = () => {
+    sec.classList.toggle('is-live', isLive());
+    sec.classList.toggle('is-strip', stripMq.matches);
+    headerTop();
+    if (isLive()) onScroll(); else { if (cur < 0) set(0); setFill(cur / (N - 1)); onStrip(); }
+  };
+  btns.forEach((b) => b.addEventListener('click', () => {
+    const i = Number(b.dataset.plineGo) || 0;
+    if (isLive()) {
+      const top = sec.getBoundingClientRect().top + window.scrollY;
+      const total = sec.offsetHeight - window.innerHeight;
+      window.scrollTo({ top: top + total * ((i + 0.5) / N), behavior: reduce ? 'auto' : 'smooth' });
+    } else if (sec.classList.contains('is-strip') && strip) {
+      strip.scrollTo({ left: panels[i].offsetLeft - panels[0].offsetLeft, behavior: reduce ? 'auto' : 'smooth' });
+      set(i); setFill(i / (N - 1));
+    } else { set(i); setFill(i / (N - 1)); }
+  }));
+  strip?.addEventListener('scroll', () => requestAnimationFrame(onStrip), { passive: true });
+  window.addEventListener('scroll', req, { passive: true });
+  window.addEventListener('resize', apply, { passive: true });
+  pinMq.addEventListener?.('change', apply);
+  stripMq.addEventListener?.('change', apply);
+  apply();
 })();
