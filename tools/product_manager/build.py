@@ -2314,7 +2314,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.90'
+SITE_ASSET_VERSION = '3.3.92'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
@@ -4314,7 +4314,7 @@ def render_global_footer(prefix=''):
     <div class="footer-v3202-socials" aria-label="Sosyal medya bağlantıları"><a href="https://instagram.com/bgstudio.3dtr" rel="me noopener" target="_blank">Instagram <span>↗</span></a><a href="https://www.facebook.com/bgstudio.3dtr" rel="me noopener" target="_blank">Facebook <span>↗</span></a><a href="https://wa.me/905302466903?text=Merhaba%20BG%20Studio%203D" rel="noopener" target="_blank">WhatsApp <span>↗</span></a></div>
     <button class="footer-consent-button footer-v3202-consent" type="button">Çerez tercihleri</button>
   </div>
-  <div class="footer-v3202-wordmark" aria-hidden="true"><span>BG STUDIO</span><strong>3D</strong></div>
+  <div class="fbrand-v3392"><div class="fbrand-top"><p class="fbrand-say">Tek stüdyo, iki iş kolu. Burada <em>fikirleri üretiyoruz.</em></p><nav class="fbrand-switch" aria-label="BG Studio iş kolları"><a href="https://bgstudio.com.tr" rel="noopener" target="_blank"><b>Mimarlık ↗</b><small>bgstudio.com.tr</small></a><span class="is-on" aria-current="page"><b>3D Üretim</b><small>Buradasınız</small></span></nav></div><div class="fbrand-dim" aria-hidden="true"><i></i><b>TASARIMDAN ÜRETİME · KUŞADASI</b></div><div class="fbrand-wm" aria-hidden="true">BG STUDIO</div><p class="fbrand-sign">Kurucu · <span>Mimar Berkant Gökbel</span></p></div>
   <div class="footer-v3202-bottom"><p>BG STUDIO 3D © <span data-current-year="">2026</span>. Tüm hakları saklıdır.</p><p>Türkiye geneli kargo · Kuşadası elden teslim</p><p>BG Studio tarafından tasarlanmış ve geliştirilmiştir.</p></div>
 </div>
 </footer>'''

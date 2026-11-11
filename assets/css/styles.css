@@ -6177,3 +6177,42 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
   .pline-v3390.is-live .pline-num{font-size:3.4rem}
   .pline-v3390.is-live .pline-panel h3{font-size:2rem}
 }
+
+
+/* v3.3.92 · Ortak footer imzası (Architecture + 3D aynı dil): tek cümle, iş kolu anahtarı,
+   ölçü çizgisi, kenardan kenara BG STUDIO, kurucu imzası */
+.footer-v3202-wordmark{display:none}
+.fbrand-v3392{container-type:inline-size;padding:clamp(28px,4vw,48px) 0 18px;border-top:1px solid rgba(255,255,255,.09);color:#f4f3f1}
+.fbrand-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px 32px;flex-wrap:wrap}
+.fbrand-say{margin:0;max-width:30ch;font-size:clamp(1.15rem,2vw,1.6rem);line-height:1.25;letter-spacing:-.01em;color:#f4f3f1}
+.fbrand-say em{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-weight:500;color:#c8894a}
+.fbrand-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid rgba(255,255,255,.18);border-radius:999px}
+.fbrand-switch a,.fbrand-switch span{display:grid;align-content:center;min-height:44px;padding:6px 18px;border-radius:999px;color:rgba(255,255,255,.7);text-decoration:none;white-space:nowrap}
+.fbrand-switch b{font-size:13px;font-weight:700;color:inherit}
+.fbrand-switch small{font-size:11px;letter-spacing:.02em;opacity:.8}
+.fbrand-switch .is-on{background:#c8894a;color:#14110f}
+.fbrand-switch a:focus-visible{outline:2px solid #c8894a;outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.fbrand-switch a{transition:background-color .25s ease,color .25s ease}.fbrand-switch a:hover{background:rgba(255,255,255,.08);color:#fff}}
+.fbrand-dim{position:relative;height:10px;margin:clamp(26px,3.5vw,40px) 0 12px;border-left:1px solid #c8894a;border-right:1px solid #c8894a}
+.fbrand-dim i{position:absolute;left:0;right:0;top:5px;border-top:1px solid #c8894a}
+.fbrand-dim b{position:absolute;left:50%;top:-6px;transform:translateX(-50%);padding:0 12px;background:#0c0c0b;font-size:11px;font-weight:600;letter-spacing:.16em;color:#c8894a;white-space:nowrap}
+.fbrand-wm{font-family:"DM Sans",sans-serif;font-weight:700;font-size:19.9cqw;line-height:.8;letter-spacing:-.06em;white-space:nowrap;color:#f4f3f1;margin-left:-.02em}
+.fbrand-sign{margin:16px 0 0;font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.55)}
+.fbrand-sign span{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-size:15px;letter-spacing:0;color:#f4f3f1}
+@media (max-width:760px){
+  .fbrand-top{gap:16px}
+  .fbrand-say{font-size:1.15rem}
+  .fbrand-switch{width:100%}
+  .fbrand-switch a,.fbrand-switch span{padding:6px 14px}
+  .fbrand-dim b{font-size:11px;letter-spacing:.1em;padding:0 8px}
+}
+.fbrand-switch a.has-brand-icon::before,.fbrand-switch a::before{display:none!important;content:none!important}
+.fbrand-switch a.fbrand-switch a,.fbrand-switch a.has-brand-icon{display:grid!important;gap:0!important;padding-left:18px!important}
+@media (max-width:760px){.fbrand-switch a.has-brand-icon{padding-left:14px!important}}
+/* v3.3.92b · Telefon footer listeleri: bağlantılar arası boşluk yok, 40px dokunma, daha sıkı */
+@media (max-width:760px){
+  .footer-v3202-grid{row-gap:22px!important}
+  .footer-v3202-grid nav{gap:0!important}
+  .footer-v3202-grid nav strong{margin-bottom:2px!important}
+  .footer-v3202-grid nav a{min-height:40px!important;display:flex!important;align-items:center}
+}
