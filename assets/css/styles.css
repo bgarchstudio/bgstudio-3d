@@ -6277,3 +6277,9 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
 /* v3.3.94b · WhatsApp ve asistan kapatma butonları: oval değil 44px tam daire */
 .wa-panel-close,.bg-assistant-close,body.bg-assistant-keyboard .bg-assistant-close{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
   flex:0 0 44px!important;padding:0!important;aspect-ratio:1/1;border-radius:50%!important;display:grid!important;place-items:center!important;line-height:1!important}
+
+/* v3.3.95 · Rakamlar her yerde aynı hizada (Playfair'in eski stil rakamları yerine düz rakamlar): 899 TL, 01, 2026 … */
+html{font-variant-numeric:lining-nums}
+:where(h1,h2,h3,h4,h5,h6,strong,b,span,small,p,a,em,i,div,li,td,th,figcaption,text){font-variant-numeric:lining-nums}
+.home-stat-card-v3198>strong,.review-score-v3328,.lightbox-counter,.stl-metrics dd,.home-product-carousel-nav>span,.filter-btn .filter-count,.project-filter.project-filter>span,
+.gmap-coord,.gmap-scale,.pline-hud,.home-process-story-v3363 [data-print-story-label]{font-variant-numeric:lining-nums tabular-nums!important}
