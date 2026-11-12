@@ -6134,7 +6134,7 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
 /* Masaüstü sabit mod */
 .pline-v3390.is-live{height:calc(100vh + 300vh);padding:0}
 .pline-v3390.is-live .pline-pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;padding-top:var(--pline-top,84px);box-sizing:border-box;overflow:hidden}
-.pline-v3390.is-live .pline-inner{width:100%}
+.pline-v3390.is-live .pline-pin{flex-direction:column;justify-content:center}
 @media (max-height:760px){.pline-v3390.is-live .pline-headrow h2{font-size:clamp(2rem,3.2vw,2.8rem)}.pline-v3390.is-live .pline-trackwrap{margin:22px 0 18px}.pline-v3390.is-live .pline-canvas{max-height:44vh}}
 /* JS yoksa / hareket azaltma (masaüstü): tüm adımlar okunur */
 .pline-v3390:not(.is-live):not(.is-strip) .pline-panels{gap:28px}
@@ -6216,3 +6216,64 @@ h1,h2,.maket-start-copy h2{line-height:1.08!important}
   .footer-v3202-grid nav strong{margin-bottom:2px!important}
   .footer-v3202-grid nav a{min-height:40px!important;display:flex!important;align-items:center}
 }
+
+/* v3.3.93 · Üretim hattı telefonda: hat + sahne + aktif adım başlığın altında kilitlenir,
+   kaydırma adımları sırayla ilerletir (JS .is-mlive ekler; hareket azaltmada eski kaydırmalı kartlar) */
+.pline-spacer{height:0}
+.pline-v3390.is-mlive .pline-sticky{position:sticky;top:var(--pline-top,96px);z-index:1;background:#14110f;padding:6px 0 10px}
+.pline-v3390.is-mlive .pline-spacer{height:240vh}
+.pline-v3390.is-mlive .pline-trackwrap{margin:6px 0 12px}
+.pline-v3390.is-mlive .pline-stage{gap:12px}
+.pline-v3390.is-mlive .pline-panels{display:grid!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;overflow:visible!important;scroll-snap-type:none!important;padding:0!important}
+.pline-v3390.is-mlive .pline-panel{grid-area:1/1!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;
+  opacity:0!important;visibility:hidden!important;transform:translateY(10px)!important;
+  transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s .35s!important}
+.pline-v3390.is-mlive .pline-panel.is-active{opacity:1!important;visibility:visible!important;transform:none!important;
+  transition:opacity .35s ease .05s,transform .45s cubic-bezier(.2,.8,.2,1) .05s,visibility 0s!important}
+.pline-v3390.is-mlive .pline-num{font-size:2.2rem}
+.pline-v3390.is-mlive .pline-panel small{margin-top:6px}
+.pline-v3390.is-mlive .pline-panel h3{font-size:1.35rem;margin:4px 0 6px}
+.pline-v3390.is-mlive .pline-panel p{font-size:.9rem;line-height:1.5}
+.pline-v3390.is-mlive .pline-panel .pline-cap{margin-top:8px}
+@media (max-width:860px) and (max-height:760px){.pline-v3390.is-mlive .pline-canvas{aspect-ratio:16/10}}
+@media (max-width:860px) and (max-height:660px){.pline-v3390.is-mlive .pline-canvas{aspect-ratio:2/1}}
+
+/* v3.3.94 · Ürün sayfası "Sipariş süreci": bronz hatla bağlı adımlar, ikonlu espresso düğümler.
+   Masaüstü yatay hat; telefon soldan dikey zaman çizelgesi (kompakt satırlar). */
+.order-process .order-steps{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px;padding:clamp(28px,4vw,44px);border-radius:28px;background:#f4f3f1;border:1px solid rgba(20,17,15,.06)}
+.order-process .order-steps::before{content:"";position:absolute;left:calc(12.5% + 6px);right:calc(12.5% + 6px);top:calc(clamp(28px,4vw,44px) + 27px);height:1px;
+  background:linear-gradient(90deg,#8a4e0e,#c8894a);transform-origin:left center;transform:scaleX(1)}
+.order-process .order-step{position:relative;display:grid;justify-items:center;align-content:start;gap:0;text-align:center;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;min-height:0!important}
+.order-process .order-ico{position:relative;z-index:1;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:#14110f;color:#c8894a;
+  box-shadow:0 0 0 6px #f4f3f1,0 10px 24px -8px rgba(20,17,15,.45);transition:background-color .3s ease,color .3s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
+.order-process .order-ico svg{width:24px;height:24px}
+.order-process .order-step > span{display:block!important;width:auto!important;height:auto!important;margin:16px 0 0!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;
+  font-family:"DM Sans",sans-serif!important;font-size:12px!important;font-weight:700;letter-spacing:.16em;color:#8a4e0e!important}
+.order-process .order-step h3{margin:6px 0 8px!important;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:clamp(1.15rem,1.5vw,1.35rem)!important;line-height:1.15;color:#14110f}
+.order-process .order-step p{margin:0!important;max-width:24ch;font-size:14px!important;line-height:1.55;color:#5f5750}
+@media (hover:hover) and (pointer:fine){.order-process .order-step:hover .order-ico{background:#c8894a;color:#14110f;transform:translateY(-3px)}}
+@media (prefers-reduced-motion:no-preference){
+  .order-process .order-steps.is-anim::before{transform:scaleX(0);transition:transform 1.1s cubic-bezier(.5,0,.2,1)}
+  .order-process .order-steps.is-anim .order-step{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .order-process .order-steps.is-anim.is-in::before{transform:scaleX(1)}
+  .order-process .order-steps.is-anim.is-in .order-step{opacity:1;transform:none}
+  .order-process .order-steps.is-anim.is-in .order-step:nth-child(2){transition-delay:.15s}
+  .order-process .order-steps.is-anim.is-in .order-step:nth-child(3){transition-delay:.3s}
+  .order-process .order-steps.is-anim.is-in .order-step:nth-child(4){transition-delay:.45s}
+}
+@media (max-width:760px){
+  .order-process .order-steps{grid-template-columns:1fr!important;gap:18px;padding:22px 18px;border-radius:22px}
+  .order-process .order-steps::before{left:calc(18px + 23px);right:auto;top:46px;bottom:46px;width:1px;height:auto;background:linear-gradient(180deg,#8a4e0e,#c8894a);transform-origin:center top}
+  .order-process .order-steps.is-anim::before{transform:scaleY(0)}
+  .order-process .order-steps.is-anim.is-in::before{transform:scaleY(1)}
+  .order-process .order-step{grid-template-columns:48px minmax(0,1fr);justify-items:start;column-gap:14px;text-align:left}
+  .order-process .order-ico{grid-row:1/span 3;width:48px;height:48px;box-shadow:0 0 0 5px #f4f3f1,0 8px 18px -8px rgba(20,17,15,.45)}
+  .order-process .order-ico svg{width:21px;height:21px}
+  .order-process .order-step > span{margin:2px 0 0!important;font-size:11px!important}
+  .order-process .order-step h3{margin:2px 0 4px!important;font-size:1.12rem!important}
+  .order-process .order-step p{max-width:none;font-size:13.5px!important;line-height:1.5}
+}
+
+/* v3.3.94b · WhatsApp ve asistan kapatma butonları: oval değil 44px tam daire */
+.wa-panel-close,.bg-assistant-close,body.bg-assistant-keyboard .bg-assistant-close{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
+  flex:0 0 44px!important;padding:0!important;aspect-ratio:1/1;border-radius:50%!important;display:grid!important;place-items:center!important;line-height:1!important}

@@ -1709,7 +1709,8 @@ if (floatingWhatsApp) {
     ['Kişiye özel üretim', 'Merhaba BG Studio 3D, kişiye özel 3D baskı üretim için teklif almak istiyorum.'],
     ['Toplu / kurumsal', 'Merhaba BG Studio 3D, işletmem için toplu veya kurumsal üretim hakkında görüşmek istiyorum.'],
     ['Prototip / parça', 'Merhaba BG Studio 3D, prototip veya yedek parça üretimi için görüşmek istiyorum. Parçanın fotoğrafını ve yaklaşık ölçülerini paylaşacağım.'],
-    ['NFC & QR', 'Merhaba BG Studio 3D, NFC & QR sistemleri hakkında bilgi almak istiyorum.']
+    ['NFC & QR', 'Merhaba BG Studio 3D, NFC & QR sistemleri hakkında bilgi almak istiyorum.'],
+    ['Mimari maket', 'Merhaba BG Studio 3D, mimari maket 3D baskı için teklif almak istiyorum. Proje dosyalarını ve istediğim ölçeği paylaşacağım.']
   ];
 
   const panel = document.createElement('aside');
@@ -2883,14 +2884,35 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
     if (hud) hud.textContent = `0${i + 1} / 0${N}`;
   };
   const isLive = () => pinMq.matches && !reduce;
+  /* v3.3.93 — telefon/tablet: hat + sahne + aktif adım başlığın altında kilitlenir,
+     aşağı kaydırdıkça adımlar sırayla ilerler, yukarı çıkarken geri döner */
+  const mliveMq = window.matchMedia('(max-width: 860px)');
+  const sticky = sec.querySelector('.pline-sticky');
+  const spacer = sec.querySelector('.pline-spacer');
+  const isMLive = () => !isLive() && mliveMq.matches && !reduce && !!sticky && !!spacer;
+  let stickTop = 0;
   const setFill = (f) => { if (fill) fill.style.transform = `scaleX(${Math.min(1, Math.max(0, f)).toFixed(3)})`; };
   const headerTop = () => {
     const h = document.querySelector('.site-header');
-    sec.style.setProperty('--pline-top', `${Math.round((h ? Math.max(0, h.getBoundingClientRect().bottom) : 0) + 16)}px`);
+    const b = h ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+    stickTop = Math.round(b + (isMLive() ? 8 : 16));
+    sec.style.setProperty('--pline-top', `${stickTop}px`);
+  };
+  const mProgress = () => {
+    const sp = spacer.getBoundingClientRect();
+    const naturalTop = sp.top - sticky.offsetHeight;
+    return Math.min(1, Math.max(0, (stickTop - naturalTop) / Math.max(1, sp.height)));
   };
   let raf = 0;
   const onScroll = () => {
     raf = 0;
+    if (isMLive()) {
+      headerTop();
+      const p = mProgress();
+      set(Math.min(N - 1, Math.floor(p * N)));
+      setFill(p);
+      return;
+    }
     if (!isLive()) return;
     headerTop();
     const r = sec.getBoundingClientRect();
@@ -2909,13 +2931,19 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   };
   const apply = () => {
     sec.classList.toggle('is-live', isLive());
-    sec.classList.toggle('is-strip', stripMq.matches);
+    sec.classList.toggle('is-mlive', isMLive());
+    sec.classList.toggle('is-strip', stripMq.matches && !isMLive());
     headerTop();
-    if (isLive()) onScroll(); else { if (cur < 0) set(0); setFill(cur / (N - 1)); onStrip(); }
+    if (isLive() || isMLive()) onScroll(); else { if (cur < 0) set(0); setFill(cur / (N - 1)); onStrip(); }
   };
   btns.forEach((b) => b.addEventListener('click', () => {
     const i = Number(b.dataset.plineGo) || 0;
-    if (isLive()) {
+    if (isMLive()) {
+      const sp = spacer.getBoundingClientRect();
+      const p = (i + 0.5) / N;
+      const target = window.scrollY + sp.top - (stickTop + sticky.offsetHeight - p * sp.height);
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    } else if (isLive()) {
       const top = sec.getBoundingClientRect().top + window.scrollY;
       const total = sec.offsetHeight - window.innerHeight;
       window.scrollTo({ top: top + total * ((i + 0.5) / N), behavior: reduce ? 'auto' : 'smooth' });
@@ -2929,5 +2957,16 @@ displayAmpObserver.observe(document.body,{subtree:true,childList:true,characterD
   window.addEventListener('resize', apply, { passive: true });
   pinMq.addEventListener?.('change', apply);
   stripMq.addEventListener?.('change', apply);
+  mliveMq.addEventListener?.('change', apply);
   apply();
+})();
+
+/* v3.3.94 — Sipariş süreci: görünür olunca hat çizilir, adımlar sırayla belirir */
+(() => {
+  const el = document.querySelector('[data-order-steps]');
+  if (!el || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (el.getBoundingClientRect().top < window.innerHeight * 0.85) return;
+  el.classList.add('is-anim');
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add('is-in'); io.disconnect(); } }), { threshold: 0.25 });
+  io.observe(el);
 })();
