@@ -6319,3 +6319,25 @@ html{font-variant-numeric:lining-nums}
   .legal-list-v3396 li{font-size:14px}
 }
 @media (max-width:760px){.content-v3396 .capability-grid .cap-card h3{font-size:17px!important;line-height:1.15!important;margin:8px 0 6px!important}.content-v3396 .capability-grid .cap-card p{font-size:12.5px!important;line-height:1.5!important}}
+
+/* v3.3.97 · Ürün sayfası müşteri yorumları (gerçek mesajlar, izinli) */
+.product-reviews-v3397{padding:24px 0 72px}
+.product-reviews-v3397 .section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.review-summary-v3397{display:flex;align-items:center;gap:10px;margin:0;font-size:14px;color:#5f5750}
+.review-summary-v3397 strong{font-family:"Playfair Display",Georgia,serif;font-size:2.2rem;font-weight:500;color:#14110f;line-height:1}
+.review-stars-v3397{color:#8a4e0e;letter-spacing:2px;font-size:15px}
+.review-grid-v3397{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:24px}
+.review-card-v3397{margin:0;background:#fff;border:1px solid #e4e1dc;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.review-card-v3397 blockquote{margin:0}
+.review-card-v3397 blockquote p{margin:0;font-size:1rem;line-height:1.65;color:#14110f}
+.review-card-v3397 figcaption{margin-top:auto;display:flex;flex-direction:column;gap:2px}
+.review-card-v3397 figcaption strong{font-size:.95rem}
+.review-card-v3397 figcaption span{font-size:13px;color:#5f5750}
+.review-note-v3397{margin:16px 0 0;font-size:13px;color:#5f5750}
+@media (max-width:760px){
+  .product-reviews-v3397{padding:8px 0 48px}
+  .review-summary-v3397 strong{font-size:1.7rem}
+  .review-grid-v3397{grid-template-columns:1fr;gap:10px;margin-top:16px}
+  .review-card-v3397{padding:16px;border-radius:16px;gap:10px}
+  .review-card-v3397 blockquote p{font-size:14.5px}
+}

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BG Studio 3D | Müşteri Yorumları</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--paper:#fff;--stone:#f4f3f1;--stone-2:#eceae6;--line:#dcd8d2;--ink:#14110f;--soft:#5f5750;--bronze:#8a4e0e;--bronze-d:#c8894a;--good:#2e7557;--bad:#a54236}
+*{box-sizing:border-box}
+body{margin:0;background:var(--stone);color:var(--ink);font:15px/1.5 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 28px;flex-wrap:wrap}
+.top b{display:block;font-size:15px}.top small{display:block;color:var(--line);font-size:12px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.top-actions a,.top-actions button{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;text-decoration:none;font-size:13px;font-weight:600;cursor:pointer}
+.wrap{width:min(100% - 48px,1320px);margin:36px auto 80px}
+.intro p.eyebrow{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--bronze)}
+.intro h1{font:500 clamp(34px,4vw,52px)/1 "Playfair Display",Georgia,serif;margin:0 0 12px}
+.intro>p{max-width:760px;color:var(--soft);margin:0}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 28px}
+.rules div{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.rules strong{display:block;margin-bottom:4px}.rules span{color:var(--soft);font-size:14px}
+.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;align-items:start}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:24px}
+.card h2{font:500 24px/1.1 "Playfair Display",Georgia,serif;margin:0 0 18px}
+.form{position:sticky;top:96px}
+label.field,.field{display:grid;gap:6px;margin-bottom:14px;font-size:13px;font-weight:600}
+.field small{font-weight:400;color:var(--soft);font-size:12.5px}
+input[type=text],input[type=date],select,textarea{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:11px 12px;outline:none}
+textarea{min-height:140px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--bronze);box-shadow:0 0 0 3px rgba(138,78,14,.12)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stars{display:flex;flex-wrap:wrap;gap:6px}
+.stars button{min-height:40px;min-width:44px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-weight:600}
+.stars button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.check{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;font-size:14px;cursor:pointer}
+.check input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--bronze);flex:0 0 auto}
+.check.must{border-color:rgba(138,78,14,.35);background:var(--stone)}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{min-height:46px;padding:0 20px;border-radius:999px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-weight:700}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff;flex:1}
+.list-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.list-head h2{margin:0}
+.list-head input{max-width:280px}
+.items{display:grid;gap:10px}
+.item{border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:8px}
+.item header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.item .product{font-size:13px;color:var(--bronze);font-weight:700}
+.item p{margin:0;color:var(--soft);font-size:14px;white-space:pre-line}
+.item .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.pill{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;background:var(--stone-2);font-weight:600}
+.pill.live{background:#e3f2eb;color:var(--good)}.pill.off{background:#fae5e1;color:var(--bad)}
+.stars-txt{color:var(--bronze);letter-spacing:1px}
+.item .row{display:flex;gap:8px}
+.item .row button{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-weight:600;font-size:13px}
+.empty{padding:28px;text-align:center;color:var(--soft);border:1px dashed var(--line);border-radius:16px}
+.toast{position:fixed;right:24px;bottom:24px;z-index:50;background:var(--ink);color:#fff;padding:14px 18px;border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.24);max-width:420px}
+.toast.error{background:#7e2d29}
+@media (max-width:980px){.grid{grid-template-columns:1fr}.form{position:static}.rules{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .top{padding:12px 14px}.wrap{width:calc(100% - 24px);margin-top:22px}
+  .card{padding:16px;border-radius:18px}.two{gap:8px}
+  .rules{gap:8px}.rules div{padding:12px 14px}
+  .list-head input{max-width:none}
+  .toast{left:12px;right:12px;bottom:12px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div><b>BG Studio 3D</b><small>Müşteri yorumları</small></div><div class="top-actions"><button type="button" id="back">← Ürün yöneticisi</button><a href="https://3d.bgstudio.com.tr/urunler/" target="_blank" rel="noopener">Canlı ürünler ↗</a></div></header>
+<main class="wrap">
+  <section class="intro"><p class="eyebrow">ÜRÜN SAYFALARI</p><h1>Müşteri yorumları</h1>
+    <p>Müşterinin sana gönderdiği memnuniyet mesajını ilgili ürüne ekle. Kaydettiğinde yorum ürün sayfasındaki “Müşterilerimiz ne dedi?” bölümünde görünür.</p></section>
+  <section class="rules" aria-label="Kurallar">
+    <div><strong>Yalnızca gerçek mesaj</strong><span>Müşterinin kendi yazdığı mesajı gir; yazım hatası düzeltilebilir, anlamı değiştirilmez.</span></div>
+    <div><strong>Yayın izni şart</strong><span>Müşteri mesajının sitede paylaşılmasını onaylamadıysa kayıt yapılmaz.</span></div>
+    <div><strong>Puanı müşteri verir</strong><span>Müşteri puan vermediyse “Puan yok” kalsın. Google yıldızları yalnızca müşterinin verdiği puanlardan oluşur.</span></div>
+  </section>
+  <div class="grid">
+    <form class="card form" id="form" autocomplete="off">
+      <h2 id="formTitle">Yeni yorum</h2>
+      <input type="hidden" id="rid">
+      <label class="field">Ürün<select id="product"></select></label>
+      <div class="two">
+        <label class="field">Sitede görünecek isim<input type="text" id="author" maxlength="60" placeholder="Ayşe K."></label>
+        <label class="field">Mesaj tarihi<input type="date" id="date"></label>
+      </div>
+      <label class="field">Müşterinin mesajı<textarea id="text" maxlength="1200" placeholder="Müşterinin yazdığı memnuniyet mesajı"></textarea><small>Yazım hatalarını düzeltebilirsin; anlamı değiştirme.</small></label>
+      <label class="field">Mesaj nereden geldi?<select id="source"></select></label>
+      <div class="field"><span>Müşterinin verdiği puan</span>
+        <div class="stars" id="stars" role="group" aria-label="Puan"></div>
+        <small>Müşteri “5 yıldız” gibi bir puan vermediyse “Puan yok” seçili kalsın.</small></div>
+      <label class="check must"><input type="checkbox" id="consent"><span><b>Müşteri yayın izni verdi.</b> Mesajının sitede paylaşılmasını onayladı.</span></label>
+      <label class="check"><input type="checkbox" id="active" checked><span>Sitede göster</span></label>
+      <div class="actions"><button class="btn primary" type="submit" id="save">Yorumu kaydet ve siteyi güncelle</button><button class="btn" type="button" id="reset">Temizle</button></div>
+    </form>
+    <section class="card">
+      <div class="list-head"><h2>Kayıtlı yorumlar <span id="count"></span></h2><input type="text" id="filter" placeholder="Ürün veya isimde ara"></div>
+      <div class="items" id="items"></div>
+    </section>
+  </div>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const state = { items: [], products: [], sources: {}, rating: 0, busy: false };
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+  let toastTimer;
+  function toast(msg, error) {
+    const t = $('toast'); t.textContent = msg; t.className = 'toast' + (error ? ' error' : ''); t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 4200);
+  }
+  function renderStars() {
+    $('stars').innerHTML = [0, 1, 2, 3, 4, 5].map((n) => `<button type="button" data-rate="${n}" aria-pressed="${state.rating === n}">${n ? '★'.repeat(n) : 'Puan yok'}</button>`).join('');
+  }
+  function productName(slug) { const p = state.products.find((x) => x.slug === slug); return p ? p.name : slug; }
+  function renderList() {
+    const q = $('filter').value.trim().toLocaleLowerCase('tr-TR');
+    const rows = state.items.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))
+      .filter((r) => !q || (productName(r.product_slug) + ' ' + r.author + ' ' + r.text).toLocaleLowerCase('tr-TR').includes(q));
+    $('count').textContent = state.items.length ? `(${state.items.length})` : '';
+    if (!rows.length) { $('items').innerHTML = `<div class="empty">${state.items.length ? 'Aramaya uyan yorum yok.' : 'Henüz yorum yok. İlk müşteri mesajını formdan ekle.'}</div>`; return; }
+    $('items').innerHTML = rows.map((r) => `<article class="item">
+      <header><span class="product">${esc(productName(r.product_slug))}</span><span class="stars-txt">${r.rating ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : ''}</span></header>
+      <p>${esc(r.text)}</p>
+      <div class="meta"><strong>${esc(r.author)}</strong><span class="pill">${esc(state.sources[r.source] || 'Müşteri mesajı')}</span><span class="pill">${esc(r.date)}</span><span class="pill ${r.active && r.consent ? 'live' : 'off'}">${r.active && r.consent ? 'Sitede' : 'Gizli'}</span>${r.rating ? '' : '<span class="pill">Puan yok</span>'}</div>
+      <div class="row"><button type="button" data-edit="${esc(r.id)}">Düzenle</button><button type="button" data-del="${esc(r.id)}">Sil</button></div></article>`).join('');
+  }
+  function fill(r) {
+    $('rid').value = r ? r.id : '';
+    $('product').value = r ? r.product_slug : '';
+    $('author').value = r ? r.author : '';
+    $('date').value = r ? r.date : today();
+    $('text').value = r ? r.text : '';
+    $('source').value = r ? r.source : 'whatsapp';
+    $('consent').checked = r ? !!r.consent : false;
+    $('active').checked = r ? !!r.active : true;
+    state.rating = r ? Number(r.rating || 0) : 0;
+    $('formTitle').textContent = r ? 'Yorumu düzenle' : 'Yeni yorum';
+    renderStars();
+  }
+  async function load() {
+    const res = await fetch('/api/reviews', { cache: 'no-store' });
+    const data = await res.json();
+    state.items = data.items || []; state.products = data.products || []; state.sources = data.sources || {};
+    $('product').innerHTML = '<option value="">Ürün seç</option>' + state.products.slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'tr')).map((p) => `<option value="${esc(p.slug)}">${esc(p.name)}${p.active ? '' : ' (arşivde)'}</option>`).join('');
+    $('source').innerHTML = Object.entries(state.sources).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
+    fill(null); renderList();
+  }
+  async function post(url, body) {
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({ ok: false, error: 'Sunucudan yanıt alınamadı.' }));
+    if (!res.ok || !data.ok) throw new Error(data.error || 'İşlem yapılamadı.');
+    return data;
+  }
+  $('stars').addEventListener('click', (e) => { const b = e.target.closest('[data-rate]'); if (!b) return; state.rating = Number(b.dataset.rate); renderStars(); });
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (state.busy) return;
+    if (!$('consent').checked) { toast('Müşterinin yayın izni olmadan yorum kaydedilemez. İzin kutusunu işaretle.', true); return; }
+    state.busy = true; $('save').disabled = true; $('save').textContent = 'Kaydediliyor, site güncelleniyor…';
+    try {
+      const data = await post('/api/reviews/save', { item: { id: $('rid').value, product_slug: $('product').value, author: $('author').value, date: $('date').value, text: $('text').value, source: $('source').value, rating: state.rating, consent: $('consent').checked, active: $('active').checked } });
+      state.items = data.items || []; fill(null); renderList(); toast(data.message);
+    } catch (err) { toast(err.message, true); }
+    finally { state.busy = false; $('save').disabled = false; $('save').textContent = 'Yorumu kaydet ve siteyi güncelle'; }
+  });
+  $('reset').addEventListener('click', () => fill(null));
+  $('filter').addEventListener('input', renderList);
+  $('back').addEventListener('click', () => { location.href = 'index.html'; });
+  $('items').addEventListener('click', async (e) => {
+    const ed = e.target.closest('[data-edit]');
+    if (ed) { fill(state.items.find((r) => r.id === ed.dataset.edit)); $('form').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    const del = e.target.closest('[data-del]');
+    if (!del || state.busy) return;
+    const r = state.items.find((x) => x.id === del.dataset.del);
+    if (!r || !confirm(`${r.author} adlı müşterinin yorumu silinsin mi? Ürün sayfasından da kalkar.`)) return;
+    state.busy = true;
+    try { const data = await post('/api/reviews/delete', { id: r.id }); state.items = data.items || []; renderList(); toast(data.message); }
+    catch (err) { toast(err.message, true); }
+    finally { state.busy = false; }
+  });
+  load().catch(() => toast('Yorumlar yüklenemedi. Paneli yeniden başlat.', true));
+})();
+</script>
+</body>
+</html>

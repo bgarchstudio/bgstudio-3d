@@ -11,6 +11,7 @@
     const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
     if (file === 'nfc-settings.html') return 'nfc';
     if (file === 'content.html') return 'content';
+    if (file === 'reviews.html') return 'reviews';
     return 'manager';
   }
 

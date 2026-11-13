@@ -2198,6 +2198,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json({'ok': True, 'backups': list_backups()})
         if u.path == '/api/preflight':
             return self.send_json(preflight())
+        if u.path == '/api/reviews':
+            import reviews_v3397 as R3397
+            products = [{'slug': p.get('slug'), 'name': p.get('name'), 'active': p.get('active', True)} for p in read_products()]
+            return self.send_json({'ok': True, 'items': get_collection('reviews', []), 'products': products, 'sources': R3397.SOURCES})
         if u.path == '/api/projects-admin':
             return self.send_json({'ok': True, 'items': project_admin_items(), 'root': str(ROOT), 'storage': storage_status()})
         if u.path == '/api/site-content-v3175':
@@ -2583,6 +2587,31 @@ class Handler(BaseHTTPRequestHandler):
                 content = module.write_site_content_v3175(payload.get('content') or {})
                 result = module.build_site()
                 return self.send_json({'ok': True, 'message': 'Site içerikleri kaydedildi ve site yeniden oluşturuldu.', 'content': content, 'result': result})
+
+            if self.path in ('/api/reviews/save', '/api/reviews/delete'):
+                import reviews_v3397 as R3397
+                payload = self.read_json()
+                items = [r for r in get_collection('reviews', []) if isinstance(r, dict)]
+                if self.path.endswith('/save'):
+                    try:
+                        item = R3397.normalize(payload.get('item') or {})
+                    except ValueError as exc:
+                        return self.send_json({'ok': False, 'error': str(exc)}, 400)
+                    if not item['consent']:
+                        return self.send_json({'ok': False, 'error': 'Müşterinin yayın izni olmadan yorum sitede gösterilemez. İzin kutusunu işaretle.'}, 400)
+                    full_backup('before-review-save')
+                    items = [r for r in items if r.get('id') != item['id']] + [item]
+                    message = 'Yorum kaydedildi ve ürün sayfası güncellendi.'
+                else:
+                    rid = str(payload.get('id') or '')
+                    if not any(r.get('id') == rid for r in items):
+                        return self.send_json({'ok': False, 'error': 'Yorum bulunamadı.'}, 404)
+                    full_backup('before-review-delete')
+                    items = [r for r in items if r.get('id') != rid]
+                    message = 'Yorum silindi ve ürün sayfası güncellendi.'
+                set_collection('reviews', items)
+                result = build_site()
+                return self.send_json({'ok': True, 'message': message, 'items': items, 'result': result})
 
             if self.path == '/api/projects-admin/save':
                 payload = self.read_json()

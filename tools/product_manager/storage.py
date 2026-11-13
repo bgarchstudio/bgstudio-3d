@@ -31,6 +31,7 @@ COLLECTIONS = {
     'corporate': ROOT / 'data' / 'corporate_references.json',
     'prototype': ROOT / 'data' / 'prototypes.json',
     'site_settings': ROOT / 'data' / 'site_settings.json',
+    'reviews': ROOT / 'data' / 'reviews.json',  # v3.3.97 müşteri yorumları
 }
 
 MUTABLE_MEDIA_PREFIXES = (
