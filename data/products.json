@@ -944,30 +944,12 @@
     "poster_image_height": null
   },
   {
-    "card_description": "Hareketli gövde yapısına sahip sevimli flexi köpekbalığı anahtarlık. Anahtar, çanta ve sırt çantaları için renkli 3D baskı aksesuar.",
-    "material_ids": [
-      "pla"
-    ],
-    "color_ids": [
-      "sakura-pink",
-      "pastel-cloud-blue",
-      "lavender"
-    ],
-    "price_value": "99",
-    "seo_description": "Eklemli gövdesiyle kıvrılan sevimli flexi köpekbalığı anahtarlık. Metal halkalı, renkli 3D baskı; anahtar ve çantalar için eğlenceli hediye.",
-    "active": true,
     "description": "Eklemli gövdesi sayesinde hareket eden Flexi Köpekbalığı Anahtarlık, sevimli tasarımını 3D baskı hareketli yapıyla birleştirir. Gövde parçaları birbirine bağlı şekilde hareket eder ve metal anahtarlık halkasıyla anahtar, çanta veya sırt çantasına takılır. Tekli veya avantajlı set seçenekleriyle sipariş verilebilir.",
-    "tags": [
-      "Anahtarlık",
-      "Flexi",
-      "Hediye",
-      "Köpekbalığı",
-      "Hareketli",
-      "Eklemli",
-      "3D Baskı Anahtarlık",
-      "Çanta Aksesuarı"
-    ],
-    "options": [],
+    "featured": false,
+    "slug": "flexi-kopekbaligi-anahtarlik",
+    "usage_info": "",
+    "estimated_production_time": "",
+    "og_image_source": "main",
     "features": [
       "Hareketli flexi gövde",
       "Eklemli köpekbalığı tasarımı",
@@ -977,13 +959,18 @@
       "Tekli ve set seçenekleri",
       "Hafif yapı"
     ],
-    "slug": "flexi-kopekbaligi-anahtarlik",
-    "price_text": "99 TL",
+    "production_time": "",
+    "print_method": "",
+    "dimensions": "",
+    "sort_order": 20,
+    "price_value": "149",
+    "production_status": "",
+    "weight": "",
     "pricing_tiers": [
       {
         "label": "2’li alım",
         "quantity": 2,
-        "price_value": "179",
+        "price_value": "199",
         "note": "Avantajlı Fiyat"
       },
       {
@@ -999,21 +986,42 @@
         "note": "Avantajlı Fiyat"
       }
     ],
-    "sale_price_value": null,
-    "featured": false,
     "category": "anahtarlik-aksesuar",
-    "production_note": "Ürün hareketli eklemlere sahip tek parça flexi 3D baskı yöntemiyle üretilir. Metal anahtarlık halkası ürüne takılı olarak gönderilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
+    "card_description": "Hareketli gövde yapısına sahip sevimli flexi köpekbalığı anahtarlık. Anahtar, çanta ve sırt çantaları için renkli 3D baskı aksesuar.",
+    "active": true,
+    "color_ids": [
+      "sakura-pink",
+      "pastel-cloud-blue",
+      "lavender"
+    ],
+    "technical_info": "",
+    "seo_description": "Eklemli gövdesiyle kıvrılan sevimli flexi köpekbalığı anahtarlık. Metal halkalı, renkli 3D baskı; anahtar ve çantalar için eğlenceli hediye.",
+    "material_ids": [
+      "pla"
+    ],
     "name": "Flexi Köpekbalığı Anahtarlık",
-    "sort_order": 20,
+    "sale_price_value": null,
+    "tags": [
+      "Anahtarlık",
+      "Flexi",
+      "Hediye",
+      "Köpekbalığı",
+      "Hareketli",
+      "Eklemli",
+      "3D Baskı Anahtarlık",
+      "Çanta Aksesuarı"
+    ],
+    "personalization_info": "",
+    "options": [],
+    "price_text": "149 TL",
     "seo_title": "Flexi Köpekbalığı Anahtarlık – Hareketli | BG Studio 3D",
+    "box_contents": "",
     "personalizable": false,
+    "production_note": "Ürün hareketli eklemlere sahip tek parça flexi 3D baskı yöntemiyle üretilir. Metal anahtarlık halkası ürüne takılı olarak gönderilir. 3D baskı yüzeylerinde ince katman izleri görülebilir.",
     "gallery_images": [],
     "main_image": "assets/images/products/flexi-kopekbaligi-anahtarlik.webp",
     "main_image_width": 1000,
-    "main_image_height": 760,
-    "poster_image": null,
-    "poster_image_width": null,
-    "poster_image_height": null
+    "main_image_height": 760
   },
   {
     "card_description": "Telefonu dik konumda sabit tutan, boşluklu organik yüzeye sahip 3D baskı masaüstü telefon standı.",
