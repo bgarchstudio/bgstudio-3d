@@ -5,9 +5,9 @@
     "direction": "rtl",
     "separator": "✦",
     "colors": {
-      "bg": "#9f657e",
+      "bg": "#14110f",
       "fg": "#ffffff",
-      "accent": "#f4f3f1"
+      "accent": "#c8894a"
     },
     "messages": [
       {
