@@ -144,7 +144,7 @@ def _panel_ui_version_text(text, filename):
 
 
 
-ADMIN_UNIFIED_REVISION = '3.3.96-theme'
+ADMIN_UNIFIED_REVISION = '3.3.98-ui'
 
 def _inject_admin_unified_assets(text):
     """Attach the additive V3.1.82 admin UI layer to every Product Manager HTML page.

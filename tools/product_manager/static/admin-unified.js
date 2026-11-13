@@ -212,3 +212,28 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
   else boot();
 })();
+
+/* v3.3.98 — Okunabilirlik: paneldeki 11px altı yazılar 11px'e, 32px altı butonlar 32px'e çıkar (site kuralı). */
+(() => {
+  'use strict';
+  const MIN_FONT = 11;
+  const MIN_TAP = 32;
+  let timer = 0;
+  const fix = () => {
+    timer = 0;
+    for (const el of document.body.querySelectorAll('*')) {
+      if (el.closest('svg') || el.dataset.bgMinFixed === '1') continue;
+      const cs = getComputedStyle(el);
+      const size = parseFloat(cs.fontSize);
+      const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+      if (hasText && size > 0 && size < MIN_FONT) el.style.setProperty('font-size', MIN_FONT + 'px', 'important');
+      if (el.tagName === 'BUTTON' && el.getClientRects().length) {
+        const h = el.getBoundingClientRect().height;
+        if (h > 0 && h < MIN_TAP) el.style.setProperty('min-height', MIN_TAP + 'px', 'important');
+      }
+    }
+  };
+  const schedule = () => { if (!timer) timer = setTimeout(fix, 150); };
+  const start = () => { fix(); new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true }); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
