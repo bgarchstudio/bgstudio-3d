@@ -1,0 +1,18 @@
+/* v3.3.96 · Ürün Yöneticisi site temasında: beyaz / taş / espresso / bronz, Playfair Display + DM Sans.
+   Renkler panelin kendi CSS dosyalarında haritalandı; bu dosya yalnızca fontları yükler. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@400;500;600&display=swap");
+html body{font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+html body :is(input,select,textarea,button){font-family:inherit}
+/* Üst bar: DM Sans biraz daha geniş; butonlar tek satırda kalsın */
+@media (min-width:901px){
+  body[data-bg-admin-page="manager"] .top-actions{gap:5px!important}
+  body[data-bg-admin-page="manager"] .top-actions>button,
+  body[data-bg-admin-page="manager"] .top-actions>a,
+  body[data-bg-admin-page="manager"] .bg-v3181-toolbar-shortcut{padding:0 10px!important;font-size:10.5px!important;letter-spacing:0!important}
+}
+@media (min-width:1400px){body[data-bg-admin-page="manager"] .top-actions{flex-wrap:nowrap!important}}
+/* Telefonda içerik ve NFC sayfalarının üst barı ekrana sığsın */
+@media (max-width:760px){
+  body[data-bg-admin-page]:not([data-bg-admin-page="manager"]) .top{flex-wrap:wrap!important;height:auto!important;min-height:64px;row-gap:8px;padding-top:10px!important;padding-bottom:10px!important}
+  body[data-bg-admin-page]:not([data-bg-admin-page="manager"]) .top-actions{flex-wrap:wrap!important;width:100%;gap:6px!important}
+}

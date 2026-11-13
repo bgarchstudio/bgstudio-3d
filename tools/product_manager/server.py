@@ -144,7 +144,7 @@ def _panel_ui_version_text(text, filename):
 
 
 
-ADMIN_UNIFIED_REVISION = '3.1.82-R1'
+ADMIN_UNIFIED_REVISION = '3.3.96-theme'
 
 def _inject_admin_unified_assets(text):
     """Attach the additive V3.1.82 admin UI layer to every Product Manager HTML page.
@@ -156,7 +156,7 @@ def _inject_admin_unified_assets(text):
     """
     value = str(text or '')
     rev = str(ADMIN_UNIFIED_REVISION)
-    css_tag = f'<link rel="stylesheet" href="admin-unified.css?v={rev}">'
+    css_tag = f'<link rel="stylesheet" href="admin-unified.css?v={rev}"><link rel="stylesheet" href="admin-theme.css?v={rev}">'
     js_tag = f'<script defer src="admin-unified.js?v={rev}"></script>'
     if 'admin-unified.css' not in value:
         value = value.replace('</head>', css_tag + '</head>', 1)

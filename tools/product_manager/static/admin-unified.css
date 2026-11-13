@@ -2,18 +2,18 @@
    Unified admin experience. Additive visual layer only. */
 
 html[data-bg-admin-ui="v3182"]{
-  --au-bg:#f5f1eb;
-  --au-bg-2:#eee5da;
-  --au-card:#fffdf9;
+  --au-bg:#f4f3f1;
+  --au-bg-2:#eceae6;
+  --au-card:#ffffff;
   --au-card-strong:#ffffff;
-  --au-ink:#251c16;
-  --au-muted:#78695d;
-  --au-line:#ded3c7;
-  --au-line-soft:#e9e1d8;
-  --au-dark:#17130f;
-  --au-dark-2:#241c17;
-  --au-accent:#a76622;
-  --au-accent-soft:#f4e8d8;
+  --au-ink:#14110f;
+  --au-muted:#5f5750;
+  --au-line:#dcd8d2;
+  --au-line-soft:#eceae6;
+  --au-dark:#14110f;
+  --au-dark-2:#14110f;
+  --au-accent:#8a4e0e;
+  --au-accent-soft:#eceae6;
   --au-good:#2e7557;
   --au-good-soft:#e3f2eb;
   --au-warn:#9d6b18;
@@ -23,9 +23,9 @@ html[data-bg-admin-ui="v3182"]{
   --au-radius-sm:10px;
   --au-radius:16px;
   --au-radius-lg:22px;
-  --au-shadow:0 18px 50px rgba(55,39,27,.08);
-  --au-shadow-soft:0 10px 30px rgba(55,39,27,.055);
-  --au-focus:0 0 0 3px rgba(167,102,34,.10);
+  --au-shadow:0 18px 50px rgba(29,25,22,.08);
+  --au-shadow-soft:0 10px 30px rgba(29,25,22,.055);
+  --au-focus:0 0 0 3px rgba(138,78,14,.10);
   background:var(--au-bg);
 }
 
@@ -51,7 +51,7 @@ html[data-bg-admin-ui="v3182"] input:focus,
 html[data-bg-admin-ui="v3182"] select:focus,
 html[data-bg-admin-ui="v3182"] textarea:focus{
   outline:none!important;
-  border-color:#b78049!important;
+  border-color:#8a4e0e!important;
   box-shadow:var(--au-focus)!important;
 }
 
@@ -67,9 +67,9 @@ body[data-bg-admin-page="manager"] .top{
   min-height:68px!important;
   padding:10px 22px!important;
   gap:18px!important;
-  background:rgba(20,17,14,.985)!important;
+  background:rgba(20,17,15,.985)!important;
   border-bottom:1px solid rgba(255,255,255,.08)!important;
-  box-shadow:0 8px 28px rgba(17,13,10,.10)!important;
+  box-shadow:0 8px 28px rgba(20,17,15,.10)!important;
 }
 body[data-bg-admin-page="manager"] .brand-lockup{
   flex:0 0 auto!important;
@@ -83,7 +83,7 @@ body[data-bg-admin-page="manager"] .brand-copy small{
   opacity:.74;
 }
 body[data-bg-admin-page="manager"] .brand-copy em{
-  color:#c99558!important;
+  color:#c8894a!important;
 }
 body[data-bg-admin-page="manager"] .top-actions{
   flex:1 1 auto!important;
@@ -126,7 +126,7 @@ body[data-bg-admin-page="manager"] .sidebar{
   position:sticky!important;
   top:68px!important;
   padding:18px 14px 26px!important;
-  background:#f4ede5!important;
+  background:#f4f3f1!important;
   border-right:1px solid var(--au-line)!important;
   overflow:auto!important;
   scrollbar-gutter:stable;
@@ -138,7 +138,7 @@ body[data-bg-admin-page="manager"] .stats{
 body[data-bg-admin-page="manager"] .stats>div{
   min-height:72px!important;
   padding:10px 6px!important;
-  background:#fffaf4!important;
+  background:#ffffff!important;
   border:1px solid var(--au-line-soft)!important;
   border-radius:16px!important;
   box-shadow:none!important;
@@ -156,7 +156,7 @@ body[data-bg-admin-page="manager"] #newProduct{
   min-height:44px!important;
   border-radius:14px!important;
   margin-bottom:20px!important;
-  box-shadow:0 10px 22px rgba(29,22,17,.10)!important;
+  box-shadow:0 10px 22px rgba(20,17,15,.10)!important;
 }
 body[data-bg-admin-page="manager"] .search{
   gap:7px!important;
@@ -164,12 +164,12 @@ body[data-bg-admin-page="manager"] .search{
 }
 body[data-bg-admin-page="manager"] .search>span{
   font-size:10px!important;
-  color:#66564a!important;
+  color:#5f5750!important;
 }
 body[data-bg-admin-page="manager"] .search input{
   min-height:42px!important;
   border-radius:12px!important;
-  background:#fffdf9!important;
+  background:#ffffff!important;
   border-color:var(--au-line)!important;
   padding:0 12px!important;
 }
@@ -188,7 +188,7 @@ body[data-bg-admin-page="manager"] .list-filters button{
 body[data-bg-admin-page="manager"] .drag-note{
   margin:10px 2px!important;
   font-size:9px!important;
-  color:#8b7a6d!important;
+  color:#5f5750!important;
 }
 body[data-bg-admin-page="manager"] .product-list{
   display:grid!important;
@@ -207,9 +207,9 @@ body[data-bg-admin-page="manager"] .product-item:hover{
   border-color:var(--au-line-soft)!important;
 }
 body[data-bg-admin-page="manager"] .product-item.active{
-  background:#fffdf9!important;
-  border-color:#d8c7b7!important;
-  box-shadow:0 8px 22px rgba(65,45,30,.06)!important;
+  background:#ffffff!important;
+  border-color:#dcd8d2!important;
+  box-shadow:0 8px 22px rgba(95,87,80,.06)!important;
 }
 body[data-bg-admin-page="manager"] .product-main{
   min-width:0!important;
@@ -233,12 +233,12 @@ body[data-bg-admin-page="manager"] .product-main small{
   text-overflow:ellipsis!important;
 }
 body[data-bg-admin-page="manager"] .product-main strong{font-size:11px!important}
-body[data-bg-admin-page="manager"] .product-main small{font-size:8.5px!important;color:#837266!important}
+body[data-bg-admin-page="manager"] .product-main small{font-size:8.5px!important;color:#5f5750!important}
 
 body[data-bg-admin-page="manager"] .main{
   min-width:0!important;
   padding:38px clamp(24px,4vw,68px) 90px!important;
-  background:#f8f5f1!important;
+  background:#ffffff!important;
 }
 body[data-bg-admin-page="manager"] .intro,
 body[data-bg-admin-page="manager"] .quality-panel,
@@ -256,7 +256,7 @@ body[data-bg-admin-page="manager"] .intro>div:first-child>p{
   margin-bottom:7px!important;
   font-size:9px!important;
   letter-spacing:.15em!important;
-  color:#9c6327!important;
+  color:#8a4e0e!important;
 }
 body[data-bg-admin-page="manager"] .intro h1{
   font-size:clamp(34px,3.3vw,50px)!important;
@@ -270,7 +270,7 @@ body[data-bg-admin-page="manager"] #repoPath{
   text-overflow:ellipsis!important;
   white-space:nowrap!important;
   font-size:9px!important;
-  color:#8a7a6e!important;
+  color:#5f5750!important;
 }
 body[data-bg-admin-page="manager"] .section{
   margin-bottom:16px!important;
@@ -283,7 +283,7 @@ body[data-bg-admin-page="manager"] .section{
 body[data-bg-admin-page="manager"] .section-head{
   padding-bottom:14px!important;
   margin-bottom:16px!important;
-  border-bottom:1px solid #eee7df!important;
+  border-bottom:1px solid #eceae6!important;
 }
 body[data-bg-admin-page="manager"] .section-head h2{
   font-size:22px!important;
@@ -295,22 +295,22 @@ body[data-bg-admin-page="manager"] .section-head>div>span{
   display:grid!important;
   place-items:center!important;
   border-radius:50%!important;
-  background:#fff8ef!important;
-  border:1px solid #ead8c4!important;
-  color:#a96827!important;
+  background:#ffffff!important;
+  border:1px solid #dcd8d2!important;
+  color:#8a4e0e!important;
   font-size:9px!important;
   font-weight:850!important;
 }
 body[data-bg-admin-page="manager"] #form label{
   gap:7px!important;
   font-size:11px!important;
-  color:#4f4137!important;
+  color:#5f5750!important;
 }
 body[data-bg-admin-page="manager"] #form input,
 body[data-bg-admin-page="manager"] #form select,
 body[data-bg-admin-page="manager"] #form textarea{
   border-color:var(--au-line)!important;
-  background:#fffdfb!important;
+  background:#ffffff!important;
   border-radius:12px!important;
   font-size:13px!important;
 }
@@ -327,7 +327,7 @@ body[data-bg-admin-page="manager"] #form label small,
 body[data-bg-admin-page="manager"] .section small{
   font-size:9px!important;
   line-height:1.45!important;
-  color:#8f7f72!important;
+  color:#5f5750!important;
 }
 body[data-bg-admin-page="manager"] .grid.two{
   gap:16px 18px!important;
@@ -340,7 +340,7 @@ body[data-bg-admin-page="manager"] .product-tag-manager{
   padding:16px!important;
   border-radius:16px!important;
   border:1px solid var(--au-line-soft)!important;
-  background:#fcfaf7!important;
+  background:#ffffff!important;
 }
 body[data-bg-admin-page="manager"] .checks{
   padding-top:14px!important;
@@ -349,8 +349,8 @@ body[data-bg-admin-page="manager"] .checks{
 body[data-bg-admin-page="manager"] .image-drop,
 body[data-bg-admin-page="manager"] .gallery-upload{
   border-radius:16px!important;
-  border-color:#ddd1c3!important;
-  background:#fcf9f5!important;
+  border-color:#dcd8d2!important;
+  background:#ffffff!important;
 }
 body[data-bg-admin-page="manager"] .form-footer{
   position:sticky!important;
@@ -359,10 +359,10 @@ body[data-bg-admin-page="manager"] .form-footer{
   margin-top:18px!important;
   padding:14px 16px!important;
   border-radius:18px!important;
-  background:rgba(25,20,16,.96)!important;
+  background:rgba(20,17,15,.96)!important;
   color:#fff!important;
   border:1px solid rgba(255,255,255,.08)!important;
-  box-shadow:0 20px 50px rgba(24,18,14,.20)!important;
+  box-shadow:0 20px 50px rgba(20,17,15,.20)!important;
   backdrop-filter:blur(12px)!important;
 }
 body[data-bg-admin-page="manager"] .form-footer strong{font-size:12px!important}
@@ -371,13 +371,13 @@ body[data-bg-admin-page="manager"] .form-footer p{
   max-width:760px!important;
   font-size:9px!important;
   line-height:1.45!important;
-  color:#c9bfb6!important;
+  color:#dcd8d2!important;
 }
 body[data-bg-admin-page="manager"] .form-footer .save{
   min-height:42px!important;
   padding:0 18px!important;
   border-radius:999px!important;
-  background:#b8752e!important;
+  background:#8a4e0e!important;
   color:#fff!important;
   box-shadow:none!important;
 }
@@ -386,13 +386,13 @@ body[data-bg-admin-page="manager"] .form-footer .save{
    Shared modal language
    --------------------------------------------------------- */
 body[data-bg-admin-page="manager"] .modal-backdrop{
-  background:rgba(23,19,16,.68)!important;
+  background:rgba(20,17,15,.68)!important;
   backdrop-filter:blur(9px)!important;
 }
 body[data-bg-admin-page="manager"] .modal-card{
   border-radius:24px!important;
   border:1px solid rgba(255,255,255,.46)!important;
-  background:#fbf6ef!important;
+  background:#ffffff!important;
   box-shadow:0 30px 90px rgba(0,0,0,.28)!important;
 }
 body[data-bg-admin-page="manager"] .modal-close{
@@ -403,7 +403,7 @@ body[data-bg-admin-page="manager"] .modal-close{
   place-items:center!important;
 }
 body[data-bg-admin-page="manager"] .eyebrow-preview{
-  color:#a56625!important;
+  color:#8a4e0e!important;
   letter-spacing:.14em!important;
   font-size:10px!important;
   font-weight:850!important;
@@ -443,7 +443,7 @@ body[data-bg-admin-page="manager"] .colors-toolbar{
   padding:10px;
   border:1px solid var(--au-line-soft);
   border-radius:14px;
-  background:#fffaf4;
+  background:#ffffff;
 }
 .bg-v3182-color-tools input,
 .bg-v3182-color-tools select{
@@ -470,7 +470,7 @@ body[data-bg-admin-page="manager"] .color-inventory-row{
   align-items:center!important;
   gap:8px!important;
   padding:9px!important;
-  background:#fffdf9!important;
+  background:#ffffff!important;
   border:1px solid var(--au-line-soft)!important;
   border-radius:14px!important;
 }
@@ -493,7 +493,7 @@ body[data-bg-admin-page="manager"] .colors-footer{
   z-index:3!important;
   margin-top:16px!important;
   padding:14px 0 0!important;
-  background:linear-gradient(to top,#fbf6ef 72%,rgba(251,246,239,0))!important;
+  background:linear-gradient(to top,#ffffff 72%,rgba(255,255,255,0))!important;
 }
 body[data-bg-admin-page="manager"] .colors-footer .primary{
   min-height:44px!important;
@@ -532,7 +532,7 @@ body[data-bg-admin-page="manager"] .preflight-item{
   min-height:48px!important;
   padding:9px 12px!important;
   border-radius:12px!important;
-  background:#fffdf9!important;
+  background:#ffffff!important;
   border:1px solid var(--au-line-soft)!important;
 }
 body[data-bg-admin-page="manager"] .preflight-item strong{font-size:11px!important}
@@ -553,8 +553,8 @@ body[data-bg-admin-page="manager"] .preflight-badge.fail{background:var(--au-bad
   width:100%;
   margin:8px 0 2px;
   border:1px solid var(--au-line);
-  background:#fffaf4;
-  color:#5e4a3a;
+  background:#ffffff;
+  color:#5f5750;
   border-radius:11px;
   padding:9px 12px;
   font-size:10px;
@@ -572,7 +572,7 @@ body[data-bg-admin-page="manager"] .publish-footer{
   bottom:-28px!important;
   margin-top:16px!important;
   padding:14px 0 0!important;
-  background:linear-gradient(to top,#fbf6ef 72%,rgba(251,246,239,0))!important;
+  background:linear-gradient(to top,#ffffff 72%,rgba(255,255,255,0))!important;
 }
 
 /* ---------------------------------------------------------
@@ -581,14 +581,14 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-site-content-shell{
   inset:14px!important;
   border-radius:20px!important;
-  background:#f8f5f0!important;
+  background:#ffffff!important;
   box-shadow:0 30px 100px rgba(0,0,0,.30)!important;
 }
 .bg-site-content-header{
   min-height:68px!important;
   padding:14px 18px!important;
   align-items:center!important;
-  background:#17130f!important;
+  background:#14110f!important;
 }
 .bg-site-content-header p{font-size:9px!important}
 .bg-site-content-header h2{font-size:16px!important}
@@ -598,7 +598,7 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-site-content-tabs{
   padding:12px!important;
   gap:5px!important;
-  background:#eee5da!important;
+  background:#eceae6!important;
 }
 .bg-site-content-tabs button{
   min-height:38px!important;
@@ -609,11 +609,11 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-site-content-tabs button.is-active{
   background:#fff!important;
   border-color:var(--au-line)!important;
-  box-shadow:0 6px 18px rgba(69,48,32,.05)!important;
+  box-shadow:0 6px 18px rgba(95,87,80,.05)!important;
 }
 .bg-site-content-editor{
   padding:18px 22px 100px!important;
-  background:#f8f5f0!important;
+  background:#ffffff!important;
 }
 .bg-site-content-card{
   max-width:1380px!important;
@@ -635,7 +635,7 @@ body[data-bg-admin-page="manager"] .publish-footer{
   min-height:42px!important;
   border-radius:11px!important;
   border-color:var(--au-line)!important;
-  background:#fffdfb!important;
+  background:#ffffff!important;
   font-size:12px!important;
   padding:9px 11px!important;
 }
@@ -645,17 +645,17 @@ body[data-bg-admin-page="manager"] .publish-footer{
   bottom:10px!important;
   padding:11px 13px!important;
   border-radius:15px!important;
-  background:rgba(28,23,19,.96)!important;
+  background:rgba(20,17,15,.96)!important;
   color:#fff!important;
   border-color:rgba(255,255,255,.07)!important;
-  box-shadow:0 18px 40px rgba(28,21,16,.18)!important;
+  box-shadow:0 18px 40px rgba(20,17,15,.18)!important;
 }
-.bg-site-content-savebar span{color:#c9beb4!important;font-size:10px!important}
+.bg-site-content-savebar span{color:#a29a92!important;font-size:10px!important}
 .bg-site-content-savebar .primary{
   min-height:40px!important;
   border-radius:999px!important;
   padding:0 15px!important;
-  background:#b8752e!important;
+  background:#8a4e0e!important;
 }
 .bg-placement-manager{padding:4px 0 0!important}
 .bg-placement-group{padding:16px 0!important}
@@ -666,7 +666,7 @@ body[data-bg-admin-page="manager"] .publish-footer{
   grid-template-columns:96px minmax(0,1fr)!important;
   padding:11px!important;
   border-radius:14px!important;
-  background:#fffdf9!important;
+  background:#ffffff!important;
   border-color:var(--au-line-soft)!important;
 }
 .bg-placement-slot>span{font-size:10.5px!important}
@@ -680,20 +680,20 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-project-admin-shell{
   inset:14px!important;
   border-radius:20px!important;
-  background:#f8f5f0!important;
+  background:#ffffff!important;
 }
 .bg-project-admin-header{
   min-height:68px!important;
   padding:14px 18px!important;
   align-items:center!important;
-  background:#17130f!important;
+  background:#14110f!important;
 }
 .bg-project-admin-header p{font-size:9px!important}
 .bg-project-admin-header h2{font-size:16px!important}
 .bg-project-admin-header span{font-size:10px!important}
 .bg-project-admin-layout{grid-template-columns:310px minmax(0,1fr)!important}
 .bg-project-admin-sidebar{
-  background:#eee5da!important;
+  background:#eceae6!important;
   border-right-color:var(--au-line)!important;
 }
 .bg-project-admin-search{padding:12px 12px 7px!important}
@@ -713,14 +713,14 @@ body[data-bg-admin-page="manager"] .publish-footer{
 }
 .bg-project-admin-list-item.is-active{
   background:#fff!important;
-  border-color:#d9cbbc!important;
-  box-shadow:0 8px 22px rgba(67,46,31,.06)!important;
+  border-color:#dcd8d2!important;
+  box-shadow:0 8px 22px rgba(95,87,80,.06)!important;
 }
 .bg-project-admin-list-top b{font-size:11px!important}
 .bg-project-admin-list-top em,
 .bg-project-admin-list-item small{font-size:9px!important}
 .bg-project-admin-list-flags i{font-size:8px!important}
-.bg-project-admin-editor{background:#f8f5f0!important}
+.bg-project-admin-editor{background:#ffffff!important}
 .bg-project-admin-form{
   max-width:1280px!important;
   padding:20px 24px 100px!important;
@@ -744,7 +744,7 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-project-admin-form input,
 .bg-project-admin-form textarea{
   border-color:var(--au-line)!important;
-  background:#fffdfb!important;
+  background:#ffffff!important;
   border-radius:11px!important;
   font-size:12px!important;
   padding:10px 11px!important;
@@ -752,29 +752,29 @@ body[data-bg-admin-page="manager"] .publish-footer{
 .bg-project-admin-form input{min-height:42px!important}
 .bg-project-admin-grid{gap:12px!important}
 .bg-project-admin-media-row{grid-template-columns:minmax(260px,380px) 1fr!important}
-.bg-project-admin-cover{background:#f1e9df!important;border-radius:14px!important}
+.bg-project-admin-cover{background:#eceae6!important;border-radius:14px!important}
 .bg-project-admin-savebar{
   bottom:10px!important;
   padding:11px 13px!important;
   border-radius:15px!important;
-  background:rgba(28,23,19,.96)!important;
+  background:rgba(20,17,15,.96)!important;
   color:#fff!important;
   border-color:rgba(255,255,255,.07)!important;
-  box-shadow:0 18px 40px rgba(28,21,16,.18)!important;
+  box-shadow:0 18px 40px rgba(20,17,15,.18)!important;
 }
-.bg-project-admin-savebar span{color:#c9beb4!important;font-size:10px!important}
-.bg-project-admin-savebar .primary{min-height:40px!important;border-radius:999px!important;background:#b8752e!important}
+.bg-project-admin-savebar span{color:#a29a92!important;font-size:10px!important}
+.bg-project-admin-savebar .primary{min-height:40px!important;border-radius:999px!important;background:#8a4e0e!important}
 
 /* ---------------------------------------------------------
    NFC settings
    --------------------------------------------------------- */
 body[data-bg-admin-page="nfc"]{
-  background:#f7f3ee!important;
+  background:#f4f3f1!important;
 }
 body[data-bg-admin-page="nfc"] .top{
   min-height:66px!important;
   padding:12px 24px!important;
-  background:#17130f!important;
+  background:#14110f!important;
 }
 body[data-bg-admin-page="nfc"] .wrap{
   width:min(1540px,calc(100% - 44px))!important;
@@ -802,7 +802,7 @@ body[data-bg-admin-page="nfc"] .media-card,
 body[data-bg-admin-page="nfc"] .copy-card{
   padding:20px!important;
   border-radius:20px!important;
-  background:#fffdf9!important;
+  background:#ffffff!important;
   border-color:var(--au-line)!important;
   box-shadow:var(--au-shadow-soft)!important;
 }
@@ -814,7 +814,7 @@ body[data-bg-admin-page="nfc"] .field select,
 body[data-bg-admin-page="nfc"] .copy-card textarea,
 body[data-bg-admin-page="nfc"] .capacity-row input{
   border-color:var(--au-line)!important;
-  background:#fffdfb!important;
+  background:#ffffff!important;
 }
 body[data-bg-admin-page="nfc"] .media-card{margin-top:14px!important}
 body[data-bg-admin-page="nfc"] .media-card h2,
@@ -836,26 +836,26 @@ body[data-bg-admin-page="nfc"] .footer{
   margin-top:14px!important;
   padding:12px 14px!important;
   border-radius:16px!important;
-  background:rgba(28,23,19,.96)!important;
+  background:rgba(20,17,15,.96)!important;
   border-color:rgba(255,255,255,.07)!important;
   color:#fff!important;
   backdrop-filter:blur(12px)!important;
 }
-body[data-bg-admin-page="nfc"] .footer span{color:#c9beb4!important}
-body[data-bg-admin-page="nfc"] .save{background:#b8752e!important;min-height:42px!important}
+body[data-bg-admin-page="nfc"] .footer span{color:#a29a92!important}
+body[data-bg-admin-page="nfc"] .save{background:#8a4e0e!important;min-height:42px!important}
 
 /* ---------------------------------------------------------
    Saha / Kurumsal / Prototip content.html
    JS tags stable containers where possible; generic fallbacks stay scoped.
    --------------------------------------------------------- */
 body[data-bg-admin-page="content"]{
-  background:#f8f5f1!important;
+  background:#ffffff!important;
 }
 body[data-bg-admin-page="content"]>header,
 body[data-bg-admin-page="content"] header:first-of-type{
   min-height:66px!important;
   padding:12px 24px!important;
-  background:#17130f!important;
+  background:#14110f!important;
 }
 body[data-bg-admin-page="content"] h1{
   font-size:clamp(36px,4vw,54px)!important;
@@ -897,7 +897,7 @@ body[data-bg-admin-page="content"] form input,
 body[data-bg-admin-page="content"] form select,
 body[data-bg-admin-page="content"] form textarea{
   border-color:var(--au-line)!important;
-  background:#fffdfb!important;
+  background:#ffffff!important;
   border-radius:11px!important;
 }
 body[data-bg-admin-page="content"] form input,
@@ -909,7 +909,7 @@ body[data-bg-admin-page="content"] .bg-v3182-save-explainer{
   border-radius:16px!important;
   min-height:72px!important;
   max-height:none!important;
-  box-shadow:0 18px 42px rgba(27,20,15,.18)!important;
+  box-shadow:0 18px 42px rgba(20,17,15,.18)!important;
 }
 
 /* ---------------------------------------------------------
@@ -973,10 +973,10 @@ body[data-bg-admin-page="content"] .bg-v3182-save-explainer{
 }
 
 /* v3.3.37 — okunabilirlik + klavye erişimi: 8.5–9px yardımcı metinler okunmuyordu, butonlarda odak halkası yoktu. */
-:where(button,a,[role=button],summary,input[type=checkbox],input[type=radio],input[type=file]):focus-visible{outline:2px solid #b77736!important;outline-offset:2px!important}
+:where(button,a,[role=button],summary,input[type=checkbox],input[type=radio],input[type=file]):focus-visible{outline:2px solid #8a4e0e!important;outline-offset:2px!important}
 html:root body:is([data-bg-admin-page],:not([data-bg-admin-page])) :is(small,.image-spec-status,#saveState,#qualityState,#dragNote,#repoPath,#productionStatusHint,.pricing-empty,.gallery-preview>small,.seo-meter span){font-size:11px!important;line-height:1.45}
 html:root body[data-bg-admin-page] :is(.top button,.top a,#openSite){font-size:11px!important}
-.catalog-admin-filter-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:999px;background:rgba(41,29,21,.1);font-size:10px;font-weight:700;line-height:1}
+.catalog-admin-filter-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:999px;background:rgba(29,25,22,.1);font-size:10px;font-weight:700;line-height:1}
 button.active .catalog-admin-filter-count,[aria-pressed=true] .catalog-admin-filter-count{background:rgba(255,255,255,.22)}
 button:disabled{cursor:progress;opacity:.7}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
@@ -993,11 +993,11 @@ html body .intro-side .product-actions{flex-wrap:nowrap}
 /* 3) Etiketler kutusu 4 satırda kalıyor, içerik kaydırma çubuğuna gizleniyordu. */
 html body #tags{min-height:132px}
 /* 4) "Kişiselleştirilebilir" kutusu diğer iki onay kutusundan farklı görünüyordu: üçü aynı stil. */
-html body .checks > label{background:rgba(138,78,14,.055)!important;border:1px solid rgba(138,78,14,.12)!important;border-radius:12px!important;box-shadow:none!important}
+html body .checks > label{background:rgba(95,87,80,.055)!important;border:1px solid rgba(95,87,80,.12)!important;border-radius:12px!important;box-shadow:none!important}
 /* 5) Tarayıcının ham "Dosya Seç" kutusu panelin buton stiline çekildi (tüm ekranlarda tek tip). */
-html body input[type=file]{font:inherit;font-size:12px;color:var(--muted,#816f61)}
-html body input[type=file]::file-selector-button{margin-right:10px;border:1px solid rgba(71,47,29,.18);border-radius:999px;background:#fffdf9;color:#291d15;font:600 12px/1 system-ui,-apple-system,Segoe UI,sans-serif;padding:9px 14px;cursor:pointer;transition:background .15s,border-color .15s}
-html body input[type=file]::file-selector-button:hover{background:#fff;border-color:rgba(157,99,35,.45)}
+html body input[type=file]{font:inherit;font-size:12px;color:var(--muted,#5f5750)}
+html body input[type=file]::file-selector-button{margin-right:10px;border:1px solid rgba(95,87,80,.18);border-radius:999px;background:#ffffff;color:#1d1916;font:600 12px/1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;padding:9px 14px;cursor:pointer;transition:background .15s,border-color .15s}
+html body input[type=file]::file-selector-button:hover{background:#fff;border-color:rgba(138,78,14,.45)}
 /* 6) Site İçerikleri: 100 px alt boşluk yüzünden "Kaydet" çubuğu ekranın ortasında asılı kalıp alanları kapatıyordu. */
 html body .bg-site-content-editor{padding-bottom:18px!important}
 html body .bg-site-content-editor form{padding-bottom:6px}
@@ -1008,7 +1008,7 @@ html body .bg-project-admin-filters button{min-height:28px!important;height:auto
 /* v3.3.41 — kampanya canlı önizlemesi Opera'da takılıyordu: sürekli kayan şerit, tam ekran blur(9px) arka planın
    ve altındaki 5 ayrı backdrop-filter katmanının (üst menü, kaydet çubuğu, rozetler) her karede yeniden
    hesaplanmasına yol açıyordu. Pencere açıkken bulanıklıklar kapatılır; arka plan düz koyu renk olur. */
-html body[data-bg-admin-page] #campaignModal .modal-backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(18,14,11,.86)!important}
+html body[data-bg-admin-page] #campaignModal .modal-backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,17,15,.86)!important}
 html body.modal-open :is(.top,.form-footer,.save-state,.quality-chip,#previewProduct,.intro-side button){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body #campaignPreviewLine{transform-style:flat!important;backface-visibility:visible!important}
 
@@ -1017,12 +1017,12 @@ html body .catalog-intro-launch{display:block;width:100%;margin-top:8px;padding:
 html body .catalog-intro-card{max-width:640px}
 html body #catalogIntroText{width:100%;min-height:150px;margin-top:10px}
 html body .catalog-intro-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
-html body .catalog-intro-foot #catalogIntroState{flex:1;color:var(--muted,#816f61);font-size:12px}
+html body .catalog-intro-foot #catalogIntroState{flex:1;color:var(--muted,#5f5750);font-size:12px}
 html body .moved-note a{color:inherit;text-decoration:underline}
 html body .grating-stars{display:flex;gap:6px;margin:6px 0 14px}
-html body .grating-star{width:46px;height:46px;border:1px solid rgba(70,45,26,.14);border-radius:12px;background:#fff;color:#d9cdbd;font-size:26px;line-height:1;cursor:pointer}
-html body .grating-star.on{color:#f2a91c;border-color:rgba(242,169,28,.5);background:#fff8e8}
-html body .grating-star:focus-visible{outline:2px solid #8a4e0e;outline-offset:2px}
+html body .grating-star{width:46px;height:46px;border:1px solid rgba(95,87,80,.14);border-radius:12px;background:#fff;color:#dcd8d2;font-size:26px;line-height:1;cursor:pointer}
+html body .grating-star.on{color:#8a4e0e;border-color:rgba(138,78,14,.5);background:#f4f3f1}
+html body .grating-star:focus-visible{outline:2px solid #5f5750;outline-offset:2px}
 html body .grating-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-html body .grating-fields label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--muted,#816f61)}
-html body .grating-fields input{height:42px;padding:0 12px;border:1px solid rgba(70,45,26,.16);border-radius:10px;font-size:15px}
+html body .grating-fields label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--muted,#5f5750)}
+html body .grating-fields input{height:42px;padding:0 12px;border:1px solid rgba(95,87,80,.16);border-radius:10px;font-size:15px}
