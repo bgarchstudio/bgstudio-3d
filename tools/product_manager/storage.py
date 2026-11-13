@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import json
+import re
 import sqlite3
 import shutil
 import zipfile
@@ -79,6 +80,10 @@ def _merge_site_settings(value):
     if direction in ('rtl', 'ltr'):
         bar['direction'] = direction
     bar['separator'] = '✦'
+    # v3.3.98 şerit renkleri (zemin / yazı / ayraç)
+    colors_in = bar_in.get('colors') if isinstance(bar_in.get('colors'), dict) else {}
+    defaults = {'bg': '#14110f', 'fg': '#ffffff', 'accent': '#c8894a'}
+    bar['colors'] = {k: (str(colors_in.get(k)).lower() if re.fullmatch(r'#[0-9a-fA-F]{6}', str(colors_in.get(k) or '')) else v) for k, v in defaults.items()}
     if isinstance(bar_in.get('messages'), list):
         messages = []
         seen = set()

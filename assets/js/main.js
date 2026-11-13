@@ -353,6 +353,12 @@ const mountAnnouncementBar = async () => {
   bar.setAttribute('aria-label', 'Kampanya ve duyuru şeridi');
   const announcementSpeed = announcementPixelsPerSecond(config?.speed);
   bar.dataset.speed = String(config?.speed || 'normal').toLowerCase();
+  // v3.3.98 — panelden seçilen şerit renkleri
+  const annColors = config?.colors && typeof config.colors === 'object' ? config.colors : {};
+  [['bg', '--ann-bg'], ['fg', '--ann-fg'], ['accent', '--ann-accent']].forEach(([key, prop]) => {
+    const value = String(annColors[key] || '');
+    if (/^#[0-9a-f]{6}$/i.test(value)) bar.style.setProperty(prop, value);
+  });
   bar.innerHTML = `
     <div class="announcement-marquee-viewport">
       <div class="announcement-marquee-track">

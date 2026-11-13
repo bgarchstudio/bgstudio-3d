@@ -16,3 +16,22 @@ html body :is(input,select,textarea,button){font-family:inherit}
   body[data-bg-admin-page]:not([data-bg-admin-page="manager"]) .top{flex-wrap:wrap!important;height:auto!important;min-height:64px;row-gap:8px;padding-top:10px!important;padding-bottom:10px!important}
   body[data-bg-admin-page]:not([data-bg-admin-page="manager"]) .top-actions{flex-wrap:wrap!important;width:100%;gap:6px!important}
 }
+
+/* v3.3.98 · Kampanya şeridi: önizleme sitedeki şeritle aynı (zemin / yazı / ayraç noktası panelden seçilir) */
+.campaign-preview-box{--ann-bg:#14110f;--ann-fg:#ffffff;--ann-accent:#c8894a;background:var(--ann-bg)!important;border:1px solid color-mix(in srgb,var(--ann-fg) 12%,transparent)!important;padding:0!important}
+.campaign-preview-head{padding:9px 14px 0!important}
+.campaign-preview-head>span,.campaign-preview-head>small{color:var(--ann-fg)!important;opacity:.6;font-size:11px!important}
+.campaign-preview-viewport{min-height:36px!important;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.campaign-preview-item{color:var(--ann-fg)!important;opacity:.86;font-size:12.2px!important;font-weight:500!important;letter-spacing:.02em!important;text-transform:none!important;padding:0 22px!important}
+.campaign-preview-separator{font-size:0!important;width:4px;height:4px;padding:0!important;border-radius:50%;background:var(--ann-accent);opacity:.9!important}
+.campaign-preview-placeholder{color:var(--ann-fg)!important;opacity:.7}
+.campaign-color-box{border:1px solid #dcd8d2;border-radius:16px;padding:14px 16px;margin:4px 0 14px;background:#fff}
+.campaign-color-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.campaign-color-head strong{font-size:14px}.campaign-color-head small{font-size:12px;color:#5f5750}
+.campaign-color-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.campaign-color-presets button{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px 0 6px;border-radius:999px;border:1px solid #dcd8d2;background:#fff;cursor:pointer;font-weight:600;font-size:13px}
+.campaign-color-presets button i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font-style:normal;font-size:11px;font-weight:700;border:1px solid #dcd8d2}
+.campaign-color-presets button[aria-pressed="true"]{border-color:#14110f;box-shadow:0 0 0 2px #14110f inset}
+.campaign-color-custom{display:flex;flex-wrap:wrap;gap:14px}
+.campaign-color-custom label{display:inline-flex!important;align-items:center;gap:8px;font-size:13px;font-weight:600;margin:0!important}
+.campaign-color-custom input[type=color]{width:44px!important;height:36px;padding:2px!important;border:1px solid #dcd8d2;border-radius:10px;background:#fff;cursor:pointer}

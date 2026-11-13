@@ -1041,6 +1041,8 @@ def clean_site_settings(value):
             'speed': speed,
             'direction': direction,
             'separator': '✦',
+            # v3.3.98 şerit renkleri
+            'colors': {k: (str((incoming.get('colors') or {}).get(k)).lower() if isinstance(incoming.get('colors'), dict) and re.fullmatch(r'#[0-9a-fA-F]{6}', str((incoming.get('colors') or {}).get(k) or '')) else v) for k, v in {'bg': '#14110f', 'fg': '#ffffff', 'accent': '#c8894a'}.items()},
             'messages': messages,
             # Reserved bridge: future discount rules can inject generated messages
             # without changing the manual message schema.

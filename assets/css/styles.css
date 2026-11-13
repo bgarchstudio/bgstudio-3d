@@ -6341,3 +6341,10 @@ html{font-variant-numeric:lining-nums}
   .review-card-v3397{padding:16px;border-radius:16px;gap:10px}
   .review-card-v3397 blockquote p{font-size:14.5px}
 }
+
+/* v3.3.98 · Duyuru şeridi renkleri panelden seçilebilir (varsayılan espresso / beyaz / bronz nokta) */
+.announcement-marquee{background:var(--ann-bg,var(--espresso))!important;color:var(--ann-fg,#fff)!important;border-bottom:1px solid color-mix(in srgb,var(--ann-fg,#fff) 8%,transparent)!important}
+.announcement-marquee-item{color:var(--ann-fg,#fff)!important;opacity:.86}
+.announcement-marquee-item.is-link{color:var(--ann-fg,#fff)!important;opacity:1}
+.announcement-marquee-item.is-link:hover{color:var(--ann-accent,var(--bronze-light))!important}
+.announcement-marquee-separator{background:var(--ann-accent,var(--bronze-light))!important}

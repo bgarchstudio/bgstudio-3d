@@ -4,6 +4,11 @@
     "speed": "fast",
     "direction": "rtl",
     "separator": "✦",
+    "colors": {
+      "bg": "#14110f",
+      "fg": "#ffffff",
+      "accent": "#c8894a"
+    },
     "messages": [
       {
         "id": "ucretsiz-kargo",

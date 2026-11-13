@@ -2321,7 +2321,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.97'
+SITE_ASSET_VERSION = '3.3.98'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
