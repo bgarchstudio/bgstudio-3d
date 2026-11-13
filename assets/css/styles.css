@@ -6283,3 +6283,39 @@ html{font-variant-numeric:lining-nums}
 :where(h1,h2,h3,h4,h5,h6,strong,b,span,small,p,a,em,i,div,li,td,th,figcaption,text){font-variant-numeric:lining-nums}
 .home-stat-card-v3198>strong,.review-score-v3328,.lightbox-counter,.stl-metrics dd,.home-product-carousel-nav>span,.filter-btn .filter-count,.project-filter.project-filter>span,
 .gmap-coord,.gmap-scale,.pline-hud,.home-process-story-v3363 [data-print-story-label]{font-variant-numeric:lining-nums tabular-nums!important}
+
+/* v3.3.96 · İçerik genişletme: açık soru-cevap, iletişim listesi, yasal maddeler, proje süreç kartları */
+.content-v3396 .capability-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.content-v3396 .cap-card{min-height:0}
+.content-v3396 .cap-card h3{font-size:1.6rem;margin:18px 0 10px}
+.content-v3396 .cap-card p{font-size:.92rem;line-height:1.6}
+.content-v3396 .maket-architect p+p{margin-top:12px}
+.qa-v3396{display:grid;grid-template-columns:repeat(2,1fr);gap:0 48px;border-top:1px solid var(--line)}
+.qa-v3396 article{padding:24px 0;border-bottom:1px solid var(--line)}
+.qa-v3396 h3{font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:1.35rem;line-height:1.2;margin:0 0 8px}
+.qa-v3396 p{margin:0;color:var(--ink-soft);font-size:.95rem;line-height:1.65}
+.contact-list-v3396{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.contact-list-v3396>a,.contact-list-v3396>div{display:flex;flex-direction:column;gap:6px;padding:22px;border:1px solid var(--line);border-radius:20px;background:#fff;color:inherit;text-decoration:none;min-height:44px}
+.contact-list-v3396>a:hover{border-color:#8a4e0e}
+.contact-list-v3396 small{font-size:12px;font-weight:700;color:#8a4e0e;letter-spacing:.04em}
+.contact-list-v3396 strong{font-size:1.02rem;font-weight:600;overflow-wrap:anywhere}
+.legal-list-v3396{margin:12px 0 0;padding-left:1.2em;display:grid;gap:8px}
+.legal-list-v3396 li{line-height:1.65;color:#5f5750}
+.legal-page a,.legal-content a{color:#8a4e0e;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:760px){
+  .content-v3396.section-pad-sm{padding-bottom:56px}
+  .content-v3396 .capability-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .content-v3396 .cap-card{padding:14px;border-radius:16px}
+  .content-v3396 .cap-card .cap-no{font-size:1rem}
+  .content-v3396 .cap-card h3{font-size:1.08rem;margin:8px 0 6px}
+  .content-v3396 .cap-card p{font-size:12.5px;line-height:1.5}
+  .qa-v3396{grid-template-columns:1fr}
+  .qa-v3396 article{padding:16px 0}
+  .qa-v3396 h3{font-size:1.08rem}
+  .qa-v3396 p{font-size:13.5px}
+  .contact-list-v3396{grid-template-columns:1fr 1fr;gap:8px}
+  .contact-list-v3396>a,.contact-list-v3396>div{padding:14px;border-radius:16px}
+  .contact-list-v3396 strong{font-size:.86rem}
+  .legal-list-v3396 li{font-size:14px}
+}
+@media (max-width:760px){.content-v3396 .capability-grid .cap-card h3{font-size:17px!important;line-height:1.15!important;margin:8px 0 6px!important}.content-v3396 .capability-grid .cap-card p{font-size:12.5px!important;line-height:1.5!important}}
