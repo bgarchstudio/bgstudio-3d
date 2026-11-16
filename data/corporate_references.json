@@ -12,7 +12,7 @@
     "slug": "planet-yucca",
     "source_kind": "nfc",
     "source_slug": "planet-yucca",
-    "theme": "light",
+    "theme": "dark",
     "active": true,
     "sort_order": 2,
     "show_in_corporate": true
@@ -21,7 +21,7 @@
     "slug": "istavrit-restaurant",
     "source_kind": "nfc",
     "source_slug": "istavrit-restaurant",
-    "theme": "dark",
+    "theme": "light",
     "active": true,
     "sort_order": 3,
     "show_in_corporate": true
@@ -30,7 +30,7 @@
     "slug": "yusuf-sef",
     "source_kind": "nfc",
     "source_slug": "yusuf-sef",
-    "theme": "light",
+    "theme": "dark",
     "active": true,
     "sort_order": 4,
     "show_in_corporate": true
@@ -39,7 +39,7 @@
     "slug": "naz-balik-restaurant",
     "source_kind": "nfc",
     "source_slug": "naz-balik-restaurant",
-    "theme": "light",
+    "theme": "dark",
     "active": true,
     "sort_order": 5,
     "show_in_corporate": true
@@ -48,7 +48,7 @@
     "slug": "yenipazar-pidecisi",
     "source_kind": "nfc",
     "source_slug": "yenipazar-pidecisi",
-    "theme": "dark",
+    "theme": "light",
     "active": true,
     "sort_order": 6,
     "show_in_corporate": true
@@ -57,7 +57,7 @@
     "slug": "koala-petshop",
     "source_kind": "nfc",
     "source_slug": "koala-petshop",
-    "theme": "dark",
+    "theme": "light",
     "active": true,
     "sort_order": 7,
     "show_in_corporate": true
@@ -77,7 +77,7 @@
     ],
     "active": true,
     "sort_order": 8,
-    "theme": "light",
+    "theme": "dark",
     "image": "assets/images/references/kusadasi-asansor.webp",
     "profile_image": "assets/images/references/kusadasi-asansor-profile.webp",
     "category": "Kurumsal üretim"
@@ -107,7 +107,7 @@
     ],
     "active": true,
     "sort_order": 9,
-    "theme": "light",
+    "theme": "dark",
     "image": "assets/images/references/luckyland-kusadasi.webp",
     "profile_image": "assets/images/references/luckyland-kusadasi-profile.webp"
   },
@@ -136,7 +136,7 @@
     ],
     "active": true,
     "sort_order": 10,
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/references/kabalci-hukuk-burosu.webp",
     "profile_image": "assets/images/references/kabalci-hukuk-burosu-profile.webp"
   },
