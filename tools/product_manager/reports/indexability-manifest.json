@@ -3,11 +3,11 @@
   "asset_version": "3.3.98",
   "generated_at": "2026-11-16",
   "summary": {
-    "physical_html_pages": 82,
-    "canonical_indexable_pages": 79,
+    "physical_html_pages": 83,
+    "canonical_indexable_pages": 80,
     "noindex_pages": 3,
-    "index_html_aliases": 81,
-    "sitemap_urls": 79,
+    "index_html_aliases": 82,
+    "sitemap_urls": 80,
     "indexable_not_in_sitemap": 0,
     "duplicate_canonicals": 0
   },
@@ -753,6 +753,16 @@
       "expected_treatment": "canonical-indexable"
     },
     {
+      "file": "urunler/kitsune-kurt-maske-boyanabilir/index.html",
+      "route": "/urunler/kitsune-kurt-maske-boyanabilir/",
+      "url": "https://3d.bgstudio.com.tr/urunler/kitsune-kurt-maske-boyanabilir/",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kitsune-kurt-maske-boyanabilir/",
+      "robots": "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
       "file": "urunler/makyaj-pamugu-pamuklu-cubuk-organizer/index.html",
       "route": "/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
       "url": "https://3d.bgstudio.com.tr/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/",
@@ -1270,6 +1280,12 @@
       "url": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/index.html",
       "canonical": "https://3d.bgstudio.com.tr/urunler/kisiye-ozel-telefon-standi-anahtarlik/",
       "source_file": "urunler/kisiye-ozel-telefon-standi-anahtarlik/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/urunler/kitsune-kurt-maske-boyanabilir/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/urunler/kitsune-kurt-maske-boyanabilir/",
+      "source_file": "urunler/kitsune-kurt-maske-boyanabilir/index.html",
       "expected_google_treatment": "alternate-canonical-or-redirect"
     },
     {
