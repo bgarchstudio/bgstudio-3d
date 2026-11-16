@@ -139,5 +139,28 @@
     "theme": "dark",
     "image": "assets/images/references/kabalci-hukuk-burosu.webp",
     "profile_image": "assets/images/references/kabalci-hukuk-burosu-profile.webp"
+  },
+  {
+    "slug": "qnb-bank",
+    "name": "QNB Bank",
+    "headline": "6 adet logolu ATM maskot figürü üretimi.",
+    "description": "QNB Bank için ATM formundaki maskot karakteri, banka logosu ve kurumsal mavi rengiyle 6 adet figür olarak 3D baskı ile üretildi. Karakterin yüz ifadesi, kolları, tuş takımı ve kart yuvası gibi detaylar çok renkli baskıyla ürünün kendisine işlendi; figürler siyah taban üzerinde, masada duracak şekilde tamamlandı.\n\nFigürler müdür yardımcılarına hediye edilmek üzere hazırlandı. Her birine ad soyad bilgilerini taşıyan pirinç levha eklenerek kişisel çalışma masalarında kullanılacak.\n\nProje, kurumsal kimliği kişiye özel bir hediyeye dönüştüren BG Studio 3D kurumsal üretim çalışmalarından biridir.",
+    "tags": [
+      "QNB Bank",
+      "6 Adet",
+      "Maskot Figür",
+      "Kurumsal Hediye",
+      "Kurumsal Üretim",
+      "Logolu Ürün",
+      "Çok Renkli Baskı",
+      "3D Baskı",
+      "Seri Üretim",
+      "Kişiye Özel"
+    ],
+    "active": true,
+    "sort_order": 11,
+    "theme": "light",
+    "image": "assets/images/references/qnb-bank.webp",
+    "profile_image": "assets/images/references/qnb-bank-profile.webp"
   }
 ]
