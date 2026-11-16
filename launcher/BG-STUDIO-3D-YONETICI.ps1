@@ -102,8 +102,10 @@ public static class BG3DShellNotify {
     $pythonCommand = $null
     $pythonPrefix = @()
     $candidates = @()
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'  # Pillow denemesinin hata çıktısı başlatıcıyı durdurmasın
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        $listed = & py -0p 2>$null
+        $listed = & py -0p 2>&1 | ForEach-Object { "$_" }
         foreach ($line in $listed) { if ($line -match '(\S:\\.*python\.exe)\s*$') { $candidates += ,@($Matches[1].Trim()) } }
         $candidates += ,@('py', '-3')
     }
@@ -111,9 +113,10 @@ public static class BG3DShellNotify {
     if (Get-Command python3 -ErrorAction SilentlyContinue) { $candidates += ,@('python3') }
     foreach ($cand in $candidates) {
         $exe = $cand[0]; $pre = @($cand | Select-Object -Skip 1)
-        & $exe @pre -c 'from PIL import Image' 2>$null
+        $null = & $exe @pre -c 'from PIL import Image' 2>&1
         if ($LASTEXITCODE -eq 0) { $pythonCommand = $exe; $pythonPrefix = $pre; break }
     }
+    $ErrorActionPreference = $prevEap
     if (-not $pythonCommand -and $candidates.Count) { $pythonCommand = $candidates[0][0]; $pythonPrefix = @($candidates[0] | Select-Object -Skip 1) }
     if (-not $pythonCommand) { Wait-And-Exit 'Python 3 bulunamadi.' }
 
