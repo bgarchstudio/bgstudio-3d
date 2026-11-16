@@ -3,11 +3,11 @@
   "asset_version": "3.3.98",
   "generated_at": "2026-11-16",
   "summary": {
-    "physical_html_pages": 78,
-    "canonical_indexable_pages": 75,
+    "physical_html_pages": 79,
+    "canonical_indexable_pages": 76,
     "noindex_pages": 3,
-    "index_html_aliases": 77,
-    "sitemap_urls": 75,
+    "index_html_aliases": 78,
+    "sitemap_urls": 76,
     "indexable_not_in_sitemap": 0,
     "duplicate_canonicals": 0
   },
@@ -317,6 +317,16 @@
       "route": "/projeler/prototip-finnsauna-izmir/",
       "url": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
       "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/qnb-bank/index.html",
+      "route": "/projeler/qnb-bank/",
+      "url": "https://3d.bgstudio.com.tr/projeler/qnb-bank/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/qnb-bank/",
       "robots": "index,follow",
       "indexable": true,
       "in_sitemap": true,
@@ -972,6 +982,12 @@
       "url": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/index.html",
       "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-finnsauna-izmir/",
       "source_file": "projeler/prototip-finnsauna-izmir/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/qnb-bank/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/qnb-bank/",
+      "source_file": "projeler/qnb-bank/index.html",
       "expected_google_treatment": "alternate-canonical-or-redirect"
     },
     {
