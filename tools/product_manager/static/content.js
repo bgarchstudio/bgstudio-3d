@@ -27,7 +27,7 @@ function fillFromSource(slug){const src=sourceBySlug(slug);if(!src)return;$('c_n
 function reset(){currentSlug='';profileImageClear=false;preparedProfileImage=null;preparedProfileName='';profileRemoteSrc='';$('editorTitle').textContent='Yeni kayıt';['c_name','c_slug','c_headline','c_description','c_tags','c_category'].forEach(x=>$(x).value='');$('c_sort').value=items.length+1;$('c_active').checked=true;$('c_image').value='';$('c_profile_image').value='';if($('c_image_status')){$('c_image_status').textContent='Henüz görsel seçilmedi.';$('c_image_status').className='image-spec-status'}if($('c_profile_status')){$('c_profile_status').textContent='Henüz yeni logo seçilmedi.';$('c_profile_status').className='image-spec-status'}$('c_preview').hidden=true;$('c_placeholder').hidden=false;setFileName('Dosya seçilmedi');showProfile(DEFAULT_PROFILE);$('deleteItem').hidden=true;$('contentActiveLabel').hidden=false;$('c_theme').value='light';$('c_source').value='';$('c_show_corporate').checked=true;setSharedLocked(false);updateCorporateVisibilityPanel()}
 function render(){const wrap=$('contentList');wrap.innerHTML='';items.sort((a,b)=>(a.sort_order||999)-(b.sort_order||999)).forEach(raw=>{const x=resolvedItem(raw);const b=document.createElement('button');b.type='button';b.className=raw.slug===currentSlug?'active':'';const linked=kind==='corporate'&&raw.source_slug;const source=linked?sourceBySlug(raw.source_slug):(kind==='nfc'?raw:null);const corpHidden=!!source&&source.show_in_corporate===false;const off=raw.active===false||(linked&&corpHidden);const mirrorState=(kind==='nfc'||linked)?(corpHidden?'🏢 Kurumsalda gizli · ':'🏢 Kurumsalda açık · '):'';b.innerHTML=`<b><span class="status-dot ${off?'off':''}"></span>${esc(x.name||raw.slug)}</b><small>${linked?'🔗 NFC ile senkron · ':''}${mirrorState}${effectiveTheme(raw)==='dark'?'● Koyu':'○ Açık'} · ${esc(x.headline||x.category||'')}</small>`;b.onclick=()=>edit(raw.slug);wrap.append(b)})}
 function renderSources(){const sel=$('c_source');sel.innerHTML='<option value="">Bağımsız kurumsal kart</option>'+sources.map(x=>`<option value="${esc(x.slug)}">${esc(x.name)}</option>`).join('')}
-function edit(slug){const raw=items.find(i=>i.slug===slug);if(!raw)return;const x=resolvedItem(raw);currentSlug=raw.slug;$('editorTitle').textContent=x.name||raw.slug;$('c_source').value=raw.source_slug||'';$('c_theme').value=effectiveTheme(raw);$('c_name').value=x.name||'';$('c_slug').value=raw.slug||x.slug||'';$('c_headline').value=x.headline||'';$('c_description').value=x.description||'';$('c_tags').value=(x.tags||[]).join('\n');$('c_category').value=x.category||'';$('c_sort').value=raw.sort_order||999;$('c_active').checked=raw.active!==false;const linked=kind==='corporate'&&!!raw.source_slug;$('deleteItem').hidden=linked;$('contentActiveLabel').hidden=linked;setSharedLocked(linked);if(x.image){$('c_preview').src='/'+x.image;$('c_preview').hidden=false;$('c_placeholder').hidden=true}else{$('c_preview').hidden=true;$('c_placeholder').hidden=false}$('c_profile_image').value='';profileImageClear=false;preparedProfileImage=null;preparedProfileName='';profileRemoteSrc=x.profile_image?'/'+x.profile_image:'';setFileName('Dosya seçilmedi');showProfile(profileRemoteSrc||DEFAULT_PROFILE);updateCorporateVisibilityPanel(raw);render()}
+function edit(slug){const raw=items.find(i=>i.slug===slug);if(!raw)return;const x=resolvedItem(raw);currentSlug=raw.slug;$('editorTitle').textContent=x.name||raw.slug;$('c_source').value=raw.source_slug||'';$('c_theme').value=effectiveTheme(raw);$('c_name').value=x.name||'';$('c_slug').value=raw.slug||x.slug||'';$('c_headline').value=x.headline||'';$('c_description').value=x.description||'';$('c_tags').value=(x.tags||[]).join('\n');$('c_category').value=x.category||'';$('c_sort').value=raw.sort_order||999;$('c_active').checked=raw.active!==false;const linked=kind==='corporate'&&!!raw.source_slug;$('deleteItem').hidden=linked;$('contentActiveLabel').hidden=linked;setSharedLocked(linked);if(x.image){$('c_preview').src='/'+x.image;$('c_preview').hidden=false;$('c_placeholder').hidden=true}else{$('c_preview').hidden=true;$('c_placeholder').hidden=false}$('c_profile_image').value='';profileImageClear=false;preparedProfileImage=null;preparedProfileName='';profileRemoteSrc=x.profile_image?'/'+x.profile_image:'';setFileName('Dosya seçilmedi');showProfile(profileRemoteSrc||DEFAULT_PROFILE);updateCorporateVisibilityPanel(raw);render();showThemeHint(raw.slug)}
 async function load(){const d=await api('/api/content?kind='+kind);items=d.items||[];sources=d.sources||[];renderSources();render();reset()}
 function switchKind(next){kind=next;document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('active',b.dataset.kind===kind));document.querySelectorAll('.corporate-only').forEach(x=>x.hidden=kind!=='corporate');$('corporateBulkActions').hidden=kind!=='corporate';$('profileImageField').hidden=kind==='prototype';$('kindEyebrow').textContent=kind==='nfc'?'NFC & QR REFERANSI':kind==='corporate'?'KURUMSAL REFERANS':'PROTOTİP & PARÇA ÜRETİM';$('imageLabel').textContent=kind==='prototype'?'Prototip / parça görseli':kind==='corporate'?'Kurumsal referans görseli':'NFC & QR referans görseli';$('c_category').placeholder=kind==='prototype'?'Örn. Yedek parça / makine aksamı':'Örn. Restoran • QR Stand';load().catch(e=>toast(e.message,true))}
 function stageMetrics(){const stage=$('logoEditorStage'),crop=$('logoEditorCropBox');const stageRect=stage.getBoundingClientRect(),cropRect=crop.getBoundingClientRect();return {stageRect,cropRect,stageW:stageRect.width,stageH:stageRect.height,cropW:cropRect.width,cropH:cropRect.height,cropLeft:cropRect.left-stageRect.left,cropTop:cropRect.top-stageRect.top}}
@@ -84,28 +84,34 @@ async function saveCorporateVisibilityImmediately(){
   finally{if(seq===corporateVisibilitySeq)toggle.disabled=false}
 }
 async function bulkCorporateVisibility(visible){const text=visible?'Tüm NFC aynaları Kurumsal sayfada gösterilsin mi?':'Tüm NFC aynaları Kurumsal sayfadan gizlensin mi? NFC & QR sayfası ve ana sayfadaki Sahadan İşler etkilenmez.';if(!confirm(text))return;try{const d=await api('/api/content/corporate-visibility/bulk',{method:'POST',body:JSON.stringify({visible})});toast('✅ '+d.message);await load()}catch(err){toast(err.message,true)}}
-let themeSaveTimer=null,themeSaveSeq=0;
+// v3.3.99 — kart tonu: seçim anında listeye yazılır; kayıt arka planda biter, karttan karta geçince durum kaybolmaz
+const themeSaveSeq={},themePending={};
+function showThemeHint(slug){const hint=$('themeSaveHint');if(!hint)return;const p=themePending[kind+':'+slug];if(p==='saving'){hint.textContent='Kart tonu kaydediliyor…';hint.className='saving'}else if(p==='error'){hint.textContent='Kart tonu kaydedilemedi.';hint.className='error'}else{hint.textContent='';hint.className=''}}
 function saveThemeImmediately(){
   if(!currentSlug)return;
-  clearTimeout(themeSaveTimer);
-  const slug=currentSlug,theme=$('c_theme').value,seq=++themeSaveSeq;
-  const select=$('c_theme'),hint=$('themeSaveHint');
-  if(hint){hint.textContent='Kart tonu kaydediliyor…';hint.className='saving'}
-  themeSaveTimer=setTimeout(async()=>{
+  const slug=currentSlug,theme=$('c_theme').value,saveKind=kind,key=saveKind+':'+slug,seq=(themeSaveSeq[key]||0)+1;
+  themeSaveSeq[key]=seq;
+  const row=items.find(i=>i.slug===slug);if(row)row.theme=theme;
+  const label=(resolvedItem(row||{}).name)||slug;
+  themePending[key]='saving';showThemeHint(slug);render();
+  (async()=>{
     try{
-      const d=await api('/api/content/theme/save',{method:'POST',body:JSON.stringify({kind,slug,theme})});
-      if(seq!==themeSaveSeq)return;
+      const d=await api('/api/content/theme/save',{method:'POST',body:JSON.stringify({kind:saveKind,slug,theme})});
+      if(themeSaveSeq[key]!==seq)return;
       const persisted=String(d.item?.theme||'').toLowerCase();
       if(persisted!==theme)throw new Error('Kart tonu kalıcı kayda yazıldı ancak doğrulama eşleşmedi.');
-      if(hint){hint.textContent=`✓ ${theme==='dark'?'Koyu':'Açık'} kart tonu kaydedildi ve ilgili sayfa doğrulandı.`;hint.className='saved'}
-      toast(`✅ Kart tonu ${theme==='dark'?'Koyu':'Açık'} olarak uygulandı.`);
-      await refreshCurrentContent(slug);
+      delete themePending[key];
+      if(kind===saveKind){const r=items.find(i=>i.slug===slug);if(r)r.theme=persisted;render();
+        if(currentSlug===slug){const hint=$('themeSaveHint');if(hint){hint.textContent=`✓ ${persisted==='dark'?'Koyu':'Açık'} kart tonu kaydedildi ve ilgili sayfa doğrulandı.`;hint.className='saved'}}}
+      toast(`✅ ${label}: kart tonu ${persisted==='dark'?'Koyu':'Açık'} olarak uygulandı.`);
     }catch(err){
-      if(seq!==themeSaveSeq)return;
-      if(hint){hint.textContent='Kart tonu kaydedilemedi.';hint.className='error'}
-      toast(err.message,true);
+      if(themeSaveSeq[key]!==seq)return;
+      themePending[key]='error';
+      try{const r=await api('/api/content?kind='+saveKind);if(kind===saveKind){items=r.items||items;render();if(currentSlug===slug)$('c_theme').value=effectiveTheme(items.find(i=>i.slug===slug)||{})}}catch(_){}
+      if(kind===saveKind&&currentSlug===slug)showThemeHint(slug);
+      toast(`${label}: ${err.message}`,true);
     }
-  },100);
+  })();
 }
 document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>switchKind(b.dataset.kind));$('newItem').onclick=reset;$('backProducts').onclick=()=>location.href='index.html';$('openSite').onclick=()=>window.open(kind==='nfc'?'https://3d.bgstudio.com.tr/nfc-qr/':kind==='corporate'?'https://3d.bgstudio.com.tr/kurumsal/':'https://3d.bgstudio.com.tr/prototip-parca/','_blank');$('c_name').addEventListener('input',()=>{if(!currentSlug&&!(kind==='corporate'&&$('c_source').value))$('c_slug').value=slugify($('c_name').value)});$('c_theme').addEventListener('change',saveThemeImmediately);$('c_show_corporate').addEventListener('change',saveCorporateVisibilityImmediately);$('hideAllNfcCorporate').onclick=()=>bulkCorporateVisibility(false);$('showAllNfcCorporate').onclick=()=>bulkCorporateVisibility(true);$('c_source').addEventListener('change',()=>{const linked=kind==='corporate'&&!!$('c_source').value;$('contentActiveLabel').hidden=linked;$('deleteItem').hidden=linked||!currentSlug;setSharedLocked(linked);if(linked){fillFromSource($('c_source').value);updateCorporateVisibilityPanel()}else if(!currentSlug){['c_name','c_slug','c_headline','c_description','c_tags','c_category'].forEach(x=>$(x).value='');$('c_preview').hidden=true;$('c_placeholder').hidden=false;preparedProfileImage=null;preparedProfileName='';profileRemoteSrc='';setFileName('Dosya seçilmedi');showProfile(DEFAULT_PROFILE);profileImageClear=false;updateCorporateVisibilityPanel()}});$('c_image').addEventListener('change',async()=>{const f=$('c_image').files[0];if(!f)return;const u=URL.createObjectURL(f);$('c_preview').src=u;$('c_preview').hidden=false;$('c_placeholder').hidden=true;try{setContentDimensionStatus('c_image_status',await contentFileDimensions(f),1600,900)}catch(_){}});
 $('contentForm').addEventListener('submit',async e=>{e.preventDefault();try{const {linked,item}=currentContentItem();const file=linked?null:$('c_image').files[0];const image=file?await convertImage(file):null;const profileFile=(kind!=='prototype'&&!linked)?$('c_profile_image').files[0]:null;const profile_image=(kind!=='prototype'&&!linked)?(preparedProfileImage||(profileFile?await convertProfileImage(profileFile):null)):null;const d=await api('/api/content/save',{method:'POST',body:JSON.stringify({kind,original_slug:currentSlug,item,image,profile_image,profile_image_clear:kind!=='prototype'&&!linked&&profileImageClear})});toast('✅ '+d.message);await refreshCurrentContent(d.item.slug)}catch(err){toast(err.message,true)}});
