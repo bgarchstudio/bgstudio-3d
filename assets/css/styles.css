@@ -6348,3 +6348,11 @@ html{font-variant-numeric:lining-nums}
 .announcement-marquee-item.is-link{color:var(--ann-fg,#fff)!important;opacity:1}
 .announcement-marquee-item.is-link:hover{color:var(--ann-accent,var(--bronze-light))!important}
 .announcement-marquee-separator{background:var(--ann-accent,var(--bronze-light))!important}
+
+/* v3.3.99 · NFC / Kurumsal referans şeridi kartları paneldeki koyu tonu izler (aşağıdaki referans kartlarıyla aynı espresso) */
+.home-client-card-v3199r1.is-dark-v3399{background:#1b1713!important;border-color:rgba(255,255,255,.1)!important;color:#f4f3f1!important}
+.home-client-card-v3199r1.is-dark-v3399 strong{color:#fff!important}
+.home-client-card-v3199r1.is-dark-v3399 small{color:rgba(255,255,255,.62)!important}
+.home-client-card-v3199r1.is-dark-v3399 em{color:#c8894a!important}
+.home-client-card-v3199r1.is-dark-v3399 .home-client-arrow-v3199r1{color:#c8894a!important;border-color:rgba(255,255,255,.16)!important;background:transparent!important}
+.home-client-card-v3199r1.is-dark-v3399 .home-client-mark-v3199r1{border-color:rgba(255,255,255,.14)!important}

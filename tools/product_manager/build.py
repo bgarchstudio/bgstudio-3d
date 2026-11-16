@@ -1078,7 +1078,7 @@ def render_home_project_feature(item, index, prefix=''):
     )
 
 
-def render_home_business_marquee_card(item, index, prefix=''):
+def render_home_business_marquee_card(item, index, prefix='', themed=False):
     """Homepage client/reference logo card sourced from published field records.
 
     This is intentionally not a testimonial. It only identifies businesses that
@@ -1095,8 +1095,11 @@ def render_home_business_marquee_card(item, index, prefix=''):
         media = f'<span class="home-client-mark-v3199r1"><img src="{esc(prefix + media_path)}" alt="" loading="lazy" decoding="async"/></span>'
     else:
         media = f'<span class="home-client-mark-v3199r1 home-client-mark-fallback-v3199r1" aria-hidden="true">{esc(initials)}</span>'
+    # v3.3.99 — NFC ve Kurumsal sayfa şeritleri paneldeki kart tonunu (açık / koyu) izler
+    tone = 'dark' if themed and str(item.get('theme') or '').strip().lower() == 'dark' else 'light'
+    tone_class = ' is-dark-v3399' if tone == 'dark' else ''
     return (
-        f'<a class="home-client-card-v3199r1" href="{href}">'
+        f'<a class="home-client-card-v3199r1{tone_class}" href="{href}" data-card-theme="{tone}">'
         f'{media}<span class="home-client-copy-v3199r1"><small>SAHADAN REFERANS</small><strong>{name}</strong><em>{category}</em></span>'
         f'<span class="home-client-arrow-v3199r1" aria-hidden="true">↗</span></a>'
     )
@@ -1124,7 +1127,7 @@ def render_contextual_business_marquee(items, eyebrow, title, description, prefi
             break
     if not selected:
         return ''
-    cards = ''.join(render_home_business_marquee_card(item, index + 1, prefix) for index, item in enumerate(selected))
+    cards = ''.join(render_home_business_marquee_card(item, index + 1, prefix, themed=True) for index, item in enumerate(selected))
     is_static = len(selected) <= 1
     loop = (
         f'<div class="home-client-marquee-group-v3199r1">{cards}</div>'
@@ -2321,7 +2324,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.98'
+SITE_ASSET_VERSION = '3.3.99'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
