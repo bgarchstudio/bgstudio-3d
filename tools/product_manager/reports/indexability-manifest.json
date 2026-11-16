@@ -3,11 +3,11 @@
   "asset_version": "3.3.98",
   "generated_at": "2026-11-16",
   "summary": {
-    "physical_html_pages": 80,
-    "canonical_indexable_pages": 77,
+    "physical_html_pages": 81,
+    "canonical_indexable_pages": 78,
     "noindex_pages": 3,
-    "index_html_aliases": 79,
-    "sitemap_urls": 77,
+    "index_html_aliases": 80,
+    "sitemap_urls": 78,
     "indexable_not_in_sitemap": 0,
     "duplicate_canonicals": 0
   },
@@ -297,6 +297,16 @@
       "route": "/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/",
       "url": "https://3d.bgstudio.com.tr/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/",
       "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/",
+      "robots": "index,follow",
+      "indexable": true,
+      "in_sitemap": true,
+      "expected_treatment": "canonical-indexable"
+    },
+    {
+      "file": "projeler/prototip-cfmoto-450-sr-mars-butonu/index.html",
+      "route": "/projeler/prototip-cfmoto-450-sr-mars-butonu/",
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-cfmoto-450-sr-mars-butonu/",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-cfmoto-450-sr-mars-butonu/",
       "robots": "index,follow",
       "indexable": true,
       "in_sitemap": true,
@@ -980,6 +990,12 @@
       "url": "https://3d.bgstudio.com.tr/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/index.html",
       "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/",
       "source_file": "projeler/prototip-burc-temali-dekoratif-tablo-uretimi/index.html",
+      "expected_google_treatment": "alternate-canonical-or-redirect"
+    },
+    {
+      "url": "https://3d.bgstudio.com.tr/projeler/prototip-cfmoto-450-sr-mars-butonu/index.html",
+      "canonical": "https://3d.bgstudio.com.tr/projeler/prototip-cfmoto-450-sr-mars-butonu/",
+      "source_file": "projeler/prototip-cfmoto-450-sr-mars-butonu/index.html",
       "expected_google_treatment": "alternate-canonical-or-redirect"
     },
     {

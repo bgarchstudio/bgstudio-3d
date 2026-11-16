@@ -105,7 +105,34 @@
     "active": true,
     "sort_order": 5,
     "category": "KALIP MODELİ & 3D ÜRETİM",
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/prototypes/burc-temali-dekoratif-tablo-uretimi.webp"
+  },
+  {
+    "slug": "cfmoto-450-sr-mars-butonu",
+    "name": "CFMOTO 450 SR Marş Butonu",
+    "headline": "CFMOTO 450 SR Motosiklet Marş Butonunun 3D Yeniden Üretimi",
+    "description": "CFMOTO 450 SR motosiklet sahibi müşterimizin kaybolan marş butonunun yerine geçecek yeni bir parça üretildi. Orijinal butonun görsel formu ve bağlantı yapısı referans alınarak parça 3D ortamda modellendi. Üst yüzey geometrisi, kontrol bölümleri ve alt bağlantı ayakları tasarıma aktarıldı. Hazırlanan dijital modelin ardından 3D baskı yöntemiyle fiziksel prototip üretildi. Bu çalışma, BG Studio 3D'nin motosikletler için kayıp veya temini zor parçaların yeniden modellenmesi ve özel üretimine yönelik referans projelerinden biridir.",
+    "tags": [
+      "BG Studio 3D",
+      "CFMOTO",
+      "CFMOTO 450 SR",
+      "Motosiklet",
+      "Marş Butonu",
+      "Yedek Parça",
+      "3D Baskı",
+      "3D Modelleme",
+      "Prototip",
+      "Özel Üretim",
+      "Parça Yeniden Üretimi",
+      "Teknik Parça",
+      "Tersine Mühendislik",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 6,
+    "category": "MOTOSİKLET YEDEK PARÇA • PROTOTİP",
+    "theme": "light",
+    "image": "assets/images/prototypes/cfmoto-450-sr-mars-butonu.webp"
   }
 ]
