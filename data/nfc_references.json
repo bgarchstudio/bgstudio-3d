@@ -57,7 +57,7 @@
     "sort_order": 2,
     "category": "Restoran • Premium Feedback Duo",
     "show_in_corporate": true,
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/references/planet-yucca.webp",
     "profile_image": "assets/images/references/planet-yucca-profile.webp"
   },
@@ -127,7 +127,7 @@
     "sort_order": 4,
     "category": "Restoran • Profesyonel Paket",
     "show_in_corporate": true,
-    "theme": "light",
+    "theme": "dark",
     "image": "assets/images/references/yusuf-sef.webp",
     "profile_image": "assets/images/references/yusuf-sef-profile.webp",
     "project_installation": "15 masa · 45 NFC",
@@ -192,7 +192,7 @@
     "sort_order": 6,
     "category": "Restoran • Premium Feedback Trio",
     "show_in_corporate": true,
-    "theme": "dark",
+    "theme": "light",
     "image": "assets/images/references/yenipazar-pidecisi.webp",
     "profile_image": "assets/images/references/yenipazar-pidecisi-profile.webp"
   },
