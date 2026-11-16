@@ -2247,5 +2247,59 @@
     "main_image": "assets/images/products/3-bolmeli-gunluk-ilac-kutusu-foto.webp",
     "main_image_width": 1000,
     "main_image_height": 760
+  },
+  {
+    "pricing_tiers": [],
+    "name": "Çizgili Dekor Tepsi Seti",
+    "card_description": "Tepsi, vazo, kapaklı kutu ve ev mumluk; dört parçalı dekor seti.",
+    "box_contents": "Yuvarlak tepsi, çizgili vazo, kapaklı çizgili kutu, ev mumluk ve hediye pilli LED tealight mum. Görseldeki yapay bitkiler sete dahil değildir.",
+    "material_ids": [
+      "pla"
+    ],
+    "options": [],
+    "seo_description": "Tepsi, çizgili vazo, kapaklı kutu ve ev mumluktan oluşan 4 parçalı dekor seti. Pilli LED mum hediye. 3D baskı, Türkiye geneli kargo.",
+    "category": "dekoratif-duvar",
+    "description": "Yuvarlak tepsi, çizgili vazo, kapaklı çizgili kutu ve ev formundaki mumluktan oluşan dört parçalı dekor seti. Sehpa, konsol, mutfak tezgâhı ya da komodin üzerinde tek parça halinde bir dekor köşesi kurar. Vazoya kuru ya da yapay çiçek konabilir; kapaklı kutu küçük eşyalar, takı veya şekerlemeler için kullanılır. Ev mumluğun pencere ve kapısından tealight mumun ışığı süzülür.\n\nNot: Görseldeki yapay bitkiler ürün yerleştirmesidir, sete dahil değildir. Pilli yapay tealight mum setle birlikte hediye olarak gönderilir.",
+    "color_ids": [
+      "bone-white"
+    ],
+    "slug": "cizgili-dekor-tepsi-seti",
+    "production_note": "3D baskı ürünlerde katman dokusu üretim yönteminin doğal bir parçasıdır. Renk, adet ve kişiselleştirme seçenekleri sipariş öncesi netleştirilir.",
+    "tags": [
+      "Dekor Seti",
+      "Vazo",
+      "Mumluk",
+      "Tepsi",
+      "Ev Dekorasyonu",
+      "Hediye"
+    ],
+    "seo_title": "Çizgili Dekor Tepsi Seti – Vazo, Kutu ve Mumluk | BG Studio 3D",
+    "personalizable": false,
+    "sale_price_value": null,
+    "active": true,
+    "featured": false,
+    "price_text": "1.099 TL",
+    "features": [
+      "4 parçalı set: tepsi, vazo, kapaklı kutu, ev mumluk",
+      "Dikey çizgili, mat doku",
+      "Pilli LED tealight mum hediye",
+      "Bone White renk"
+    ],
+    "sort_order": 41,
+    "price_value": "1099",
+    "dimensions": "",
+    "weight": "",
+    "print_method": "",
+    "production_time": "",
+    "estimated_production_time": "",
+    "technical_info": "",
+    "usage_info": "",
+    "personalization_info": "",
+    "production_status": "",
+    "og_image_source": "main",
+    "gallery_images": [],
+    "main_image": "assets/images/products/cizgili-dekor-tepsi-seti.webp",
+    "main_image_width": 1000,
+    "main_image_height": 760
   }
 ]
