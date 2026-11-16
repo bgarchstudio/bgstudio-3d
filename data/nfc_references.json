@@ -28,18 +28,7 @@
     "show_in_corporate": true,
     "theme": "light",
     "image": "assets/images/references/circolo-kusadasi.webp",
-    "profile_image": "assets/images/references/circolo-kusadasi-profile.webp",
-    "project_installation": "5 stand · 10 NFC",
-    "project_metrics": {
-      "total_scans": 317,
-      "nfc_scans": 55,
-      "qr_scans": 262,
-      "google_redirects": 251,
-      "instagram_opens": 66,
-      "google_review_growth": "+188",
-      "google_review_range": "211 → 399"
-    },
-    "project_metrics_date": "10 Kasım 2026"
+    "profile_image": "assets/images/references/circolo-kusadasi-profile.webp"
   },
   {
     "slug": "planet-yucca",
