@@ -86,5 +86,26 @@
     "category": "Yedek Parça • Hassas Ölçüyle Yeniden Üretim",
     "theme": "dark",
     "image": "assets/images/prototypes/el-testeresi-bicak-kilavuz-parcasi.webp"
+  },
+  {
+    "slug": "burc-temali-dekoratif-tablo-uretimi",
+    "name": "Burç Temalı Dekoratif Tablo Üretimi",
+    "headline": "Burç Sembolleri İçin Hassas 3D Kalıp Modelleri",
+    "description": "Burç temalı dekoratif tablolar üreten müşterimiz için Koç, Yengeç, Akrep, Yay ve Terazi burçlarını temsil eden 6 adet detaylı 3D model ürettik.\n\nSilikon kalıp alma ve ardından alçı döküm yöntemiyle çoğaltma sürecinde ana model olarak kullanılacak figürleri, kabartma detaylarını ve yüzey formlarını koruyarak 3D baskıyla hayata geçirdik.\n\nBG Studio 3D olarak dekoratif ürün geliştirme, silikon kalıp öncesi ana model üretimi ve kişiye özel prototipleme ihtiyaçlarına çözüm sunuyoruz.",
+    "tags": [
+      "3D Baskı",
+      "Silikon Kalıp Modeli",
+      "Burç Sembolleri",
+      "Dekoratif Tablo",
+      "Alçı Döküm",
+      "Prototip Üretimi",
+      "Özel Üretim",
+      "Kuşadası"
+    ],
+    "active": true,
+    "sort_order": 5,
+    "category": "KALIP MODELİ & 3D ÜRETİM",
+    "theme": "dark",
+    "image": "assets/images/prototypes/burc-temali-dekoratif-tablo-uretimi.webp"
   }
 ]
