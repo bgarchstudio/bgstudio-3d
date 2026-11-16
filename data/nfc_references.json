@@ -70,18 +70,7 @@
     "show_in_corporate": true,
     "theme": "dark",
     "image": "assets/images/references/planet-yucca.webp",
-    "profile_image": "assets/images/references/planet-yucca-profile.webp",
-    "project_installation": "10 stand · 20 NFC",
-    "project_metrics": {
-      "total_scans": 143,
-      "nfc_scans": 14,
-      "qr_scans": 129,
-      "google_redirects": 100,
-      "instagram_opens": 43,
-      "google_review_growth": "+66",
-      "google_review_range": "1.487 → 1.553"
-    },
-    "project_metrics_date": "10 Kasım 2026"
+    "profile_image": "assets/images/references/planet-yucca-profile.webp"
   },
   {
     "slug": "istavrit-restaurant",
