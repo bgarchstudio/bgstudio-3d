@@ -97,15 +97,24 @@ public static class BG3DShellNotify {
     Write-Host ''
     Write-Host 'Kalici veriler hazirlaniyor...' -ForegroundColor DarkYellow
 
+    # v3.3.98: Pillow'u olan Python'u en baştan seç (görsel ölçüleri için gerekli). Böylece panel
+    # "Pillow bu Python'da yok" deyip kendini başka Python ile yeniden başlatmak zorunda kalmaz.
     $pythonCommand = $null
     $pythonPrefix = @()
+    $candidates = @()
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        $pythonCommand = 'py'; $pythonPrefix = @('-3')
-    } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-        $pythonCommand = 'python'
-    } elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
-        $pythonCommand = 'python3'
+        $listed = & py -0p 2>$null
+        foreach ($line in $listed) { if ($line -match '(\S:\\.*python\.exe)\s*$') { $candidates += ,@($Matches[1].Trim()) } }
+        $candidates += ,@('py', '-3')
     }
+    if (Get-Command python -ErrorAction SilentlyContinue) { $candidates += ,@('python') }
+    if (Get-Command python3 -ErrorAction SilentlyContinue) { $candidates += ,@('python3') }
+    foreach ($cand in $candidates) {
+        $exe = $cand[0]; $pre = @($cand | Select-Object -Skip 1)
+        & $exe @pre -c 'from PIL import Image' 2>$null
+        if ($LASTEXITCODE -eq 0) { $pythonCommand = $exe; $pythonPrefix = $pre; break }
+    }
+    if (-not $pythonCommand -and $candidates.Count) { $pythonCommand = $candidates[0][0]; $pythonPrefix = @($candidates[0] | Select-Object -Skip 1) }
     if (-not $pythonCommand) { Wait-And-Exit 'Python 3 bulunamadi.' }
 
     $storage = Join-Path $repo 'tools\product_manager\storage_cli.py'

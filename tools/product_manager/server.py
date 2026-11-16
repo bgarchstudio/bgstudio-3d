@@ -2743,7 +2743,7 @@ def _relaunch_with_pillow_python():
         if Path(exe).resolve() == Path(sys.executable).resolve():
             continue
         try:
-            if subprocess.run([exe, '-c', 'import PIL'], capture_output=True, timeout=15).returncode != 0:
+            if subprocess.run([exe, '-c', 'from PIL import Image'], capture_output=True, timeout=15).returncode != 0:
                 continue
         except Exception:
             continue
