@@ -2306,12 +2306,12 @@
     "slug": "kitsune-kurt-maske-boyanabilir",
     "technical_info": "",
     "featured": false,
-    "main_image": "assets/images/products/kitsune-kurt-maske-boyanabilir-1-20261116212000.webp",
+    "main_image": "assets/images/products/kitsune-kurt-maske-boyanabilir.webp",
     "price_value": "2490",
     "active": true,
     "card_description": "Oymalı kitsune kurt maskesi; beyaz, boyamaya hazır.",
     "main_image_width": 1000,
-    "description": "Japon kitsune geleneğinden ilham alan, oymalı süslemeli kurt / tilki maskesi. Kulaklardaki işlemeler, alnındaki desen, yüzdeki tüy dokusu ve dişler 3D baskıyla tek parça olarak üretilir. Maske beyaz ve boyasız gönderilir; akrilik boyayla kendi renginize boyayabilir, cosplay, kostüm partisi, sahne ya da duvar dekoru olarak kullanabilirsiniz. İç yüzeyi yüze oturacak şekilde oyuktur, göz açıklıkları görüş sağlar.\n\nNot: Görsellerdeki boyalı maskeler (kırmızı-beyaz ve siyah-altın) boyama fikri vermek içindir; ürün beyaz, boyasız gönderilir. Fırça, boya ve palet görsel yerleştirmesidir, ürüne dahil değildir.",
+    "description": "Japon kitsune geleneğinden ilham alan, oymalı süslemeli kurt / tilki maskesi. Kulaklardaki işlemeler, alnındaki desen, yüzdeki tüy dokusu ve dişler 3D baskıyla tek parça olarak üretilir. Maske beyaz ve boyasız gönderilir; akrilik boyayla kendi renginize boyayabilir, cosplay, kostüm partisi, sahne ya da duvar dekoru olarak kullanabilirsiniz. İç yüzeyi yüze oturacak şekilde oyuktur, göz açıklıkları görüş sağlar.\n\nNot: Görseldeki kırmızı-beyaz boyalı maske boyama fikri vermek içindir; ürün beyaz, boyasız gönderilir. Fırça, boya ve palet görsel yerleştirmesidir, ürüne dahil değildir.",
     "material_ids": [
       "pla"
     ],
@@ -2319,7 +2319,7 @@
     "personalization_info": "",
     "gallery_images": [
       {
-        "path": "assets/images/products/kitsune-kurt-maske-boyanabilir-2-20261116212000.webp",
+        "path": "assets/images/products/kitsune-kurt-maske-boyanabilir-gallery-01.webp",
         "width": 1000,
         "height": 760,
         "alt": "Kitsune Kurt Maske – Boyanabilir Beyaz galeri görseli 1"
@@ -2329,7 +2329,7 @@
     "main_image_height": 760,
     "seo_description": "Oymalı kitsune kurt maskesi, beyaz ve boyamaya hazır. Cosplay, kostüm partisi ve duvar dekoru için 3D baskı. Türkiye geneli kargo.",
     "og_image_source": "main",
-    "box_contents": "Beyaz, boyasız kitsune kurt maske. Görsellerdeki boyalı örnekler, fırça, boya ve palet ürüne dahil değildir.",
+    "box_contents": "Beyaz, boyasız kitsune kurt maske. Görseldeki boyalı örnek, fırça, boya ve palet ürüne dahil değildir.",
     "options": [],
     "tags": [
       "Maske",
