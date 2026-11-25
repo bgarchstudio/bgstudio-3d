@@ -1,0 +1,322 @@
+{
+ "/": {
+  "hash": "8896e00872dafeaa3072146d6bbb1b830762add4",
+  "lastmod": "2026-11-25"
+ },
+ "/gizlilik/": {
+  "hash": "cf0b534ca144b9df27f6812e8d4d30d249bdd148",
+  "lastmod": "2026-11-25"
+ },
+ "/hakkimizda/": {
+  "hash": "48359ea883d1a673272cfa09eb091457dd99c101",
+  "lastmod": "2026-11-25"
+ },
+ "/iletisim/": {
+  "hash": "a1e209ca16b12ad9048c1f486a17f6b9a27eaef3",
+  "lastmod": "2026-11-25"
+ },
+ "/kisiye-ozel-urun-kosullari/": {
+  "hash": "4f0081b9ed5669319769faa1d10a5d30d425e1ef",
+  "lastmod": "2026-11-25"
+ },
+ "/kurumsal/": {
+  "hash": "c84aab2add5ba25aa86f933aef63bc3fa0272d97",
+  "lastmod": "2026-11-25"
+ },
+ "/kusadasi-3d-baski/": {
+  "hash": "3079c262f4042b838b579ce0cba9919a0593b8cd",
+  "lastmod": "2026-11-25"
+ },
+ "/kvkk/": {
+  "hash": "2fd35b69626264ea9ef17add371f72c91a30f17b",
+  "lastmod": "2026-11-25"
+ },
+ "/mimari-maket-3d-baski/": {
+  "hash": "b03a7cd5f6bf02b2fa8b7689747373f5d5522e31",
+  "lastmod": "2026-11-25"
+ },
+ "/nfc-qr/": {
+  "hash": "d541be50247e9a2846b406c22ec3ce5274141713",
+  "lastmod": "2026-11-25"
+ },
+ "/nfc-qr/feedback/": {
+  "hash": "7fb406476b81240a08bf90da10b8d9c2b6f81784",
+  "lastmod": "2026-11-25"
+ },
+ "/nfc-qr/hizli-baglanti/": {
+  "hash": "136713160f025d498a6ba232839c96574c1a18f3",
+  "lastmod": "2026-11-25"
+ },
+ "/nfc-qr/premium-plus/": {
+  "hash": "04c0982482e1b5b684169364d179eaa46db9bf7b",
+  "lastmod": "2026-11-25"
+ },
+ "/nfc-qr/restoran/": {
+  "hash": "b827223aa92d5d34ae9f64412ee0b50e4fb9f0fb",
+  "lastmod": "2026-11-25"
+ },
+ "/ozel-uretim/": {
+  "hash": "5679d56065708ce8f23554acf724c7cb0e7e5ed9",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/": {
+  "hash": "2a2171cd2ea2cd68cf77aa3a0d8299dab0a4f60c",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/circolo-kusadasi/": {
+  "hash": "99d35a40305f9e529a10330f26f4befcc8610bef",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/istavrit-restaurant/": {
+  "hash": "d000aa4554874c39b4708c2f39dbbad6399d60d0",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/kabalci-hukuk-burosu/": {
+  "hash": "5a2fc01d20b9df1ef293c95a5d1f5c138279f46f",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/koala-petshop/": {
+  "hash": "7fc70d8bae9092331da585dc2e3662b2979d545f",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/kusadasi-asansor/": {
+  "hash": "483f2bb0c812d0f158999580ba09aefa6a5382c3",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/luckyland-kusadasi/": {
+  "hash": "4a9433b9f3abc87270131abff81c60a82e5a5915",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/naz-balik-restaurant/": {
+  "hash": "1d84ab5f12e2592c5c7ab55f3593edaf461836d4",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/planet-yucca/": {
+  "hash": "e50b46352950cbf76819ba837c52dbfafcbc4bd0",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-bot-sisirme-pompasi-ara-parcasi/": {
+  "hash": "61fa57a162ce214cd644f3da669a7cb49ae0f4b5",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-burc-temali-dekoratif-tablo-uretimi/": {
+  "hash": "0bacf70fde90291e07976b91c8d91fc6f3a8ee40",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-cfmoto-450-sr-mars-butonu/": {
+  "hash": "60e0fc42d7222d26b241395fa33dc67352fbdaeb",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-cikolata-selalesi-spiral-aksami/": {
+  "hash": "d02235fe75b161ee647e1036a1ac28d04497a9ae",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-el-testeresi-bicak-kilavuz-parcasi/": {
+  "hash": "f9c0be6e8e973c69482cff6d9c6a69a05672c986",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/prototip-finnsauna-izmir/": {
+  "hash": "4cba4d78a25fa7f9854b27f870a7241cc5720532",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/qnb-bank/": {
+  "hash": "92cba1eadd25a96b35c01c8816f6ea2bf15e7140",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/yenipazar-pidecisi/": {
+  "hash": "efc0e4c57d7afe82c41dcbb65fe08546fe17fcb3",
+  "lastmod": "2026-11-25"
+ },
+ "/projeler/yusuf-sef/": {
+  "hash": "e5bf0c193b325ab925e7bfed5eb71b32032eb9b6",
+  "lastmod": "2026-11-25"
+ },
+ "/prototip-parca/": {
+  "hash": "76699365f69500de09d5fe780985fbf7c592e0be",
+  "lastmod": "2026-11-25"
+ },
+ "/siparis-bilgilendirme/": {
+  "hash": "505e1143445d7c3721bb1aa79637ba6442840323",
+  "lastmod": "2026-11-25"
+ },
+ "/teklif/": {
+  "hash": "e0893339b3898347ce7384b313eaac6b289f3b51",
+  "lastmod": "2026-11-25"
+ },
+ "/teslimat-iade/": {
+  "hash": "79b8a840d068c08f550ffdef9602e66baccb13af",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/": {
+  "hash": "247e41a4b7806ff62a5b1d7324b0ddd7db3dfce6",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/3-bolmeli-gunluk-ilac-kutusu/": {
+  "hash": "f84caebac1b386894b3d38dbc2ede98839f42e42",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/3-bolmeli-kumanda-duzenleyici/": {
+  "hash": "90b1ab1560ef81241b181de7fbf5563ef426b42b",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/3-lu-dis-fircasi-dis-macunu-standi/": {
+  "hash": "69336ad1ac464463fd693dda4b2c897da8a87a03",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/arac-guneslik-gozluk-tutucu/": {
+  "hash": "240aeb559a6f970f07e875e100d949056befcf18",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/arac-koku-difuzoru/": {
+  "hash": "cd33da60cdb609d4823497d17e4982a60800ad45",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/ataturk-imzasi/": {
+  "hash": "1bb17f6ce15d8949c76643835265abf74a8956a1",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/batman-katmanli-yuz-dekor/": {
+  "hash": "3419b78aabc4ab532fdf540294e97da9c382115f",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/cerceveli-dalga-lamba/": {
+  "hash": "c44eb4e2d995cc9e9fb3603c010a1d61c7064d65",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/cizgili-dekor-tepsi-seti/": {
+  "hash": "1262e1565a2adafd531db16db016f319bd9d3611",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/cok-bolmeli-masaustu-organizer/": {
+  "hash": "cc777b5e5c3563af0f3b215b856b7ae823fa20d6",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dekoratif-kus-obje/": {
+  "hash": "acee77cc7f7eaaa9340dbafffc5a9b07a9007d74",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dekoratif-lale/": {
+  "hash": "6e02b3e4917f6af69b2e1b4c63bd1a34f8f4b5a3",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dekoratif-mirket-obje/": {
+  "hash": "f72022f5476abbe89e47c99697ac0063d9a1657d",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dekoratif-mumluk/": {
+  "hash": "9dfc9ee55cb33d1a70d424eeb34848c816fda50c",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dekoratif-tavsan-obje/": {
+  "hash": "a9eea7e219d17e089569fcf40f7d5fe4d9a21227",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/dis-macunu-tup-sikacagi/": {
+  "hash": "9cbd7d47c6d068e8624b0d5b950cac276cf42a5c",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati/": {
+  "hash": "1384ba8dc569dbaa97c4121178adf9fcba3fbe4c",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/drenajli-lavabo-duzenleyici/": {
+  "hash": "e1baaaccaffbd10bbfa9ef4eac8020ba87e739d9",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/flexi-kopekbaligi-anahtarlik/": {
+  "hash": "9445ebb95908309ab9c3c9020acbef8019734925",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/futbol-takimi-logolu-anahtarlik/": {
+  "hash": "0745c42825bde1cb2f0c97d75de89732e3208596",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/havuz-icecek-tutucu/": {
+  "hash": "1e9234919f28f636dc581a3eefcc12386d8c63b7",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/hayvaninizin-ismine-ozel-mama-kuregi/": {
+  "hash": "2c5ce800369382156960b7e6d1b4bf2db8bd8a99",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/heykel-bust-masa-lambasi/": {
+  "hash": "5b131455e54d8d888d387c3cebd2e850dd1fbbe4",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/iplerle-asili-insan-figuru-dekor/": {
+  "hash": "56a9c5aefc2abb6721cbefebcc07b13cf56ca95d",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/iron-man-eli-masa-lambasi/": {
+  "hash": "9a8a5c84c152f8011b38f304534f5ae61423f2e8",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kaktus-kulaklik-saat-standi/": {
+  "hash": "d173e502e72623692cdcf8265e0540041951f9e5",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kask-askiligi/": {
+  "hash": "dc54a954617d94f50528b736f2a1845fe6852763",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kedili-kitap-ayraci/": {
+  "hash": "98d526deac88692eab9e52ef9676ab0e020cc311",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kemal-ataturk-imzali-anahtarlik/": {
+  "hash": "58f3317fb2999b03a73984bb05e970a1ea5b5222",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kisiye-ozel-gaming-stand/": {
+  "hash": "fb581de625c84ea5f24a7bdec7ed3ee8adc7b835",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kisiye-ozel-miknatisli-acacak/": {
+  "hash": "8ba5a6bdc50634e2aa978e3811de6834f1676e3d",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kisiye-ozel-plaka-anahtarlik/": {
+  "hash": "5c6bed0705d450a1260c9f0e3cf02ff401e32072",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kisiye-ozel-telefon-standi-anahtarlik/": {
+  "hash": "4340dacd0b806357dee3ac7a78b196f9e0d6d854",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/kitsune-kurt-maske-boyanabilir/": {
+  "hash": "319713477487386fbdf5ee4a28c373bb83869c13",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/makyaj-pamugu-pamuklu-cubuk-organizer/": {
+  "hash": "c99cb40bcbbb3075e37de80ffbe7f140fa1efac3",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/masa-alti-bardak-tutucu/": {
+  "hash": "e7edac1d50bbe2b7bdff89045c1b48997e105034",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/masaustu-telefon-tutucu-stand/": {
+  "hash": "4769670b43adcc14d9b34c64f2813b03c32f9e58",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/renkli-masa-lambasi/": {
+  "hash": "c7a82486030d3c95ebad9460d23a28548a0bdbea",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/sonsuzluk-kupu-fidget-oyuncak/": {
+  "hash": "f69fdbb9ca1dedcf73890a09e3981c07b747f272",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/spiral-masa-lambasi/": {
+  "hash": "c4a05e0495724a96a4d39621db2462283d1da2c7",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/taki-aksesuar-tepsisi/": {
+  "hash": "f41c86cc6a467d76fc7919fb71294f3f8c252b6c",
+  "lastmod": "2026-11-25"
+ },
+ "/urunler/xiaomi-smart-band-8-pro-9-pro-sarj-standi/": {
+  "hash": "6d44f42f526668b789c5a9f6dabb2dc764e5a2f6",
+  "lastmod": "2026-11-25"
+ }
+}

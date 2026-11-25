@@ -1266,7 +1266,8 @@ def render_home_spatial_control(product, index=0):
         f'data-spatial-name="{esc(copy["name"])}" data-spatial-category="{esc(copy["category"])}" '
         f'data-spatial-price="{esc(copy["price"])}" data-spatial-description="{esc(copy["description"])}" '
         f'data-spatial-href="{esc(copy["href"])}" aria-pressed="{"true" if index == 0 else "false"}" '
-        f'aria-label="{esc(copy["name"])} ürününü göster">'
+        # v3.3.99 — accessible name must contain the visible text ("01 Name")
+        f'aria-label="{index + 1:02d} {esc(copy["name"])} ürününü göster">'
         f'{thumb}<span class="home-spatial-control-copy"><small>{index + 1:02d}</small><strong>{esc(copy["name"])}</strong></span>'
         f'</button>'
     )
@@ -2256,6 +2257,9 @@ def render_product_page(p, related):
         'batman-katmanli-yuz-dekor': ('Batman Katmanlı Duvar Dekoru | Kuşadası 3D Baskı | BG Studio 3D', 'Batman Katmanlı Duvar Dekoru | BG Studio 3D'),
         'doldurulabilir-ice-roller-buzlu-yuz-masaj-aparati': ('Doldurulabilir Ice Roller | Buzlu Yüz Masaj Aparatı | BG Studio 3D', 'Doldurulabilir Ice Roller | BG Studio 3D'),
         'heykel-bust-masa-lambasi': ('3D Baskı Heykeli Masa Lambası | Kuşadası 3D Baskı | BG Studio 3D', 'Heykel Büst Masa Lambası | BG Studio 3D'),
+        # v3.3.99 — titles over 60 chars were cut in results
+        'kitsune-kurt-maske-boyanabilir': ('Kitsune Kurt Maske – Boyanabilir Beyaz Cosplay Maskesi | BG Studio 3D', 'Kitsune Kurt Maske – Boyanabilir Cosplay | BG Studio 3D'),
+        'cizgili-dekor-tepsi-seti': ('Çizgili Dekor Tepsi Seti – Vazo, Kutu ve Mumluk | BG Studio 3D', 'Çizgili Dekor Tepsi Seti – Vazo ve Mumluk | BG Studio 3D'),
     }
     known_old, known_new = serp_known_overrides.get(str(p.get('slug') or ''), ('', ''))
     if stored_title and known_old and stored_title == known_old:
@@ -2448,7 +2452,7 @@ def render_product_page(p, related):
 
 
 # V3.3.04 · Floating Back-To-Top Polish
-SITE_ASSET_VERSION = '3.3.98'
+SITE_ASSET_VERSION = '3.3.99'
 # Teklif formu dosyaları → Google Drive (tools/upload-drive/Code.gs). Boşsa dosyalar WhatsApp'a elle eklenir.
 QUOTE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwbwO4J-8bgKS0BUb4fgK-E6WWRrgOx-m2X_sDB9IneFV9boqyyeLVhSruJ-ab6NOTD/exec'
 
@@ -4343,7 +4347,7 @@ def render_corporate_page_v3169(items):
         + '</div></section>'
         + _service_pathways_v3319('corporate')
     )
-    return _editorial_page_shell('Kurumsal 3D Üretim | BG Studio 3D','İşletmelere özel kurumsal 3D baskı, promosyon, masaüstü ürün ve saha üretimleri. Kuşadası BG Studio 3D.','/kurumsal/',body,'corporate')
+    return _editorial_page_shell('Kurumsal 3D Üretim ve Promosyon Ürünleri | BG Studio 3D','İşletmelere özel kurumsal 3D baskı: logolu promosyon ürünleri, masaüstü ürünler ve saha üretimleri. Kuşadası BG Studio 3D, Türkiye geneli kargo.','/kurumsal/',body,'corporate')
 
 
 def render_prototype_page_v3169(items):
@@ -4393,7 +4397,7 @@ def render_maket_page_v3373():
     }
     schema = '<script type="application/ld+json" data-schema="service">' + json.dumps(service, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/') + '</script>'
     body = '<div class="maket-page">' + MAKET_BODY_V3373 + '</div>' + _faq_schema_v3319(MAKET_FAQ_V3373) + schema
-    return _editorial_page_shell('Mimari Maket 3D Baskı – Kuşadası, İzmir, Aydın | BG Studio 3D',
+    return _editorial_page_shell('Mimari Maket 3D Baskı – Kuşadası, İzmir | BG Studio 3D',
         'Mimari maket 3D baskı: STL, 3MF veya OBJ dosyanızdan kütle, cephe, vaziyet ve iç mekân maketleri. Mimar kurucu, Kuşadası merkezli, Ege geneline teslim.',
         '/mimari-maket-3d-baski/', body, 'maket')
 
@@ -5178,6 +5182,60 @@ def _sitemap_priority_v3321(url):
     return .60
 
 
+SITEMAP_LASTMOD_STATE_V3399 = Path(__file__).with_name('sitemap_lastmod.json')
+
+
+def _page_fingerprint_v3399(text):
+    """Hash of what a visitor/crawler gets, minus build noise (asset ?v= tokens, the
+    asset version string, whitespace), so a rebuild alone never bumps lastmod."""
+    t = re.sub(r'\?v=[^"\'&\s)<>]+', '', text)
+    t = t.replace(SITE_ASSET_VERSION, '')
+    t = re.sub(r'\s+', ' ', t)
+    import hashlib
+    return hashlib.sha1(t.encode('utf-8')).hexdigest()
+
+
+def _git_last_date_v3399(rel):
+    try:
+        import subprocess
+        out = subprocess.run(['git', 'log', '-1', '--format=%cs', '--', rel], cwd=ROOT,
+                             capture_output=True, text=True, timeout=20).stdout.strip()
+        return out or None
+    except Exception:
+        return None
+
+
+def _sitemap_lastmods_v3399(url_to_rel):
+    """v3.3.99 — lastmod changes only when the page content really changes.
+    Before this every build stamped all URLs with today's date, which teaches
+    Google to ignore lastmod. State lives in tools/product_manager/sitemap_lastmod.json."""
+    try:
+        state = json.loads(SITEMAP_LASTMOD_STATE_V3399.read_text(encoding='utf-8'))
+    except Exception:
+        state = {}
+    today = date.today().isoformat()
+    out, new_state = {}, {}
+    for url, rel in url_to_rel.items():
+        path = url[len(BASE_URL):] or '/'
+        try:
+            fp = _page_fingerprint_v3399((ROOT / rel).read_text(encoding='utf-8'))
+        except Exception:
+            fp = ''
+        prev = state.get(path) or {}
+        if prev.get('hash') == fp and prev.get('lastmod'):
+            lastmod = prev['lastmod']
+        elif not prev:
+            # First run: seed from the last commit that touched the page.
+            lastmod = _git_last_date_v3399(rel) or today
+        else:
+            lastmod = today
+        out[url] = lastmod
+        new_state[path] = {'hash': fp, 'lastmod': lastmod}
+    SITEMAP_LASTMOD_STATE_V3399.write_text(
+        json.dumps(new_state, ensure_ascii=False, indent=1, sort_keys=True) + '\n', encoding='utf-8')
+    return out
+
+
 def build_canonical_sitemap_v3321():
     """Build sitemap from generated indexable self-canonical pages, not a hand-maintained list."""
     canonical_to_page = {}
@@ -5210,12 +5268,12 @@ def build_canonical_sitemap_v3321():
         canonical_to_page[canonical] = rel
 
     urls = sorted(canonical_to_page, key=lambda u: (u != BASE_URL+'/', u))
-    today = date.today().isoformat()
+    lastmods = _sitemap_lastmods_v3399({u: canonical_to_page[u] for u in urls})
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for url in urls:
         priority = _sitemap_priority_v3321(url)
         lines.append(
-            f'  <url><loc>{url}</loc><lastmod>{today}</lastmod>'
+            f'  <url><loc>{url}</loc><lastmod>{lastmods[url]}</lastmod>'
             f'<changefreq>monthly</changefreq><priority>{priority}</priority></url>'
         )
     lines.append('</urlset>')

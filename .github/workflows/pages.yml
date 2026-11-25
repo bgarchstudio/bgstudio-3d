@@ -33,7 +33,7 @@ jobs:
           set -euo pipefail
           mkdir -p _site/data
           # Root files served by the site.
-          for f in index.html 404.html CNAME robots.txt sitemap.xml site.webmanifest \
+          for f in index.html 404.html CNAME robots.txt sitemap.xml llms.txt site.webmanifest \
                    favicon.ico bgstudio3d.ico apple-touch-icon.png .nojekyll; do
             if [ -e "$f" ]; then cp "$f" _site/; fi
           done

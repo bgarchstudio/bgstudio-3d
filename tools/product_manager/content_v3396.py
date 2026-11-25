@@ -204,7 +204,7 @@ LEGAL_PAGES = {
             'Kanuna aykırı işleme nedeniyle zarara uğramanız hâlinde zararın giderilmesini talep etme.']),
         ('Başvuru', f'Haklarınızla ilgili taleplerinizi {MAIL} adresine e-posta ile iletebilirsiniz. Başvurular en geç 30 gün içinde ücretsiz olarak yanıtlanır.'),
     ]),
-    'teslimat-iade': ('Teslimat / İade', 'Ürünler sipariş üzerine üretilir; teslim, kargo, cayma ve iade kuralları aşağıdadır.', [
+    'teslimat-iade': ('Teslimat / İade', 'Ürünler sipariş üzerine 1–3 iş gününde üretilir, Türkiye geneline kargolanır. Teslim, 14 gün iade, kişiye özel ürün ve hasarlı ürün kuralları.', [
         ('Üretim süresi', 'Ürünler sipariş onayından sonra 1–3 iş günü içinde PLA veya PETG malzemeden üretilir, ardından kargoya verilir. Toplu ve kurumsal siparişlerde süre sipariş öncesinde ayrıca paylaşılır.'),
         ('Kargo', 'Türkiye geneline kargo ile gönderilir; kargoya verilen ürün genellikle 1 hafta içinde teslim edilir. Kargo ücreti teslimat sırasında alıcı tarafından ödenir. Uygun siparişlerde Kuşadası’nda elden teslim seçeneği vardır.'),
         ('Teslim alırken', 'Paketi kargo görevlisinin yanında kontrol edin. Pakette ezilme, yırtılma veya ıslanma varsa görevliye hasar tespit tutanağı tutturun; bu tutanak hasarlı ürün sürecini hızlandırır.'),
@@ -216,7 +216,7 @@ LEGAL_PAGES = {
             'Ürün bize ulaşıp kontrol edildikten sonra ödemeniz en geç 14 gün içinde ödediğiniz yöntemle iade edilir.']),
         ('Kişiye özel ürünler', 'İsim, logo, ölçü veya müşteriye özgü başka bir detayla kişiselleştirilen ürünler, Mesafeli Sözleşmeler Yönetmeliği gereği cayma hakkı ve iade kapsamında değildir. Bu nedenle üretim öncesinde kişiselleştirme bilgilerinin doğru onaylanması önemlidir. Hasarlı veya hatalı ürün hakkınız kişiye özel ürünlerde de geçerlidir.'),
     ]),
-    'kisiye-ozel-urun-kosullari': ('Kişiye Özel Ürün Koşulları', 'İsim, logo, ölçü, renk veya işletmeye özgü tasarımla hazırlanan işlerde onaylanan üretim kapsamı esas alınır.', [
+    'kisiye-ozel-urun-kosullari': ('Kişiye Özel Ürün Koşulları', 'İsim, logo, ölçü veya renkle kişiselleştirilen 3D baskı işlerinde onay, dosya formatı, renk ve ölçü toleransı, revizyon ve iade koşulları.', [
         ('Onay', 'Üretim öncesinde isim, logo, ölçü, renk, adet ve diğer kişiselleştirme detaylarının doğru iletilmesi müşterinin sorumluluğundadır. Gerekli işlerde üretimden önce tasarım görseli onayınıza sunulur; üretim bu onaydan sonra başlar.'),
         ('Logo ve dosyalar', 'Logolar için SVG, PDF veya AI gibi vektör dosyalar en iyi sonucu verir. Yalnızca görsel varsa yüksek çözünürlüklü PNG gönderin. Çok ince çizgiler ve küçük yazılar 3D baskıda okunacak şekilde sadeleştirilebilir.'),
         ('Kullanım hakkı', 'Gönderdiğiniz logo, marka veya görselin kullanım hakkının size ait olduğu ya da kullanım için izin aldığınız kabul edilir.'),

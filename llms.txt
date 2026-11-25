@@ -1,0 +1,24 @@
+# BG Studio 3D
+
+> Kuşadası (Aydın) merkezli 3D baskı stüdyosu. Dekoratif ürün ve aydınlatma, kişiye özel üretim, prototip ve parça üretimi, mimari maket baskısı, kurumsal toplu üretim ve işletmeler için NFC + QR sistemleri. Kurucu: Mimar Berkant Gökbel. Malzemeler: PLA ve PETG. Kuşadası'nda elden teslim, Türkiye geneline kargo.
+
+## Hizmetler
+
+- [Kuşadası 3D baskı](https://3d.bgstudio.com.tr/kusadasi-3d-baski/): Yerel 3D baskı hizmeti ve özel üretim
+- [Kişiye özel üretim](https://3d.bgstudio.com.tr/ozel-uretim/): Fotoğraf, ölçü, eskiz veya mevcut parçadan üretim
+- [Prototip ve parça](https://3d.bgstudio.com.tr/prototip-parca/): Prototip, yedek parça ve teknik 3D baskı üretimi
+- [Mimari maket 3D baskı](https://3d.bgstudio.com.tr/mimari-maket-3d-baski/): Mimar kurucu tarafından maket üretimi
+- [Kurumsal üretim](https://3d.bgstudio.com.tr/kurumsal/): Logolu promosyon, masaüstü ürün ve toplu üretim
+- [NFC + QR işletme sistemleri](https://3d.bgstudio.com.tr/nfc-qr/): Restoran menü standı, Google yorum ve hızlı bağlantı standları
+
+## Ürünler ve işler
+
+- [Ürün kataloğu](https://3d.bgstudio.com.tr/urunler/): Fiyatlı hazır ürünler
+- [Projeler](https://3d.bgstudio.com.tr/projeler/): İşletme projeleri ve prototip örnekleri
+
+## İletişim ve koşullar
+
+- [Teklif al](https://3d.bgstudio.com.tr/teklif/): Teklif formu ve STL/3MF dosya önizleme
+- [İletişim](https://3d.bgstudio.com.tr/iletisim/): WhatsApp +90 530 246 69 03, Instagram @bgstudio.3dtr
+- [Hakkımızda](https://3d.bgstudio.com.tr/hakkimizda/)
+- [Teslimat / İade](https://3d.bgstudio.com.tr/teslimat-iade/): 1–3 iş günü üretim, 14 gün iade, kişiye özel ürün istisnası
