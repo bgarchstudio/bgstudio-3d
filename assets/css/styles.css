@@ -6356,3 +6356,14 @@ html{font-variant-numeric:lining-nums}
 .nfc-link-count button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line,#e4e1dc);background:#fff;color:#14110f;font:inherit;font-weight:700;cursor:pointer}
 .nfc-link-count button[aria-pressed="true"]{background:#14110f;border-color:#14110f;color:#fff}
 @media (max-width:760px){.nfc-link-count button{width:42px;height:42px}}
+
+/* v3.3.103 · NFC paket hesaplayıcı: toplam fiyat büyük ve belirgin, seçenek fiyatları okunur */
+.nfc-config-total{display:grid;gap:4px}
+.nfc-config-total>span{font-size:12px!important;font-weight:800!important;letter-spacing:.06em}
+.nfc-config-total strong,.nfc-config-total [data-package-total]{font-family:"DM Sans",system-ui,sans-serif!important;font-size:clamp(28px,6vw,34px)!important;font-weight:800!important;line-height:1.1!important;letter-spacing:-.01em;color:#14110f!important;font-variant-numeric:lining-nums tabular-nums}
+.nfc-config-total small,.nfc-config-total [data-package-breakdown]{font-size:13px!important;line-height:1.45!important;color:#5f5750!important}
+.nfc-config-options [data-package-option]>b,.nfc-config-options [data-package-option] [data-qr-cost]{font-family:"DM Sans",system-ui,sans-serif!important;font-size:14px!important;font-weight:800!important;color:#8a4e0e!important}
+.nfc-config-options [data-package-option]>span{font-size:14px!important;font-weight:700!important}
+.nfc-config-options [data-package-option]>small{font-size:12.5px!important}
+html body .nfc-package-configurator .nfc-config-total [data-package-total][data-package-total]{font-size:clamp(28px,6vw,34px)!important}
+html body .nfc-package-configurator .nfc-config-total [data-package-breakdown][data-package-breakdown]{font-size:13px!important}
