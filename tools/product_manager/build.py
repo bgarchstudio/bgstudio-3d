@@ -4635,7 +4635,10 @@ def _bg_entity_schema_v3317():
             'opens': '10:00',
             'closes': '19:00',
         }],
-        'founder': {'@type': 'Person', 'name': 'Berkant Gökbel'},
+        'founder': {'@type': 'Person', '@id': 'https://bgstudio.com.tr/#berkant-gokbel', 'name': 'Berkant Gökbel'},
+        # Same owner as the architecture practice; links both entities for Google.
+        'parentOrganization': {'@type': 'Organization', '@id': 'https://bgstudio.com.tr/#organization',
+                               'name': 'BG Studio Architecture', 'url': 'https://bgstudio.com.tr/'},
         'contactPoint': {
             '@type': 'ContactPoint',
             'contactType': 'customer service',
