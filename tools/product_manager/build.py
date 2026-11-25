@@ -1782,6 +1782,11 @@ def build_product_feeds_v3399(products):
         if not p.get('active', True):
             continue
         price = parse_price_number(p.get('price_value'))
+        if not price:
+            # Starting price lives in pricing tiers or in "549 TL’den başlayan" text.
+            tiers = [parse_price_number(t.get('price_value')) for t in (p.get('pricing_tiers') or []) if isinstance(t, dict)]
+            m = re.search(r'[\d.,]+', str(p.get('price_text') or ''))
+            price = next((t for t in tiers if t), None) or (parse_price_number(m.group(0)) if m else None)
         if not price or price <= 0:
             skipped.append(p['slug'])
             continue
