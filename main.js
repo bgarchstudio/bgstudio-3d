@@ -39,7 +39,7 @@
   const canonicalHeader = () => `
     <header class="site-header" id="top" data-bg-nav="${HEADER_VERSION}">
       <div class="shell nav-shell">
-        <a aria-label="BG Studio 3D ana sayfa" class="brand" href="/"><span class="brand-monogram">BG</span><span class="brand-text"><strong>STUDIO</strong><small>3D</small></span></a>
+        <a aria-label="BG Studio 3D ana sayfa" class="brand" href="/"><span class="brand-monogram">BG</span> <span class="brand-text"><strong>STUDIO</strong> <small>3D</small></span></a>
         <button aria-controls="primary-navigation" aria-expanded="false" aria-label="Menüyü aç" class="menu-toggle" type="button"><span></span><span></span></button>
         <nav aria-label="Ana menü" class="main-nav" id="primary-navigation">
           <a${directActive('products')} href="/urunler/">Ürünler</a>

@@ -1,6 +1,6 @@
 # BG Studio 3D · Indexability Manifest
 
-- Asset version: **3.3.100**
+- Asset version: **3.3.101**
 - Physical HTML: **83**
 - Canonical + indexable + sitemap: **80**
 - Noindex: **3**
