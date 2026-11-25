@@ -38,6 +38,8 @@ jobs:
             if [ -e "$f" ]; then cp "$f" _site/; fi
           done
           cp -r assets _site/
+          # Product feeds for Google Merchant Center and Meta/WhatsApp catalog.
+          cp -r feeds _site/
           # main.js reads this at runtime; the other data files are build input.
           cp data/site_settings.json _site/data/
           # Every top-level page folder (has an index.html), except internal ones.
