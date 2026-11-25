@@ -4627,10 +4627,11 @@ def _bg_entity_schema_v3317():
             'https://www.facebook.com/bgstudio.3dtr',
             GOOGLE_REVIEWS_URL_V3328,
         ],
-        # Hours as published on the Google Business Profile (every day 10:00-19:00).
+        # Hours: Monday-Saturday 10:00-19:00, Sunday closed (owner confirmed 2026-11-25;
+        # keep WhatsApp Business and the Google Business Profile in sync with this).
         'openingHoursSpecification': [{
             '@type': 'OpeningHoursSpecification',
-            'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            'dayOfWeek': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             'opens': '10:00',
             'closes': '19:00',
         }],
