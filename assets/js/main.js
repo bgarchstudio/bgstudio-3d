@@ -1016,9 +1016,11 @@ if (backToTop) {
 
   document.querySelectorAll('[data-nfc-package-calculator]').forEach(root => {
     const base = numberOrNull(root.dataset.basePrice);
-    const qrCount = Number(root.dataset.qrCount || 0);
+    let qrCount = Number(root.dataset.qrCount || 0);
     const qrUnit = Number(root.dataset.qrUnit || 0);
     const menuPrice = Number(root.dataset.menuPrice || 0);
+    // v3.3.99 — Hızlı Stand: bağlantı sayısı (2–6) QR adedini belirler
+    const linkButtons = [...root.querySelectorAll('[data-link-count]')];
     const logoPrice = Number(root.dataset.logoPrice || 0);
     const code = root.dataset.packageCode || '';
     const offerBase = root.dataset.offerBase || '../teklif/';
@@ -1029,6 +1031,12 @@ if (backToTop) {
     const selected = new Set();
 
     const update = () => {
+      if (linkButtons.length) {
+        const t = root.querySelector('[data-qr-title]'), c = root.querySelector('[data-qr-cost]'), k = root.querySelector('[data-qr-copy]');
+        if (t) t.textContent = `${qrCount} QR ekle`;
+        if (c) c.textContent = `+${money(qrCount * qrUnit)}`;
+        if (k) k.textContent = `${qrCount} × ${money(qrUnit)} / QR`;
+      }
       const qrCost = selected.has('qr') ? qrCount * qrUnit : 0;
       const menuCost = selected.has('menu') ? menuPrice : 0;
       const logoCost = selected.has('logo') ? logoPrice : 0;
@@ -1038,9 +1046,11 @@ if (backToTop) {
       if (selected.has('qr')) extras.push(`QR +${money(qrCost)}`);
       if (selected.has('menu')) extras.push(`Menü +${money(menuPrice)}`);
       if (selected.has('logo')) extras.push(`Logo +${money(logoPrice)}`);
-      if (breakdownEl) breakdownEl.textContent = extras.length ? `Paket plan bedeli dahil · ${extras.join(' · ')}` : 'Paket plan bedeli dahil · Ek hizmet seçilmedi';
+      const linkNote = linkButtons.length ? `${qrCount} bağlantı · ` : '';
+      if (breakdownEl) breakdownEl.textContent = linkNote + (extras.length ? `Paket plan bedeli dahil · ${extras.join(' · ')}` : 'Paket plan bedeli dahil · Ek hizmet seçilmedi');
       if (offerEl && code) {
         const flags = optionFlags(selected);
+        if (linkButtons.length) flags.push(`baglanti=${qrCount}`);
         offerEl.href = `${offerBase}?tur=nfc&paket=${encodeURIComponent(code)}${flags.length ? '&' + flags.join('&') : ''}`;
       }
     };
@@ -1049,6 +1059,11 @@ if (backToTop) {
       if (!key) return;
       selected.has(key) ? selected.delete(key) : selected.add(key);
       setPressed(button, selected.has(key));
+      update();
+    }));
+    linkButtons.forEach(button => button.addEventListener('click', () => {
+      qrCount = Number(button.dataset.linkCount) || qrCount;
+      linkButtons.forEach(b => setPressed(b, b === button));
       update();
     }));
     update();

@@ -6348,3 +6348,11 @@ html{font-variant-numeric:lining-nums}
 .announcement-marquee-item.is-link{color:var(--ann-fg,#fff)!important;opacity:1}
 .announcement-marquee-item.is-link:hover{color:var(--ann-accent,var(--bronze-light))!important}
 .announcement-marquee-separator{background:var(--ann-accent,var(--bronze-light))!important}
+
+/* v3.3.99 · Hızlı Stand hesaplayıcısında bağlantı sayısı (2–6) */
+.nfc-link-count{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+.nfc-link-count>span{font-size:13px;font-weight:700;color:var(--ink-soft,#5f5750)}
+.nfc-link-count>div{display:flex;gap:6px}
+.nfc-link-count button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line,#e4e1dc);background:#fff;color:#14110f;font:inherit;font-weight:700;cursor:pointer}
+.nfc-link-count button[aria-pressed="true"]{background:#14110f;border-color:#14110f;color:#fff}
+@media (max-width:760px){.nfc-link-count button{width:42px;height:42px}}

@@ -127,7 +127,9 @@ QUICK_FOR = [
 QUICK_QA = [
     ('Hangi telefonlar dokunarak açar?', 'NFC özelliği olan Android telefonlar ve iPhone XS ile sonraki iPhone modelleri. NFC’si kapalı veya olmayan telefonlar için standa QR eklenebilir.'),
     ('Müşterinin bir uygulama indirmesi gerekir mi?', 'Hayır. Bağlantı telefonun kendi tarayıcısında açılır.'),
-    ('Bağlantıları sonradan değiştirebilir miyim?', 'Evet. Standdaki üç hedef panelden güncellenir; fiziksel ürün olduğu gibi kalır.'),
+    ('Bağlantıları sonradan değiştirebilir miyim?', 'Evet. Standdaki hedefler panelden güncellenir; fiziksel ürün olduğu gibi kalır.'),
+    ('Standa kaç bağlantı eklenebilir?', 'Standart stand 3 bağlantılıdır. İhtiyaca göre 1 ile 6 arasında bağlantı kurulur; QR seçilirse her bağlantıya bir QR eklenir.'),
+    ('IBAN / ödeme bilgisi eklenebilir mi?', 'Evet. Bir bağlantı IBAN / ödeme bilgilerine ayarlanırsa müşteri hesaplarınızı görür ve IBAN’ı tek dokunuşla kopyalar. Hesapları kendi panelinizden yönetirsiniz.'),
     ('Hangi bağlantının ne kadar kullanıldığını görebilir miyim?', 'Evet. BG Studio NFC panelinde her bağlantının kaç kez açıldığı görünür.'),
 ]
 
