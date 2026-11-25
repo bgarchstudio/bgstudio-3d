@@ -1731,6 +1731,128 @@ def offer_policies_v3384(p):
     return {'hasMerchantReturnPolicy': policy, 'shippingDetails': shipping}
 
 
+def build_product_feeds_v3399(products):
+    """V3.3.99: product feeds for Google Merchant Center and Meta Commerce (WhatsApp catalog).
+
+    Writes /feeds/google-merchant.xml and /feeds/meta-katalog.csv from the same
+    product data the site uses, plus JPG copies of product images for Meta,
+    which does not reliably accept WebP. Products without a price are skipped
+    (both channels require one)."""
+    import csv, io
+    from xml.sax.saxutils import escape as xesc
+    feed_dir = ROOT / 'feeds'
+    img_dir = ROOT / 'assets' / 'images' / 'feed'
+    feed_dir.mkdir(parents=True, exist_ok=True)
+    img_dir.mkdir(parents=True, exist_ok=True)
+
+    def clean(text):
+        return re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', str(text or ''))).strip()
+
+    def money(n):
+        return '%.2f TRY' % n
+
+    def gallery_paths(p):
+        out = []
+        for item in (p.get('gallery_images') or []):
+            if isinstance(item, dict):
+                item = item.get('path') or item.get('src') or item.get('image') or ''
+            if isinstance(item, str) and item and item != p.get('main_image'):
+                out.append(item)
+        return out
+
+    def jpg_copy(rel):
+        src = ROOT / rel if rel else None
+        if not src or not src.exists():
+            return ''
+        if src.suffix.lower() in ('.jpg', '.jpeg', '.png'):
+            return BASE_URL + '/' + rel
+        # Posters can share a stem with the main image; keep their names apart.
+        prefix = '' if src.parent.name == 'products' else src.parent.name + '-'
+        dest = img_dir / (prefix + src.stem + '.jpg')
+        if PILImage is not None and (not dest.exists() or dest.stat().st_mtime < src.stat().st_mtime):
+            with PILImage.open(src) as im:
+                im = im.convert('RGBA')
+                bg = PILImage.new('RGB', im.size, (255, 255, 255))
+                bg.paste(im, mask=im.split()[3])
+                bg.save(dest, 'JPEG', quality=88, optimize=True, progressive=True)
+        return BASE_URL + '/assets/images/feed/' + dest.name if dest.exists() else ''
+
+    rows, skipped = [], []
+    for p in products:
+        if not p.get('active', True):
+            continue
+        price = parse_price_number(p.get('price_value'))
+        if not price or price <= 0:
+            skipped.append(p['slug'])
+            continue
+        sale = parse_price_number(p.get('sale_price_value'))
+        status = product_production_status(p)
+        availability = {'preorder': 'preorder', 'paused': 'out of stock'}.get(status, 'in stock')
+        parts = [clean(p.get('description') or p.get('card_description'))]
+        feats = [clean(f) for f in (p.get('features') or []) if clean(f)]
+        if feats:
+            parts.append('Özellikler: ' + ', '.join(feats) + '.')
+        opts = [clean(o) for o in (p.get('options') or []) if clean(o)]
+        if opts:
+            parts.append('Seçenekler: ' + ', '.join(opts) + '.')
+        if catalog_personalizable(p):
+            parts.append('Kişiye özel üretilir; isim/metin sipariş sırasında alınır.')
+        parts.append('Kuşadası atölyemizde 3D baskı ile üretilir, 1–3 iş gününde kargoya verilir. Türkiye geneli kargo.')
+        gallery = gallery_paths(p)
+        rows.append({
+            'id': p['slug'],
+            'title': clean(p.get('name'))[:150],
+            'description': ' '.join(x for x in parts if x)[:4900],
+            'link': BASE_URL + '/urunler/' + p['slug'] + '/',
+            'image_link': BASE_URL + '/' + p['main_image'],
+            'image_jpg': jpg_copy(p.get('main_image')),
+            'extra': [BASE_URL + '/' + x for x in gallery][:10],
+            'extra_jpg': [u for u in (jpg_copy(x) for x in gallery) if u][:10],
+            'availability': availability,
+            'price': money(price),
+            'sale_price': money(sale) if sale and 0 < sale < price else '',
+            'product_type': CATEGORY_LABELS.get(p.get('category'), 'Dekoratif & Duvar'),
+            'custom_label_0': 'kisiye-ozel' if catalog_personalizable(p) else 'standart',
+        })
+
+    g = ['<?xml version="1.0" encoding="UTF-8"?>',
+         '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel>',
+         '<title>BG Studio 3D Ürünleri</title>', '<link>' + BASE_URL + '/urunler/</link>',
+         '<description>BG Studio 3D – Kuşadası 3D baskı ürün kataloğu</description>']
+    for r in rows:
+        g.append('<item>')
+        for tag, val in (('g:id', r['id']), ('g:title', r['title']), ('g:description', r['description']),
+                         ('g:link', r['link']), ('g:image_link', r['image_link'])):
+            g.append('<%s>%s</%s>' % (tag, xesc(val), tag))
+        for u in r['extra']:
+            g.append('<g:additional_image_link>%s</g:additional_image_link>' % xesc(u))
+        g.append('<g:availability>%s</g:availability>' % r['availability'])
+        g.append('<g:price>%s</g:price>' % r['price'])
+        if r['sale_price']:
+            g.append('<g:sale_price>%s</g:sale_price>' % r['sale_price'])
+        g.append('<g:brand>BG Studio 3D</g:brand><g:condition>new</g:condition><g:identifier_exists>no</g:identifier_exists>')
+        g.append('<g:product_type>%s</g:product_type>' % xesc(r['product_type']))
+        g.append('<g:custom_label_0>%s</g:custom_label_0>' % r['custom_label_0'])
+        g.append('</item>')
+    g.append('</channel></rss>')
+    (feed_dir / 'google-merchant.xml').write_text('\n'.join(g) + '\n', encoding='utf-8')
+
+    buf = io.StringIO()
+    cols = ['id', 'title', 'description', 'availability', 'condition', 'price', 'sale_price', 'link',
+            'image_link', 'additional_image_link', 'brand', 'product_type', 'custom_label_0']
+    w = csv.DictWriter(buf, fieldnames=cols, lineterminator='\n')
+    w.writeheader()
+    for r in rows:
+        w.writerow({'id': r['id'], 'title': r['title'], 'description': r['description'],
+                    'availability': r['availability'], 'condition': 'new', 'price': r['price'],
+                    'sale_price': r['sale_price'], 'link': r['link'],
+                    'image_link': r['image_jpg'] or r['image_link'],
+                    'additional_image_link': ','.join(r['extra_jpg']), 'brand': 'BG Studio 3D',
+                    'product_type': r['product_type'], 'custom_label_0': r['custom_label_0']})
+    (feed_dir / 'meta-katalog.csv').write_text(buf.getvalue(), encoding='utf-8-sig')
+    return {'items': len(rows), 'skipped_no_price': skipped}
+
+
 def product_schema_availability(p):
     key = product_production_status(p)
     if key == 'preorder':
@@ -5863,6 +5985,7 @@ def build_site(nfc_family_theme_overrides=None):
     audit_fixes = sync_audit_fixes_v3326()
     site_content_state = read_site_content_v3175()
     sitemap_sync = build_canonical_sitemap_v3321()
+    product_feeds = build_product_feeds_v3399(products)
     indexability_sync = build_indexability_manifest_v3322()
     asset_sync = sync_site_asset_versions()
     shell_verify = verify_v3164_public_shell()
@@ -5870,7 +5993,7 @@ def build_site(nfc_family_theme_overrides=None):
     launch_audit = audit_v3312_launch_readiness()
     release_candidate = release_candidate_summary_v3314(launch_audit, shell_verify, seo_audit)
     release_gate = enforce_strict_release_v3314(release_candidate)
-    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'audit_fixes': audit_fixes, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'indexability_sync': indexability_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0)}
+    return {'error_page_sync': error_page_sync, 'navigation_sync': nav_sync, 'footer_sync': footer_sync, 'assistant_sync': assistant_sync, 'seo_a11y_sync': seo_a11y_sync, 'canonical_sync': canonical_sync, 'audit_fixes': audit_fixes, 'css_minify': css_minify, 'site_content': site_content_state, 'sitemap_sync': sitemap_sync, 'indexability_sync': indexability_sync, 'asset_sync': asset_sync, 'shell_verify': shell_verify, 'audit': seo_audit, 'launch_audit': launch_audit, 'release_candidate': release_candidate, 'release_gate': release_gate, 'legal_pages': legal_pages, 'products': len(products), 'active': len(active), 'featured': len(featured), 'nfc_references': len(nfc_items), 'nfc_subpages': nfc_subpages, 'projects': project_build, 'local_seo_sync': local_seo_sync, 'service_seo_sync': service_seo_sync, 'corporate_references': len(corporate_items), 'prototypes': len(prototype_items), 'sitemap_urls': sitemap_sync.get('urls', 0), 'product_feeds': product_feeds}
 
 
 if __name__ == '__main__':
